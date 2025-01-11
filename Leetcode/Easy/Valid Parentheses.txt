@@ -1,0 +1,62 @@
+// Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+// An input string is valid if:
+
+// Open brackets must be closed by the same type of brackets.
+// Open brackets must be closed in the correct order.
+// Every close bracket has a corresponding open bracket of the same type.
+
+class Solution {
+public:
+    bool isValid(string s) {
+        vector<char> stack;
+        bool valid=true;
+        stack.push_back('d');
+
+        int stringLength= s.size();
+
+        for(int i=0; i<stringLength; i++){
+            char c= stack.back();
+            if((s.at(i)=='(') || (s.at(i)=='{') || (s.at(i)=='[')){
+                stack.push_back(s.at(i));
+            }
+            else if( ((s.at(i) == ')') && (c!= '(')) 
+                        || ((s.at(i) == '}') && (c!= '{'))
+                        || ((s.at(i) == ']') && (c!= '[')) ){
+                valid = false;
+                break;
+            }
+            else stack.pop_back();
+
+            // else if(s.at(i) == ')'){
+            //     char c= stack.back();
+            //     if(c != '('){
+            //         valid=false; 
+            //         break;
+            //     }
+            //     stack.pop_back();
+            // }
+            // else if(s.at(i)=='}'){
+            //     char c= stack.back();
+            //     if(c != '{'){
+            //         valid=false; 
+            //         break;
+            //     }
+            //     stack.pop_back();
+            // }
+            // else if(s.at(i)==']'){
+            //     char c= stack.back();
+            //     if(c != '['){
+            //         valid=false; 
+            //         break;
+            //     }
+            //     stack.pop_back();
+            // }            
+        }
+
+        if(stack.back() !='d')
+            valid=false;
+        return valid;
+        
+    }
+};
