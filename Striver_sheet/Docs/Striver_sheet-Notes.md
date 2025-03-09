@@ -29,7 +29,12 @@
 
 8. Shortcuts:
      - Initializing array filled with default values: int hash[13] = {0};
-     - 
+     - To print as Booleans:
+     ```
+          cout << std::boolalpha; 
+          cout << true << endl;
+          cout << std::noboolalpha;
+     ```
      -
      -
      -
