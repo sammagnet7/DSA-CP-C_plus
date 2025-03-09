@@ -34,6 +34,6 @@ This repository I will use to store the hands-on from Striver's sheets.
 
 - 07/03/25: Step2:: Lec2: Sorting 2 [38/455] <span style="color: green;">[2 hours]</span>
 - 08/03/25: Step3:: Lec1: Arrays Easy [42/455] <span style="color: green;">[4 hours]</span>
-- 09/03/25: Step3:: 
+- 09/03/25: Step3:: Lec1: Arrays Easy [44/455] <span style="color: green;">[2.5 hours]</span>
 
 
