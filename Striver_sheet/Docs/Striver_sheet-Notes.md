@@ -61,4 +61,8 @@
      - XOR of two same numbers is always 0 i.e. a ^ a = 0. ←Property 1.
      - XOR of a number with 0 will result in the number itself i.e. 0 ^ a = a.  ←Property 2
 
-14. 
+14. Sub-array vs sub-sequence:
+    - A subarray is a contiguous (consecutive) portion of an array.
+    - A subsequence is a sequence of elements derived from the original array by deleting some elements without changing the order of the remaining elements.
+
+15. 
