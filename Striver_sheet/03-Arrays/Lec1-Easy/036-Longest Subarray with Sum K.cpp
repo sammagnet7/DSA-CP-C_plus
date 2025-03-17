@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <map>
 #include <climits>
 #include <sstream>
 
@@ -15,7 +16,6 @@ https://www.geeksforgeeks.org/problems/longest-sub-array-with-sum-k0809/1?utm_so
 
 Problem Statement:
 Given an array arr[] containing integers and an integer k, your task is to find the length of the longest subarray where the sum of its elements is equal to the given value k. If there is no subarray with sum equal to k, return 0.
-
 
 Examples:
 
@@ -49,18 +49,18 @@ INPUT::::::
 
 OUTPUT::::::
 
-1
-4
-1
-2
-10
 3
+1
+1
+6
+5
+0
 
  */
 class Solution
 {
 public:
-    // Approach: Two pointer approach as elements are zero or positive only.
+    // Approach: Two pointer approach. Applicable only when elements are zero or positive only.
     // Time: O(2N)
     // Space: O(1)
     int longestSubarray_WO_Negetives(vector<int> &arr, int k)
@@ -98,10 +98,46 @@ public:
         return maxL;
     }
 
+    // Approach applicable for all kinds of arrays
+    // In this approach, we are using the concept of the prefix sum to solve this problem. Here, the prefix sum of a subarray ending at index i, simply means the sum of all the elements of that subarray.
+    // we will keep track of the prefix sum of the subarrays generated at every index using a map data structure.
+    // In the map, we will store every prefix sum calculated, with the index(where the subarray with that prefix sum ends)
+    // to maximize the calculated length, we will consider only the first or the leftmost index where the subarray with sum x-k ends.
+    // So, we will check the map before inserting the prefix sum. If it already exists in the map, we will not update it but if it is not present, we will insert it for the first time.
     int longestSubarray_WITH_Negetives(vector<int> &arr, int k)
     {
+        int maxL = 0;
+        map<int, int> prefixSum_index_map;
+        int prefixSum = 0;
 
-        return k;
+        for (int i = 0; i < arr.size(); i++)
+        {
+            prefixSum += arr[i];
+
+            // Maintaining cumulative sum with left most index possible
+            if (prefixSum_index_map.find(prefixSum) == prefixSum_index_map.end())
+            {
+                prefixSum_index_map[prefixSum] = i;
+            }
+
+            // If current prefixSum matches then, this must be the longest subarray till now
+            if (prefixSum == k)
+            {
+                maxL = i + 1;
+                continue;
+            }
+
+            // else
+            int prefixSum_req = prefixSum - k;
+
+            if (prefixSum_index_map.find(prefixSum_req) != prefixSum_index_map.end())
+            {
+                int subArrLen = (i - prefixSum_index_map[prefixSum_req]);
+                maxL = subArrLen > maxL ? subArrLen : maxL;
+            }
+        }
+
+        return maxL;
     }
 };
 
