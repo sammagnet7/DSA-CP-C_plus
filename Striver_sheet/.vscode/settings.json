@@ -5,6 +5,8 @@
         "cmath": "cpp",
         "vector": "cpp",
         "*.tcc": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "unordered_map": "cpp",
+        "sstream": "cpp"
     }
 }
