@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+
 Striver_sheet/output/input.txt
 Striver_sheet/output/output.txt
 Striver_sheet/output/sys.txt
