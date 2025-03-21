@@ -44,4 +44,8 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 16/03/25: Step3:: <span style="color: red;">[0 hour]</span>
 - 17/03/25: Step3:: Lec2: Arrays Medium [54/455] <span style="color: green;">[2 hours]</span>
 - 18/03/25: Step3:: Lec2: Arrays Medium [56/455] <span style="color: green;">[2 hours]</span>
+- 19/03/25: Step3:: <span style="color: red;">[0 hour]</span>
+- 20/03/25: Step3:: <span style="color: red;">[0 hour]</span>
+- 21/03/25: Step3:: Lec2: Arrays Medium [59/455] <span style="color: green;">[2 hours]</span>
 - 
+

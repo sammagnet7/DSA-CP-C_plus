@@ -63,7 +63,7 @@ If you have figured out the O(n) solution, try coding another solution using the
 class Solution
 {
 public:
-    // Kadane's algorithm
+    // Kadane's algorithm: Needed to store the subarray indices
     // Approach: The intuition of the algorithm is not to consider the subarray as a part of the answer if its sum is less than 0. A subarray with a sum less than 0 will always reduce our answer and so this type of subarray cannot be a part of the subarray with maximum sum.
     // Time: O(N)
     // Space: O(1)
