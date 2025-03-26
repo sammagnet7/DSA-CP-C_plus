@@ -39,15 +39,17 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 11/03/25: Step3:: Lec1: Arrays Easy [50/455] <span style="color: green;">[2 hours]</span>
 - 12/03/25: Step3:: Lec1: Arrays Easy [51/455] <span style="color: green;">[2.5 hours]</span>
 - 13/03/25: Step3:: Arrays Easy [52/455] <span style="color: orange;">[1.5 hours]</span> 
-- 14/03/25: Step3:: <span style="color: red;">[0 hour]</span>
-- 15/03/25: Step3:: <span style="color: red;">[0 hour]</span>
-- 16/03/25: Step3:: <span style="color: red;">[0 hour]</span>
+- 14/03/25: <span style="color: red;">[0 hour]</span>
+- 15/03/25: <span style="color: red;">[0 hour]</span>
+- 16/03/25: <span style="color: red;">[0 hour]</span>
 - 17/03/25: Step3:: Lec2: Arrays Medium [54/455] <span style="color: green;">[2 hours]</span>
 - 18/03/25: Step3:: Lec2: Arrays Medium [56/455] <span style="color: green;">[2 hours]</span>
-- 19/03/25: Step3:: <span style="color: red;">[0 hour]</span>
-- 20/03/25: Step3:: <span style="color: red;">[0 hour]</span>
+- 19/03/25: <span style="color: red;">[0 hour]</span>
+- 20/03/25: <span style="color: red;">[0 hour]</span>
 - 21/03/25: Step3:: Lec2: Arrays Medium [59/455] <span style="color: green;">[2 hours]</span>
-- 22/03/25: Step3:: <span style="color: red;">[0 hour]</span>
-- 23/03/25: Step3:: <span style="color: red;">[0 hour]</span>
+- 22/03/25: <span style="color: red;">[0 hour]</span>
+- 23/03/25: <span style="color: red;">[0 hour]</span>
 - 24/03/25: Step3:: Lec2: Arrays Medium [62/455] <span style="color: green;">[3 hours]</span>
-
+- 25/03/25: <span style="color: red;">[0 hour]</span>
+- 26/03/25: Step3:: Lec2: Arrays Medium [64/455] <span style="color: green;">[3 hours]</span>
+- 
