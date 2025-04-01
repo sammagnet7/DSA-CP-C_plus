@@ -106,7 +106,7 @@ public:
     // So, we will check the map before inserting the prefix sum. If it already exists in the map, we will not update it but if it is not present, we will insert it for the first time.
     // Time: O(N) or O(N*logN)
     // Space:O(N)
-    // Reason: If we are using an unordered_map data structure in C++ the time complexity will be O(N)(though in the worst case, unordered_map takes O(N) to find an element and the time complexity becomes O(N2))
+    // Reason: If we are using an unordered_map data structure in C++ the time complexity will be O(N)(though in the worst case, unordered_map takes O(N) to find an element and the time complexity becomes O(N^2))
     // but if we are using a map data structure, the time complexity will be O(N*logN).
     int longestSubarray_WITH_Negetives(vector<int> &arr, int k)
     {
