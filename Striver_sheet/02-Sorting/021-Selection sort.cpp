@@ -1,12 +1,13 @@
 #include <iostream>
-#include<vector>
-#include<climits>
-#include<sstream>
+#include <vector>
+#include <climits>
+#include <sstream>
 
 using namespace std;
 
 /*
 https://takeuforward.org/sorting/selection-sort-algorithm/
+https://www.geeksforgeeks.org/problems/selection-sort/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=selection-sort
 
 Problem statement:
 Given an array arr, use selection sort to sort arr[] in increasing order.
@@ -56,11 +57,12 @@ int main()
 {
 
     int t;
-    cin>>t;
+    cin >> t;
     cin.ignore();
-    cout<<endl;
+    cout << endl;
 
-    while(t--){
+    while (t--)
+    {
         string input;
 
         getline(cin, input);
@@ -69,16 +71,18 @@ int main()
         vector<int> arr;
         int num;
 
-        while(ss>>num){
+        while (ss >> num)
+        {
             arr.push_back(num);
         }
 
         Solution ob;
         ob.selectionSort(arr);
 
-        for(auto i: arr){
-            cout<<i<<" ";
+        for (auto i : arr)
+        {
+            cout << i << " ";
         }
-        cout<<endl;
+        cout << endl;
     }
 }
