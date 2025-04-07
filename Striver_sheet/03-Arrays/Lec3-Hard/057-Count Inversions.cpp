@@ -72,6 +72,24 @@ public:
     }
 
 private:
+    // O(N Log N)
+    int mergeSort(vector<int> &arr, int start, int end)
+    {
+        if (start >= end)
+            return 0;
+        int inversionCount = 0;
+
+        int mid = start - (start - end) / 2;
+
+        inversionCount += mergeSort(arr, start, mid);
+        inversionCount += mergeSort(arr, mid + 1, end);
+
+        // inversionCount += countInversions(arr, start, end, mid);
+        inversionCount += mergeAndCountInversions(arr, start, end, mid);
+
+        return inversionCount;
+    }
+
     // O(N)
     int mergeAndCountInversions(vector<int> &arr, int start, int end, int mid)
     {
@@ -126,21 +144,28 @@ private:
         return inversionCount;
     }
 
-    // O(N Log N)
-    int mergeSort(vector<int> &arr, int start, int end)
-    {
-        if (start >= end)
-            return 0;
-        int inversionCount = 0;
+    // REVERSE PAIRs
+    // This method will be used to 'Count Reverse Pairs': https://takeuforward.org/data-structure/count-reverse-pairs/
+    // Reverse Pairs are those pairs where i<j and arr[i]>2*arr[j]
+    // So inside merge algo we can not count Reverse pair. Because if temp1[l]>temp2[r] => we can not simply inversionCount++ => we do r++ => but there can be possible elements in temp1 where temp1[l++]>2*temp2[r], which we missed in merge algo
+    // So we need this explicit method to return `inversionCount` and merge algo will return void
+    // Time: O(N)
+    // Space: O(1)
+    int countInversions(vector<int> &arr, int start, int end, int mid){
+        int inversions=0;
+        int l=start, r=mid+1;
 
-        int mid = start - (start - end) / 2;
+        while(l<=mid && r<=end){
+            if((long long)arr[l] > (2*(long long)arr[r]) ){
+                inversions += (mid-l+1);
+                r++;
+            }
+            else {
+                l++;
+            }
+        }
 
-        inversionCount += mergeSort(arr, start, mid);
-        inversionCount += mergeSort(arr, mid + 1, end);
-
-        inversionCount += mergeAndCountInversions(arr, start, end, mid);
-
-        return inversionCount;
+        return inversions;
     }
 };
 
