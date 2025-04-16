@@ -69,3 +69,11 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 06/04/25: Step3:: Lec3: Arrays Hard [76/455] <span style="color: green;">[2 hours]</span>
 - 07/04/25: Step3:: Lec3: Arrays Complete [78/455] <span style="color: green;">[2 hours]</span>
 - 08/04/25: Step3:: Lec3: Binary Search easy [81/455] <span style="color: green;">[3 hours]</span>
+- 09/04/25: <span style="color: red;">[0 hour]</span>
+- 10/04/25: <span style="color: red;">[0 hour]</span>
+- 11/04/25: <span style="color: red;">[0 hour]</span>
+- 12/04/25: <span style="color: red;">[0 hour]</span>
+- 13/04/25: <span style="color: red;">[0 hour]</span>
+- 14/04/25: <span style="color: red;">[0 hour]</span>
+- 15/04/25: <span style="color: red;">[0 hour]</span>
+- 16/04/25: Step3:: Lec3: Binary Search easy [85/455] <span style="color: orange;">[1 hours]</span> 

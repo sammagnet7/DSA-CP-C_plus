@@ -12,9 +12,10 @@ using namespace std;
 Find Floor and ceil of target element from sorted array
 
 https://www.geeksforgeeks.org/problems/floor-in-a-sorted-array-1587115620/1?track=DSASP-Searching&amp%253BbatchId=154&utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=floor-in-a-sorted-array
+https://www.naukri.com/code360/problems/ceiling-in-a-sorted-array_1825401?leftPanelTab=0
 
 Problem statement:
-Given a sorted array of N integers and an integer x, write a program to find the Floor and Ceil of x.
+Given a sorted array of N integers and an integer target, write a program to find the Floor and Ceil of target.
 
 Note:
 
@@ -32,17 +33,17 @@ Ceil of`target` doesn’t exist if `target` is smaller than smallest element of 
 Examples:
 
 Example 1:
-Input: arr[] = [1, 2, 8, 10, 10, 12, 19], x = 5
+Input: arr[] = [1, 2, 8, 10, 10, 12, 19], target = 5
 Output: 1
 Explanation: Largest number less than or equal to 5 is 2, whose index is 1.
 
 Example 2:
-Input: arr[] = [1, 2, 8, 10, 10, 12, 19], x = 11
+Input: arr[] = [1, 2, 8, 10, 10, 12, 19], target = 11
 Output: 4
 Explanation: Largest Number less than or equal to 11 is 10, whose indices are 3 and 4. The index of last occurrence is 4.
 
 Example 3:
-Input: arr[] = [1, 2, 8, 10, 10, 12, 19], x = 0
+Input: arr[] = [1, 2, 8, 10, 10, 12, 19], target = 0
 Output: -1
 Explanation: No element less than or equal to 0 is found. So, output is -1.
 
@@ -110,12 +111,12 @@ public:
 
             if (arr[mid] == target)
             {
-                ans = mid;
+                ans = mid;  // Possible arr[i]=target
                 l = mid + 1;
             }
             else if (arr[mid] < target)
             {
-                ans = mid;
+                ans = mid;  // Possible arr[i]<target
                 l = mid + 1;
             }
             else if (target < arr[mid])

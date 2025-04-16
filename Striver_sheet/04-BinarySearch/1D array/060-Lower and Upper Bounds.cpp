@@ -18,36 +18,36 @@ https://takeuforward.org/arrays/implement-upper-bound/
 https://www.naukri.com/code360/problems/implement-upper-bound_8165383?utm_source=youtube&utm_medium=affiliate&utm_campaign=codestudio_Striver_BinarySeries&leftPanelTabValue=PROBLEM
 
 Problem statement:
-Given a sorted array of N integers and an integer x, write a program to find the lower bound and upper bound of x.
+Given a sorted array of N integers and an integer target, write a program to find the lower bound and upper bound of target.
 
 Note:
 What is Lower Bound?
-The lower bound is the smallest index, ind, where arr[ind] >= x. But if any such index is not found, the lower bound algorithm returns n i.e. size of the given array.
+The lower bound is the smallest index, ind, where arr[ind] >= target. But if any such index is not found, the lower bound algorithm returns n i.e. size of the given array.
 
 What is Upper Bound?
-The upper bound is the smallest index, ind, where arr[ind] > x.
+The upper bound is the smallest index, ind, where arr[ind] > target.
 But if any such index is not found, the upper bound algorithm returns n i.e. size of the given array.
 
-The main difference between the lower and upper bound is in the condition. For the lower bound the condition was arr[ind] >= x and here, in the case of the upper bound, it is arr[ind] > x.
+The main difference between the lower and upper bound is in the condition. For the lower bound the condition was arr[ind] >= target and here, in the case of the upper bound, it is arr[ind] > target.
 
 
 Examples:
 
 Example 1:
-Input Format: N = 4, arr[] = {1,2,2,3}, x = 2
+Input Format: N = 4, arr[] = {1,2,2,3}, target = 2
 Result:
     Lower bound 1
-        Explanation: Index 1 is the smallest index such that arr[1] >= x.
+        Explanation: Index 1 is the smallest index such that arr[1] >= target.
     Upper bound 3
-        Explanation: Index 3 is the smallest index such that arr[3] > x.
+        Explanation: Index 3 is the smallest index such that arr[3] > target.
 
 Example 2:
-Input Format: N = 5, arr[] = {3,5,8,15,19}, x = 9
+Input Format: N = 5, arr[] = {3,5,8,15,19}, target = 9
 Result:
     Lower bound 3
-        Explanation: Index 3 is the smallest index such that arr[3] >= x.
+        Explanation: Index 3 is the smallest index such that arr[3] >= target.
     Upper bound 4
-        Explanation: Index 4 is the smallest index such that arr[4] > x.
+        Explanation: Index 4 is the smallest index such that arr[4] > target.
 
 
 INPUT::::::
