@@ -11,7 +11,6 @@ using namespace std;
 /*
 Find Minimum in Rotated Sorted Array
 
-w/o duplicates:
 https://takeuforward.org/data-structure/minimum-in-rotated-sorted-array/
 https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/
 

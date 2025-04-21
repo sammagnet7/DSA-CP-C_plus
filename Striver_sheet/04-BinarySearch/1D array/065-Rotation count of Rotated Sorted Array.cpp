@@ -11,7 +11,6 @@ using namespace std;
 /*
 Find out how many times the array has been rotated
 
-w/o duplicates:
 https://takeuforward.org/arrays/find-out-how-many-times-the-array-has-been-rotated/
 https://www.naukri.com/code360/problems/rotation_7449070?leftPanelTabValue=PROBLEM
 
