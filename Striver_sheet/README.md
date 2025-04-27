@@ -68,7 +68,7 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 05/04/25: Step3:: Lec3: Arrays Hard [75/455] <span style="color: green;">[2 hours]</span>
 - 06/04/25: Step3:: Lec3: Arrays Hard [76/455] <span style="color: green;">[2 hours]</span>
 - 07/04/25: Step3:: Lec3: Arrays Complete [78/455] <span style="color: green;">[2 hours]</span>
-- 08/04/25: Step3:: Lec3: Binary Search on 1D arr [81/455] <span style="color: green;">[3 hours]</span>
+- 08/04/25: Step4:: Lec1: Binary Search on 1D arr [81/455] <span style="color: green;">[3 hours]</span>
 - 09/04/25: <span style="color: red;">[0 hour]</span>
 - 10/04/25: <span style="color: red;">[0 hour]</span>
 - 11/04/25: <span style="color: red;">[0 hour]</span>
@@ -76,9 +76,15 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 13/04/25: <span style="color: red;">[0 hour]</span>
 - 14/04/25: <span style="color: red;">[0 hour]</span>
 - 15/04/25: <span style="color: red;">[0 hour]</span>
-- 16/04/25: Step3:: Lec3: Binary Search on 1D arr [85/455] <span style="color: orange;">[1 hours]</span>
+- 16/04/25: Step4:: Lec1: Binary Search on 1D arr [85/455] <span style="color: orange;">[1 hours]</span>
 - 17/04/25: <span style="color: red;">[0 hour]</span>
 - 18/04/25: <span style="color: red;">[0 hour]</span>
 - 19/04/25: <span style="color: red;">[0 hour]</span>
-- 20/04/25: Step3:: Lec3: Binary Search on 1D arr [89/455] <span style="color: green;">[4 hours]</span>
-- 21/04/25: Step3:: Lec3: Binary Search on 1D arr complete [91/455] <span style="color: green;">[2 hours]</span>
+- 20/04/25: Step4:: Lec1: Binary Search on 1D arr [89/455] <span style="color: green;">[4 hours]</span>
+- 21/04/25: Step4:: Lec1: Binary Search on 1D arr complete [91/455] <span style="color: green;">[2 hours]</span>
+- 22/04/25: <span style="color: red;">[0 hour]</span>
+  23/04/25: <span style="color: red;">[0 hour]</span>
+- 24/04/25: <span style="color: red;">[0 hour]</span>
+- 25/04/25: <span style="color: red;">[0 hour]</span>
+- 26/04/25: <span style="color: red;">[0 hour]</span>
+- 27/04/25: Step4:: Lec2: Binary Search on Answers [93/455] <span style="color: green;">[2 hours]</span>
