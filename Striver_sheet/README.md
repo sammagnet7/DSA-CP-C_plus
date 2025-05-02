@@ -88,3 +88,11 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 25/04/25: <span style="color: red;">[0 hour]</span>
 - 26/04/25: <span style="color: red;">[0 hour]</span>
 - 27/04/25: Step4:: Lec2: Binary Search on Answers [93/455] <span style="color: green;">[2 hours]</span>
+- 28/04/25: <span style="color: red;">[0 hour]</span>
+- 29/04/25: <span style="color: red;">[0 hour]</span>
+- 30/04/25: <span style="color: red;">[0 hour]</span>
+
+---
+
+- 01/05/25: <span style="color: red;">[0 hour]</span
+- 02/05/25: Step4:: Lec2: Binary Search on Answers [95/455] <span style="color: green;">[2 hours]</span>  

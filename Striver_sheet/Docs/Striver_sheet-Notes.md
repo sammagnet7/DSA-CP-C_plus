@@ -35,7 +35,7 @@
           cout << true << endl;
           cout << std::noboolalpha;
      ```
-     - 
+     - To find max element in an array: {    int maxE= *max_element(arr.begin(),arr.end());   }
      -
      -
      -
@@ -65,4 +65,6 @@
     - A subarray is a contiguous (consecutive) portion of an array.
     - A subsequence is a sequence of elements derived from the original array by deleting some elements without changing the order of the remaining elements.
 
-15. 
+15. When input array is given as sorted, then try to use Binary search.
+16. When we have to find the minimum number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something.
+17. 
