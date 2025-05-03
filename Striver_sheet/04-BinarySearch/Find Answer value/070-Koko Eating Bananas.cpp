@@ -20,10 +20,23 @@ A monkey is given ‘n’ piles of bananas, whereas the 'ith' pile has ‘a[i]�
 Each hour, the monkey chooses a non-empty pile of bananas and eats ‘k’ bananas. If the pile contains less than ‘k’ bananas, then the monkey consumes all the bananas and won’t eat any more bananas in that hour.
 Find the minimum number of bananas ‘k’ to eat per hour so that the monkey can eat all the bananas within ‘h’ hours.
 
+Similar kind of problems:
 [   
-    Similar kind of problem: Minimum days to make M bouquets
+    Problem statement: Minimum days to make M bouquets
     https://takeuforward.org/arrays/minimum-days-to-make-m-bouquets/
     https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/description/
+]
+
+[   
+    Problem statement: Find the Smallest Divisor Given a Threshold
+    https://takeuforward.org/arrays/find-the-smallest-divisor-given-a-threshold/
+    https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/description/
+]
+
+[
+    problem: Capacity to Ship Packages within D Days
+    https://takeuforward.org/arrays/capacity-to-ship-packages-within-d-days/    (*)
+    https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/submissions/1624525643/
 ]
 
 Examples:
