@@ -66,5 +66,5 @@
     - A subsequence is a sequence of elements derived from the original array by deleting some elements without changing the order of the remaining elements.
 
 15. When input array is given as sorted, then try to use Binary search.
-16. When we have to find the minimum number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something.
+16. When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
 17. 
