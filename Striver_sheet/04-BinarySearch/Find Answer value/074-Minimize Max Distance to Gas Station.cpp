@@ -2,6 +2,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include <queue>
 #include <climits>
 #include <sstream>
 #include <numeric>
@@ -14,7 +15,7 @@ using namespace std;
 Minimise Maximum Distance between Gas Stations
 
 https://takeuforward.org/arrays/minimise-maximum-distance-between-gas-stations/
-https://www.naukri.com/code360/problems/minimise-max-distance_7541449
+https://www.naukri.com/code360/problems/minimise-max-distance_7541449?leftPanelTabValue=PROBLEM
 
 
 Problem statement:
@@ -29,29 +30,169 @@ Examples:
 Example 1:
 Input Format: N = 5, arr[] = {1,2,3,4,5}, k = 4
 Result: 0.5
-Explanation: One of the possible ways to place 4 gas stations is {1,1.5,2,2.5,3,3.5,4,4.5,5}. Thus the maximum difference between adjacent gas stations is 0.5. Hence, the value of ‘dist’ is 0.5. It can be shown that there is no possible way to add 4 gas stations in such a way that the value of ‘dist’ is lower than this. 
+Explanation: One of the possible ways to place 4 gas stations is {1,1.5,2,2.5,3,3.5,4,4.5,5}. Thus the maximum difference between adjacent gas stations is 0.5. Hence, the value of ‘dist’ is 0.5. It can be shown that there is no possible way to add 4 gas stations in such a way that the value of ‘dist’ is lower than this.
 Example 2:
 Input Format: N = 10, arr[] = {1,2,3,4,5,6,7,8,9,10}, k = 1
 Result: 1
-Explanation: One of the possible ways to place 1 gas station is {1,1.5,2,3,4,5,6,7,8,9,10}. Thus the maximum difference between adjacent gas stations is still 1. Hence, the value of ‘dist’ is 1. It can be shown that there is no possible way to add 1 gas station in such a way that the value of ‘dist’ is lower than this. 
+Explanation: One of the possible ways to place 1 gas station is {1,1.5,2,3,4,5,6,7,8,9,10}. Thus the maximum difference between adjacent gas stations is still 1. Hence, the value of ‘dist’ is 1. It can be shown that there is no possible way to add 1 gas station in such a way that the value of ‘dist’ is lower than this.
 
 
 
 INPUT::::::
- 7 9 9 9 10 3 2 2 8 6 5 9 8 3 7 9 1 4 8 10 5 10 8 2 1 10 4 10 2 4 7 10 2 2 9 9 5 2 3 1 7 10 3 9 8 10 2 7 5 10 3 9 8 4 5 7 5 5 6 2 7 5 5 1 4 1 1 7 6 6 8 2 2 1 1 2 8 10 8 3 10 9 6 7 8 3 3 1 6 2 6 7 10 2 6 6 2 2 3 7 6 8 3 10 1 6 3 4 5 4 4 2 6 2 1 9 4 1 9 1 7 4 9 6 3 8 1 7 6 5 9 1 7 5 10 2 1 6 8 2 10 9 10 1 8 6 4 8 2 1 6 6 5 7 3 8 3 8 3 5 2 5 9 7 6 7 6 4 6 7 8 8 9 8 7 2 9 2 6 4 1 4 2 1 9 1 4 9 9 3 10 4 8 2 5 10 5 10 2 1 2 5 1 8 3 5 10 2 1 1 3 1 5 4 9 1 5 6 4 6 6 8 1 5 6 7 6 2 9 8 6 6 9 7 3 4 6 8 2 4 4 1 4 6 1 3 5 10 5 3 2 1 1 7 8 1 3 5 10 9 10 6 3 2 4 7 9 8 3 8 1 9 10 10 7 1 8 6 4 5 5 7 2 2 10 9 10 2 4 9 10 2 2 2 3 8 6 10 8 4 1 4 9 6 9 6 1 3 5 7 3 5 9 8 9 3 3 5 8 5 10 8 3 7 9 5 2 8 5 10 10 1 10 1 2 4 7 3 6 10 5 9 8 7 3 8 4 6 9 7 8 4 1 4 6 5 9 6 5 3 7 5 1 10 9 4 9 8 6 4 6 7 3 5 7 2 1 7 8 7 10 10 9 7 3 9 8 9 1 10 2 4 10 8 7 4 5 3 3 5 10 2 4 4 8 9 2 6 10 3 7 10 9 3 5 1 5 10 10 10 10 3 2 8 9 8 10 1 9 9 9 5 7 6 5 2 7 10 10 4 6 6 2 7 9 2 4 2 4 6 10 10 7 4 1 3 3 1 3 3 3 4 3 1 1 4 7 8 7 2 10 4 4 4 4 2 3 8 10 7 7 4 7 7 9 2 1 5 9 9 7 9 10 10 7 1 8 7 3 3 4 2 3 4 7 10 2 7 9 3 3 4 10 5 9 9 2 7 6 8 5 9 6 1 7 1 10 7 2 1 3 7 7 8 2 8 9 7 2 8 1 4 3 9 10 7 6 1 2 3 8 6 6 3 10 2 1 10 10 2 10 3 9 7 3 9 7 10 7 5 1 10 10 2 8 3 9 6 8 1 4 7 1 4 2 3 9 8 10 9 10 4 9 1 4 8 10 4 8 4 4 10 2 5 2 8 1 1 8 6 3 2 7 2 8 5 10 9 7 6 3 7 6 10 1 1 7 6 4 1 3 6 3 5 6 10 6 1 6 2 7 7 8 10 5 8 3 9 6 8 7 6 6 3 3 1 6 8 9 8 2 7 3 2 3 3 6 5 9 4 8 2 10 4 8 1 8 7 5 4 10 1 3 1 7 7 9 5 9 5 9 7 3 2 2 5 7 6 7 6 6 5 3 5 6 9 3 10 8 2 4 1 2 1 8 2 2 2 4 4 5 5 2 2 8 8 3 10 10 1 10 4 2 5 3 9 10 4 2 3 9 4 9 9 6 1 7 10 7 7 10 2 9 3 3 9 6 8 6 3 7 7 7 1 5 2 5 3 9 8 1 8 2 6 8 7 6 1 1 4 3 8 6 2 1 5 10 8 10 7 2 7 2 9 9 3 10 3 5 7 1 6 9 10 10 10 9 5 9 3 10 9 6 7 6 4 2 6 2 9 2 8 4 6 10 6 9 3 7 8 3 3 3 7
-
+5
+4
+1 2 3 4 5
+1
+1 2 3 4 5 6 7 8 9 10
+1
+1 4 6 10 11
+1
+1 2 3 4 5 6 7 8 9 10
+1
+2 4 6 8 10 
 
 OUTPUT::::::
-
+0.5
+1
+3
+1
+2
 
  */
 class Solution
 {
 public:
+    // // Brute force: Array traversal
+    // // Time: O(N*K) + O(k)
+    // // Space: O(N)
+    // double minimiseMaxDistance(vector<int> &arr, int k)
+    // {
+    //     int N = arr.size();
 
-    int minimiseMaxDistance(vector<int> &arr, int target)
+    //     vector<int> addedCount(N - 1, 0);
+
+    //     for (int x = 0; x < k; x++)
+    //     { // Number of new gas stations i.e. k times
+
+    //         double maxDist = INT_MIN;
+    //         int maxDistIdx = -1;
+
+    //         for (int i = 0; i < N - 1; i++)
+    //         { // existing N gas stations
+    //             int sectionalDist = arr[i + 1] - arr[i];
+    //             double minSectionalDist = (double)sectionalDist / (addedCount[i] + 1);
+
+    //             if (minSectionalDist > maxDist)
+    //             {
+    //                 maxDist = minSectionalDist;
+    //                 maxDistIdx = i;
+    //             }
+    //         }
+
+    //         addedCount[maxDistIdx]++;
+    //     }
+
+    //     double ans = INT_MIN;
+    //     for (int i = 0; i < N - 1; i++)
+    //     {
+    //         int sectionalDist = arr[i + 1] - arr[i];
+    //         double minSectionalDist = (double)sectionalDist / (addedCount[i] + 1);
+
+    //         ans = max(ans, minSectionalDist);
+    //     }
+
+    //     return ans;
+    // }
+
+    // // Better approach: Using Priority queue as Max heap
+    // // Time: O(N Log N) + O(K Log N)
+    // // Space: O(2N)
+    // double minimiseMaxDistance(vector<int> &arr, int k)
+    // {
+    //     int N = arr.size();
+
+    //     vector<int> addedPostCount(N - 1, 0);
+    //     priority_queue<pair<double, int>> maxSecDistIdx; // Section wise max distance and index pair
+
+    //     // Creating max heap
+    //     for (int i = 0; i < N - 1; i++)
+    //     {                                                   // O(N)
+    //         maxSecDistIdx.push({(arr[i + 1] - arr[i]), i}); // O(Log N)
+    //     }
+
+    //     for (int p = 0; p < k; p++)
+    //     { // Number of new gas stations i.e. k times
+
+    //         auto distIdxPair = maxSecDistIdx.top(); // Get cuurent max dist in O(1)
+    //         maxSecDistIdx.pop();
+
+    //         int idx = distIdxPair.second;
+
+    //         addedPostCount[idx]++;
+
+    //         double currDist = (double)(arr[idx + 1] - arr[idx]) / (addedPostCount[idx] + 1);
+
+    //         maxSecDistIdx.push({currDist, idx}); // O(Log N)
+    //     }
+
+    //     return maxSecDistIdx.top().first;
+    // }
+
+
+    // Optimal approach: Using Binary search
+    // Go to the half side with minimum distance possible with available number of gas stations
+    // Note: As dist is measured in 10^-6 range
+    // do r=mid and l=mid instead of r-mid-1 and l=mid+1
+    // Also check condition (l-r<1e-6)
+    // Time: O(Log N)
+    // Space: O(1)
+    double minimiseMaxDistance(vector<int> &arr, int k)
     {
-        
+
+        int N = arr.size();
+
+        //double ans = 1; // Test cases are failing while maintaining ans var
+
+        double maxDist = INT_MIN;
+
+        // O(N)
+        for (int i = 0; i < N - 1; i++)
+        {
+            maxDist = max(maxDist, (double)(arr[i + 1] - arr[i]));
+        }
+
+        double l = 0.0;
+        double r = maxDist;
+
+        double diff = 1e-6 ;
+
+        // O(Log N)
+        while (r - l > diff)
+        { // within 10^-6
+
+            double mid = (l + r) / 2.0;
+            int availableStations = k;
+
+            // O(N)
+            for (int i = 0; i < N - 1; i++)
+            {
+                double sectionDist = arr[i + 1] - arr[i];
+
+                int stationsNeeded = ceil(sectionDist / mid) - 1;
+                availableStations -= stationsNeeded;
+            }
+
+            if (availableStations >= 0)
+            { // i.e. less required than avaialbe
+                //ans = mid;
+                r = mid;
+            }
+            else // i.e. more required than avaialbe
+                l = mid;
+                
+        }
+
+        return r; // Must return r instead of answer to pass test cases 2 and 5 here
     }
 };
 

@@ -30,25 +30,59 @@
 8. Shortcuts:
      - Initializing array filled with default values: int hash[13] = {0};
      - To print as Booleans:
-     ```
+     ```c
           cout << std::boolalpha; 
           cout << true << endl;
           cout << std::noboolalpha;
      ```
      - To find max element in an array: {    int maxE= *max_element(arr.begin(),arr.end());   }
-     -
-     -
-     -
+     - To create heap from array in O(N):
+     ```c++
+          #include <algorithm>
+          std::make_heap(arr.begin(), arr.end());
+     ```
+     - c++ priority_queue by default is max heap:
+     ```c++
+          #include <queue>
+          std::priority_queue<int> pq;
+          // Add elements to the priority queue
+          pq.push(30);
+          pq.push(100);
 
+          // Remove elements from the priority queue
+          while (!pq.empty()) {
+               std::cout << "Popping: " << pq.top() << std::endl;
+               pq.pop();
+          }
+     ```
+     -  To use it as min_heap:
+     ```c++
+          #include <queue>
+          std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
+          minHeap.push(30);
+          minHeap.push(10);
+          minHeap.push(50);
+          minHeap.push(20);
+
+          while (!minHeap.empty()) {
+               std::cout << minHeap.top() << " ";
+               minHeap.pop();
+          }
+     ```
+     - To write 10^-6:
+     ```c
+          double diff = 1e-6;
+     ```
+     - 
 
 9. 
 ![Max array size we can initialize with](./img/max_array_size.png)
 
-10. If the string contains both uppercase and lowercase letters: We have 256 characters in total in this case. So, we will create a hash array of size **256**. Otherwise we can use hash[s[i]-’a’] OR hash[s[i]-’A’] and keep the hash array of 26 elements only.
+1.  If the string contains both uppercase and lowercase letters: We have 256 characters in total in this case. So, we will create a hash array of size **256**. Otherwise we can use hash[s[i]-’a’] OR hash[s[i]-’A’] and keep the hash array of 26 elements only.
 
-11. In the map data structure, the data type of key can be anything like int, double, pair<int, int>, etc. But for unordered_map the data type is limited to integer, double, string, etc. We cannot have an unordered_map whose key is pair<int, int>. 
+2.  In the map data structure, the data type of key can be anything like int, double, pair<int, int>, etc. But for unordered_map the data type is limited to integer, double, string, etc. We cannot have an unordered_map whose key is pair<int, int>. 
 
-12. How to traverse map from end to start?
+3.  How to traverse map from end to start?
      Ans: 
 
      ```c++
@@ -57,14 +91,14 @@
           }
      ```
 
-13. XOR properties:
+4.  XOR properties:
      - XOR of two same numbers is always 0 i.e. a ^ a = 0. ←Property 1.
      - XOR of a number with 0 will result in the number itself i.e. 0 ^ a = a.  ←Property 2
 
-14. Sub-array vs sub-sequence:
+5.  Sub-array vs sub-sequence:
     - A subarray is a contiguous (consecutive) portion of an array.
     - A subsequence is a sequence of elements derived from the original array by deleting some elements without changing the order of the remaining elements.
 
-15. When input array is given as sorted, then try to use Binary search.
-16. When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
-17. 
+6.  When input array is given as sorted, then try to use Binary search.
+7.  When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
+8.  
