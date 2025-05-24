@@ -151,7 +151,7 @@ public:
 
         int N = arr.size();
 
-        //double ans = 1; // Test cases are failing while maintaining ans var
+        double ans = -1; // Test cases are failing while maintaining ans var
 
         double maxDist = INT_MIN;
 
@@ -184,7 +184,7 @@ public:
 
             if (availableStations >= 0)
             { // i.e. less required than avaialbe
-                //ans = mid;
+                ans = mid;
                 r = mid;
             }
             else // i.e. more required than avaialbe
@@ -192,7 +192,8 @@ public:
                 
         }
 
-        return r; // Must return r instead of answer to pass test cases 2 and 5 here
+        //return r; // Must return r instead of answer to pass test cases 2 and 5 here
+        return ans==-1?r:ans; // Or do this to handle the cases where given array's max dist is already the min dist
     }
 };
 
