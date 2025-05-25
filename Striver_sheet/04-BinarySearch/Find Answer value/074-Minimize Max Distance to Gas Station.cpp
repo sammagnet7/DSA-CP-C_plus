@@ -49,7 +49,7 @@ INPUT::::::
 1
 1 2 3 4 5 6 7 8 9 10
 1
-2 4 6 8 10 
+2 4 6 8 10
 
 OUTPUT::::::
 0.5
@@ -138,7 +138,6 @@ public:
     //     return maxSecDistIdx.top().first;
     // }
 
-
     // Optimal approach: Using Binary search
     // Go to the half side with minimum distance possible with available number of gas stations
     // Note: As dist is measured in 10^-6 range
@@ -162,9 +161,9 @@ public:
         }
 
         double l = 0.0;
-        double r = maxDist;
+        double r = maxDist + 1; // Add 1 to handle the case when ans=maxDist so that (l+r)/2 can reach to it.
 
-        double diff = 1e-6 ;
+        double diff = 1e-6;
 
         // O(Log N)
         while (r - l > diff)
@@ -189,11 +188,13 @@ public:
             }
             else // i.e. more required than avaialbe
                 l = mid;
-                
         }
 
-        //return r; // Must return r instead of answer to pass test cases 2 and 5 here
-        return ans==-1?r:ans; // Or do this to handle the cases where given array's max dist is already the min dist
+        // return r; // Must return r instead of answer to pass test cases 2 and 5 here
+        // return ans == -1 ? r : ans; // Or do this to handle the cases where given array's max dist is already the min dist
+        // This happens because (l+r)/2 can never reach the max value i.e. r.
+
+        return ans; // After adding 1 to r it works fine.
     }
 };
 
