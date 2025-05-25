@@ -73,9 +73,23 @@
      ```c
           double diff = 1e-6;
      ```
+     - proper alternative for (l+r)/2 :
+     ```c
+      int mid = l + (r - l) / 2;
+     ```
+
+> NOTE: While using ceil DO NOT FORGET to cast to double: ceil((`double`)N / 2);
+-    
+     - If you want to swap teo arrays based upon their size:
+     
+     ```c
+     if (n < m)
+            return findMedianSortedArrays(nums2, nums1);
+     ```
+
      - 
 
-9. 
+1. 
 ![Max array size we can initialize with](./img/max_array_size.png)
 
 1.  If the string contains both uppercase and lowercase letters: We have 256 characters in total in this case. So, we will create a hash array of size **256**. Otherwise we can use hash[s[i]-’a’] OR hash[s[i]-’A’] and keep the hash array of 26 elements only.
@@ -102,3 +116,14 @@
 6.  When input array is given as sorted, then try to use Binary search.
 7.  When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
 8.  
+
+
+
+
+
+---
+### Some tricky problems to revise:
+
+1. 074-Minimize Max Distance to Gas Station
+2. 075-Median of 2 sorted arrays
+3. 
