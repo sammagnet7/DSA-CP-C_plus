@@ -46,7 +46,7 @@ INPUT::::::
 
 OUTPUT::::::
 1
-3.5
+2.5
 
  */
 class Solution
@@ -189,8 +189,8 @@ public:
         int N = m + n; // Length of merged array
         int mergedLeftHalf = ceil((double)N / 2);
 
-        int l = 0; // starting of the range
-        int r = m; // ending of the range
+        int l = max(0, (mergedLeftHalf-n)); // starting of the range
+        int r = min(m, mergedLeftHalf); // ending of the range
 
         while (l <= r)
         {
