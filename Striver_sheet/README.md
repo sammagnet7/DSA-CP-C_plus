@@ -121,4 +121,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 25/05/25: Step4:: Lec2: Binary Search on Answers [104/455] <span style="color: green;">[4 hours]</span>
 - 26/05/25: Step4:: Lec2: Binary Search on Answers Completed [105/455] <span style="color: green;">[2 hours]</span>
 - 27/05/26: Step4:: Lec3: BS on 2D arrays [108/455] <span style="color: green;">[4 hours]</span>
+- 28/05/26: Step4:: BS Completed[110/455] <span style="color: green;">[4 hours]</span>
 - 

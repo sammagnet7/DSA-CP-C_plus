@@ -126,4 +126,6 @@
 
 1. 074-Minimize Max Distance to Gas Station
 2. 075-Median of 2 sorted arrays
-3. 
+3. 078-Find Peak Element in 2D Matrix
+4. 079-Median of Row Wise Sorted Matrix
+5. 
