@@ -123,3 +123,4 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 27/05/26: Step4:: Lec3: BS on 2D arrays [108/455] <span style="color: green;">[4 hours]</span>
 - 28/05/26: Step4:: BS Completed[110/455] <span style="color: green;">[4 hours]</span>
 - 29/05/26: Step5:: Lec1: Basic Strings [115/455] <span style="color: green;">[4 hours]</span>
+- 30/05/26: Step5:: Lec1: Basic Strings completed [117/455] <span style="color: green;">[2 hours]</span>

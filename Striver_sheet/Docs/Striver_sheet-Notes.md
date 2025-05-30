@@ -115,7 +115,50 @@
 
 6.  When input array is given as sorted, then try to use Binary search.
 7.  When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
-8.  
+8. How to rotate an array or a string? (`O(N)`)
+     - Use built-in function rotate(first,middle, last) where
+       - first: fist iterator in the range of elements to rotate
+       - last: last iterator in the range of elements to rotate
+       - middle: Iterator pointing to the element that should apprear at the begining of the rotated range
+     - Example to left-rotate a string ("abcde") by 3 positions. Output: "deabc"
+     ```cpp
+          string s = "abcde";
+          int d=3;
+          rotate(s.begin(), (s.begin()+d) , s.end());
+          cout<<s<<endl;
+     ```
+     - Example to right-rotate a string ("abcde") by 3 positions. Output: "cdeab"
+     
+     ```cpp
+          string s = "abcde";
+          int d=3;  int N=s.length();
+          rotate(s.begin(), (s.begin()+(N-d)) , s.end());
+          cout<<s<<endl;
+     ```
+
+9. string substr (size_t pos = 0, size_t len = npos) const;
+     - pos: Position of the first character to be copied as a substring.
+     - len: Number of characters to include in the substring
+     - Example: 
+     ```cpp
+          // left rotate by i places each at a time
+          // abcde -> bcdea -> cdeab -> deabc -> eabcd -> abcde
+          for(int i=0; i<N; i++){
+            int d = i;
+            string leftShiftedStr = s.substr(d,(N-d)) + s.substr(0, d);
+            cout<<leftShiftedStr;
+          }
+
+          // Right rotate by i places each at a time
+          // abcde -> eabcd -> deabc -> cdeab -> bcdea -> abcde
+          for(int i=0; i<N; i++){
+            int d = i;
+            string rightShiftedStr = s.substr(N-d, d) + s.substr(0, (N-d));
+            cout<<rightShiftedStr;
+          }
+     ```
+
+10.  
 
 
 

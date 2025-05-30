@@ -138,7 +138,52 @@ false
 true
 
 -----------------------------------------------------------------------
+Rotate String
+https://leetcode.com/problems/rotate-string/submissions/1648726360/
 
+Given two strings s and goal, return true if and only if s can become goal after some number of shifts on s.
+A shift on s consists of moving the leftmost character of s to the rightmost position.
+
+For example, if s = "abcde", then it will be "bcdea" after one shift.
+
+Example 1:
+Input: s = "abcde", goal = "cdeab"
+Output: true
+
+Example 2:
+Input: s = "abcde", goal = "abced"
+Output: false
+
+INPUT::::::
+2
+abcde
+cdeab
+abcde
+abced
+
+
+OUTPUT::::::
+true
+false
+-----------------------------------------------------------------------
+Valid Anagram
+https://takeuforward.org/data-structure/check-if-two-strings-are-anagrams-of-each-other/
+https://leetcode.com/problems/valid-anagram/
+
+Problem Statement: Check if two Strings are anagrams of each other
+
+Anagrams of a string are all the possible permutations of that string
+
+Example 1:
+Input: CAT, ACT
+Output: true
+Explanation: Since the count of every letter of both strings are equal.
+
+Example 2:
+Input: RULES, LESRT
+Output: false
+Explanation: Since the count of U and T  is not equal in both strings.
+-----------------------------------------------------------------------
 
  */
 class Solution
@@ -180,6 +225,8 @@ public:
 
         return s;
     }
+
+    //-----------------------------------------------------------------------
 
     // Brute force: Using Stack
     // Time: O(N)
@@ -231,6 +278,60 @@ public:
         return ans;
     }
 
+    //-----------------------------------------------------------------------
+
+    // O(N) * O(Min string length)
+    string longestCommonPrefix(vector<string> &strs)
+    {
+        int N = strs.size();
+        int minL = INT_MAX;
+        string minLStr = "";
+
+        // O(N)
+        for (string str : strs)
+        {
+            if (str.length() < minL)
+            {
+                minL = str.length();
+                minLStr = str;
+            }
+        }
+
+        int matchedIdx = minLStr.size() - 1;
+
+        // O(N) * O(Min string length)
+        for (string str : strs)
+        {
+            bool modified = false;
+            int i = -1;
+            while ((i + 1) <= matchedIdx)
+            { // O(Min string length)
+                if (minLStr[i + 1] != str[i + 1])
+                {
+                    break;
+                }
+                else
+                {
+                    i++;
+                    modified = true;
+                }
+            }
+
+            if (i == -1)
+                return "";
+            if (i < matchedIdx)
+                matchedIdx = i;
+        }
+
+        minLStr.resize(matchedIdx + 1);
+
+        return minLStr;
+    }
+
+    //-----------------------------------------------------------------------
+    // Optimal approach
+    // Time: O(N Log N)
+    // Space: O(2N)
     bool isIsomorphic(string s, string t)
     {
 
@@ -243,6 +344,7 @@ public:
         map<int, int> mp1;
         map<int, int> mp2;
 
+        // O(N)
         for (int i = 0; i < n; i++)
         {
             if (mp1.find(s[i]) != mp1.end())
@@ -252,7 +354,7 @@ public:
             }
             else
             {
-                mp1[s[i]] = t[i];
+                mp1[s[i]] = t[i]; // O(Log N)
             }
             if (mp2.find(t[i]) != mp2.end())
             {
@@ -261,8 +363,92 @@ public:
             }
             else
             {
-                mp2[t[i]] = s[i];
+                mp2[t[i]] = s[i]; // O(Log N)
             }
+        }
+
+        return true;
+    }
+
+    //-----------------------------------------------------------------------
+    // // Time: O(N^2)
+    // // Space: O(1)
+    // bool rotateString(string s, string goal)
+    // {
+
+    //     int N = s.length();
+    //     int M = goal.length();
+
+    //     if (N != M)
+    //         return false;
+
+    //     for (int i = 0; i < N; i++)
+    //     {
+    //         int d = i;
+    //         string shiftedStr = s.substr(d, (N - d)) + s.substr(0, d);
+
+    //         if (goal == shiftedStr)
+    //             return true;
+    //     }
+
+    //     return false;
+    // }
+
+    // Optimal approach: Using concatenation of the the strings
+    // Time: O(2N)
+    // Space: O(N)
+    // Note: Anothe KMP method is available with same complexities
+    bool rotateString(string s, string goal)
+    {
+
+        int N = s.length();
+        int M = goal.length();
+
+        if (N != M)
+            return false;
+
+        string conStr = s + s;
+
+        if (conStr.find(goal) < conStr.length()) // O(N)
+            return true;
+
+        else
+            return false;
+    }
+
+    //-----------------------------------------------------------------------
+    // Approach: Optimal when unicode also involved
+    // Time: O(N)
+    // Space: O(1)
+    // Note: In case of only letters -> Take vector of 26 size. Faster
+    bool isAnagram(string s, string t)
+    {
+        int n = s.length();
+        int m = t.length();
+
+        if (n != m)
+            return false;
+
+        unordered_map<int, int> mp;
+
+        // O(N)
+        for (int i = 0; i < n; i++)
+        {
+            mp[s[i]]++;
+        }
+
+        // O(N)
+        for (int i = 0; i < n; i++)
+        {
+            mp[t[i]]--;
+        }
+
+        auto it = mp.begin();
+        while (it != mp.end())
+        {
+            if (it->second != 0)
+                return false;
+            it++;
         }
 
         return true;
