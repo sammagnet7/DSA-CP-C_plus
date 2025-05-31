@@ -158,7 +158,17 @@
           }
      ```
 
-10.  
+10.  Try not to concat strings in loops with '+' operator as each time it creates new string. Instead use the below method:
+     ```cpp
+          
+          string ans;
+    
+          for(int i=255; i>=0; i--){
+               int frequency = freq[i].first;
+               char thisChar = freq[i].second;
+               ans.append(frequency,thisChar);  // Appends char N times
+          }
+     ```
 
 
 
