@@ -170,6 +170,10 @@
           }
      ```
 
+11. How to detech integer overflow using only int variable? Below code is the answer:
+    ```cpp
+    bool isOverflow = (ans>INT_MAX/10) || (ans==INT_MAX/10 && curDigit>7);
+    ```   
 
 
 
