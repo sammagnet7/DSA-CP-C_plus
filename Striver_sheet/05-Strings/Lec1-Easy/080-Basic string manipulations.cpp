@@ -260,20 +260,20 @@ public:
     // Space: O(1)
     string reverseWords(string s)
     {
-        string ans = "";
+        int N = s.size();
+        string ans="";
+        ans.reserve(N);
 
+        
         stringstream ss(s);
         string inp;
-
-        while (ss >> inp)
-        {
-            if (ans == "")
-                ans = inp;
-            else
-                ans = inp + " " + ans;
+        
+        while(ss >> inp){
+            if(ans=="") ans=inp;
+            else {ans.insert(0," "); ans.insert(0,inp);}
         }
 
-        // ans.resize(ans.length()-1);
+        //ans.resize(ans.length()-1);
 
         return ans;
     }

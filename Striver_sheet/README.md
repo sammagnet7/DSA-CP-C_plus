@@ -129,3 +129,7 @@ This repository I will use to store the hands-on from Striver's sheets.
 ---
 
 - 01/06/26: Step5:: Lec2: Medium Strings started [122/455] <span style="color: green;">[4 hours]</span>
+- 02/06/26: <span style="color: red;">[0 hour]</span>
+- 03/06/26: <span style="color: red;">[0 hour]</span>
+- 04/06/26: Step5:: Lec2: Medium Strings completed [125/455] <span style="color: green;">[3 hours]</span>
+- 

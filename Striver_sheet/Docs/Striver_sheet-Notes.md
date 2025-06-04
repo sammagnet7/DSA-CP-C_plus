@@ -158,19 +158,54 @@
           }
      ```
 
-10.  Try not to concat strings in loops with '+' operator as each time it creates new string. Instead use the below method:
+10.  DO NOT concat strings in loops with '`+`' operator as each time it creates new string. Instead use the below method:
      ```cpp
-          
           string ans;
-    
           for(int i=255; i>=0; i--){
                int frequency = freq[i].first;
                char thisChar = freq[i].second;
                ans.append(frequency,thisChar);  // Appends char N times
           }
      ```
+     - To insert before the current string use `insert()`:
+     ```cpp
+          int N = s.size();
+          string ans="";
+          ans.reserve(N);     // **Pre reserve the size of string.
 
-11. How to detech integer overflow using only int variable? Below code is the answer:
+          stringstream ss(s);
+          string inp;
+
+          while(ss >> inp){
+            if(ans=="") ans=inp;
+            else {ans.insert(0," "); ans.insert(0,inp);}    // Use insert
+          }
+     ```
+
+11. DO NOT pass strings w/o reference operator in method call from inside a loop. It creates new stirng in each method call and will give space limit reached error. Pass like below:
+     ```cpp
+          bool isPal(string& str, int s, int e){
+               cout<< str[s];          
+          }
+     ```
+     - Also instead of saving strings in each iteration, try to save the index. Ex:
+     ```cpp
+          for(int i=0; i<N; i++){
+            for(int j=i; j<N; j++){
+                if(isPal(s,i,j)){
+                    if((j-i+1)>maxLen){
+                        maxLen = j-i+1;
+                        ansL = i;  // instead of doing ans = s.substr(i, j-i+1) here
+                        ansR = j;  // save the index
+                    }
+                }
+            }
+        }
+
+        return s.substr(ansL, ansR-ansL+1);
+     ```
+
+12. How to detech integer overflow using only int variable? Below code is the answer:
     ```cpp
     bool isOverflow = (ans>INT_MAX/10) || (ans==INT_MAX/10 && curDigit>7);
     ```   
@@ -185,4 +220,6 @@
 2. 075-Median of 2 sorted arrays
 3. 078-Find Peak Element in 2D Matrix
 4. 079-Median of Row Wise Sorted Matrix
-5. 
+5. Is there any optimized version possible instead of O(N^2 * 26): https://leetcode.com/problems/sum-of-beauty-of-all-substrings/submissions/1653682726/
+6. DP not used till now: https://leetcode.com/problems/longest-palindromic-substring/
+7. 
