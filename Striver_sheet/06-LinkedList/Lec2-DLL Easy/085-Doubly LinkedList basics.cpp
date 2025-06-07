@@ -25,6 +25,8 @@ https://www.naukri.com/code360/problems/insert-at-end-of-doubly-linked-list_8160
 Deletion In Doubly Linked List:
 https://www.naukri.com/code360/problems/deletion-in-doubly-linked-list_4609672?leftPanelTabValue=SUBMISSION
 
+Reverse a Doubly Linked List:
+https://www.naukri.com/code360/problems/reverse-a-doubly-linked-list_1116098?leftPanelTabValue=SUBMISSION
 
 INPUT::::::
 
@@ -46,6 +48,7 @@ public:
 class MyDoublyLinkedList
 {
 public:
+    // -------------------------------------------------------------
     // Construct Doubly LinkedList
     Node *constructDLL(vector<int> &arr)
     {
@@ -65,6 +68,7 @@ public:
         return head;
     }
 
+    // -------------------------------------------------------------
     // Insert at end of Doubly Linked List
     Node *insertAtTail(Node *head, int k)
     {
@@ -88,6 +92,7 @@ public:
         return head;
     }
 
+    // -------------------------------------------------------------
     // Insertion In Doubly Linked List
     Node *insert(int k, int val, Node *head)
     {
@@ -129,6 +134,7 @@ public:
         }
     }
 
+    // -------------------------------------------------------------
     // Deletion In Doubly Linked List
     void deleteNode(Node *(&head), int pos)
     {
@@ -154,6 +160,30 @@ public:
         curN->prev = NULL;
         curN->next = NULL;
         delete (curN); // Before deleting Made the pointers to NULL
+    }
+
+    // -------------------------------------------------------------
+    // Reverse a Doubly Linked List
+    Node *reverseDLL(Node *head)
+    {
+        if (head == NULL || head->next == NULL) // ** Handling the edge case **
+            return head;
+        
+        Node *curN = head;
+
+        while (curN != NULL)
+        {
+            Node *preN = curN->prev;
+            Node *nextN = curN->next;
+
+            curN->prev = nextN;
+            curN->next = preN;
+
+            head = curN;
+            curN = nextN;
+        }
+
+        return head;
     }
 };
 
