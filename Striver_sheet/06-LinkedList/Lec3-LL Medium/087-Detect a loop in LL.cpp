@@ -14,7 +14,6 @@
 using namespace std;
 
 /*
-
 Linked List Cycle:
 https://takeuforward.org/data-structure/detect-a-cycle-in-a-linked-list/
 https://leetcode.com/problems/linked-list-cycle/submissions/1656523475/
@@ -24,6 +23,13 @@ https://leetcode.com/problems/linked-list-cycle/submissions/1656523475/
 Linked list find starting Node of the cycle:
 https://takeuforward.org/data-structure/starting-point-of-loop-in-a-linked-list/
 https://leetcode.com/problems/linked-list-cycle-ii/submissions/1656859563/
+
+--------------------------------------------------------
+
+Length of Loop in Linked List:
+https://takeuforward.org/linked-list/length-of-loop-in-linked-list
+https://www.naukri.com/code360/problems/find-length-of-loop_8160455?leftPanelTabValue=SUBMISSION
+
 
 INPUT::::::
 
@@ -92,7 +98,6 @@ public:
     }
 
     // -------------------------------------------------------
-
     // Brute force
     // Time: O(N) ~ O(N^2)
     // Space: O(N)
@@ -162,6 +167,50 @@ public:
         }
 
         return NULL;
+    }
+
+    // -------------------------------------------------------
+    // Optimal approach: Tortoise-Hare method
+    // Time: O(N)
+    // Space: O(1)
+    int lengthOfLoop(ListNode *head)
+    {
+
+        if (head == NULL || head->next == NULL)
+            return 0;
+
+        bool isCyclic = false;
+        ListNode *slow = head;
+        ListNode *fast = head;
+
+        while (fast != NULL && fast->next != NULL)
+        {
+            fast = fast->next->next;
+            slow = slow->next;
+
+            if (slow == fast)
+            {
+                isCyclic = true;
+                break;
+            }
+        }
+
+        if (isCyclic)
+        {
+            slow = slow->next;
+            int dist = 1;
+
+            // Count the length of the loop
+            while (fast != slow)
+            {
+                slow = slow->next;
+                dist++;
+            }
+
+            return dist;
+        }
+        else
+            return 0;
     }
 };
 
