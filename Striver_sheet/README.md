@@ -137,3 +137,6 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 07/06/26: Step6:: Lec3: Medium problems of LL  [139/455] <span style="color: green;">[4 hours]</span>
 - 08/06/26: Step6:: Lec3: Medium problems of LL  [141/455] <span style="color: green;">[3 hours]</span>
 - 09/06/26: Step6:: Lec3: Medium problems of LL  [143/455] <span style="color: green;">[3 hours]</span>
+- 10/06/26: Step6:: Lec3: Medium problems of LL  [145/455] <span style="color: green;">[2 hours]</span>
+- 11/06/26: Step6:: Lec3: Medium problems of LL  [148/455] <span style="color: green;">[4 hours]</span>
+- 
