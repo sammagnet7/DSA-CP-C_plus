@@ -54,6 +54,9 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------
 
+Add two numbers represented as Linked Lists:
+https://takeuforward.org/data-structure/add-two-numbers-represented-as-linked-lists/
+https://leetcode.com/problems/add-two-numbers/submissions/1661531904/
 
 */
 
@@ -186,6 +189,67 @@ public:
 
             return newN;
         }
+    }
+
+
+    // ---------------------------------------------------------------------------
+    // Add two numbers represented as Linked Lists:
+
+    // Time: O(max(m,n))
+    // Space: O(max(m,n))
+    Node *addTwoNumbers(Node *l1, Node *l2)
+    {
+        Node *headRet = l1;
+
+        int dig1 = 0;
+        int dig2 = 0;
+        int carry = 0;
+        int sum = 0;
+        Node *preN = NULL;
+
+        while (l1 != NULL || l2 != NULL || carry)
+        {
+
+            if (l1 != NULL)
+                dig1 = l1->data;
+            else
+                dig1 = 0;
+
+            if (l2 != NULL)
+                dig2 = l2->data;
+            else
+                dig2 = 0;
+
+            sum = dig1 + dig2 + carry;
+
+            if (sum > 9)
+                carry = 1;
+            else
+                carry = 0;
+
+            sum = sum % 10;
+
+            if (l1 != NULL)
+            {
+                l1->data = sum;
+                preN = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                Node *newN = new Node(sum);
+                preN->next = newN;
+                preN = newN;
+                l1 = newN->next; // i.e. NULL
+            }
+
+            if (l2 != NULL)
+            {
+                l2 = l2->next;
+            }
+        }
+
+        return headRet;
     }
 };
 
