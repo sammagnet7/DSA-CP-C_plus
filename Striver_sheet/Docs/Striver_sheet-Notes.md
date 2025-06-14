@@ -182,7 +182,7 @@
           }
      ```
 
-11. DO NOT pass strings w/o reference operator in method call from inside a loop. It creates new stirng in each method call and will give space limit reached error. Pass like below:
+11. DO NOT pass strings **w/o** reference operator in method call from inside a loop. It creates new stirng in each method call and will give space limit reached error. Pass like below:
      ```cpp
           bool isPal(string& str, int s, int e){
                cout<< str[s];          
@@ -205,11 +205,14 @@
         return s.substr(ansL, ansR-ansL+1);
      ```
 
-12. How to detech integer overflow using only int variable? Below code is the answer:
+12. How to detect integer overflow using only int variable? Below code is the answer:
     ```cpp
     bool isOverflow = (ans>INT_MAX/10) || (ans==INT_MAX/10 && curDigit>7);
     ```   
 
+13. Note: c++ string method to check digit is: `isdigit(s[i])` not isDigit.
+14. Note: In c++ string checking s[i] == NULL (or '\0') won’t work reliably to detect the end of the string. Correct usage: `if (i == s.length()) return;` where i is 0 based index over string chars.
+15. 
 
 
 

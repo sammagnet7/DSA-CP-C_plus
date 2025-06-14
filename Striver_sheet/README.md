@@ -140,4 +140,11 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 10/06/26: Step6:: Lec3: Medium problems of LL  [145/455] <span style="color: green;">[2 hours]</span>
 - 11/06/26: Step6:: Lec3: Medium problems of LL  [148/455] <span style="color: green;">[4 hours]</span>
 - 12/06/26: Step6:: Lec3, Lec4: Completed  [152/455] <span style="color: green;">[4 hours]</span>
-- 
+- 13/06/26: Step6:: Lec5: Continues  [154/455] <span style="color: green;">[2 hours]</span>
+
+---
+#### Tracking problem count instead of time:
+
+---
+
+- 14/06/26: Step6:: LinkedList Completed  [158/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 1 ] [ Hard :3 ]</span> 
