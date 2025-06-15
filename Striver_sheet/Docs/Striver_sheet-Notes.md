@@ -69,7 +69,7 @@
                minHeap.pop();
           }
      ```
-     - To write 10^-6:
+     - To write **exponent** like 10^-6:
      ```c
           double diff = 1e-6;
      ```
@@ -158,7 +158,7 @@
           }
      ```
 
-10.  DO NOT concat strings in loops with '`+`' operator as each time it creates new string. Instead use the below method:
+10.  DO NOT concat strings in loops with '`+`' operator as each time it creates new string. Instead use **append()** or **push_back()** and **pop_back()** methods:
      ```cpp
           string ans;
           for(int i=255; i>=0; i--){
@@ -166,6 +166,12 @@
                char thisChar = freq[i].second;
                ans.append(frequency,thisChar);  // Appends char N times
           }
+     ```
+     OR
+     ```cpp
+          s.push_back('0');
+          findStringsRecursively(s);
+          s.pop_back();
      ```
      - To insert before the current string use `insert()`:
      ```cpp
@@ -184,9 +190,13 @@
 
 11. DO NOT pass strings **w/o** reference operator in method call from inside a loop. It creates new stirng in each method call and will give space limit reached error. Pass like below:
      ```cpp
-          bool isPal(string& str, int s, int e){
+          bool isPal(string& str){
                cout<< str[s];          
           }
+
+          // Calling the above method
+          string s = "madam";
+	     cout<<isPal(s);
      ```
      - Also instead of saving strings in each iteration, try to save the index. Ex:
      ```cpp
@@ -212,8 +222,38 @@
 
 13. Note: c++ string method to check digit is: `isdigit(s[i])` not isDigit.
 14. Note: In c++ string checking s[i] == NULL (or '\0') won’t work reliably to detect the end of the string. Correct usage: `if (i == s.length()) return;` where i is 0 based index over string chars.
-15. 
+15. Below is an example of how to use **Lambda functions** in c++:
 
+     > Note: Below `quickmul` is the labmda function which is using var `mod` from class attributes. [Ref: https://leetcode.com/problems/count-good-numbers/]
+
+     ```cpp
+     class Solution {
+     private:
+          static constexpr int mod = 1000000007;
+
+     public:
+          int countGoodNumbers(long long n) {
+
+               // use fast exponentiation to calculate x^y % mod
+               auto quickmul = [](int x, long long y) -> int {
+                    int ret = 1, mul = x;
+                    while (y > 0) {
+                         if (y % 2 == 1) {
+                              ret = (long long)ret * mul % mod;
+                         }
+                         mul = (long long)mul * mul % mod;
+                         y /= 2;
+                    }
+                    return ret;
+               };
+
+               return (long long)quickmul(5, (n + 1) / 2) * quickmul(4, n / 2) % mod;
+          }
+     };
+
+     ```
+
+16. 
 
 
 ---

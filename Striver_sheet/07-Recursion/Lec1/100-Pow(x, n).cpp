@@ -43,6 +43,12 @@ x = 1.00000
 n = -2147483648
 output = 1.00000
 
+
+INPUT::::::
+
+
+OUTPUT::::::
+
 */
 
 class Solution

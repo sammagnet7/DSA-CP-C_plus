@@ -81,6 +81,13 @@ Output: 0
 Explanation:
 Reading stops at the first non-digit character 'w'.
 
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
 */
 
 class Solution
