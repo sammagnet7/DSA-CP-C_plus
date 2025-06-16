@@ -16,6 +16,7 @@ using namespace std;
 
 /*
 Generate Binary Strings Without Adjacent Zeros:
+
 https://leetcode.com/problems/generate-binary-strings-without-adjacent-zeros/description/
 https://www.geeksforgeeks.org/problems/generate-all-binary-strings/1
 
@@ -42,12 +43,36 @@ INPUT::::::
 
 OUTPUT::::::
 
+--------------------------------------------------------------------------------------
+
+Generate Parentheses:
+
+https://leetcode.com/problems/generate-parentheses/description/
+
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+Examples:
+
+Example 1:
+Input: n = 3
+Output: ["((()))","(()())","(())()","()(())","()()()"]
+
+Example 2:
+Input: n = 1
+Output: ["()"]
+
+INPUT::::::
+
+
+OUTPUT::::::
+
 */
 
 class Solution
 {
 public:
     // ---------------------------------------------
+    // Generate Binary Strings Without Adjacent Zeros:
 
     // O(2^N)
     void findStringsRecursively(vector<string> &v, int N, bool isPrevZero, string &s)
@@ -87,6 +112,39 @@ public:
         string s = "";
         findStringsRecursively(ans, n, false, s);
 
+        return ans;
+    }
+
+    // --------------------------------------------------------------------------------
+    // Generate Parentheses:
+
+    // O(N* 2^N)
+    void recursiveParanthGen(vector<string> &v, string &str, int N, int left, int right){
+
+        if(left==N && right==N){
+            v.push_back(str);
+            return;
+        }
+
+        if(left < N){
+            str.push_back('(');
+            recursiveParanthGen(v, str, N, (left+1), right);
+            str.pop_back();
+        }
+        if(right<N && left>right){
+            str.push_back(')');
+            recursiveParanthGen(v, str, N, left, (right+1));
+            str.pop_back();
+        }
+    }
+
+    // Optimal approach: 
+    // Time: O(N* 2^N) i.e. due to vector copying and created binary recursion tree
+    // Space: O(N) i.e. recursion stack space
+    vector<string> generateParenthesis(int n) {
+        vector<string> ans;
+        string tmp = "";
+        recursiveParanthGen(ans, tmp, n , 0, 0);
         return ans;
     }
 };

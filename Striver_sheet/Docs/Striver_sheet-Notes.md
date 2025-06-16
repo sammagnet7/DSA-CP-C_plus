@@ -110,8 +110,8 @@
      - XOR of a number with 0 will result in the number itself i.e. 0 ^ a = a.  ←Property 2
 
 5.  Sub-array vs sub-sequence:
-    - A subarray is a contiguous (consecutive) portion of an array.
-    - A subsequence is a sequence of elements derived from the original array by deleting some elements without changing the order of the remaining elements.
+    - A subarray is a **contiguous** (consecutive) portion of an array.
+    - A subsequence is a sequence of elements derived from the original array by deleting some elements **without changing the order** of the remaining elements.
 
 6.  When input array is given as sorted, then try to use Binary search.
 7.  When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
@@ -253,8 +253,23 @@
 
      ```
 
-16. 
+16. Temporarily removes each element from set s, processes the rest via funcA, then restores the removed element safely.
+    
+```cpp
+     for (auto it = s.begin(); it != s.end(); ) {
+          int val = *it;
+          it++;                // Move iterator forward first
+          s.erase(val);        // Temporarily remove the element
 
+          funcA(s);            // Do something with the modified set
+
+          s.insert(val);       // Re-insert the removed element
+     }
+```
+
+17. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
+Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
+18. 
 
 ---
 ### Some tricky problems to revise:

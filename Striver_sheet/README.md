@@ -148,4 +148,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 ---
 
 - 14/06/26: Step6:: LinkedList Completed  [158/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 1 ] [ Hard : 3 ]</span> 
-- 15/06/26: Step6:: LinkedList Completed  [162/455] <span style="color: green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 0 ]</span> 
+- 15/06/26: Step6:: LinkedList Completed + Recursion Lec1  [162/455] <span style="color: green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 0 ]</span> 
+- 16/06/26: Step6:: Recursion Lec2  [168/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 05 ] [ Hard : 0 ]</span> 
