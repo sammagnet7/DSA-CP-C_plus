@@ -17,7 +17,9 @@ using namespace std;
 /*
 
 Combination Sum - 1:
-(Given array of distinct integers and same number may be chosen from candidates an unlimited number of times):
+1. Given array of **distinct** integers.
+2. same number may be chosen from candidates an **unlimited** number of times.
+3. The solution set must not contain duplicate combinations
 
 https://takeuforward.org/data-structure/combination-sum-1/
 https://leetcode.com/problems/combination-sum/description/
@@ -51,8 +53,11 @@ INPUT::::::
 OUTPUT::::::
 
 -------------------------------------------------------------------------------
+
 Combination Sum II:
-(Given array may have duplicates and Each number in candidates may only be used once in the combination)
+1. Given array may have **duplicates.**
+2. Each number in candidates may only be used **once** in the combination.
+3. The solution set must not contain duplicate combinations
 
 https://takeuforward.org/data-structure/combination-sum-ii-find-all-unique-combinations/
 https://leetcode.com/problems/combination-sum-ii/description/
@@ -90,6 +95,57 @@ INPUT::::::
 
 OUTPUT::::::
 
+-------------------------------------------------------------------------------
+
+Combination Sum III:
+
+1. Given array may have **duplicates.**
+2. The solution set must not contain duplicate combinations
+3. Solution must be of given length
+
+https://leetcode.com/problems/combination-sum-iii/description/
+
+
+Problem statement:
+Find all valid combinations of k numbers that sum up to n such that the following conditions are true:
+Only numbers 1 through 9 are used.
+Each number is used at most once.
+Return a list of all possible valid combinations. The list must not contain the same combination twice, and the combinations may be returned in any order.
+
+Examples:
+
+Example 1:
+Input: k = 3, n = 7
+Output: [[1,2,4]]
+Explanation:
+1 + 2 + 4 = 7
+There are no other valid combinations.
+
+Example 2:
+Input: k = 3, n = 9
+Output: [[1,2,6],[1,3,5],[2,3,4]]
+Explanation:
+1 + 2 + 6 = 9
+1 + 3 + 5 = 9
+2 + 3 + 4 = 9
+There are no other valid combinations.
+
+Example 3:
+Input: k = 4, n = 1
+Output: []
+Explanation: There are no valid combinations.
+Using 4 different numbers in the range [1,9], the smallest sum we can get is 1+2+3+4 = 10 and since 10 > 1, there are no valid combination.
+
+Example 4:
+Input: k = 9, n = 45
+Output: [[1,2,3,4,5,6,7,8,9]]
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
 */
 
 class Solution
@@ -97,6 +153,9 @@ class Solution
 public:
     // ---------------------------------------------
     // Combination Sum - 1:
+    // 1. Given array of **distinct** integers.
+    // 2. same number may be chosen from candidates an **unlimited** number of times.
+    // 3. The solution set must not contain duplicate combinations
 
     // O(2^target * N)
     void recursiveCombSum(vector<vector<int>> &ans, vector<int> &inputs, vector<int> &comb, int target, int prevSum, int idx)
@@ -124,9 +183,9 @@ public:
     // Optimal approach: Using Backtracking
     // At each index either can be picked up or not
     // As duplicates allowed so try with same index iteratively until vector size reaches
-    // Time: O(2^target * N): Because of the case when `1` is there and can be repeated `target` times
-    // + vector of size N push_back time
-    // Space: O(k*x) where `k` is avg combination length and `x` is #combinations found, ignoring stack space
+    // Time: O(2^target * K): Because of the case when `1` is there and can be repeated `target` times
+    // + vector of size `K` push_back time where `k` is avg combinations' length
+    // Space: O(k*x) i.e `ans` space where `k` is avg combinations` length and `x` is #combinations found, ignoring recursion stack space
     vector<vector<int>> combinationSum(vector<int> &candidates, int target)
     {
         vector<vector<int>> ans;
@@ -136,7 +195,109 @@ public:
     }
 
     // ---------------------------------------------
-    // Combination Sum - 2:
+    // Combination Sum II:
+    // 1. Given array may have **duplicates.**
+    // 2. Each number in candidates may only be used **once** in the combination.
+    // 3. The solution set must not contain duplicate combinations
+
+    // O(2^N * K)
+    void recursiveCombSum(vector<vector<int>> &ans, vector<int> &inputs, vector<int> &comb, int target, int prevSum, int idx)
+    {
+
+        if (prevSum > target)
+            return;
+        if (prevSum == target)
+        {
+            ans.push_back(comb);
+            return;
+        }
+        if (idx == inputs.size())
+            return;
+
+        // 1. This loop one by one selects each element in the `input` array.
+        // 2. Calls recursively with the next element of the array.
+        // 3. As the normal recursion tree here always allows the `first entry`
+        //    and all the `input` array elements get its chance once by default.
+        // 4. Skipping the duplicate elements from the loop
+        //      ignores duplication of the combinations by not allowing same element to be considered for the same index again
+        for (int i = idx; i < inputs.size(); i++)
+        {
+
+            if (inputs[i] > target)
+                break; // As sorted array, simply optimize time
+
+            if (i > idx && inputs[i - 1] == inputs[i]) // allows  `first entry`, then further checks for duplicates
+                continue;
+
+            comb.push_back(inputs[i]);
+            recursiveCombSum(ans, inputs, comb, target, (prevSum + inputs[i]), (i + 1)); // Note: here passing `i` not `idx`
+            comb.pop_back();
+        }
+    }
+
+    // Optimal approach: backtracking combination with Iteration: see comments in the method
+    // Time: O(2^N * K) where `N` is size of input array and `k` is avg combination length
+    // Space: O(k*x) where `x` is possible combinations in the `ans`
+    vector<vector<int>> combinationSum2(vector<int> &candidates, int target)
+    {
+        vector<vector<int>> ans;
+        vector<int> comb;
+
+        sort(candidates.begin(), candidates.end()); // Needed so that we can eleminate duplicates later
+
+        recursiveCombSum(ans, candidates, comb, target, 0, 0);
+        return ans;
+    }
+
+    // ---------------------------------------------
+    // Combination Sum III:
+    // 1. Given array may have **duplicates.**
+    // 2. The solution set must not contain duplicate combinations
+    // 3. Solution must be of given length
+
+    // O(2^N * 3)
+    void recursiveCombSum(vector<vector<int>> &ans, vector<int> &inputs, vector<int> &comb, int target, int length, int prevSum, int idx)
+    {
+        // Check if `combinations` vector size reaches given length limit
+        if (comb.size() == length && prevSum == target)
+        {
+            ans.push_back(comb);
+            return;
+        }
+
+        // 1. This loop one by one selects each element in the `input` array.
+        // 2. Calls recursively with the next element of the array.
+        // 3. As the normal recursion tree here always allows the `first entry`
+        //    and all the `input` array elements get its chance once by default.
+        // 4. Skipping the duplicate elements from the loop
+        //      ignores duplication of the combinations by not allowing same element to be considered for the same index again
+        for (int i = idx; i < inputs.size(); i++)
+        {
+
+            if (inputs[i] > target)
+                break; // For more optimization: As sorted array
+
+            if (i > idx && inputs[i - 1] == inputs[i]) // allows  `first entry`, then further checks for duplicates
+                continue;
+
+            comb.push_back(inputs[i]);
+            recursiveCombSum(ans, inputs, comb, target, length, (prevSum + inputs[i]), (i + 1)); // Note: here passing `i` not `idx`
+            comb.pop_back();
+        }
+    }
+
+    // Optimal approach: Recursion + Iteration
+    // TIme: O(2^N * 3)
+    // Space: O(3 * x) where x is the number of combinations in `ans`
+    vector<vector<int>> combinationSum3(int k, int n)
+    {
+        vector<vector<int>> ans;
+        vector<int> comb;
+        vector<int> candidates = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+        recursiveCombSum(ans, candidates, comb, n, k, 0, 0);
+        return ans;
+    }
 };
 
 int main()

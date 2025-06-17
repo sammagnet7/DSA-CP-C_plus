@@ -37,7 +37,9 @@ INPUT::::::
 OUTPUT::::::
 
 -------------------------------------------------------------------------------
+
 Count Subsets with Sum K:
+
 https://www.naukri.com/code360/problems/count-subsets-with-sum-k_3952532?leftPanelTabValue=PROBLEM
 
 Problem statement
@@ -63,6 +65,8 @@ INPUT::::::
 
 OUTPUT::::::
 
+-------------------------------------------------------------------------------
+
 */
 
 class Solution
@@ -82,9 +86,6 @@ public:
 
         bool ret = false;
         if ((prevSum + cur) == target)
-            ret = true;
-
-        if (ret)
             return true;
 
         ret = recFindExists(arr, (index + 1), target, (prevSum + cur));
