@@ -269,7 +269,23 @@
 
 17. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
-18. 
+18. Below is a way to get the next valid index while traversing a 2-D matrix:
+     ```cpp
+               int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index
+               curFlatIndex++;                       // Move to next
+               int nextRowIdx = curFlatIndex / totalCols;
+               int nextColIdx = curFlatIndex % totalCols;
+     ```
+     OR
+
+     ```cpp
+          // Compute next cell's indices for 2D matrix
+          int nextRowIdx = (curColIdx == N - 1) ? (curRowIdx + 1) : curRowIdx;
+          int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
+     ```
+
+19. 
+
 
 ---
 ### Some tricky problems to revise:
@@ -279,5 +295,9 @@ Whenever the problem is related to picking up elements from an array to form a c
 3. 078-Find Peak Element in 2D Matrix
 4. 079-Median of Row Wise Sorted Matrix
 5. Is there any optimized version possible instead of O(N^2 * 26): https://leetcode.com/problems/sum-of-beauty-of-all-substrings/submissions/1653682726/
-6. DP not used till now: https://leetcode.com/problems/longest-palindromic-substring/
-7. 
+6. **DP** not used till now. Do later: 
+   - https://leetcode.com/problems/longest-palindromic-substring/
+   - 109-Word Searches: 
+   - 
+7. 110=N-Queens: Formula for upper and lower diagonal check in 2D matrix: https://takeuforward.org/data-structure/n-queen-problem-return-all-distinct-solutions-to-the-n-queens-puzzle/
+8. 
