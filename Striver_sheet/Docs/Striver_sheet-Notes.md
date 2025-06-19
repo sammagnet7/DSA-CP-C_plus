@@ -222,7 +222,7 @@
 
 13. Note: c++ string method to check digit is: `isdigit(s[i])` not isDigit.
 14. Note: In c++ string checking s[i] == NULL (or '\0') won’t work reliably to detect the end of the string. Correct usage: `if (i == s.length()) return;` where i is 0 based index over string chars.
-15. Below is an example of how to use **Lambda functions** in c++:
+15. Below is an example of how to use **Lambda xfunctions** in c++:
 
      > Note: Below `quickmul` is the labmda function which is using var `mod` from class attributes. [Ref: https://leetcode.com/problems/count-good-numbers/]
 
@@ -331,6 +331,29 @@ Whenever the problem is related to picking up elements from an array to form a c
           expression.pop_back();
      ```
 
+Bit manipulation:
+---
+
+23. -ve numbers are stored as 2's complement format.
+24. Not(~) operator: 
+```cpp
+     int x = 6; // originally stored as 32 bits: 0000 .. 0000 0110 
+     cout<< ~(x)<< endl; // After negetaion:   [1]111 .. 1111 1001
+                         // becomes -ve
+                         // So interpreted as 2's completed
+                         // [1]111 .. 1111 1001->[1]000 .. 0000 0110
+                         //                                     +1
+                         //                      -------------------
+                         //                   -> [1]000 .. 0000 0111->-7
+
+
+
+     int y = -6; // originally stored as 32 bits: 1111 .. 1111 1010
+                 // After negetaion:              0000 .. 0000 0101->+5
+
+     cout<< ~(y) << endl;
+```
+
 ---
 ### Some tricky problems to revise:
 
@@ -345,4 +368,5 @@ Whenever the problem is related to picking up elements from an array to form a c
    - 
 7. 110=N-Queens: Formula for upper and lower diagonal check in 2D matrix: https://takeuforward.org/data-structure/n-queen-problem-return-all-distinct-solutions-to-the-n-queens-puzzle/
 8. 114-Expression Add Operators: **Hard**: [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/) <- *could not complete.* getting **TLE**. Need to calculate the result on the go, instead of calculating it at the end. Follow Editorial.
-9. 
+9. 115-basic bit manipulation: Hard: [Title: Count the set bits](https://www.naukri.com/code360/problems/count-set-bits_1112627?leftPanelTabValue=PROBLEM) <- *could not complete.* getting **TLE**. Check later.
+10. 
