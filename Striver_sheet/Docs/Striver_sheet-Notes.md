@@ -284,8 +284,52 @@ Whenever the problem is related to picking up elements from an array to form a c
           int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
      ```
 
-19. 
+19. A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
 
+     ```cpp
+          for(int i=0; i<N; i++){
+               for(int j=0; j<N; j++){
+                    if(board[i][j] == '.'){
+                         goto endLoop;  // breaks to loops together
+                    }
+               }
+          }
+          endLoop:;
+     ```
+20. Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
+
+    <img src="img/sudoku.png" alt="alt text" style="display: block; margin: auto; width: 400px;">
+
+    ```cpp
+          int matrixSize = N;
+          int subMatrixSize = sqrt(matrixSize);
+
+          // Iterates over the same sub-matrix as curRow-curCol cell belongs to
+          for (int k = 0; k < N; k++)
+          {
+               int subMatrixStartRow = subMatrixSize * (curRowIdx / subMatrixSize);
+               int subMatrixStartCol = subMatrixSize * (curColIdx / subMatrixSize);
+
+               int subMatrixRowIdx =  subMatrixStartRow + ( k / subMatrixSize );
+               int subMatrixColIdx =  subMatrixStartCol + ( k % subMatrixSize );
+
+               if (board[subMatrixRowIdx][subMatrixColIdx] == curCellChar)
+                    return false;
+          }
+    ```
+21. How to push back and pop back a **string** to a **string**?
+     ```cpp
+          string cur = "test";
+          size_t oldSize = expression.size();
+          expression.append(cur);
+          expression.resize(oldSize);
+     ```
+22. How to push back and pop back a **char** to a **string**?
+     ```cpp
+          char cur = 'x';
+          expression.push_back(cur);
+          expression.pop_back();
+     ```
 
 ---
 ### Some tricky problems to revise:
@@ -300,4 +344,5 @@ Whenever the problem is related to picking up elements from an array to form a c
    - 109-Word Searches: 
    - 
 7. 110=N-Queens: Formula for upper and lower diagonal check in 2D matrix: https://takeuforward.org/data-structure/n-queen-problem-return-all-distinct-solutions-to-the-n-queens-puzzle/
-8. 
+8. 114-Expression Add Operators: **Hard**: [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/) <- *could not complete.* getting **TLE**. Need to calculate the result on the go, instead of calculating it at the end. Follow Editorial.
+9. 
