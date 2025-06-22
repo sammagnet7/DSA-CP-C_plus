@@ -205,12 +205,30 @@ public:
     // ------------------------------------
     // Title: Single Number II : Approach 3
 
-    // Optimal approach:
-    // Time:
-    // Space: 
-    int singleNumberTWO(vector<int> &nums)
+    // Optimal approach: Using binary operators' equations
+    // Here 3 buckets are being used and the logic is being followed as follows:
+    // 1. cur will go to `ones` if not in `twos`
+    // 2. cur will go to `twos` if not in `ones`
+    // 3. cur will go to `thrice` if not in `twos`
+    // Here we are ignoring the count of 3 repeatation as no need
+    //
+    // Time: O(N)
+    // Space: O(1)
+    int singleNumber(vector<int> &nums)
     {
-        
+
+        int ones = 0;
+        int twos = 0;
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            ones = (ones ^ nums[i]) & (~twos);
+            twos = (twos ^ nums[i]) & (~ones);
+
+            cout << "Cur:" << nums[i] << " Ones: " << ones << " Twos: " << twos << endl;
+        }
+
+        return ones;
     }
 
     // ------------------------------------------------------------------------------
