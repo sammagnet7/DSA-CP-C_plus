@@ -154,5 +154,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 18/06/26: Step6:: Recursion Lec 3  [179/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 02 ] [ Hard : 5 ]</span>
 - 19/06/26: Step6:: Recursion complete + Bit manipulation Lec1 [188/455] <span style="color: green;"> [ Easy : 08 ] [ Medium : 00 ] [ Hard : 02 ]</span>
 - 20/06/26: Step6:: Bit manipulation Lec2 [194/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 04 ] [ Hard : 02 ]</span>
-- 21/06/26: Step6:: Bit manipulation completes [195/455] <span style="color: oanger;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
+- 21/06/26: Step6:: Bit manipulation completes [195/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
 - 22/06/26: Step6:: Math completes [199/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
