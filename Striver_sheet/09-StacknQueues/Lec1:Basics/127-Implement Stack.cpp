@@ -46,10 +46,25 @@ OUTPUT::::::
 2. Title: Implement Stack using Linked list
 
 Links:
-
+https://takeuforward.org/data-structure/implement-stack-using-linked-list/
+https://www.naukri.com/code360/problems/implement-stack-with-linked-list_630475?leftPanelTabValue=PROBLEM
 
 
 Problem statement:
+You must implement the Stack data structure using a Singly Linked List.
+
+Create a class named 'Stack' which supports the following operations(** all in O(1) time **):
+
+
+getSize: Returns an integer. Gets the current size of the stack
+
+isEmpty: Returns a boolean. Gets whether the stack is empty
+
+push: Returns nothing. Accepts an integer. Puts that integer at the top of the stack
+
+pop: Returns nothing. Removes the top element of the stack. It does nothing if the stack is empty.
+
+getTop: Returns an integer. Gets the top element of the stack. Returns -1 if the stack is empty
 
 
 INPUT::::::
@@ -93,6 +108,7 @@ OUTPUT::::::
 
 //-----------------------------------------------------------------------
 // 1. Title: Implement Stack using Arrays
+// Note: All op must be in O(1)
 class Stack
 {
 
@@ -151,11 +167,98 @@ public:
 };
 
 //-----------------------------------------------------------------------
+// 2. Title: Implement Stack using Linked list
+// Note: All op must be done in O(1)
+
+class Node
+{
+public:
+    int data;
+    Node *next;
+    Node()
+    {
+        this->data = 0;
+        next = NULL;
+    }
+    Node(int data)
+    {
+        this->data = data;
+        this->next = NULL;
+    }
+    Node(int data, Node *next)
+    {
+        this->data = data;
+        this->next = next;
+    }
+};
+
+class Stack
+{
+    // Write your code here
+    Node *head;
+    int size;
+
+public:
+    Stack()
+    {
+        // Write your code here
+        Node *dummyN = new Node();
+        head = dummyN;
+
+        size = 0;
+    }
+
+    int getSize() // O(1)
+    {
+        // Write your code here
+        return this->size;
+    }
+
+    bool isEmpty() // O(1)
+    {
+        // Write your code here
+        if (this->size == 0)
+            return true;
+        else
+            return false;
+    }
+
+    void push(int data) // O(1)
+    {
+        // Write your code here
+        Node *newN = new Node(data, head); // newN --> head
+        head = newN;
+        this->size++;
+    }
+
+    void pop() // O(1)
+    {
+        // Write your code here
+        if (size != 0)
+        {
+            Node *tmp = head;
+            head = head->next;
+            tmp->next = NULL;
+            delete (tmp);
+            this->size--;
+        }
+    }
+
+    int getTop() // O(1)
+    {
+        // Write your code here
+        if (size == 0)
+            return -1;
+        else
+            return head->data;
+    }
+};
 
 //-----------------------------------------------------------------------
 // 3. Title: Implement Stack using Queue:
+// Some ops takes O(N)
 
-// Approach1: Sub-optimal approach
+// Approach1: Sub-optimal approach beacuse of higher space taken
 // Implementing Stack using double queue
 // Space: O(2N)
 // class MyStack {
@@ -216,11 +319,12 @@ public:
 //     }
 // };
 
-// Approach2: Implementing Stack using single queue
+// Approach2: Implementing Stack using single queue i.e. taking lower space
+// Note: Here we are reversing at the time of push()
+//       But in general implementations reverse at time of pop() or top()
 // Space: O(N)
 class MyStack
 {
-
     queue<int> q1;
 
 public:
@@ -276,6 +380,7 @@ public:
         return top;
     }
 
+    // O(1)
     bool empty()
     {
         return q1.empty();

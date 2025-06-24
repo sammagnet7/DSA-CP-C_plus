@@ -366,7 +366,14 @@ Bit manipulation:
      ```
 34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
      <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
-35. 
+35. In c, once array is passed through method calling, then it is becomes a pointer and it's size can not be calculated with sizeof() op.
+    ```c
+          void reverse(char arr[]){
+          // int len = sizeof(arr)/sizeof(arr[0]); // Wrong because arr is a pointer here, and sizeof(arr) returns size of pointer i.e. 4 or 8 always. 
+          int len = strlen(arr); // correct
+          }
+    ```
+36. 
 
 ---
 ### Some tricky problems to revise:

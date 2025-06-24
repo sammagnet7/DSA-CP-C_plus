@@ -157,3 +157,4 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 21/06/26: Step6:: Bit manipulation completes [195/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
 - 22/06/26: Step6:: Math completes [199/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
 - 23/06/26: Step6:: Stack and queues [202/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 00 ] [ Hard : 00 ]</span>
+- 24/06/26: Step6:: Stack and queues [209/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 03 ] [ Hard : 00 ]</span>
