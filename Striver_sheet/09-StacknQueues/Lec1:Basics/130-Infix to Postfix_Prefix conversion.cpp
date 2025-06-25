@@ -26,29 +26,19 @@ https://www.naukri.com/code360/problems/day-23-:-infix-to-postfix-_1382146?leftP
 
 Problem statement:
 You are given a string 'exp' which is a valid infix expression.
-
 Convert the given infix expression to postfix expression.
-
-
 Note:
-Infix notation is a method of writing mathematical expressions in which operators are placed between operands.
-
-For example, "3 + 4" represents the addition of 3 and 4.
-
-Postfix notation is a method of writing mathematical expressions in which operators are placed after the operands.
-
-For example, "3 4 +" represents the addition of 3 and 4.
-
-Expression contains digits, lower case English letters, ‘(’, ‘)’, ‘+’, ‘-’, ‘*’, ‘/’, ‘^’.
-
+    Infix notation is a method of writing mathematical expressions in which operators are placed between operands.
+    For example, "3 + 4" represents the addition of 3 and 4.
+    Postfix notation is a method of writing mathematical expressions in which operators are placed after the operands.
+    For example, "3 4 +" represents the addition of 3 and 4.
+    Expression contains digits, lower case English letters, ‘(’, ‘)’, ‘+’, ‘-’, ‘*’, ‘/’, ‘^’.
 
 Example:
-Input: exp = ‘3+4*8’
-
-Output: 348*+
-
-Explanation:
-Here multiplication is performed first and then the addition operation. Hence postfix expression is  3 4 8 * +.
+    Input: exp = ‘3+4*8’
+    Output: 348*+
+    Explanation:
+    Here multiplication is performed first and then the addition operation. Hence postfix expression is  3 4 8 * +.
 
 INPUT::::::
 
@@ -68,16 +58,15 @@ Problem statement:
 Given an infix expression, Your task is to convert the given infix expression to a prefix expression.
 
 Examples:
+    Example 1:
+    Input: x+y*z/w+u
+    Output: ++x/*yzwu
+    Explanation: Infix to prefix
 
-Example 1:
-Input: x+y*z/w+u
-Output: ++x/*yzwu
-Explanation: Infix to prefix
-
-Example 2:
-Input: a+b
-Output: +ab
-Explanation: Infix to prefix
+    Example 2:
+    Input: a+b
+    Output: +ab
+    Explanation: Infix to prefix
 
 
 INPUT::::::
@@ -126,7 +115,7 @@ string infixToPostfix(string exp)
 {
     // Write your code here
 
-    stack<char> st;
+    stack<char> st; // operator stack
     string ans;
 
     for (char c : exp)
@@ -197,7 +186,10 @@ void reverse(char arr[])
 }
 
 // Optimal approach:
-// Step1: reverse input; step2: swap brackets; step3: perform infix to postfix; step4: reverse again
+// Step1: reverse input; 
+// step2: swap brackets; 
+// step3: perform infix to postfix; 
+// step4: reverse again
 //
 // Time: O(N)
 // Space: O(N)
@@ -218,7 +210,7 @@ void infixToPrefix(char infix[], char prefix[])
             infix[i] = '(';
     }
 
-    char stack[len];
+    char stack[len];    // operator stack
     int stkIdx = -1;
     int pfIdx = 0;
 

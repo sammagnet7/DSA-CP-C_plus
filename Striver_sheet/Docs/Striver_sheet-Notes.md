@@ -373,7 +373,16 @@ Bit manipulation:
           int len = strlen(arr); // correct
           }
     ```
-36. 
+36. Convert char to string in-line:
+     ```cpp  
+          stack<string> st; // stack of string
+          for (char c : postfix) {
+               if (isalnum(c)) {
+                    st.push(string(1, c));   // convert char to string in-line
+               }
+          }
+     ```
+37. 
 
 ---
 ### Some tricky problems to revise:
