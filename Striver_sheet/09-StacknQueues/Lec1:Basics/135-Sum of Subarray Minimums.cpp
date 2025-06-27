@@ -39,7 +39,7 @@ Example 2:
     Input: arr = [11,81,94,43,3]
     Output: 444
 
-Example 3: **edge case check
+Example 3: **edge case check for duplcate range considering 
     Input: arr = [71,55,82,55]
     Output: 593
 
@@ -73,7 +73,6 @@ OUTPUT::::::
 // Space: O(N+N+N)~O(3N): 2 vectors for smaller elements + 1 stack
 int sumSubarrayMins(vector<int> &arr)
 {
-
     int ans = 0;
     int moduler = 1e9 + 7;
 

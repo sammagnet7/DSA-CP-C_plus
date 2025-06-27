@@ -366,6 +366,10 @@ Bit manipulation:
      ```
 34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
      <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
+
+Misc continues..
+---
+
 35. In c, once array is passed through method calling, then it is becomes a pointer and it's size can not be calculated with sizeof() op.
     ```c
           void reverse(char arr[]){
@@ -382,7 +386,10 @@ Bit manipulation:
                }
           }
      ```
-37. 
+37. Best waysto declare a 2D vector in C++:
+    ```cpp
+          vector<vector<int>> matrix(M, vector<int>(N, initial_value));
+     ```
 
 ---
 ### Some tricky problems to revise:
