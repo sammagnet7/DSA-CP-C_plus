@@ -40,6 +40,46 @@
                     double abs_double = std::abs(double_num);
                }
           ```
+     - **std::queue**
+
+          **Concept:**  
+          `std::queue` is a container adaptor that provides a First-In, First-Out (FIFO) behavior, similar to a real-world queue or line.
+
+          **Operations:**  
+          It offers a limited set of operations:
+          - `push()`: Adds an element to the back (enqueue).
+          - `pop()`: Removes an element from the front (dequeue).
+          - `front()`: Accesses the front element without removing it.
+          - `back()`: Accesses the back element without removing it.
+          - `empty()`: Checks if the queue is empty.
+          - `size()`: Returns the number of elements.
+
+          **Underlying Container:**  
+          By default, `std::queue` uses `std::deque` as its underlying container, but it can also be adapted to use `std::list` or `std::vector` (with some limitations for `std::vector`).
+
+          **Purpose:**  
+          Ideal for scenarios where strict FIFO order is required and direct access or manipulation of elements other than at the ends is not needed.
+     
+     - **std::deque**
+
+       **Concept:**  
+       `std::deque` (double-ended queue) is a sequence container that allows efficient insertion and deletion of elements at both the front and the back.
+
+       **Operations:**  
+       It provides a richer set of operations compared to `std::queue`:
+       - `push_front()`, `push_back()`: Adds elements to the front or back.
+       - `pop_front()`, `pop_back()`: Removes elements from the front or back.
+       - `front()`, `back()`: Accesses elements at the ends.
+       - `operator[]`, `at()`: Allows random access to elements by index, similar to `std::vector`.
+       - `insert()`, `erase()`: Allows insertion and deletion at arbitrary positions (though less efficient than at the ends).
+       - `empty()`, `size()`: Checks if the deque is empty and returns the number of elements.
+
+       **Underlying Implementation:**  
+       `std::deque` is typically implemented as a collection of fixed-size blocks of memory, providing efficient growth and contraction at both ends while also enabling random access.
+
+       **Purpose:**  
+       Suitable when you need a dynamic array-like structure that requires efficient insertions/deletions at both ends and potentially random access to elements.
+
      - 
 
 8. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
@@ -390,6 +430,8 @@ Misc continues..
     ```cpp
           vector<vector<int>> matrix(M, vector<int>(N, initial_value));
      ```
+38. Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
+39. 
 
 ---
 ### Some tricky problems to revise:
