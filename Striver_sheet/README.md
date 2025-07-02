@@ -164,4 +164,9 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 28/06/26: Step6:: Stack and queues [227/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
 - 29/06/26: Step6:: Stack and queues completed [229/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 01 ]</span>
 - 30/06/26: Step6:: Stack and queues completed [231/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+  
+---
+
+- 01/07/26: Step6:: Sliding window started [233/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 02/07/26: Step6:: Sliding window [235/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
 - 

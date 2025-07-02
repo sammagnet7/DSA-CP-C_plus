@@ -21,6 +21,7 @@ using namespace std;
 1. Title: Longest Substring Without Repeating Characters
 
 Links:
+https://www.youtube.com/watch?v=-zSxTJkcdAo&list=PLgUwDviBIf0q7vrFA_HEWcqRqMpCXzYAL&index=3
 https://takeuforward.org/data-structure/length-of-longest-substring-without-any-repeating-character/
 https://takeuforward.org/plus/dsa/problems/longest-substring-without-repeating-characters?tab=editorial
 https://leetcode.com/problems/longest-substring-without-repeating-characters/description/

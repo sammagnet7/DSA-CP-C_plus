@@ -21,6 +21,7 @@ using namespace std;
 1. Title: Max Consecutive Ones III
 
 Links:
+https://www.youtube.com/watch?v=3E4JBHSLpYk&list=PLgUwDviBIf0q7vrFA_HEWcqRqMpCXzYAL&index=4
 https://takeuforward.org/plus/dsa/problems/max-consecutive-ones-iii
 https://leetcode.com/problems/max-consecutive-ones-iii/description/
 
