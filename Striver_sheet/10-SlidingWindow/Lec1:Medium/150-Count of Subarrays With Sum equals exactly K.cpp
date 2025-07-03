@@ -19,8 +19,8 @@ using namespace std;
 /*
 
 **
-NOTE: 
-    WHENEVER COUNT OF SUB-ARRAYS EQUALS K is there, 
+NOTE:
+    WHENEVER COUNT OF SUB-ARRAYS EQUALS K is there,
     USE APPROACH: count_equals_(k) = count_less_equal_(k)-count_less_equal_(k-1)
 **
 
@@ -94,6 +94,40 @@ INPUT::::::
 OUTPUT::::::
 
 
+------------------------------------------------------------------------
+
+3. Title: Subarrays with K Different Integers
+
+Links:
+https://www.youtube.com/watch?v=7wYGbV_LsX4&list=PLgUwDviBIf0q7vrFA_HEWcqRqMpCXzYAL&index=11
+https://takeuforward.org/plus/dsa/problems/subarrays-with-k-different-integers?tab=editorial
+https://leetcode.com/problems/subarrays-with-k-different-integers/description/
+
+Problem statement:
+Given an integer array nums and an integer k, return the number of good subarrays of nums.
+
+A good array is an array where the number of different integers in that array is exactly k.
+
+Examples:
+    For example, [1,2,3,1,2] has 3 different integers: 1, 2, and 3.
+
+    Example 1:
+    Input: nums = [1,2,1,2,3], k = 2
+    Output: 7
+    Explanation: Subarrays formed with exactly 2 different integers: [1,2], [2,1], [1,2], [2,3], [1,2,1], [2,1,2], [1,2,1,2]
+
+    Example 2:
+    Input: nums = [1,2,1,3,4], k = 3
+    Output: 3
+    Explanation: Subarrays formed with exactly 3 different integers: [1,2,1,3], [2,1,3], [1,3,4].
+
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
 */
 
 class Solution
@@ -101,7 +135,7 @@ class Solution
 public:
     //------------------------------------------------------------------------
     // 1. Binary Subarrays With Sum equals K
-    //
+    //------------------------------------------------------------------------
 
     // Approach1:
     //
@@ -194,7 +228,7 @@ public:
 
 //------------------------------------------------------------------------
 // 2. Count Number of Nice Subarrays
-//
+//------------------------------------------------------------------------
 
 class Solution
 {
@@ -248,6 +282,58 @@ public:
     {
 
         return numberOfSubarrays_less_equals(nums, k) - numberOfSubarrays_less_equals(nums, k - 1);
+    }
+};
+
+//------------------------------------------------------------------------
+// 3. Title: Subarrays with K Different Integers
+//------------------------------------------------------------------------
+
+class Solution
+{
+public:
+    // O(2N)
+    int subarraysWithKDistinct_lessEqual(vector<int> &nums, int k)
+    {
+        if (k == 0)
+            return 0;
+
+        int N = nums.size();
+        int ans = 0;
+        unordered_map<int, int> mp; // O(k)
+
+        int l = 0;
+        int r = 0;
+
+        while (r < N)
+        { // O(N)
+            mp[nums[r]]++;
+
+            while (mp.size() > k)
+            { // O(N)
+                mp[nums[l]]--;
+                if (mp[nums[l]] == 0)
+                {
+                    mp.erase(nums[l]);
+                }
+
+                l++;
+            }
+
+            ans += (r - l + 1);
+            r++;
+        }
+
+        return ans;
+    }
+
+    // Optimal approach: Two pointer: count_equals_(k) = count_less_equal_(k)-count_less_equal_(k-1)
+    //
+    // Time: O(4N) ignoring the time taken by map data structure
+    // Space: O(K)
+    int subarraysWithKDistinct(vector<int> &nums, int k)
+    {
+        return subarraysWithKDistinct_lessEqual(nums, k) - subarraysWithKDistinct_lessEqual(nums, (k - 1));
     }
 };
 

@@ -431,7 +431,46 @@ Misc continues..
           vector<vector<int>> matrix(M, vector<int>(N, initial_value));
      ```
 38. Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
-39. 
+
+Heap
+---
+
+39. In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
+    ```cpp
+          #include <queue>
+
+          priority_queue<int> max_heap; // Default: max heap
+          max_heap.push(10);
+          max_heap.push(5);
+          max_heap.push(20);
+          cout << "Max heap top: " << max_heap.top() << endl; // Output: 20
+    ```
+    ```cpp
+          #include <queue>
+          #include <functional> // For std::greater
+
+          // Min heap: specify std::greater<int> as the comparator
+          priority_queue<int, vector<int>, greater<int>> min_heap; 
+          min_heap.push(10);
+          min_heap.push(5);
+          min_heap.push(20);
+          cout << "Min heap top: " << min_heap.top() << endl; // Output: 5
+    ```
+40. Heap Theory:
+    1.  *Complete binary tree*: Binary tree where all internal nodes are full i.e. having 2 children. 
+    2.  Almost complete BS: Except last and second last level all nodes must be full. + The leaf nodes must be filled from left to right.
+    3.  Priority queue is basically *almost complete binary tree* where all operations take time **O(Log N)**
+    4.  Heap is stored in form of *Array*.
+    5.  For 0-based indexing for element `i`
+        -   left child is at: `2*i +1`
+        -   right child is at: `2*i +2`
+        -   Parent is at: `ceil( (float)i /2) - 1`
+        -   #Total nodes = #Internal nodes + #leaf nodes
+        -   For Complete Binary tree: 
+            -   #leaf nodes = #internal nodes + 1;
+        -   For Almost complete Binary tree:
+            -   Leaf nodes lie from `(N/2)` to `(N-1)`
+            -   Internal nodes lie from `0` to `(N/2 - 1)`
 
 ---
 ### Some tricky problems to revise:
@@ -449,4 +488,5 @@ Misc continues..
 8. 114-Expression Add Operators: **Hard**: [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/) <- *could not complete.* getting **TLE**. Need to calculate the result on the go, instead of calculating it at the end. Follow Editorial.
 9. 115-basic bit manipulation: Hard: [Title: Count the set bits](https://www.naukri.com/code360/problems/count-set-bits_1112627?leftPanelTabValue=PROBLEM) <- *could not complete.* getting **TLE**. Check later.
 10. 119- Single number in array: Single number II: could n't grasp the 4th optimal solution mentioned in the video: [youtube](https://www.youtube.com/watch?v=5Bb2nqA40JY&t=77s).
-11. 
+11. Sliding window: Hard: Minimum Window Subsequence -> need DP to solve. Check after DP. [Problem link](https://www.naukri.com/code360/problems/minimum-window-subsequence_2181133) [Editorial](https://takeuforward.org/plus/dsa/problems/minimum-window-subsequence?tab=editorial)
+12. 
