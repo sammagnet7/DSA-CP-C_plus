@@ -80,7 +80,19 @@
        **Purpose:**  
        Suitable when you need a dynamic array-like structure that requires efficient insertions/deletions at both ends and potentially random access to elements.
 
-     - 
+     - In c++ use random number:
+          ```cpp
+               #include<cstdlib> // for rand() and srand()
+               #include<ctime>  // for time()
+
+               int main(){
+                    srand(time(0)); // Seed the random number generator
+                                   // w/o this get same sequence each run
+                    int randomInt = rand(); // Random number between 0 and RAND_MAX where RAND_MAX= 32k.
+                    int range = 100;
+                    int boundInt = randomInt % range; // Random number between 0 and 99
+               }
+          ```
 
 8. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
      - Initializing array filled with default values: int hash[13] = {0};
@@ -141,7 +153,29 @@
      if (m > n)
             return findMedianSortedArrays(nums2, nums1);
      ```
-   - 
+   - To initialize data structures in Constructor init:
+     ```cpp
+          vector<int> heap;
+          int size;
+
+          minHeap(): heap(vector<int>()) {
+               size = 0;
+          }
+
+          minHeap(int capacity): heap(vector<int>(capacity)) {
+               size = 0;
+          }
+     ```
+   - The C++ Standard Library provides the std::swap() function (from the <utility> header):
+     ```cpp
+          #include <utility> // Required for std::swap
+          // Swap using std::swap()
+          std::swap(arr[index1], arr[index2]);
+     ```
+   - x
+   - y
+   - z
+
 9. Array size limitations: 
      ![Max array size we can initialize with](./img/max_array_size.png)
      
@@ -320,7 +354,7 @@
 
 26. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
-27. Below is a way to get the next valid index while traversing a 2-D matrix:
+1.  Below is a way to get the next valid index while traversing a 2-D matrix:
      ```cpp
                int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index
                curFlatIndex++;                       // Move to next
@@ -335,7 +369,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
      ```
 
-28. A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
+2.  A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
 
      ```cpp
           for(int i=0; i<N; i++){
@@ -347,7 +381,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           }
           endLoop:;
      ```
-29. Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
+3.  Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
 
     <img src="img/sudoku.png" alt="alt text" style="display: block; margin: auto; width: 250px;">
 
@@ -368,14 +402,14 @@ Whenever the problem is related to picking up elements from an array to form a c
                     return false;
           }
     ```
-30. How to push back and pop back a **string** to a **string**?
+4.  How to push back and pop back a **string** to a **string**?
      ```cpp
           string cur = "test";
           size_t oldSize = expression.size();
           expression.append(cur);
           expression.resize(oldSize);
      ```
-31. How to push back and pop back a **char** to a **string**?
+5.  How to push back and pop back a **char** to a **string**?
      ```cpp
           char cur = 'x';
           expression.push_back(cur);
@@ -464,13 +498,14 @@ Heap
     5.  For 0-based indexing for element `i`
         -   left child is at: `2*i +1`
         -   right child is at: `2*i +2`
-        -   Parent is at: `ceil( (float)i /2) - 1`
-        -   #Total nodes = #Internal nodes + #leaf nodes
+        -   Parent is at: `ceil( (float)i /2) - 1`; Correct version: `(i-1)/2`
+        -   #total nodes = #internal nodes + #leaf nodes
         -   For Complete Binary tree: 
             -   #leaf nodes = #internal nodes + 1;
         -   For Almost complete Binary tree:
             -   Leaf nodes lie from `(N/2)` to `(N-1)`
             -   Internal nodes lie from `0` to `(N/2 - 1)`
+    6.  
 
 ---
 ### Some tricky problems to revise:
@@ -489,4 +524,5 @@ Heap
 9. 115-basic bit manipulation: Hard: [Title: Count the set bits](https://www.naukri.com/code360/problems/count-set-bits_1112627?leftPanelTabValue=PROBLEM) <- *could not complete.* getting **TLE**. Check later.
 10. 119- Single number in array: Single number II: could n't grasp the 4th optimal solution mentioned in the video: [youtube](https://www.youtube.com/watch?v=5Bb2nqA40JY&t=77s).
 11. Sliding window: Hard: Minimum Window Subsequence -> need DP to solve. Check after DP. [Problem link](https://www.naukri.com/code360/problems/minimum-window-subsequence_2181133) [Editorial](https://takeuforward.org/plus/dsa/problems/minimum-window-subsequence?tab=editorial)
-12. 
+12. 155-Check for heap: Need to try for linkedlist tree also. Check after tree: [Unsolved problem](https://www.geeksforgeeks.org/problems/is-binary-tree-heap/1)
+13. 

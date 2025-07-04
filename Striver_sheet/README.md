@@ -170,4 +170,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 01/07/26: Step6:: Sliding window started [233/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
 - 02/07/26: Step6:: Sliding window [235/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
 - 03/07/26: Step6:: Sliding window [241/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 02 ]</span>
+- 04/07/26: Step6:: Sliding window [245/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 00 ]</span>
 - 
