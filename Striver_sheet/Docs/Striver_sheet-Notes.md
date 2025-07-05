@@ -93,6 +93,28 @@
                     int boundInt = randomInt % range; // Random number between 0 and 99
                }
           ```
+     - In c++ how to erase map entry while traversing:
+          ```cpp
+               for (auto it = myMap.begin(); it != myMap.end(); ) {
+                    if (it->second == 0) {
+                         it = myMap.erase(it); // erase and move to next
+                    } else {
+                         ++it;
+                    }
+               }
+          ```
+     - In c++ map to check two consecutive keys in a map while iterating:
+          ```cpp
+               for (auto it = mp.begin(); it != mp.end(); ++it) {
+                    auto nextIt = next(it);  // gives the nest iterator
+
+                    if (nextIt == mp.end()) break;     // safety check
+
+                    if ((nextIt->first - it->first) != 1)
+                         return false;
+               }
+          ```
+     - 
 
 8. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
      - Initializing array filled with default values: int hash[13] = {0};
@@ -144,6 +166,10 @@
           ```c
           int mid = l + (r - l) / 2;
           ```
+          or
+          ```c
+          int mid = r - (r - l) / 2;
+          ```
 
      > NOTE: While using ceil DO NOT FORGET to cast to double: ceil((`double`)N / 2);
 
@@ -175,6 +201,9 @@
    - x
    - y
    - z
+
+---
+<span style="color: violet; font-size: 18px;">**Miscs:**</span>
 
 9. Array size limitations: 
      ![Max array size we can initialize with](./img/max_array_size.png)
@@ -416,8 +445,8 @@ Whenever the problem is related to picking up elements from an array to form a c
           expression.pop_back();
      ```
 
-Bit manipulation:
 ---
+<span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
 
 32. -ve numbers are stored as 2's complement format.
 33. Not(~) operator: 
@@ -441,17 +470,18 @@ Bit manipulation:
 34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
      <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
 
-Misc continues..
 ---
+<span style="color: violet; font-size: 18px;">**Miscs continues:**</span>
 
-35. In c, once array is passed through method calling, then it is becomes a pointer and it's size can not be calculated with sizeof() op.
+
+1.  In c, once array is passed through method calling, then it is becomes a pointer and it's size can not be calculated with sizeof() op.
     ```c
           void reverse(char arr[]){
           // int len = sizeof(arr)/sizeof(arr[0]); // Wrong because arr is a pointer here, and sizeof(arr) returns size of pointer i.e. 4 or 8 always. 
           int len = strlen(arr); // correct
           }
     ```
-36. Convert char to string in-line:
+2.  Convert char to string in-line:
      ```cpp  
           stack<string> st; // stack of string
           for (char c : postfix) {
@@ -460,14 +490,15 @@ Misc continues..
                }
           }
      ```
-37. Best waysto declare a 2D vector in C++:
+3.  Best waysto declare a 2D vector in C++:
     ```cpp
           vector<vector<int>> matrix(M, vector<int>(N, initial_value));
      ```
-38. Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
+4.  Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
 
-Heap
 ---
+<span style="color: violet; font-size: 18px;">**Heap:**</span>
+
 
 39. In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
     ```cpp
