@@ -114,9 +114,10 @@
                          return false;
                }
           ```
+     - When you declare: ```cpp priority_queue<pair<int, int>> maxHeap;``` It compares pair<int, int> based on lexicographical order. First by .first. If .first is equal, then by .second
      - 
 
-8. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
+1. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
      - Initializing array filled with default values: int hash[13] = {0};
      - To print as Booleans:
           ```c

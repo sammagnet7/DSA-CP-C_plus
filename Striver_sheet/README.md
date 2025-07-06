@@ -172,4 +172,4 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 03/07/26: Step6:: Sliding window [241/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 02 ]</span>
 - 04/07/26: Step6:: Heap [245/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 00 ]</span>
 - 05/07/26: Step6:: Heap [252/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 06 ] [ Hard : 01 ]</span>
-- 
+- 06/07/26: Step6:: Heap [256/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
