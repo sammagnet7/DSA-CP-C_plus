@@ -115,6 +115,20 @@
                }
           ```
      - When you declare: ```cpp priority_queue<pair<int, int>> maxHeap;``` It compares pair<int, int> based on lexicographical order. First by .first. If .first is equal, then by .second
+     - How to use tuples in c++:
+     ```cpp
+          // C++17: structured bindings:
+          tuple<int, string, double> person = {25, "Alice", 5.9};
+          auto [age, name, height] = person;
+          cout << "Name: " << name << ", Age: " << age << ", Height: " << height << endl;
+
+          // Earlier C++ (C++11 / C++14):
+          tuple<int, string, double> person = make_tuple(25, "Alice", 5.9);
+          int age = get<0>(person);
+          string name = get<1>(person);
+          double height = get<2>(person);
+          cout << "Name: " << name << ", Age: " << age << ", Height: " << height << endl;
+     ```
      - 
 
 1. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
