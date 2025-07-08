@@ -129,9 +129,6 @@
           double height = get<2>(person);
           cout << "Name: " << name << ", Age: " << age << ", Height: " << height << endl;
      ```
-     - 
-
-1. <span style="color: violet; font-size: 18px;">**Shortcuts:** </span>
      - Initializing array filled with default values: int hash[13] = {0};
      - To print as Booleans:
           ```c
@@ -213,6 +210,19 @@
           // Swap using std::swap()
           std::swap(arr[index1], arr[index2]);
      ```
+   - Comparison between `struct` and `class` in c++: 
+
+     | Feature                      | `struct`                    | `class`                  |
+     | ---------------------------- | --------------------------- | ------------------------ |
+     | Default access               | `public`                    | `private`                |
+     | Default inheritance          | `public`                    | `private`                |
+     | Functions, inheritance, etc. | ✅ Supported                | ✅ Supported             |
+     | Style convention             | C-style or simple POD types | Full-fledged OOP classes |
+     |  When to Use?                | You want everything public  | building full OOP components |
+     -  Historical Background:
+          - In `C`, struct could only contain `data` (no `functions`).
+          - `C++` extended `struct` to support full object-oriented features.
+          - `class` was introduced to emphasize `encapsulation` and `access control`.
    - x
    - y
    - z
@@ -220,14 +230,14 @@
 ---
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
 
-9. Array size limitations: 
+1. Array size limitations: 
      ![Max array size we can initialize with](./img/max_array_size.png)
      
-10. If the string contains both uppercase and lowercase letters: We have 256 characters in total in this case. So, we will create a hash array of size **256**. Otherwise we can use hash[s[i]-’a’] OR hash[s[i]-’A’] and keep the hash array of 26 elements only.
+2.  If the string contains both uppercase and lowercase letters: We have 256 characters in total in this case. So, we will create a hash array of size **256**. Otherwise we can use hash[s[i]-’a’] OR hash[s[i]-’A’] and keep the hash array of 26 elements only.
 
-11. In the map data structure, the data type of key can be anything like int, double, pair<int, int>, etc. But for unordered_map the data type is limited to integer, double, string, etc. We cannot have an unordered_map whose key is pair<int, int>. 
+3.  In the map data structure, the data type of key can be anything like int, double, pair<int, int>, etc. But for unordered_map the data type is limited to integer, double, string, etc. We cannot have an unordered_map whose key is pair<int, int>. 
 
-12. How to traverse map from end to start?
+4.  How to traverse map from end to start?
      Ans: 
 
      ```c++
@@ -236,17 +246,17 @@
           }
      ```
 
-13. XOR properties:
+5.  XOR properties:
      - XOR of two same numbers is always 0 i.e. a ^ a = 0. ←Property 1.
      - XOR of a number with 0 will result in the number itself i.e. 0 ^ a = a.  ←Property 2
 
-14. Sub-array vs sub-sequence:
+6.  Sub-array vs sub-sequence:
     - A subarray is a **contiguous** (consecutive) portion of an array.
     - A subsequence is a sequence of elements derived from the original array by deleting some elements **without changing the order** of the remaining elements.
 
-15. When input array is given as sorted, then try to use Binary search.
-16. When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
-17. How to rotate an array or a string? (`O(N)`)
+7.  When input array is given as sorted, then try to use Binary search.
+8.  When we have to find the <b>minimum</b> number which is greater than or equal to something, try to use Binary search. And vice-versa for largest number less than equals to something. And also perform the binary search on the range of that asked value only from its min to max range.
+9.  How to rotate an array or a string? (`O(N)`)
      - Use built-in function rotate(first,middle, last) where
        - first: fist iterator in the range of elements to rotate
        - last: last iterator in the range of elements to rotate
@@ -267,7 +277,7 @@
           cout<<s<<endl;
      ```
 
-18. string substr (size_t pos = 0, size_t len = npos) const;
+10. string substr (size_t pos = 0, size_t len = npos) const;
      - pos: Position of the first character to be copied as a substring.
      - len: Number of characters to include in the substring
      - Example: 
@@ -289,7 +299,7 @@
           }
      ```
 
-19.  DO NOT concat strings in loops with '`+`' operator as each time it creates new string. Instead use **append()** or **push_back()** and **pop_back()** methods:
+11.  DO NOT concat strings in loops with '`+`' operator as each time it creates new string. Instead use **append()** or **push_back()** and **pop_back()** methods:
      ```cpp
           string ans;
           for(int i=255; i>=0; i--){
@@ -319,7 +329,7 @@
           }
      ```
 
-20. DO NOT pass strings **w/o** reference operator in method call from inside a loop. It creates new stirng in each method call and will give space limit reached error. Pass like below:
+12. DO NOT pass strings **w/o** reference operator in method call from inside a loop. It creates new stirng in each method call and will give space limit reached error. Pass like below:
      ```cpp
           bool isPal(string& str){
                cout<< str[s];          
@@ -346,14 +356,14 @@
         return s.substr(ansL, ansR-ansL+1);
      ```
 
-21. How to detect integer overflow using only int variable? Below code is the answer:
+13. How to detect integer overflow using only int variable? Below code is the answer:
     ```cpp
     bool isOverflow = (ans>INT_MAX/10) || (ans==INT_MAX/10 && curDigit>7);
     ```   
 
-22. Note: c++ string method to check digit is: `isdigit(s[i])` not isDigit.
-23. Note: In c++ string checking s[i] == NULL (or '\0') won’t work reliably to detect the end of the string. Correct usage: `if (i == s.length()) return;` where i is 0 based index over string chars.
-24. Below is an example of how to use **Lambda xfunctions** in c++:
+14. Note: c++ string method to check digit is: `isdigit(s[i])` not isDigit.
+15. Note: In c++ string checking s[i] == NULL (or '\0') won’t work reliably to detect the end of the string. Correct usage: `if (i == s.length()) return;` where i is 0 based index over string chars.
+16. Below is an example of how to use **Lambda xfunctions** in c++:
 
      > Note: Below `quickmul` is the labmda function which is using var `mod` from class attributes. [Ref: https://leetcode.com/problems/count-good-numbers/]
 
@@ -383,7 +393,7 @@
           };
      ```
 
-25. Temporarily removes each element from set s, processes the rest via funcA, then restores the removed element safely.  
+17. Temporarily removes each element from set s, processes the rest via funcA, then restores the removed element safely.  
      ```cpp
           for (auto it = s.begin(); it != s.end(); ) {
                int val = *it;
@@ -396,7 +406,7 @@
           }
      ```
 
-26. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
+18. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
 1.  Below is a way to get the next valid index while traversing a 2-D matrix:
      ```cpp
@@ -512,10 +522,47 @@ Whenever the problem is related to picking up elements from an array to form a c
 4.  Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
 
 ---
+<span style="color: violet; font-size: 18px;">**Binary tree:**</span>
+
+39. Theory of BT:
+    - Links:
+      - [TUF theory blog](https://takeuforward.org/binary-tree/introduction-to-trees/)
+      - [TUF+ theory blog](https://takeuforward.org/plus/dsa/binary-trees/theory-and-traversals/introduction-)
+      - [Binary Tree Representation in C++](https://takeuforward.org/binary-tree/binary-tree-representation-in-c/)
+      - [Tree traversals](https://takeuforward.org/binary-tree/binary-tree-traversal-inorder-preorder-postorder/)
+    - *Full/Strict Binary Tree*: 
+      - every node has either 0 or 2 children — no node has only one child, no matter how the tree is growing. 
+      - contributes significantly to the tree’s balance, making traversal, searching, and insertion options more predictable and efficient.
+    - *Complete binary tree*: 
+       -  All levels are completely filled, all internal nodes having 2 children except possibly the last.
+       -  The last level is filled from left to right, with no gaps.
+       -  aids in achieving balanced structures, making it easier to implement algorithms and ensuring reasonably consistent performance.
+       -  useful for storing data in structures like heaps
+       -  at level h, #nodes = 2^h
+    - *Almost complete binary tree*: 
+        - The term "Almost Complete" is not strictly standardized
+        - A tree that's very close to being complete, but may have small deviations.
+    -  *Perfect binary tree*: 
+       -  Every level is completely filled.
+       -  Every internal node (non-leaf node) has exactly two children
+       -  all leaf nodes are at the same level.
+       -  0-indexed Height = h, number of nodes = 2^(h+1) - 1  
+    -  *Balanced Binary Tree*: 
+       -  height difference between the left and right subtrees of every node is at most 1.
+       -  `abs(height(left subtree) - height(right subtree)) <= 1`
+       - O(log n) max height
+       -  Efficient operations like search, insert, delete in AVL/Red-Black/BSTs.
+    -  *Degenerate Tree*:
+       -  each parent node has only one child.
+       -  This makes the tree essentially behave like a linked list.
+       -  tree is called skewed
+       -  max height O(n)
+
+---
 <span style="color: violet; font-size: 18px;">**Heap:**</span>
 
 
-39. In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
+1.  In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
     ```cpp
           #include <queue>
 
@@ -536,12 +583,10 @@ Whenever the problem is related to picking up elements from an array to form a c
           min_heap.push(20);
           cout << "Min heap top: " << min_heap.top() << endl; // Output: 5
     ```
-40. Heap Theory:
-    1.  *Complete binary tree*: Binary tree where all internal nodes are full i.e. having 2 children. 
-    2.  Almost complete BS: Except last and second last level all nodes must be full. + The leaf nodes must be filled from left to right.
-    3.  Priority queue is basically *almost complete binary tree* where all operations take time **O(Log N)**
-    4.  Heap is stored in form of *Array*.
-    5.  For 0-based indexing for element `i`
+2.  Heap Theory:
+    1.  Priority queue is basically *almost complete binary tree* where all operations take time **O(Log N)**
+    2.  Heap is stored in form of *Array*.
+    3.  For 0-based indexing for element `i`
         -   left child is at: `2*i +1`
         -   right child is at: `2*i +2`
         -   Parent is at: `ceil( (float)i /2) - 1`; Correct version: `(i-1)/2`
@@ -551,7 +596,7 @@ Whenever the problem is related to picking up elements from an array to form a c
         -   For Almost complete Binary tree:
             -   Leaf nodes lie from `(N/2)` to `(N-1)`
             -   Internal nodes lie from `0` to `(N/2 - 1)`
-    6.  
+    4.  
 
 ---
 ### Some tricky problems to revise:
@@ -571,4 +616,5 @@ Whenever the problem is related to picking up elements from an array to form a c
 10. 119- Single number in array: Single number II: could n't grasp the 4th optimal solution mentioned in the video: [youtube](https://www.youtube.com/watch?v=5Bb2nqA40JY&t=77s).
 11. Sliding window: Hard: Minimum Window Subsequence -> need DP to solve. Check after DP. [Problem link](https://www.naukri.com/code360/problems/minimum-window-subsequence_2181133) [Editorial](https://takeuforward.org/plus/dsa/problems/minimum-window-subsequence?tab=editorial)
 12. 155-Check for heap: Need to try for linkedlist tree also. Check after tree: [Unsolved problem](https://www.geeksforgeeks.org/problems/is-binary-tree-heap/1)
-13. 
+13. 168-DFS traversal for Binary tree: [L12. Iterative Postorder Traversal using 1 Stack](https://www.youtube.com/watch?v=NzIGLLwZBS8&list=PLkjdNRgDmcc0Pom5erUBU4ZayeU9AyRRu&index=12) -> Logic is complex though alternate easy approach is available. Check later.
+14. Binary tree question try later: [GFG](https://www.geeksforgeeks.org/problems/postorder-traversal-from-given-inorder-and-preorder-traversals/1)
