@@ -175,4 +175,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 06/07/26: Step6:: Heap [256/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
 - 07/07/26: Step6:: Heap completed [258/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
 - 08/07/26: Step6:: Binary trees [271/455] <span style="color: green;"> [ Easy : 13 ] [ Medium : 00 ] [ Hard : 00 ]</span>
+- 09/07/26: Step6:: Binary trees [277/455] <span style="color: green;"> [ Easy : 04 ] [ Medium : 01 ] [ Hard : 01 ]</span>
 - 

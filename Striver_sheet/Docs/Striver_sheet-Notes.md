@@ -542,21 +542,23 @@ Whenever the problem is related to picking up elements from an array to form a c
     - *Almost complete binary tree*: 
         - The term "Almost Complete" is not strictly standardized
         - A tree that's very close to being complete, but may have small deviations.
-    -  *Perfect binary tree*: 
+    - *Perfect binary tree*: 
        -  Every level is completely filled.
        -  Every internal node (non-leaf node) has exactly two children
        -  all leaf nodes are at the same level.
        -  0-indexed Height = h, number of nodes = 2^(h+1) - 1  
-    -  *Balanced Binary Tree*: 
+    - *Balanced Binary Tree*: 
        -  height difference between the left and right subtrees of every node is at most 1.
        -  `abs(height(left subtree) - height(right subtree)) <= 1`
        - O(log n) max height
        -  Efficient operations like search, insert, delete in AVL/Red-Black/BSTs.
-    -  *Degenerate Tree*:
+    - *Degenerate Tree*:
        -  each parent node has only one child.
        -  This makes the tree essentially behave like a linked list.
        -  tree is called skewed
        -  max height O(n)
+    - Diameter of tree: Length of the longest path (every node can be traversed only once) between any two nodes in the tree. It may or may not pass through the root.
+    - 
 
 ---
 <span style="color: violet; font-size: 18px;">**Heap:**</span>
