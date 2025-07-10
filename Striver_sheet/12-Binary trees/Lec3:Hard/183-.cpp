@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: 
+1. Title:
 
 Links:
 
@@ -27,6 +27,21 @@ Links:
 Problem statement:
 
 
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+----------------------------------------------------------------------------------------------------
+
+2. Title:
+
+Links:
+
+
+
+Problem statement:
 
 
 INPUT::::::
@@ -46,14 +61,27 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+template <typename T = int>
+struct TreeNodeN
+{
+  int data;
+  TreeNodeN *left;
+  TreeNodeN *right;
+  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
+  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
+  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
+};
+
 class Solution
 {
 public:
   //-------------------------------------------------------------------------------
-  // 1. Title: 
+  // 1. Title:
   //-------------------------------------------------------------------------------
 
-
+  //-------------------------------------------------------------------------------
+  // 2. Title:
+  //-------------------------------------------------------------------------------
 };
 
 int main()

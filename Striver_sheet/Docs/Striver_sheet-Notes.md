@@ -408,7 +408,7 @@
 
 18. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
-1.  Below is a way to get the next valid index while traversing a 2-D matrix:
+19.  Below is a way to get the next valid index while traversing a 2-D matrix:
      ```cpp
                int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index
                curFlatIndex++;                       // Move to next
@@ -423,7 +423,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
      ```
 
-2.  A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
+20.  A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
 
      ```cpp
           for(int i=0; i<N; i++){
@@ -435,7 +435,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           }
           endLoop:;
      ```
-3.  Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
+21.  Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
 
     <img src="img/sudoku.png" alt="alt text" style="display: block; margin: auto; width: 250px;">
 
@@ -456,25 +456,37 @@ Whenever the problem is related to picking up elements from an array to form a c
                     return false;
           }
     ```
-4.  How to push back and pop back a **string** to a **string**?
+22.  How to push back and pop back a **string** to a **string**?
      ```cpp
           string cur = "test";
           size_t oldSize = expression.size();
           expression.append(cur);
           expression.resize(oldSize);
      ```
-5.  How to push back and pop back a **char** to a **string**?
+23.  How to push back and pop back a **char** to a **string**?
      ```cpp
           char cur = 'x';
           expression.push_back(cur);
           expression.pop_back();
      ```
-
+24. Convert char to int: 
+     ```cpp 
+          int c =  'x' - 'a';
+     ```
+     Convert digit to char:
+     ```cpp 
+          char dig =  5 + '0';
+     ```
+     Convert number to string of digits:
+     ```cpp 
+          int num = 245;
+          string num =  to_string(num);
+     ```
 ---
 <span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
 
-32. -ve numbers are stored as 2's complement format.
-33. Not(~) operator: 
+1.  -ve numbers are stored as 2's complement format.
+2.  Not(~) operator: 
      ```cpp
           int x = 6; // originally stored as 32 bits: 0000 .. 0000 0110 
           cout<< ~(x)<< endl; // After negetaion:   [1]111 .. 1111 1001
