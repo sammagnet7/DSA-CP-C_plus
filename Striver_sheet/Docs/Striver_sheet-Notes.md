@@ -570,6 +570,7 @@ Whenever the problem is related to picking up elements from an array to form a c
        -  tree is called skewed
        -  max height O(n)
     - Diameter of tree: Length of the longest path (every node can be traversed only once) between any two nodes in the tree. It may or may not pass through the root.
+    - LCA: Lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).
     - 
 
 ---
