@@ -469,7 +469,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           expression.push_back(cur);
           expression.pop_back();
      ```
-24. Convert char to int: 
+24. Convert char/string to int and vice-versa: 
      ```cpp 
           int c =  'x' - 'a';
      ```
@@ -479,8 +479,24 @@ Whenever the problem is related to picking up elements from an array to form a c
      ```
      Convert number to string of digits:
      ```cpp 
+          #include <string>
           int num = 245;
           string num =  to_string(num);
+     ```
+     Convert string of digits to num:
+     ```cpp
+          #include <string>
+          string str_num = "123";
+          int num = stoi(str_num);
+     ```
+25. How to parse comma:
+    ```cpp
+          stringstream ss(data);
+          string s;
+          // here ',' seperator is used
+          while (getline(ss, s, ',')) {
+               cout << s << endl;
+          }
      ```
 ---
 <span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
