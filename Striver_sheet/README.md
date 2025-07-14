@@ -180,4 +180,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 11/07/26: Step6:: Binary trees Hard [289/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 02 ]</span>
 - 12/07/26: Step6:: Binary trees Hard [289/455] <span style="color: red;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 00 ]</span>
 - 13/07/26: Step6:: Binary trees Hard [294/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
+- 14/07/26: Step6:: Binary trees Hard [297/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
 - 
