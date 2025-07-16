@@ -498,6 +498,9 @@ Whenever the problem is related to picking up elements from an array to form a c
                cout << s << endl;
           }
      ```
+26. Floor and Ceil:
+  - Floor of a x is the greatest integer less than or equal to x.
+  - Ceil of x is the least integer greater than or equal to x.
 ---
 <span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
 
@@ -673,3 +676,5 @@ Whenever the problem is related to picking up elements from an array to form a c
 12. 155-Check for heap: Need to try for linkedlist tree also. Check after tree: [Unsolved problem](https://www.geeksforgeeks.org/problems/is-binary-tree-heap/1)
 13. 168-DFS traversal for Binary tree: [L12. Iterative Postorder Traversal using 1 Stack](https://www.youtube.com/watch?v=NzIGLLwZBS8&list=PLkjdNRgDmcc0Pom5erUBU4ZayeU9AyRRu&index=12) -> Logic is complex though alternate easy approach is available. Check later.
 14. Binary tree question try later: [GFG](https://www.geeksforgeeks.org/problems/postorder-traversal-from-given-inorder-and-preorder-traversals/1)
+15. In BST try this later: [ninja](https://www.naukri.com/code360/problems/maximum-node-in-between_920450)
+16. 
