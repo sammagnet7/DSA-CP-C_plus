@@ -590,6 +590,30 @@ Whenever the problem is related to picking up elements from an array to form a c
     - 
 
 ---
+
+<span style="color: violet; font-size: 18px;">**Binary search tree:**</span>
+
+1. Link: 
+   - [TUF+ theory](https://takeuforward.org/plus/dsa/problems/introduction-to-bst)
+   - [TUF theory](https://takeuforward.org/binary-search-tree/introduction-to-binary-search-trees/) 
+2. Whst is BST?
+  -  Each node in a BST follows the binary tree property: having at most two children.
+  -  The left child of a node holds values less than the node’s value, while the right child holds values greater than the node’s value. 
+  -  (Left Child < Node < Right Child)
+  -  Each subtree of a BST is also a BST. This means that every node in the left subtree is less than the root node, and every node in the right subtree is greater.
+  -  Typically Binary Search Trees, duplicate node values are not permitted. If allowed then 
+     -  either frequency is maintained per node
+     -  or (Left Child <= Node < Right Child)
+  -  Balanced Variants of BST
+     -  AVL Tree: : A self-balancing BST where the height difference between left and right subtrees (balance factor) of any node is at most 1.
+     -  Red-Black Tree:: A self-balancing BST where each node has an extra bit for color (red or black).
+  -  Practical Applications
+     -  Database Indexing: quickly locate records based on keys.
+     -  Symbol Tables: Used in compilers 
+     -  Memory Management: Implementing data structures like heaps
+  -  
+
+---
 <span style="color: violet; font-size: 18px;">**Heap:**</span>
 
 
