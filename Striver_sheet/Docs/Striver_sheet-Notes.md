@@ -614,7 +614,7 @@ Whenever the problem is related to picking up elements from an array to form a c
      -  Database Indexing: quickly locate records based on keys.
      -  Symbol Tables: Used in compilers 
      -  Memory Management: Implementing data structures like heaps
-  -  `In-order` traversal always gives elements in `sorted` order.
+  -  `In-order` traversal of BST always gives elements in `sorted` order.
   -  
 
 ---
