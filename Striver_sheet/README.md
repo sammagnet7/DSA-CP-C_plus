@@ -193,4 +193,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 24/05/25: <span style="color: red;">[0 hour]</span>
 - 25/05/25: <span style="color: red;">[0 hour]</span>
 - 26/07/26: <span style="color: red;">[0 hour]</span>
+- 27/07/26: Step14:: BST [311/455] <span style="color: Orange;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
 - 

@@ -678,4 +678,5 @@ Whenever the problem is related to picking up elements from an array to form a c
 13. 168-DFS traversal for Binary tree: [L12. Iterative Postorder Traversal using 1 Stack](https://www.youtube.com/watch?v=NzIGLLwZBS8&list=PLkjdNRgDmcc0Pom5erUBU4ZayeU9AyRRu&index=12) -> Logic is complex though alternate easy approach is available. Check later.
 14. Binary tree question try later: [GFG](https://www.geeksforgeeks.org/problems/postorder-traversal-from-given-inorder-and-preorder-traversals/1)
 15. In BST try this later: [ninja](https://www.naukri.com/code360/problems/maximum-node-in-between_920450)
-16. 
+16. Solve later: Merge 2 BST's: [leetcode](https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/) [youtube](https://www.youtube.com/watch?v=AiKZjCuy2k4&t=4s&ab_channel=ShradhaKhapra)
+17. 
