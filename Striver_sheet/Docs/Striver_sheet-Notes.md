@@ -223,9 +223,24 @@
           - In `C`, struct could only contain `data` (no `functions`).
           - `C++` extended `struct` to support full object-oriented features.
           - `class` was introduced to emphasize `encapsulation` and `access control`.
-   - x
+   - 📝 When to Use `new` in C++
+
+          ✅ Use stack (e.g., DTO dto;) when:
+          - Object is local to the function.
+          - No need for manual memory management.
+          - Cleaner and auto destroyed.
+
+          ❌ Use `new` (e.g., DTO* dto = new DTO();) only if:
+          - You need the object beyond current scope.
+          - You're storing pointers in a data structure.
+          - Polymorphism or dynamic lifetime needed.
+
+          💡 Your code is correct:
+          - Stack use is cleaner and safer.
+          - No need for `new` since object is used and returned locally.
    - y
    - z
+   - x
 
 ---
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
