@@ -42,6 +42,9 @@ Count Subsets with Sum K:
 
 https://www.naukri.com/code360/problems/count-subsets-with-sum-k_3952532?leftPanelTabValue=PROBLEM
 
+Note: Return true if there exists a subset with sum equal to ‘K’. Otherwise, return false.
+
+
 Problem statement
 You are given an array 'arr' of size 'n' containing positive integers and a target sum 'k'.
 Find the number of ways of selecting the elements from the array such that the sum of chosen elements is equal to the target 'k'.
@@ -134,6 +137,7 @@ public:
     // NON-optimal approach: Recursion  w/o DP
     // Time: O(2^N) due to binary stack tree
     // Space: O(N) due to stack space
+    // For DP Refer: 223-subsequences with recursion.cpp
     int findWays(vector<int> &arr, int k)
     {
         return recCountSum(arr, 0, k, 0);
