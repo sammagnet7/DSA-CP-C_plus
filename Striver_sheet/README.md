@@ -196,7 +196,7 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 27/07/26: Step14:: BST [311/455] <span style="color: Orange;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
 - 28/07/26: Step14:: BST Completes [316/455] <span style="color: Green;"> [ Easy : 04 ] [ Medium : 02 ] [ Hard : 00 ]</span>
 - 29/07/26: Step12:: Greedy [321/455] <span style="color: Green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 30/07/26: Step12:: Greedy completed [329/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 01 ]</span>
+- 30/07/26: Step12:: Greedy complete [329/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 01 ]</span>
 
 ---
 
@@ -204,3 +204,8 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 02/08/26: Step16:: DP  [340/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 05 ] [ Hard : 00 ]</span>
 - 03/08/26: Step16:: DP  [342/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 01 ]</span>
 - 04/08/26: Step16:: DP  [344/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
+- 05/08/26: <span style="color: red;">[0 hour]</span>
+- 06/08/26: <span style="color: red;">[0 hour]</span>
+- 07/08/26: <span style="color: red;">[0 hour]</span>
+- 08/08/26: Step16:: DP  [348/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
+- 

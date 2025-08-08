@@ -186,7 +186,7 @@ public:
      */
     bool subsetSumToK(int n, int k, vector<int> &arr)
     {
-        vector<vector<bool>> dp(n, vector<bool>(k + 1, false));
+        vector<vector<bool>> dp(n, vector<bool>(k + 1, false)); // [index][target sum]
 
         // Base case: sum 0 is always achievable with empty subset
         for (int idx = 0; idx < n; idx++)

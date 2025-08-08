@@ -695,3 +695,5 @@ Whenever the problem is related to picking up elements from an array to form a c
 15. In BST try this later: [ninja](https://www.naukri.com/code360/problems/maximum-node-in-between_920450)
 16. Solve later: Merge 2 BST's: [leetcode](https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/) [youtube](https://www.youtube.com/watch?v=AiKZjCuy2k4&t=4s&ab_channel=ShradhaKhapra)
 17. Do after DP: Jump Game II: [leetcode](https://leetcode.com/problems/jump-game-ii/description/) [youtube](https://www.youtube.com/watch?v=7SBVnw7GSTk&t=1s)
+18. [Meet in the middle approach](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/description/) Complete: 225-Partition Set Into 2 Subsets With Min Absolute Sum Diff.cpp
+19. 
