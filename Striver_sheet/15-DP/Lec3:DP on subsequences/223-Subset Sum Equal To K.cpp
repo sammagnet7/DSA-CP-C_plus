@@ -99,74 +99,91 @@ public:
 
     // Approach1
     /**
-     * Problem: Subset Sum to Target (Classic DP Problem)
-     *
-     * Objective:
-     * Given an array `arr` of size `n`, determine if there's a subset whose sum is exactly equal to `k`.
+     * @brief Recursive helper to determine if a subset with the given target sum exists.
      *
      * Approach:
-     * - Recursion with Memoization (Top-down Dynamic Programming).
-     * - Try both choices at each index: include or exclude the current element.
-     * - Use a 2D DP table `dp[index][prevSum]` to cache results and avoid recomputation.
+     * - Uses top-down recursion with memoization.
+     * - At each step, we can either:
+     *      1. Exclude the current element and check the remaining elements.
+     *      2. Include the current element and reduce the target accordingly.
+     * - The function terminates early if:
+     *      - target becomes negative (no valid subset possible).
+     *      - target becomes zero (subset found).
+     *      - index goes out of bounds without reaching target.
+     * - Memoization table `dp[index][target]` stores:
+     *      - 1 if subset sum possible for current state.
+     *      - 0 if not possible.
+     *      - -1 if state not yet computed.
      *
-     * Time Complexity: O(n * k)
-     *   - Each state is defined by (index, prevSum), both bounded by `n` and `k` respectively.
+     * Time Complexity:
+     * - O(n * k), where n = size of array, k = target sum.
+     *   Each (index, target) pair is computed at most once.
      *
-     * Space Complexity: O(n * k) for DP array + O(n) for recursion stack.
+     * Space Complexity:
+     * - O(n * k) for memoization table.
+     * - O(n) recursion stack in worst case (when all elements are considered).
      */
-
-    bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index, int prevSum)
+    bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
     {
 
-        // Base case 1: If index exceeds bounds or running sum exceeds target
-        if (index == arr.size() || prevSum > target)
+        // Base case: Target becomes negative → invalid path
+        if (target < 0)
+            return 0;
+
+        // Base case: Target achieved
+        else if (target == 0)
+        {
+            if (index >= 0)
+                return dp[index][target] = 1; // store result if within bounds
+            else
+                return 1; // no need to store if index < 0
+        }
+
+        // Base case: No elements left to consider
+        else if (index < 0)
             return false;
 
-        // Base case 2: Subset found whose sum equals target
-        if ((prevSum + arr[index]) == target)
-        {
-            dp[index][prevSum] = 1; // Mark this state as valid
-            return true;
-        }
-
         // Memoization check
-        if (dp[index][prevSum] != -1)
-            return dp[index][prevSum] == 1;
+        if (dp[index][target] != -1)
+            return dp[index][target];
 
-        // Recursive call 1: Skip current element
-        bool ret = recFind(arr, dp, target, index + 1, prevSum);
+        // Choice 1: Skip current element
+        bool ret = recFind(arr, dp, target, index - 1);
         if (ret)
         {
-            dp[index][prevSum] = 1;
-            return true;
+            return dp[index][target] = 1; // store & return true
         }
 
-        // Recursive call 2: Include current element in the sum
-        ret = recFind(arr, dp, target, index + 1, prevSum + arr[index]);
+        // Choice 2: Include current element
+        ret = recFind(arr, dp, target - arr[index], index - 1);
         if (ret)
         {
-            dp[index][prevSum] = 1;
-            return true;
+            return dp[index][target] = 1; // store & return true
         }
 
-        // Mark as not possible
-        dp[index][prevSum] = 0;
-        return false;
+        // If both choices fail, store and return false
+        return dp[index][target] = 0;
     }
 
     /**
-     * Function to determine if a subset exists whose sum is exactly `k`.
-     * Uses recursion with memoization.
+     * @brief Checks if a subset with sum equal to k exists in the array.
      *
-     * Time: O(n * k)
-     * Space: O(n * k) + O(n) (DP table + recursion stack)
+     * @param n   Size of array
+     * @param k   Target sum
+     * @param arr Input array
+     *
+     * @return true if such subset exists, false otherwise.
+     *
+     * Time Complexity: O(n * k)
+     * Space Complexity: O(n * k) + O(n) recursion stack
      */
     bool subsetSumToK(int n, int k, vector<int> &arr)
     {
-        // Initialize memoization table with -1 (unvisited state)
-        vector<vector<int>> dp(n, vector<int>(k, -1));
+        // Memoization table initialized to -1 (unvisited states)
+        vector<vector<int>> dp(n, vector<int>(k + 1, -1));
 
-        return recFind(arr, dp, k, 0, 0);
+        // Start recursion from last index with target k
+        return recFind(arr, dp, k, n - 1);
     }
 
     //-------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Minimum Coins
+1. Title: Minimum Coins [Return the fewest number of coins]
 
 Links:
 https://takeuforward.org/data-structure/minimum-coins-dp-20/
@@ -59,13 +59,44 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title:
+2. Title: Coin Change 2 (DP - 22) [Return the number of combinations ]
 
 Links:
+https://takeuforward.org/data-structure/coin-change-2-dp-22/
+https://takeuforward.org/plus/dsa/problems/coin-change-ii?tab=editorial
+https://leetcode.com/problems/coin-change-ii/description/
 
 
 Problem statement:
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+Return the number of combinations that make up that amount. If that amount of money cannot be made up by any combination of the coins, return 0.
+You may assume that you have an infinite number of each kind of coin.
+The answer is guaranteed to fit into a signed 32-bit integer.
 
+Examples:
+    Example 1:
+    Input: amount = 5, coins = [1,2,5]
+    Output: 4
+    Explanation: there are four ways to make up the amount:
+    5=5
+    5=2+2+1
+    5=2+1+1+1
+    5=1+1+1+1+1
+
+    Example 2:
+    Input: amount = 3, coins = [2]
+    Output: 0
+    Explanation: the amount of 3 cannot be made up just with coins of 2.
+
+    Example 3:
+    Input: amount = 10, coins = [10]
+    Output: 1
+
+Constraints:
+    1 <= coins.length <= 300
+    1 <= coins[i] <= 5000
+    All the values of coins are unique.
+    0 <= amount <= 5000
 
 INPUT::::::
 
@@ -307,8 +338,103 @@ public:
     }
 
     //-------------------------------------------------------------------------------
-    // 2. Title:
+    // 2. Title: Coin Change 2 (DP - 22)
     //-------------------------------------------------------------------------------
+
+    /*
+    Method: recCount
+    ----------------
+    Recursively counts the number of ways to form a given target sum
+    using coins (or array elements) with unlimited supply (unbounded knapsack).
+
+    Parameters:
+        arr    - reference to array of coin values
+        dp     - memoization table where dp[i][t] stores the number of ways
+                 to make sum 't' using coins[0..i]
+        target - remaining sum to achieve
+        index  - current index in arr
+
+    Returns:
+        int - number of ways to make 'target' sum from arr[0..index]
+
+    Time Complexity:
+        O(N * target) — Each state (index, target) is computed once due to memoization.
+
+    Space Complexity:
+        O(N * target) for dp table +
+        O(N) recursion call stack in worst case.
+*/
+    int recCount(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
+    {
+        /* Base case: only one type of coin available (index == 0) */
+        if (index == 0)
+        {
+            // Case 1: If target is 0 and coin value is also 0 → two possibilities:
+            //         include it or exclude it
+            if (target == 0 && arr[0] == 0)
+                return dp[index][target] = 2;
+
+            // Case 2: If target is 0 → only one possibility: take nothing
+            if (target == 0)
+                return dp[index][target] = 1;
+
+            // Case 3: If target is divisible by coin value → can take multiple coins of same value
+            if (target % arr[0] == 0)
+                return dp[index][target] = 1;
+
+            // Case 4: Otherwise no way to make target
+            return 0;
+        }
+
+        /* If target becomes negative → invalid path */
+        if (target < 0)
+            return 0;
+
+        /* If already computed → return stored value */
+        if (dp[index][target] != -1)
+            return dp[index][target];
+
+        /* Choice 1: Do not take current coin (move to smaller index) */
+        int noTake = recCount(arr, dp, target, index - 1);
+
+        /* Choice 2: Take current coin (stay at same index, target decreases) */
+        int take = recCount(arr, dp, target - arr[index], index);
+
+        /* Store and return total ways */
+        return dp[index][target] = (take + noTake);
+    }
+
+    /*
+        Method: change
+        --------------
+        Solves the Coin Change II problem: count the number of combinations
+        to make a given 'amount' using unlimited supply of given coins.
+
+        Parameters:
+            amount - target amount to make
+            coins  - vector of coin denominations
+
+        Returns:
+            int - number of distinct combinations
+
+        Time Complexity:
+            O(N * amount) — where N is number of coins.
+
+        Space Complexity:
+            O(N * amount) for dp table +
+            O(N) recursion stack space due to calls to recCount.
+    */
+    int change(int amount, vector<int> &coins)
+    {
+
+        int N = coins.size();
+
+        // dp[i][t] → number of ways to make sum 't' using coins[0..i]
+        vector<vector<int>> dp(N, vector<int>(amount + 1, -1));
+
+        // Call recursive helper to count combinations
+        return recCount(coins, dp, amount, N - 1);
+    }
 };
 
 int main()

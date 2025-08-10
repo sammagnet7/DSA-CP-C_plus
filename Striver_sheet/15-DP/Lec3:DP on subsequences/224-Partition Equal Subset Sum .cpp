@@ -76,54 +76,70 @@ public:
     //-------------------------------------------------------------------------------
 
     /**
-     * Helper Function: recFind
-     * ------------------------
-     * Recursive function with memoization to determine if a subset of `arr`
-     * starting from `index` can form a sum equal to `target`.
+     * @brief Recursive helper to determine if a subset with the given target sum exists.
      *
-     * Parameters:
-     * - arr: input array of numbers
-     * - dp: memoization table
-     * - target: target sum to achieve
-     * - index: current index in the array
-     * - prevSum: running sum of current subset
+     * Approach:
+     * - Uses top-down recursion with memoization.
+     * - At each step, we can either:
+     *      1. Exclude the current element and check the remaining elements.
+     *      2. Include the current element and reduce the target accordingly.
+     * - The function terminates early if:
+     *      - target becomes negative (no valid subset possible).
+     *      - target becomes zero (subset found).
+     *      - index goes out of bounds without reaching target.
+     * - Memoization table `dp[index][target]` stores:
+     *      - 1 if subset sum possible for current state.
+     *      - 0 if not possible.
+     *      - -1 if state not yet computed.
+     *
+     * Time Complexity:
+     * - O(n * k), where n = size of array, k = target sum.
+     *   Each (index, target) pair is computed at most once.
+     *
+     * Space Complexity:
+     * - O(n * k) for memoization table.
+     * - O(n) recursion stack in worst case (when all elements are considered).
      */
-    bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index, int prevSum)
+    bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
     {
-        // Base Case 1: Reached end of array or sum exceeded
-        if (index == arr.size() || prevSum > target)
+
+        // Base case: Target becomes negative → invalid path
+        if (target < 0)
+            return 0;
+
+        // Base case: Target achieved
+        else if (target == 0)
+        {
+            if (index >= 0)
+                return dp[index][target] = 1; // store result if within bounds
+            else
+                return 1; // no need to store if index < 0
+        }
+
+        // Base case: No elements left to consider
+        else if (index < 0)
             return false;
 
-        // Base Case 2: Found a subset whose sum equals the target
-        if ((prevSum + arr[index]) == target)
-        {
-            dp[index][prevSum] = 1; // Memoize as true
-            return true;
-        }
+        // Memoization check
+        if (dp[index][target] != -1)
+            return dp[index][target];
 
-        // Memoization Check
-        if (dp[index][prevSum] != -1)
-            return dp[index][prevSum] == 1;
-
-        // Option 1: Skip current element
-        bool ret = recFind(arr, dp, target, index + 1, prevSum);
+        // Choice 1: Skip current element
+        bool ret = recFind(arr, dp, target, index - 1);
         if (ret)
         {
-            dp[index][prevSum] = 1;
-            return true;
+            return dp[index][target] = 1; // store & return true
         }
 
-        // Option 2: Include current element in sum
-        ret = recFind(arr, dp, target, index + 1, prevSum + arr[index]);
+        // Choice 2: Include current element
+        ret = recFind(arr, dp, target - arr[index], index - 1);
         if (ret)
         {
-            dp[index][prevSum] = 1;
-            return true;
+            return dp[index][target] = 1; // store & return true
         }
 
-        // If both options fail, mark as not possible
-        dp[index][prevSum] = 0;
-        return false;
+        // If both choices fail, store and return false
+        return dp[index][target] = 0;
     }
 
     /**
@@ -166,7 +182,7 @@ public:
         vector<vector<int>> dp(nums.size(), vector<int>(targetSum, -1));
 
         // Step 4: Try to find a subset with sum = targetSum
-        return recFind(nums, dp, targetSum, 0, 0);
+        return recFind(nums, dp, targetSum, nums.size() - 1);
     }
 
     //-------------------------------------------------------------------------------
