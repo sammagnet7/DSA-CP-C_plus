@@ -64,7 +64,7 @@ OUTPUT::::::
 
 
 Similar quetion:
-1) Longest Palindromic Subsequence | (DP-28) :    
+1) Longest Palindromic Subsequence | (DP-28) :
         https://takeuforward.org/data-structure/longest-palindromic-subsequence-dp-28/
         https://takeuforward.org/plus/dsa/problems/longest-palindromic-subsequence?tab=editorial
         https://leetcode.com/problems/longest-palindromic-subsequence/description/
@@ -77,6 +77,20 @@ Similar quetion:
         https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/
 
         Sol: Ans is the number of characters NOT in the Longest Palindromic Subsequence from the original string.
+
+3) Minimum Insertions/Deletions to Convert String | (DP- 30)
+        https://takeuforward.org/data-structure/minimum-insertions-deletions-to-convert-string-dp-30/
+        https://www.youtube.com/watch?v=yMnH0jrir0Q
+        https://takeuforward.org/plus/dsa/problems/minimum-insertions-or-deletions-to-convert-string-a-to-b?tab=editorial
+        https://leetcode.com/problems/delete-operation-for-two-strings/description/
+
+        Sol: If we know the LCS length, then:
+            - The characters not in LCS must be deleted from both strings to match word1 and word2.
+            - or we can say to make word1 same as word2 
+                - first remove (len(word1) - LCS) chars from word1
+                - then insert (len(word2) - LCS) chars from word2 to word1
+                - Total Required operations: (len(word1) - LCS) + (len(word2) - LCS)
+
 
 ----------------------------------------------------------------------------------------------------
 
@@ -331,6 +345,11 @@ public:
     // 2. Title: Print Longest Common Subsequence | (DP - 26)
     //-------------------------------------------------------------------------------
 
+    // -----------------
+    // Approach 1
+    // ----------------
+
+
     /*
         Helper Method: recCountSubseq
         -----------------------------
@@ -449,6 +468,108 @@ public:
                 else if (idx2 - 1 < 0)
                     idx1--;
                 else if (dp[idx1 - 1][idx2] >= dp[idx1][idx2 - 1])
+                {
+                    idx1--;
+                }
+                else
+                {
+                    idx2--;
+                }
+            }
+        }
+
+        return matchCS;
+    }
+
+    // -----------------
+    // Approach 2
+    // ----------------
+
+    /*
+     Method: findLCS
+     ----------------
+     Finds the **Longest Common Subsequence (LCS)** string between two input strings.
+
+     What is LCS?
+     ------------
+     - LCS is the longest sequence of characters that appear in the same order
+       in both strings (not necessarily contiguous).
+     - Example:
+         word1 = "abcde"
+         word2 = "ace"
+         LCS   = "ace"
+
+     Approach:
+     ---------
+     1. Build a DP table (n1+1 x n2+1):
+        - dp[i][j] = length of LCS between word1[0..i-1] and word2[0..j-1].
+        - If characters match → dp[i][j] = 1 + dp[i-1][j-1].
+        - Otherwise → dp[i][j] = max(dp[i-1][j], dp[i][j-1]).
+
+     2. After filling the table:
+        - dp[n1][n2] contains the length of the LCS.
+
+     3. Reconstruct the LCS string:
+        - Start from bottom-right of the table (dp[n1][n2]).
+        - If characters match → include it in result and move diagonally up-left.
+        - If they do not match → move in the direction of the larger dp value (up or left).
+        - Continue until reaching the top/left boundary.
+
+     4. Return the reconstructed LCS string.
+
+     Complexity:
+     -----------
+     - Time:  O(n1 * n2) for filling DP + O(n1 + n2) for reconstruction
+              → overall O(n1 * n2)
+     - Space: O(n1 * n2) for DP table
+ */
+    string findLCS(int n, int m, string &word1, string &word2)
+    {
+        int n1 = word1.size();
+        int n2 = word2.size();
+
+        // Step 1: Build DP table for LCS length
+        vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
+
+        for (int i = 1; i <= n1; i++)
+        {
+            for (int j = 1; j <= n2; j++)
+            {
+                if (word1[i - 1] == word2[j - 1])
+                {
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+                }
+                else
+                {
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        int lcsqLen = dp[n1][n2];
+
+        // Step 2: Prepare result string with placeholder size
+        string matchCS(lcsqLen, 'X');
+
+        // Step 3: Trace back to reconstruct the LCS
+        int matchIdx = lcsqLen - 1;
+        int idx1 = n1;
+        int idx2 = n2;
+
+        while (idx1 > 0 && idx2 > 0)
+        {
+            if (word1[idx1 - 1] == word2[idx2 - 1])
+            {
+                // Characters match → add to LCS and move diagonally
+                matchCS[matchIdx] = word1[idx1 - 1];
+                matchIdx--;
+                idx1--;
+                idx2--;
+            }
+            else
+            {
+                // Move towards the direction of greater LCS length
+                if (dp[idx1 - 1][idx2] >= dp[idx1][idx2 - 1])
                 {
                     idx1--;
                 }

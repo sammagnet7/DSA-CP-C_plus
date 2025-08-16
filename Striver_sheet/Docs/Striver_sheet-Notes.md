@@ -673,6 +673,13 @@ Whenever the problem is related to picking up elements from an array to form a c
     4.  
 
 ---
+<span style="color: violet; font-size: 18px;">**DP:**</span>
+
+1. In case of problems related to `subsequence`, when characters from both string matches, just consider it into answer, and move pointers for both the strings. 
+Basically, in case of subsequence if characters from both strings are matching at any index, on that index no need to apply other options like `take` `noTake`. 
+2. 
+
+---
 ### Some tricky problems to revise:
 
 1. 074-Minimize Max Distance to Gas Station
