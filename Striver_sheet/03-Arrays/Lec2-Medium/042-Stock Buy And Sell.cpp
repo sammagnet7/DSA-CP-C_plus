@@ -11,6 +11,7 @@ using namespace std;
 Kadane's Algorithm : Maximum Subarray Sum in an Array
 
 https://takeuforward.org/data-structure/stock-buy-and-sell/
+https://takeuforward.org/plus/dsa/problems/best-time-to-buy-and-sell-stock?tab=editorial
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock/description/
 https://www.naukri.com/code360/problems/893405?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website
 

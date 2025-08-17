@@ -216,3 +216,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 14/08/26: <span style="color: red;">[0 hour]</span>
 - 15/08/26: Step16:: DP  [358/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
 - 16/08/26: Step16:: DP  [363/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 04 ]</span>
+- 17/08/26: Step16:: DP  [369/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 03 ]</span>
+- 
