@@ -18,11 +18,15 @@ using namespace std;
 /*
 
 1. Title: Maximal Rectangle
+        Maximum Rectangle Area with all 1's | DP on Rectangles: DP 55
 
 Links:
 https://youtu.be/ttVu6G7Ayik?si=VBosejklFJNgK3FH
 https://takeuforward.org/plus/dsa/problems/maximum-rectangles?tab=editorial
 https://leetcode.com/problems/maximal-rectangle/description/
+
+DP : https://www.youtube.com/watch?v=tOylVCugy9k
+     https://takeuforward.org/data-structure/maximum-rectangle-area-with-all-1s-dp-on-rectangles-dp-55/
 
 
 Problem statement:
@@ -53,7 +57,39 @@ OUTPUT::::::
 
 //------------------------------------------------------------------------
 // 1. Title: Maximal Rectangle
-//
+//           Maximum Rectangle Area with all 1's | DP on Rectangles: DP 55
+//------------------------------------------------------------------------
+
+/*
+        Function: largestRectangleArea
+        --------------------------------------
+        Problem:
+        Given an array `heights` representing the heights of bars in a histogram,
+        return the area of the largest rectangle that can be formed within the histogram.
+
+        Approach:
+        - Use a **monotonic increasing stack** to store indices of bars.
+        - For each bar:
+            1. While the current bar is smaller than the bar at the stack's top:
+                - Pop from the stack (this means we found the **next smaller element** for that bar).
+                - Calculate the width using the current index as NSE (next smaller element)
+                and the new stack top as PSE (previous smaller element).
+                - Compute area = height of popped bar * width, update max.
+            2. Push the current index into the stack.
+        - After iterating through all bars, clear the stack by assuming NSE = N (array end).
+
+        Time Complexity:
+        - O(2N) → Each element is pushed and popped at most once.
+        - First pass: O(N)
+        - Second pass (clearing stack): O(N)
+
+        Space Complexity:
+        - O(N) for stack.
+
+        Why O(2N) and not O(N²)?
+        - Each index is processed twice at most (push + pop), so total operations = 2N.
+
+    */
 
 // Time: O(2N): stack loop + input array loop
 // Space: O(N): stack
@@ -108,6 +144,31 @@ int largestRectangleArea(vector<int> &heights)
     return maxi;
 }
 
+/*
+        Function: maximalRectangle
+        --------------------------------------
+        Problem:
+        Given a binary matrix (M x N), find the area of the largest rectangle containing only 1's.
+
+        Approach:
+        - Convert the matrix into a histogram for each row:
+            - For each cell (i, j), if matrix[i][j] = 1:
+                hist[i][j] = hist[i-1][j] + 1 (stacking the height from the previous row).
+            else:
+                hist[i][j] = 0.
+        - For each row's histogram, compute the largest rectangle using
+        the `largestRectangleArea()` function (same as Histogram problem).
+        - Take the maximum area across all rows.
+
+        Time Complexity:
+        - O(M * N) for building histograms
+        - O(M * 2N) for computing largest rectangle for each row
+        - Total = O(M * (N + 2N)) = O(M * N)
+
+        Space Complexity:
+        - O(M * N) for histogram matrix
+        - O(N) for stack used in largestRectangleArea()
+    */
 // Optimal approach: Uses the method of finding largest area of histograms
 //
 // Time: O(M*N + M*2N)  where M is #Rows and N is #Cols

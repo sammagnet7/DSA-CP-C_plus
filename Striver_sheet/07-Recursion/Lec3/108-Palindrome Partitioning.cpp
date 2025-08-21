@@ -49,44 +49,91 @@ public:
     // ---------------------------------------------
     // Palindrome Partitioning:
 
-    // O(N/2)
+    /**
+     * @brief Checks if the substring s[sIdx...eIdx] is a palindrome.
+     *
+     * @param s The input string.
+     * @param sIdx Start index of the substring.
+     * @param eIdx End index of the substring.
+     * @return true if the substring is a palindrome, false otherwise.
+     *
+     * Time Complexity: O(N) in the worst case (where N = length of substring).
+     * Space Complexity: O(1) (no extra space used).
+     */
     bool isPalindrome(string &s, int sIdx, int eIdx)
     {
         while (sIdx <= eIdx)
         {
-            if (s[sIdx++] != s[eIdx--])
+            if (s[sIdx++] != s[eIdx--]) // Compare characters from both ends
                 return false;
         }
         return true;
     }
 
-    // O(2^N * N/2 * k)
+    /**
+     * @brief Recursive helper to generate all palindrome partitions.
+     *
+     * @param ans Reference to the final result vector.
+     * @param partitions Current list of palindromic substrings being built.
+     * @param s The input string.
+     * @param sIdx Current starting index to partition from.
+     *
+     * Approach:
+     * - At each index, try all possible partitions (i to end of string).
+     * - For each substring, check if it's a palindrome.
+     * - If yes, include it in the current partition and recurse for the remaining part.
+     * - Backtrack after exploring the branch.
+     *
+     * Time Complexity:
+     * - There are at most 2^(N-1) ways to partition (choose cut or not at each gap).
+     * - For each substring check, palindrome verification costs O(N).
+     * - Copying substring costs O(N) in worst case.
+     * - So overall: O(N^2 * 2^N).
+     *
+     * Space Complexity:
+     * - Recursion depth = O(N).
+     * - Extra space for `partitions` (current path) and result.
+     */
     void recursePartition(vector<vector<string>> &ans, vector<string> &partitions, string &s, int sIdx)
     {
-
+        // Base Case: If we've reached the end, add the current partition
         if (sIdx == s.size())
         {
-            ans.push_back(partitions); // O(k)
+            ans.push_back(partitions); // Copy current partition into result
             return;
         }
 
+        // Try all possible partitions starting from sIdx
         for (int i = sIdx; i < s.size(); i++)
         {
-
+            // Check if substring s[sIdx..i] is a palindrome
             if (isPalindrome(s, sIdx, i))
-            { // O(N/2)
+            {
+                // If palindrome, include this substring in the current path
+                partitions.push_back(s.substr(sIdx, i - sIdx + 1));
 
-                partitions.push_back(s.substr(sIdx, (i - sIdx + 1)));
+                // Recurse for the remaining part of the string
+                recursePartition(ans, partitions, s, i + 1);
 
-                recursePartition(ans, partitions, s, (i + 1));
+                // Backtrack: remove the last added substring
                 partitions.pop_back();
             }
         }
     }
 
-    // Optimal approach: Recurson+Iteration
-    // Time: O(2^N * N/2 * k) where `N` is length of the given string and `k` is avg length of partitions
-    // Space: O(k*x) where k is the avg length of palindromes and if we have x such lists in answer
+    /**
+     * @brief Generates all possible palindrome partitions of the given string.
+     *
+     * @param s The input string.
+     * @return A vector of all possible palindrome partitions.
+     *
+     * Approach:
+     * - Uses backtracking to explore all valid palindromic partitions.
+     * - For each valid substring (palindrome), recursively partition the remaining string.
+     *
+     * Time Complexity: O(N^2 * 2^N)
+     * Space Complexity: O(N) (recursion stack + partitions) + space for output.
+     */
     vector<vector<string>> partition(string s)
     {
         vector<vector<string>> ans;
