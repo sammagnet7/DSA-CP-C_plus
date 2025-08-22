@@ -677,7 +677,34 @@ Whenever the problem is related to picking up elements from an array to form a c
 
 1. In case of problems related to `subsequence`, when characters from both string matches, just consider it into answer, and move pointers for both the strings. 
 Basically, in case of subsequence if characters from both strings are matching at any index, on that index no need to apply other options like `take` `noTake`. 
-2. 
+
+---
+<span style="color: violet; font-size: 18px;">**Graph:**</span>
+
+1.  A `path` in a graph is a sequence of vertices where each adjacent pair of vertices is connected by an edge. A path always contain unique nodes, i.e., a node cannot appear twice in a path.
+It can be of two types:
+    - Simple Path: A path where no vertex is repeated.
+    - Closed Path (Cycle): A path that **starts and ends at the same vertex**, with no other repetitions of vertices and edges.
+
+1. For un-directed graphs, 
+   - `degree of a node = #edges connected to it`.
+2. For directed graphs,
+   - `in-degree of a node = #edges in-coming to the node`.
+   - `out-degree of a node = #edges out-going from the node`.
+3. `total degree of a graph = 2 * total #edges` (because every edge is associated/connected to two nodes.)
+4. Space needed for representing Graphs 
+   - As Adjacency matris : O(V^2). Declared as: 
+     ```cpp 
+          int adjM[v+1][v+1]; 
+     ```
+   - As Adjacency list: O(E). Declared as: 
+     ```cpp 
+          vector<int> adjL[v+1]; 
+     ```
+   - As Adjacency list with weighted edges: 
+     ```cpp 
+          vector< pair<int,int> > adjWL[v+1]; 
+     ```
 
 ---
 ### Some tricky problems to revise:
