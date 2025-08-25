@@ -705,6 +705,11 @@ It can be of two types:
      ```cpp 
           vector< pair<int,int> > adjWL[v+1]; 
      ```
+5. Bipartite graph: 
+   - two adjascent nodes can not have same color. Graph will be 2 colored.
+   - Can have cycle of even length.
+   - Can not have cycle of odd length.
+6. 
 
 ---
 ### Some tricky problems to revise:
@@ -730,4 +735,5 @@ It can be of two types:
 16. Solve later: Merge 2 BST's: [leetcode](https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/) [youtube](https://www.youtube.com/watch?v=AiKZjCuy2k4&t=4s&ab_channel=ShradhaKhapra)
 17. Do after DP: Jump Game II: [leetcode](https://leetcode.com/problems/jump-game-ii/description/) [youtube](https://www.youtube.com/watch?v=7SBVnw7GSTk&t=1s)
 18. [Meet in the middle approach](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/description/) Complete: 225-Partition Set Into 2 Subsets With Min Absolute Sum Diff.cpp
-19. 
+19. [Graph Leetcode TLE](https://leetcode.com/problems/word-ladder-ii/submissions/1747769329/) : 258-Word ladder.cpp TUF+ approach:2
+20. 

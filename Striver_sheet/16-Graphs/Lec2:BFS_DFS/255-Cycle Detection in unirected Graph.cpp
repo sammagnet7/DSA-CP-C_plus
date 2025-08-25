@@ -64,12 +64,31 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title:
+2. Title: Detect cycle in a directed graph (using DFS) : G 19
 
 Links:
-
+https://takeuforward.org/data-structure/detect-cycle-in-a-directed-graph-using-dfs-g-19/
+https://takeuforward.org/plus/dsa/problems/detect-a-cycle-in-a-directed-graph?tab=editorial
+https://www.youtube.com/watch?v=9twcmtQj4DU
+https://www.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1
 
 Problem statement:
+Given a Directed Graph with V vertices (Numbered from 0 to V-1) and E edges, check whether it contains any cycle or not.
+The graph is represented as a 2D vector edges[][], where each entry edges[i] = [u, v] denotes an edge from verticex u to v.
+
+Examples:
+
+Input: V = 4, edges[][] = [[0, 1], [0, 2], [1, 2], [2, 0], [2, 3]]
+Output: true
+Explanation: The diagram clearly shows a cycle 0 → 2 → 0
+
+Input: V = 4, edges[][] = [[0, 1], [0, 2], [1, 2], [2, 3]
+Output: false
+Explanation: no cycle in the graph
+
+Constraints:
+1 ≤ V, E ≤ 105
+u ≠ v
 
 
 
@@ -263,8 +282,101 @@ public:
     }
 
     //-------------------------------------------------------------------------------
-    // 2. Title:
+    // 2. Title: Detect cycle in a directed graph (using DFS) : G 19
     //-------------------------------------------------------------------------------
+
+    /**
+     * @brief DFS helper function to detect cycle in a directed graph
+     *
+     * This function uses Depth First Search to check if there is a cycle
+     * starting from the current node. It uses two arrays:
+     * - vis[]: Marks if a node has been visited globally
+     * - path_vis[]: Marks nodes in the current DFS recursion stack
+     *
+     * If during DFS we find a node that is already in the current recursion stack,
+     * it means there is a back edge → cycle exists.
+     *
+     * @param cur Current node being visited
+     * @param vis Visited array for all nodes
+     * @param path_vis Visited array for current recursion path
+     * @param adjL Adjacency list of the graph
+     * @return true if cycle detected, false otherwise
+     *
+     * Time Complexity: O(V + E) for all DFS calls combined
+     * Space Complexity: O(V) for recursion stack and extra arrays
+     */
+    bool dfsHasCycle(int cur, vector<int> &vis, vector<int> &path_vis, vector<vector<int>> &adjL)
+    {
+
+        vis[cur] = 1;      // Mark node as visited
+        path_vis[cur] = 1; // Mark node as part of current DFS path
+
+        // Explore all adjacent nodes
+        for (int e : adjL[cur])
+        {
+
+            // If adjacent node is already in the current path → cycle found
+            if (path_vis[e])
+                return true;
+
+            // If not visited globally, DFS on it
+            if (!vis[e])
+            {
+                bool ret = dfsHasCycle(e, vis, path_vis, adjL);
+                if (ret) // If cycle detected in deeper call
+                    return true;
+            }
+        }
+
+        // Backtrack: remove node from current DFS path
+        path_vis[cur] = 0;
+        return false;
+    }
+
+    /**
+     * @brief Detect if a directed graph contains a cycle
+     *
+     * Approach:
+     * 1. Convert edge list to adjacency list
+     * 2. For every unvisited node, perform DFS and check for cycles
+     * 3. Use two arrays:
+     *    - vis[]: Marks nodes visited globally
+     *    - path_vis[]: Marks nodes in current DFS recursion stack
+     * 4. If any DFS returns true (cycle found), return true
+     * 5. If all nodes processed without cycle, return false
+     *
+     * Time Complexity: O(V + E)
+     * Space Complexity: O(V) for recursion + O(V) for visited arrays
+     *
+     * @param V Number of vertices
+     * @param edges Edge list of the directed graph
+     * @return true if the graph contains a cycle, false otherwise
+     */
+    bool isCyclic(int V, vector<vector<int>> &edges)
+    {
+
+        // Build adjacency list from edge list
+        vector<vector<int>> adjL(V);
+        for (auto e : edges)
+        {
+            adjL[e[0]].push_back(e[1]);
+        }
+
+        vector<int> vis(V, 0);      // Global visited array
+        vector<int> path_vis(V, 0); // Current DFS path visited array
+
+        // Check all nodes (handles disconnected graphs)
+        for (int i = 0; i < V; i++)
+        {
+            if (!vis[i])
+            {
+                if (dfsHasCycle(i, vis, path_vis, adjL))
+                    return true; // Cycle detected
+            }
+        }
+
+        return false; // No cycle found
+    }
 };
 
 int main()
