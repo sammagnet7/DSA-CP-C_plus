@@ -100,6 +100,25 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
+3. Title: G-23. Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS
+
+Links:
+https://www.youtube.com/watch?v=iTBaI90lpDQ
+https://takeuforward.org/plus/dsa/problems/detect-a-cycle-in-a-directed-graph?tab=editorial
+https://www.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1
+
+Problem statement:
+    Same as above
+
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
+----------------------------------------------------------------------------------------------------
+
 */
 
 class Solution
@@ -282,7 +301,7 @@ public:
     }
 
     //-------------------------------------------------------------------------------
-    // 2. Title: Detect cycle in a directed graph (using DFS) : G 19
+    // 2. Title: Detect cycle in a Directed graph (using DFS) : G 19
     //-------------------------------------------------------------------------------
 
     /**
@@ -376,6 +395,83 @@ public:
         }
 
         return false; // No cycle found
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // 3. Title: G-23. Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS
+    //---------------------------------------------------------------------------------------------
+
+    /**
+     * @brief Detect cycle in a directed graph using Kahn's Algorithm (BFS Topological Sort)
+     *
+     * Approach:
+     * 1. Build an adjacency list from the given edges.
+     * 2. Compute indegree[] for every node (number of incoming edges).
+     * 3. Push all nodes with indegree = 0 into a queue (these can appear first in topological order).
+     * 4. Perform BFS:
+     *      - Pop a node from the queue and add it to topo[].
+     *      - Reduce indegree of its adjacent nodes by 1.
+     *      - If any adjacent node's indegree becomes 0, push it into the queue.
+     * 5. If the size of topo[] == V → No cycle (graph is a DAG).
+     *    If topo[] < V → Some nodes were not processed → Cycle exists.
+     *
+     * Time Complexity: O(V + E)
+     *      - Building adjacency list: O(E)
+     *      - BFS traversal: O(V + E)
+     *
+     * Space Complexity: O(V + E)
+     *      - Adjacency list: O(E)
+     *      - Indegree array: O(V)
+     *      - Queue and topo vector: O(V)
+     *
+     * @param V Number of vertices
+     * @param edges Edge list representing the directed graph
+     * @return true if the graph contains a cycle, false otherwise
+     */
+    bool isCyclic(int V, vector<vector<int>> &edges)
+    {
+        // Step 1: Build adjacency list and indegree array
+        vector<vector<int>> adjL(V);
+        vector<int> indegree(V, 0);
+
+        for (auto &e : edges)
+        {
+            adjL[e[0]].push_back(e[1]); // Add edge e[0] -> e[1]
+            indegree[e[1]]++;           // Increase indegree of destination node
+        }
+
+        // Step 2: Push all nodes with indegree 0 into the queue
+        queue<int> q;
+        for (int i = 0; i < V; i++)
+        {
+            if (indegree[i] == 0)
+            {
+                q.push(i);
+            }
+        }
+
+        vector<int> topo; // Stores topological order
+
+        // Step 3: BFS traversal (Kahn's Algorithm)
+        while (!q.empty())
+        {
+            int node = q.front();
+            q.pop();
+            topo.push_back(node);
+
+            // Decrease indegree of all adjacent nodes
+            for (int adj : adjL[node])
+            {
+                indegree[adj]--;
+                if (indegree[adj] == 0)
+                {
+                    q.push(adj);
+                }
+            }
+        }
+
+        // Step 4: Check if topological sort includes all vertices
+        return !(topo.size() == V); // If topo.size() < V → Cycle exists
     }
 };
 
