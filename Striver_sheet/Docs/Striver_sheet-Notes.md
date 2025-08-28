@@ -686,13 +686,13 @@ It can be of two types:
     - Simple Path: A path where no vertex is repeated.
     - Closed Path (Cycle): A path that **starts and ends at the same vertex**, with no other repetitions of vertices and edges.
 
-1. For un-directed graphs, 
+2. For un-directed graphs, 
    - `degree of a node = #edges connected to it`.
-2. For directed graphs,
+3. For directed graphs,
    - `in-degree of a node = #edges in-coming to the node`.
    - `out-degree of a node = #edges out-going from the node`.
-3. `total degree of a graph = 2 * total #edges` (because every edge is associated/connected to two nodes.)
-4. Space needed for representing Graphs 
+4. `total degree of a graph = 2 * total #edges` (because every edge is associated/connected to two nodes.)
+5. Space needed for representing Graphs 
    - As Adjacency matris : O(V^2). Declared as: 
      ```cpp 
           int adjM[v+1][v+1]; 
@@ -705,11 +705,16 @@ It can be of two types:
      ```cpp 
           vector< pair<int,int> > adjWL[v+1]; 
      ```
-5. Bipartite graph: 
+6. Bipartite graph: 
    - two adjascent nodes can not have same color. Graph will be 2 colored.
    - Can have cycle of even length.
    - Can not have cycle of odd length.
-6. 
+7. Find shortest path from source node:
+   - For DAG -> always do topo sort -> then BFS/DFS -> calculates predecssor nodes before a node -> in turn saves time
+   - For undirected graph with unit weights -> Use plain BFS
+   - For undirected graph with weighted edge - use Dijkstra -> Queue [Slow]-> Priority_queue -> Set [OPTIMAL]
+   - Dijkstra can not be used if graph has negetive weight cycle.
+   - 
 
 ---
 ### Some tricky problems to revise:
