@@ -30,6 +30,10 @@ https://www.youtube.com/watch?v=3dINsjyfooY&list=PLgUwDviBIf0oE3gA41TKO2H5bHpPd7
 https://takeuforward.org/plus/dsa/problems/dijkstra's-algorithm?tab=editorial
 https://www.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-matrix/1
 
+Similar problem:
+    743. Network Delay Time: https://leetcode.com/problems/network-delay-time/description/
+    
+
 
 Problem statement:
 Given an undirected, weighted graph with V vertices numbered from 0 to V-1 and E edges, represented by 2d array edges[][], where edges[i]=[u, v, w] represents the edge between the nodes u and v having w edge weight.
@@ -98,7 +102,7 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 // 1. Title: Shortest Path in Undirected Graph with unit distance: G-28
 //-------------------------------------------------------------------------------
-// User Function Template
+//
 
 class Solution
 {
