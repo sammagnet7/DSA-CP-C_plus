@@ -24,8 +24,9 @@
 
 7. <span style="color: violet; font-size: 18px;">**Libraries:**</span>
      - **#include <bits/stdc++.h> :** Includes all popular library at once. But not available in all compilers.
-     - std::swap() : swaps 2 pointers in the argument
-     - #include<climits> : INT_MAX, INT_MIN
+     - `std::swap()` : swaps 2 pointers in the argument
+     - `#include<climits>` : INT_MAX, INT_MIN
+     - For long long use: `LLONG_MAX` and `LLONG_MIN`.
      - in c++ to get absolute value:
           ```cpp
                #include <cstdlib> // For int abs()
