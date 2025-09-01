@@ -714,8 +714,14 @@ It can be of two types:
    - For DAG -> always do topo sort -> then BFS/DFS -> calculates predecssor nodes before a node -> in turn saves time
    - For undirected graph with unit weights -> Use plain BFS
    - For undirected graph with weighted edge - use Dijkstra -> Queue [Slow]-> Priority_queue -> Set [OPTIMAL]
-   - Dijkstra can not be used if graph has negetive weight cycle.
+   - The original Dijkstra algo works for undirected graphs only having non-ngetives edges.
+   - We have modified `Dijkstra` incorporating priority_queue, so it can now handle negetive edges or non-negetive weight cycles only if graph is having directed edges. (Because undirected graph with a single negetive weight creates a negetive weight cycle.)
+   - `Bellman-ford` algo can detect negetive weight cycles(a cycle where sum of all weights is negative). 
+   - `Floyd warshall` can be used for for Directed and undirected graphs. 
+   - If you need **all-pairs shortest paths**, running `Dijkstra` from every node is usually faster on **sparse graphs with non-negative weights** (≈ O(V·E log V)), while `Floyd–Warshall` is better for **dense graphs** (≈ O(V³)) or when there are **negative weights** (but no negative cycles). In short: use **Dijkstra-all-nodes** for large sparse graphs, and **Floyd–Warshall** for dense or negative-weighted graphs.
+   - A `spanning tree` is a subset of a weighted graph in which there are N nodes(i.e. all the nodes present in the original graph) and N-1 edges and all nodes are reachable from each other. 
    - 
+
 
 ---
 ### Some tricky problems to revise:

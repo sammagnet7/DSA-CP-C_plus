@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Shortest Path in Undirected Graph with weighted edges | Djisktra's Algorithm
+1. Title: Shortest Path in Undirected Graph with weighted edges | Dijkstra's Algorithm
 
 Links:
 https://takeuforward.org/data-structure/dijkstras-algorithm-using-priority-queue-g-32/
@@ -31,8 +31,8 @@ https://takeuforward.org/plus/dsa/problems/dijkstra's-algorithm?tab=editorial
 https://www.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-matrix/1
 
 Similar problem:
-    743. Network Delay Time: https://leetcode.com/problems/network-delay-time/description/
-    
+    743. Network Delay Time: https://leetcode.com/problems/network-delay-time/description/ [with directed edges]
+
 
 
 Problem statement:
@@ -148,6 +148,7 @@ public:
         for (auto e : edges)
         {
             adjL[e[0]].push_back({e[1], e[2]});
+            adjL[e[1]].push_back({e[0], e[2]});
         }
 
         vector<int> dist(V, 1e9);
@@ -221,6 +222,7 @@ public:
         for (auto e : edges)
         {
             adjL[e[0]].push_back({e[1], e[2]});
+            adjL[e[1]].push_back({e[0], e[2]});
         }
 
         vector<int> dist(V, 1e9);
@@ -300,6 +302,7 @@ public:
         for (auto e : edges)
         {
             adjL[e[0]].push_back({e[1], e[2]});
+            adjL[e[1]].push_back({e[0], e[2]});
         }
 
         vector<int> dist(V, 1e9);
@@ -365,6 +368,7 @@ int main()
     int V = 4;
     vector<vector<int>> edges = {
         {0, 1, 1}, {0, 2, 100}, {1, 2, 1}, {2, 3, 1}};
+
     int src = 0;
 
     cout << "Using Queue: ";
