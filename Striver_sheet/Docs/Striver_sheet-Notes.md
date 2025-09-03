@@ -239,9 +239,29 @@
           💡 Your code is correct:
           - Stack use is cleaner and safer.
           - No need for `new` since object is used and returned locally.
-   - y
+   - Efficient way to merge a `string` and a `vector<string>` into `vector<vector<string>>`:
+     - **Problem:**  
+       Given a `string name` and a `vector<string> emails`, insert them together into a `vector<vector<string>> ans` in the form:  
+          ```cpp
+       { name, email1, email2, ... }
+          ``` 
+     - **Approach:**  
+          ```cpp
+          vector<string> entry;
+          entry.push_back(name);                                    // add name
+          entry.insert(entry.end(), emails.begin(), emails.end());  // append all emails
+          ans.push_back(move(entry));                               // move into ans
+          ```
+       - **push_back** → adds single element at end.  
+       - **insert** → appends a range of elements (like extend).  
+       - **move** → transfers ownership, avoids deep copy.  
+     - **Result in `ans`:**  
+          ```cpp
+          { name, email1, email2, ... }
+          ```
    - z
    - x
+   - y
 
 ---
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
@@ -424,7 +444,7 @@
 
 18. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
-19.  Below is a way to get the next valid index while traversing a 2-D matrix:
+1.   Below is a way to get the next valid index while traversing a 2-D matrix:
      ```cpp
                int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index
                curFlatIndex++;                       // Move to next
@@ -439,7 +459,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
      ```
 
-20.  A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
+2.   A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
 
      ```cpp
           for(int i=0; i<N; i++){
@@ -451,7 +471,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           }
           endLoop:;
      ```
-21.  Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
+3.   Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
 
     <img src="img/sudoku.png" alt="alt text" style="display: block; margin: auto; width: 250px;">
 
@@ -472,20 +492,20 @@ Whenever the problem is related to picking up elements from an array to form a c
                     return false;
           }
     ```
-22.  How to push back and pop back a **string** to a **string**?
+4.   How to push back and pop back a **string** to a **string**?
      ```cpp
           string cur = "test";
           size_t oldSize = expression.size();
           expression.append(cur);
           expression.resize(oldSize);
      ```
-23.  How to push back and pop back a **char** to a **string**?
+5.   How to push back and pop back a **char** to a **string**?
      ```cpp
           char cur = 'x';
           expression.push_back(cur);
           expression.pop_back();
      ```
-24. Convert char/string to int and vice-versa: 
+6.  Convert char/string to int and vice-versa: 
      ```cpp 
           int c =  'x' - 'a';
      ```
@@ -505,7 +525,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           string str_num = "123";
           int num = stoi(str_num);
      ```
-25. How to parse comma:
+7.  How to parse comma:
     ```cpp
           stringstream ss(data);
           string s;
@@ -514,7 +534,7 @@ Whenever the problem is related to picking up elements from an array to form a c
                cout << s << endl;
           }
      ```
-26. Floor and Ceil:
+8.  Floor and Ceil:
   - Floor of a x is the greatest integer less than or equal to x.
   - Ceil of x is the least integer greater than or equal to x.
 ---

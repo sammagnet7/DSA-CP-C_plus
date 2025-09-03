@@ -6,6 +6,8 @@ This repository I will use to store the hands-on from Striver's sheets.
 2. ALT -> for enabling and disabling top menu bar.
 3. Alt + Z  -> "Word Wrap" feature
 
+---
+## Team tracker sheet: [DSA practice track](https://docs.google.com/spreadsheets/d/1qcgnbkRomHnKWfCxcDuYUtUKmuKpfvtoaNNXfzqiURA/edit?gid=1460427080#gid=1460427080)
 
 ---
 ## Journal
@@ -236,4 +238,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 
 - 01/09/26: Step15:: Graph [427/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 00 ]</span>
 - 02/09/26: Step15:: Graph [431/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 03/09/26: Step15:: Graph [436/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 05 ]</span>
 - 
