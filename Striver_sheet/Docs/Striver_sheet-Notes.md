@@ -744,6 +744,7 @@ It can be of two types:
    - An `articulation point` or `cut-vertex` is a vertex whose removal, along with all its connected edges, increases the number of connected components in the graph.
    - A `back edge` is an edge in a graph that connects a vertex to one of its ancestors in a Depth-First Search (DFS) tree.
    - A component is called a `Strongly Connected Component(SCC)` only if for every possible pair of vertices (u, v) inside that component, u is reachable from v and vice-versa. Note: Strongly connected components(SCC) are only valid for **directed graphs**.
+   - `Trie` is an advanced information retrieval data structure. Ability to quickly find all strings that start with a given prefix makes Tries particularly useful for applications like autocomplete and predictive text. 
    - 
 
 
