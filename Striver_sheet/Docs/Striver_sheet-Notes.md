@@ -740,7 +740,12 @@ It can be of two types:
    - `Floyd warshall` can be used for for Directed and undirected graphs. 
    - If you need **all-pairs shortest paths**, running `Dijkstra` from every node is usually faster on **sparse graphs with non-negative weights** (≈ O(V·E log V)), while `Floyd–Warshall` is better for **dense graphs** (≈ O(V³)) or when there are **negative weights** (but no negative cycles). In short: use **Dijkstra-all-nodes** for large sparse graphs, and **Floyd–Warshall** for dense or negative-weighted graphs.
    - A `spanning tree` is a subset of a weighted graph in which there are N nodes(i.e. all the nodes present in the original graph) and N-1 edges and all nodes are reachable from each other. 
+   - Any edge in a component of a graph is called a `bridge` when the component is divided into 2 or more components if that particular edge is removed. 
+   - An `articulation point` or `cut-vertex` is a vertex whose removal, along with all its connected edges, increases the number of connected components in the graph.
+   - A `back edge` is an edge in a graph that connects a vertex to one of its ancestors in a Depth-First Search (DFS) tree.
+   - A component is called a `Strongly Connected Component(SCC)` only if for every possible pair of vertices (u, v) inside that component, u is reachable from v and vice-versa. Note: Strongly connected components(SCC) are only valid for **directed graphs**.
    - 
+
 
 
 ---
