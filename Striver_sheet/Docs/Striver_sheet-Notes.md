@@ -537,6 +537,13 @@ Whenever the problem is related to picking up elements from an array to form a c
 8.  Floor and Ceil:
   - Floor of a x is the greatest integer less than or equal to x.
   - Ceil of x is the least integer greater than or equal to x.
+
+9. Creating object:
+   * `MyClass obj;` → object lives on stack, auto destroyed, safer.
+   * `MyClass *obj = new MyClass();` → object lives on heap, must `delete` manually (or use smart pointer).
+  
+10. 
+
 ---
 <span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
 

@@ -240,4 +240,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 02/09/26: Step15:: Graph [431/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 00 ]</span>
 - 03/09/26: Step15:: Graph [436/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 05 ]</span>
 - 04/09/26: Step15:: Graph completed [441/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 02 ]</span>
+- 05/09/26: Step15:: Trie completed [446/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
 - 
