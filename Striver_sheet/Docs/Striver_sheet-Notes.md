@@ -752,6 +752,13 @@ It can be of two types:
    - A `back edge` is an edge in a graph that connects a vertex to one of its ancestors in a Depth-First Search (DFS) tree.
    - A component is called a `Strongly Connected Component(SCC)` only if for every possible pair of vertices (u, v) inside that component, u is reachable from v and vice-versa. Note: Strongly connected components(SCC) are only valid for **directed graphs**.
    - `Trie` is an advanced information retrieval data structure. Ability to quickly find all strings that start with a given prefix makes Tries particularly useful for applications like autocomplete and predictive text. 
+  
+---
+<span style="color: violet; font-size: 18px;">**Hashing:**</span>
+
+   - [hashing1](https://takeuforward.org/hashing/hashing-maps-time-complexity-collisions-division-rule-of-hashing-strivers-a2z-dsa-course/) 
+   - [hashing2](https://takeuforward.org/hashing/what-is-hashing/)
+   - [hashing3](https://takeuforward.org/hashing/hashing-applications/)
    - 
 
 
