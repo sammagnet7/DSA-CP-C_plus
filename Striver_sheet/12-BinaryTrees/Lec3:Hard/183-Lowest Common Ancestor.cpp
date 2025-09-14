@@ -44,7 +44,7 @@ Examples:
   Example 3:
   Input: root = [1,2], p = 1, q = 2
   Output: 1
- 
+
 Constraints:
   The number of nodes in the tree is in the range [2, 105].
   -109 <= Node.val <= 109
@@ -108,61 +108,71 @@ public:
   // // O(N)
   // TreeNode *traverse(TreeNode *node, int pVal, int qVal, unordered_map<int, int> &mp, int seen)
   // {
-
+  //   // If current node matches either p or q, mark it as seen
   //   if (node->val == pVal || node->val == qVal)
   //   {
-  //     seen++;
-  //     mp[node->val]++;
+  //     seen++;          // increment how many targets found so far
+  //     mp[node->val]++; // increment counter for this node
   //   }
 
+  //   // If both p and q already matched at this node (duplicate check case)
   //   if (mp[node->val] == 2)
   //     return node;
 
+  //   // If both p and q have been seen in this path, stop recursion
   //   if (seen == 2)
   //     return NULL;
 
   //   TreeNode *tmp = NULL;
 
+  //   // Recurse on left child if exists
   //   if (node->left != NULL)
   //   {
   //     tmp = traverse(node->left, pVal, qVal, mp, seen);
+  //     // Propagate child's match count up to parent
   //     mp[node->val] += mp[node->left->val];
   //   }
 
+  //   // If LCA found in left subtree, bubble it up
   //   if (tmp != NULL)
   //   {
   //     return tmp;
   //   }
+  //   // After left recursion, check if current node now covers both targets
   //   if (mp[node->val] == 2)
   //     return node;
 
+  //   // Recurse on right child if exists
   //   if (node->right != NULL)
   //   {
   //     tmp = traverse(node->right, pVal, qVal, mp, seen);
+  //     // Propagate child's match count up to parent
   //     mp[node->val] += mp[node->right->val];
   //   }
 
+  //   // If LCA found in right subtree, bubble it up
   //   if (tmp != NULL)
   //   {
   //     return tmp;
   //   }
+  //   // Final check: if current node covers both targets, it's the LCA
   //   if (mp[node->val] == 2)
   //     return node;
   //   else
-  //     return NULL;
+  //     return NULL; // otherwise keep bubbling NULL upward
   // }
 
   // //
-  // //
-  // // Time: O(N)
-  // // Space: O(N)
+  // // Wrapper function to call traverse()
+  // // Time: O(N)  → visits each node once
+  // // Space: O(N + h) → hashmap + recursion stack (h = height of tree)
   // TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q)
   // {
   //   if (root == NULL)
   //     return NULL;
 
-  //   unordered_map<int, int> mp;
-  //   int seen = 0;
+  //   unordered_map<int, int> mp; // tracks how many of p/q found under each node
+  //   int seen = 0;               // number of targets encountered so far globally
 
   //   return traverse(root, p->val, q->val, mp, seen);
   // }
