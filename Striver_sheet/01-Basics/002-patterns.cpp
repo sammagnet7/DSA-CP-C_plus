@@ -1,4 +1,5 @@
 #include <iostream>
+#include<algorithm>
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -6,7 +7,7 @@ int main(int argc, char *argv[])
     int N;
     cout << "Enter the number of rows: ";
     cin >> N;
-    cout<<endl;
+    cout << endl;
 
     cout << "\nPattern 1: Rectangular Star Pattern\n";
     for (int i = 0; i < N; i++)
@@ -351,17 +352,21 @@ int main(int argc, char *argv[])
              << endl;
     }
 
-    cout << "\nPattern 22: The Number Pattern\n";
-    int matrixSize=2*N-1;
+    cout << "\nPattern 22: The Number Pattern\n\n";
+    int matrixSize = 2 * N - 1;
     for (int i = 0; i < matrixSize; i++)
-    {   
-        for(int j=0; j< matrixSize; j++){
-            int minDist= min(min(i,(matrixSize-i-1)),min(j,(matrixSize-j-1))); // minDist ~ min dist from either edge
-            int val = N-minDist;
-            cout<<val;
+    {
+        for (int j = 0; j < matrixSize; j++)
+        {
+            int minDist = min({i, (matrixSize - i - 1), j, (matrixSize - j - 1)}); // minDist ~ min dist from {top, bottom, left, right}
+            int val = N - minDist;
+            cout << val;
         }
-        cout<<endl;
+        cout << endl;
     }
 
+    cout << endl
+         << endl
+         << endl;
     return 0;
 }
