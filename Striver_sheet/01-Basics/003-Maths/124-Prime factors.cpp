@@ -241,14 +241,14 @@ public:
 
         leastPrimes[0] = 0;
         leastPrimes[1] = 1;
-
+        // create the sieve
         for (int i = 2; i * i <= n; i++)
         { // O(N Log log N)
 
             if (leastPrimes[i] != -1)
                 continue;
 
-            leastPrimes[i] = i;
+            leastPrimes[i] = i; // if prime, put the number itself
 
             for (int j = i; i * j <= n; j++)
             {
@@ -256,7 +256,7 @@ public:
                 if (leastPrimes[i * j] != -1)
                     continue;
 
-                leastPrimes[i * j] = i;
+                leastPrimes[i * j] = i; // if not prime, then put the smallest prime factor
             }
         }
 

@@ -259,9 +259,35 @@
           ```cpp
           { name, email1, email2, ... }
           ```
-   - z
-   - x
+   - Set has functions:
+     - `lower_bound`: returns the iterator to the first element that **equals or greater** than the given value.
+     ```cpp
+          set<int> s = {10, 20, 30};
+          auto it = s.lower_bound(20);
+          cout << "Lower Bound: " << *it;    // 20
+     ```
+     - `upper_bound`: returns the iterator to the first element that is **greater** than the given value.
+     ```cpp
+          set<int> s = {10, 20, 30};
+          auto it = s.upper_bound(20);
+          cout << "Upper Bound: " << *it;    // 30
+     ```
+   - Multimap `equal_range`: returns a pair of iterators: the first iterator points to the first element with the specified key, and the second iterator points just past the last element with that key. 
+     ```cpp
+          multimap<int, string> mm;
+          mm.insert({1, "one"});
+          mm.insert({1, "uno"});
+          auto range = mm.equal_range(1);
+          for(auto it = range.first; it != range.second; ++it) {
+               cout << it->first << ": " << it->second << "\n";
+          } // 1: one    1: uno
+     ```
+   - [STL-TUF+](https://takeuforward.org/plus/dsa/problems/stl);
+     [STL-TUF](https://takeuforward.org/c/c-stl-tutorial-most-frequent-used-stl-containers/)
+   - `sort`, `find`, `count`, `next_permutation`, `accumulate`, `max_element`, `reverse`, `pow` from `<cmath>`, `popcount` from `<bit>`.
+   - `<string>` methods: `isalnum`, `tolower`.
    - y
+   - z
 
 ---
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
@@ -595,6 +621,7 @@ Whenever the problem is related to picking up elements from an array to form a c
      ```
 4.  Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
 
+5. To get length of a number `n` use function: `log10(n)+1`.
 ---
 <span style="color: violet; font-size: 18px;">**Binary tree:**</span>
 

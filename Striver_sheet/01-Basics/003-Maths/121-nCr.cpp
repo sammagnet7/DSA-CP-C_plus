@@ -61,7 +61,7 @@ public:
         {
             result *= (n - i + 1); // This 2 step split is necessary
                                    // so that numerators gets divided properly
-                                   // in both the csases of n being even or odd
+                                   // in both the cases of n being even or odd
             result /= i;
         }
         return result;

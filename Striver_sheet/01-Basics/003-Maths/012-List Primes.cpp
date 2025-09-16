@@ -8,12 +8,10 @@ using namespace std;
 https://www.rookieslab.com/posts/fastest-way-to-check-if-a-number-is-prime-or-not
 
 Problem statement
+Let’s create a process to find all primes in the range 1 to N.
 
 Sieve of Eratosthenes:
-
 The idea behind Sieve of Eratosthenes is to cross out all the composites in the given range. Once we are sure that all composites are crossed out, we are left with all the primes in the given range. How do we cross out all the composites?
-
-Let’s create a process to find all primes in the range 1 to N.
 
 Iterate from 2 to sqrt(N), call it i
 For each i, we cross out all the multiples of i, i.e. 2*i, 3*i .. and so on
