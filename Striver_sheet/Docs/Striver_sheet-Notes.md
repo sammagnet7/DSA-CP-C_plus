@@ -184,7 +184,7 @@
           int mid = r - (r - l) / 2;
           ```
 
-     > NOTE: While using ceil DO NOT FORGET to cast to double: ceil((`double`)N / 2);
+     > NOTE: While using `ceil` DO NOT FORGET to cast to double: ceil((`double`)N / 2);
 
  
    - If you want to pass always the longer array into the 1st argument, just check which one is longer and swap arguments based upon that: 
@@ -817,4 +817,10 @@ It can be of two types:
 19. [Graph Leetcode TLE](https://leetcode.com/problems/word-ladder-ii/submissions/1747769329/) : 258-Word ladder.cpp TUF+ approach:2
 20. To do: [leetcode](https://leetcode.com/problems/course-schedule-ii/)
 21. String Subsequence DP hard problem: [leet](https://leetcode.com/problems/count-palindromic-subsequences/)
-22. 
+
+---
+
+### revisit:
+1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
+2. [text](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
+3. 

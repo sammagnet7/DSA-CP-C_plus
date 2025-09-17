@@ -2,6 +2,7 @@
 #include <vector>
 #include <climits>
 #include <sstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -84,52 +85,119 @@ Rotated by 3 position: 3 2 5 4 0
 class Solution
 {
 public:
-    // Time: O(N)
+    // =====================================================
+    // Approach 1 — Extra array (straightforward, easy)
+    // Time:  O(N)
     // Space: O(N)
-    // void rotate(vector<int> &nums, int k)
-    // {
-    //     int len = nums.size();
-    //     vector<int> temp(len);
-    //     int tmpidx = 0;
+    // Notes:
+    //  - Simple and easy to reason about: write the rotated sequence into a temporary array,
+    //    then copy back to the original array.
+    //  - Good when extra memory is allowed.
+    // =====================================================
+    void rotate_extra_array(vector<int> &nums, int k)
+    {
+        int n = nums.size();
+        if (n == 0)
+            return; // guard against division by zero
+        k = k % n;  // normalize k
 
-    //     k = k % len; // This line is Important to get rid of edge cases
-    //     int rotate_start_idx = len - k;
+        // If k == 0 : no rotation needed (early exit optional)
+        if (k == 0)
+            return;
 
-    //     for (int i = rotate_start_idx; i < len; i++)
-    //     {
-    //         temp[tmpidx++] = nums[i];
-    //     }
-    //     for (int i = 0; i < rotate_start_idx; i++)
-    //     {
-    //         temp[tmpidx++] = nums[i];
-    //     }
+        vector<int> temp(n);
+        int tmpidx = 0;
 
-    //     for (int i = 0; i < len; i++)
-    //     {
-    //         nums[i] = temp[i];
-    //     }
-    // }
+        int rotate_start_idx = n - k; // index in original where rotated suffix starts
 
-    // Time: O(N)
+        // Copy suffix [rotate_start_idx .. n-1] first (these become prefix after rotation)
+        for (int i = rotate_start_idx; i < n; ++i)
+        {
+            temp[tmpidx++] = nums[i];
+        }
+
+        // Then copy prefix [0 .. rotate_start_idx-1] (they become suffix)
+        for (int i = 0; i < rotate_start_idx; ++i)
+        {
+            temp[tmpidx++] = nums[i];
+        }
+
+        // Copy back to original array
+        for (int i = 0; i < n; ++i)
+        {
+            nums[i] = temp[i];
+        }
+    }
+
+    // =====================================================
+    // Approach 2 — Three segment-reversals implemented by swapping (in-place)
+    // Time:  O(N)    (each swap loop runs at most O(N) combined)
     // Space: O(1)
+    // Notes:
+    //  - Performs the rotation in-place using three reversal steps implemented
+    //    manually by pairwise swaps.
+    //  - Careful: the loops are written so they handle k == 0 or k == n correctly
+    //    (they become no-ops or cancel out), but it is slightly more verbose than using std::reverse.
+    // =====================================================
+    void rotate_inplace_swaps(vector<int> &nums, int k)
+    {
+        int n = nums.size();
+        if (n == 0)
+            return;
+        k = k % n;
+        if (k == 0)
+            return;
+
+        int rotate_start_idx = n - k;
+
+        // Reverse suffix [rotate_start_idx .. n-1]
+        for (int i = rotate_start_idx, j = n - 1; i < j; ++i, --j)
+        {
+            swap(nums[i], nums[j]);
+        }
+
+        // Reverse prefix [0 .. rotate_start_idx-1]
+        for (int i = 0, j = rotate_start_idx - 1; i < j; ++i, --j)
+        {
+            swap(nums[i], nums[j]);
+        }
+
+        // Reverse the whole array [0 .. n-1]
+        for (int i = 0, j = n - 1; i < j; ++i, --j)
+        {
+            swap(nums[i], nums[j]);
+        }
+    }
+
+    // =====================================================
+    // Approach 3 — Classic reverse trick using std::reverse (recommended)
+    // Time:  O(N)
+    // Space: O(1)
+    // Notes:
+    //  - This is the idiomatic and concise in-place method:
+    //      1) reverse entire array
+    //      2) reverse first k elements
+    //      3) reverse remaining n-k elements
+    //  - Uses std::reverse (clear, less error-prone than hand-written swap loops).
+    // =====================================================
+
     void rotate(vector<int> &nums, int k)
     {
-        int len = nums.size();
-        k = k % len; // This line is Important to get rid of edge cas
-        int rotate_start_idx = len - k;
+        int n = nums.size();
+        if (n == 0)
+            return;
+        k = k % n;
+        if (k == 0)
+            return;
 
-        for (int i = rotate_start_idx, j = len - 1; i < j; i++, j--)
-        {
-            swap(nums[i], nums[j]);
-        }
-        for (int i = 0, j = rotate_start_idx - 1; i < j; i++, j--)
-        {
-            swap(nums[i], nums[j]);
-        }
-        for (int i = 0, j = len - 1; i < j; i++, j--)
-        {
-            swap(nums[i], nums[j]);
-        }
+        // Step 1: reverse the entire array
+        reverse(nums.begin(), nums.end());
+
+        // Step 2: reverse first k elements (they become the rotated prefix)
+        reverse(nums.begin(), nums.begin() + k);
+
+        // Step 3: reverse the remaining n-k elements
+        reverse(nums.begin() + k, nums.end());
     }
 };
 

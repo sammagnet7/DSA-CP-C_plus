@@ -35,18 +35,42 @@ Constraints:
 class Solution
 {
 public:
-    // Time: Best case: O(N) when array is already sorted,
-    // Avg and worst case: O(N^2)
+    /**
+     * Insertion Sort Algorithm
+     * ------------------------
+     * Idea:
+     *  - Builds the sorted array one element at a time.
+     *  - At iteration i, the subarray arr[0..i-1] is already sorted.
+     *  - Insert arr[i] into its correct position within this sorted subarray
+     *    by shifting/swapping larger elements to the right.
+     *
+     * Time Complexity:
+     *  - Best Case: O(N)     (when array is already sorted → only 1 comparison per iteration, no swaps)
+     *  - Average:   O(N^2)
+     *  - Worst:     O(N^2)   (when array is reverse sorted → maximum shifts/swaps each time)
+     *
+     * Space Complexity:
+     *  - O(1) (in-place, no extra data structures)
+     *
+     * Stability:
+     *  - Stable (equal elements preserve relative order since swap only happens
+     *    when arr[j] < arr[j-1], not when equal).
+     */
     void insertionSort(vector<int> &arr)
     {
-        for (int i = 0; i < arr.size(); i++)
-        {
+        int n = arr.size();
 
+        // Outer loop: place each element arr[i] into sorted position
+        for (int i = 0; i < n; i++)
+        {
+            // Inner loop: shift/swaps arr[i] backwards until it's in correct position
             for (int j = i; j > 0; j--)
             {
-                if (arr[j] > arr[j - 1])
+                // If current element is >= previous, it's already in right place → stop
+                if (arr[j] >= arr[j - 1])
                     break;
                 else
+                    // Otherwise, swap current with previous (move smaller element left)
                     swap(arr[j], arr[j - 1]);
             }
         }

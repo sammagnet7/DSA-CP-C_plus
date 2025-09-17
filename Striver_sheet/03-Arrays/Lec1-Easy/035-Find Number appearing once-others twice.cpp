@@ -49,41 +49,73 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Time: O(N)
-    // Space: O(1)
-    // Approach: Using XOR
+    // Approach 1: XOR (best for unsorted input)
+    // ----------------------------------------
+    // Idea:
+    //   XOR all numbers together. Because x ^ x = 0 and 0 ^ y = y, every number that
+    //   appears twice cancels out, leaving the single (unpaired) number as the result.
+    //   This assumes exactly one number appears once and all others appear exactly twice.
+    //
+    // Time: O(N)   -- single pass through array
+    // Space: O(1)  -- constant extra space
+    //
+    // Notes:
+    //   - Works on unsorted arrays.
+    //   - No risk of overflow since it's bitwise, not arithmetic.
+    //   - Extremely efficient and the usual preferred approach when constraints match.
     int singleNumber(vector<int> &nums)
     {
-        int xori = 0;
+        int xori = 0; // accumulator for XOR of seen elements
 
+        // XOR every element into the accumulator. Pairs cancel out.
         for (int e : nums)
         {
             xori ^= e;
         }
+
+        // After the loop, xori holds the element that did not have a pair.
         return xori;
     }
 
-    // Time Complexity: O(N)
-    // Space Complexity: O(1)
-    // If given Array is in SORTED order then Better approach to follow:
-    // int singleNumber(vector<int> &arr)
-    // {
-    //     int n = arr.size();
-    //     int ans;
+    // Approach 2: Scan sorted array (use when input is sorted)
+    // -------------------------------------------------------
+    // Idea:
+    //   If the array is sorted and exactly one element appears once while every other
+    //   element appears twice, then the unique element will be the one that is not
+    //   equal to its neighbor(s). We scan and check neighbors to find it.
+    //   This avoids extra space and can short-circuit early once found.
+    //
+    // Time: O(N)   -- in the worst case we may scan whole array
+    // Space: O(1)
+    //
+    // Notes / Edge-cases:
+    //   - Requires the input array to be sorted. If not sorted, either sort first
+    //     (cost O(N log N)) or use the XOR approach.
+    //   - Careful at boundaries (i == 0 and i == n-1) — those are handled explicitly.
+    //   - If pairs are large blocks, you can optimize by skipping pairs (i += 2 when
+    //     arr[i] == arr[i+1]) to speed average performance, but correctness remains
+    //     with the simple neighbor-check below.
+    //   - Ensure `ans` is initialized or assigned before returning (this code assigns
+    //     before break; defensive default could be used if needed).
+    int singleNumber(vector<int> &arr)
+    {
+        int n = arr.size();
+        int ans = 0; // will hold the unique element once found
 
-    //     // Traversing through the array.
-    //     for (int i = 0; i < n; ++i)
-    //     {
-
-    //         // Checking if 'Arr[i]' is neither equal to 'Arr[i - 1]' and 'Arr[i + 1]'.
-    //         if ((i == 0 || arr[i] != arr[i - 1]) && (i == n - 1 || arr[i] != arr[i + 1]))
-    //         {
-    //             ans = arr[i];
-    //             break;
-    //         }
-    //     }
-    //     return ans;
-    // }
+        // Traverse the array and find the element which is not equal to its neighbors.
+        for (int i = 0; i < n; ++i)
+        {
+            // Check left neighbor (or boundary) and right neighbor (or boundary).
+            // If both comparisons hold (not equal to left and not equal to right),
+            // arr[i] is the unique element.
+            if ((i == 0 || arr[i] != arr[i - 1]) && (i == n - 1 || arr[i] != arr[i + 1]))
+            {
+                ans = arr[i];
+                break; // we can stop once we find the unique element
+            }
+        }
+        return ans;
+    }
 };
 
 int main()

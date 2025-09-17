@@ -34,27 +34,46 @@ Constraints:
 class Solution
 {
 public:
-    // Time: Best case: O(N) when array is already sorted,
-    // Avg and worst case: O(N^2)
+    /**
+     * Bubble Sort Algorithm
+     * ---------------------
+     * Idea:
+     *  - Repeatedly compare adjacent elements and swap if they are in the wrong order.
+     *  - After each full pass, the largest element "bubbles up" to its correct position.
+     *  - Repeat until no swaps are needed (array is sorted).
+     *
+     * Time Complexity:
+     *  - Best Case: O(N)  (when the array is already sorted, due to isSwapped optimization)
+     *  - Average:  O(N^2)
+     *  - Worst:    O(N^2)
+     *
+     * Space Complexity:
+     *  - O(1) (in-place, only a few variables)
+     *
+     * Stability:
+     *  - Stable (does not change relative order of equal elements).
+     */
     void bubbleSort(vector<int> &arr)
     {
-
+        // Outer loop controls the number of passes
+        // i goes from 0 to n-1, j decreases from n to 1
         for (int i = 0, j = arr.size(); i < j; j--)
         {
+            bool isSwapped = false; // tracks if any swap happened in this pass
 
-            bool isSwaped = false;
-
+            // Inner loop: bubble up the largest element to index j-1
             for (int k = 0; k < j - 1; k++)
             {
-
+                // If current element is greater than next, swap
                 if (arr[k] > arr[k + 1])
                 {
                     swap(arr[k], arr[k + 1]);
-                    isSwaped = true;
+                    isSwapped = true;
                 }
             }
 
-            if (!isSwaped)
+            // Optimization: if no swaps in this pass, array is already sorted
+            if (!isSwapped)
                 return;
         }
     }

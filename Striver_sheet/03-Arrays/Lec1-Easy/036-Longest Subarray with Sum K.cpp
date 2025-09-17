@@ -60,80 +60,127 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Approach: Two pointer approach. Applicable only when elements are zero or positive only.
-    // Time: O(2N)
-    // Space: O(1)
+    // Approach: Sliding Window / Two Pointers
+    // ---------------------------------------
+    // This approach works ONLY if all elements are non-negative.
+    // Why? Because with negatives, shrinking the window when sum > k would not be valid.
+    //
+    // Idea:
+    //   - Maintain a sliding window [l..r] with two pointers.
+    //   - Expand the window by moving `r` and keep a running `sum`.
+    //   - If sum == k, update max length.
+    //   - If sum > k, shrink from left (`l++`) until sum <= k, checking again for equality.
+    //   - Continue until r traverses the array.
+    //
+    // Time Complexity: O(2N) in worst case
+    //   - Each element is added once (r++) and removed at most once (l++).
+    //   - So overall linear time.
+    // Space Complexity: O(1)
+    //   - Only variables used; no extra storage.
+    //
+    // Parameters:
+    //   arr : vector of non-negative integers
+    //   k   : target sum
+    // Returns:
+    //   maxL : length of the longest subarray with sum exactly equal to k
+    //
     int longestSubarray_WO_Negetives(vector<int> &arr, int k)
     {
-        // code here
-        int l = 0, r = 0, sum = 0;
+        int l = 0, r = 0; // Two pointers (left and right)
+        int sum = 0;      // Current window sum
         int len = arr.size();
-        int maxL = 0;
+        int maxL = 0; // Track maximum subarray length found
 
         while (r < len)
         {
+            // Expand the window to include arr[r]
             sum += arr[r];
 
+            // Check if current window [l..r] sum equals k
             if (sum == k)
             {
-                int countL = r - l + 1;
+                int countL = r - l + 1; // current window length
                 maxL = (countL > maxL) ? countL : maxL;
             }
 
+            // If sum > k, shrink the window from the left until sum <= k
             while (sum > k && l <= r)
             {
-                sum -= arr[l];
+                sum -= arr[l]; // remove arr[l] from sum
 
+                // After shrinking, check again for equality
                 if (sum == k)
                 {
-                    int countL = r - l;
+                    int countL = r - l; // new window length
                     maxL = (countL > maxL) ? countL : maxL;
                 }
 
-                l++;
+                l++; // move left pointer
             }
+
+            // Move right pointer forward (expand window)
             r++;
         }
 
         return maxL;
     }
 
-    // Approach applicable for all kinds of arrays
-    // In this approach, we are using the concept of the prefix sum to solve this problem. Here, the prefix sum of a subarray ending at index i, simply means the sum of all the elements of that subarray.
-    // we will keep track of the prefix sum of the subarrays generated at every index using a map data structure.
-    // In the map, we will store every prefix sum calculated, with the index(where the subarray with that prefix sum ends)
-    // to maximize the calculated length, we will consider only the first or the leftmost index where the subarray with sum x-k ends.
-    // So, we will check the map before inserting the prefix sum. If it already exists in the map, we will not update it but if it is not present, we will insert it for the first time.
-    // Time: O(N) or O(N*logN)
-    // Space:O(N)
-    // Reason: If we are using an unordered_map data structure in C++ the time complexity will be O(N)(though in the worst case, unordered_map takes O(N) to find an element and the time complexity becomes O(N^2))
-    // but if we are using a map data structure, the time complexity will be O(N*logN).
+    // Approach: Prefix Sum + Hash Map
+    // --------------------------------
+    // Unlike the sliding-window approach (which only works for non-negative arrays),
+    // this method works for arrays containing negatives as well.
+    //
+    // Idea:
+    //   - Maintain a running prefix sum as we traverse the array.
+    //   - If prefixSum == k, then the subarray [0..i] has sum k → candidate length = i+1.
+    //   - Otherwise, check if there exists a prefixSum_req = prefixSum - k in the map.
+    //       • If yes, then the subarray (prefixSum_index_map[prefixSum_req] + 1 .. i) has sum k.
+    //       • Its length = i - prefixSum_index_map[prefixSum_req].
+    //   - To maximize length, we want the leftmost occurrence of each prefix sum, so
+    //     insert prefixSum into the map only if it doesn’t already exist.
+    //   - Update max length whenever we find a valid subarray.
+    //
+    // Time Complexity:
+    //   • O(N) if using unordered_map (average case)
+    //   • O(N log N) if using map (because insert/find is O(log N))
+    //   • Worst-case unordered_map can degrade to O(N^2), but rare.
+    // Space Complexity: O(N) for storing prefix sums in the map.
+    //
+    // Parameters:
+    //   arr : vector of integers (can contain positive, negative, zero)
+    //   k   : target sum
+    // Returns:
+    //   maxL : length of the longest subarray whose sum is exactly k
+    //
     int longestSubarray_WITH_Negetives(vector<int> &arr, int k)
     {
-        int maxL = 0;
-        map<int, int> prefixSum_index_map;
-        int prefixSum = 0;
+        int maxL = 0;                      // store maximum length found
+        map<int, int> prefixSum_index_map; // map: prefixSum → earliest index
+        int prefixSum = 0;                 // running cumulative sum
 
+        // Traverse the array
         for (int i = 0; i < arr.size(); i++)
         {
-            prefixSum += arr[i];
+            prefixSum += arr[i]; // update running prefix sum
 
-            // Maintaining cumulative sum with left most index possible
+            // Store this prefix sum only if it's not already in the map
+            // (we want to preserve the leftmost index for max length calculation)
             if (prefixSum_index_map.find(prefixSum) == prefixSum_index_map.end())
             {
                 prefixSum_index_map[prefixSum] = i;
             }
 
-            // If current prefixSum matches then, this must be the longest subarray till now
+            // Case 1: If the subarray [0..i] itself has sum k
             if (prefixSum == k)
             {
-                maxL = i + 1;
+                maxL = i + 1; // length = i - 0 + 1
                 continue;
             }
 
-            // else
+            // Case 2: Look for a prefix sum that would form a subarray sum k
             int prefixSum_req = prefixSum - k;
 
+            // If prefixSum_req exists, then subarray after its index to i has sum k
             if (prefixSum_index_map.find(prefixSum_req) != prefixSum_index_map.end())
             {
                 int subArrLen = (i - prefixSum_index_map[prefixSum_req]);

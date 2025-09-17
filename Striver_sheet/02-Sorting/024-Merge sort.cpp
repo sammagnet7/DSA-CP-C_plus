@@ -80,69 +80,99 @@ public:
     //     }
     // }
 
-    // Time: O(N)
-    // Space: O(N)
+    /**
+     * Merge Function
+     * --------------
+     * Purpose:
+     *  - Merge two sorted halves of the array (arr[start..mid] and arr[mid+1..end])
+     *    into a single sorted subarray in arr[start..end].
+     *
+     * Time Complexity: O(N)   [each element in the range is processed once]
+     * Space Complexity: O(N)  [temporary arrays for left and right halves]
+     */
     void merge(vector<int> &arr, int start, int mid, int end)
     {
+        // Create temporary arrays to hold left and right halves
         vector<int> temp1(mid - start + 1), temp2(end - mid);
 
+        // Copy elements from arr[start..mid] into temp1
         for (int i = start; i <= mid; i++)
         {
             temp1[i - start] = arr[i];
         }
+
+        // Copy elements from arr[mid+1..end] into temp2
         for (int i = mid + 1; i <= end; i++)
         {
             temp2[i - mid - 1] = arr[i];
         }
 
-        int l = 0;
-        int r = 0;
-        int c = start;
+        // Merge temp1[] and temp2[] back into arr[]
+        int l = 0;     // pointer for temp1
+        int r = 0;     // pointer for temp2
+        int c = start; // pointer for arr
         int s1 = temp1.size();
         int s2 = temp2.size();
 
+        // Compare elements from both temp arrays and insert the smaller one into arr
         while (l < s1 && r < s2)
         {
             if (temp1[l] <= temp2[r])
             {
-                arr[c] = temp1[l];
-                c++;
-                l++;
+                arr[c++] = temp1[l++];
             }
-            else if (temp1[l] > temp2[r])
+            else
             {
-                arr[c] = temp2[r];
-                c++;
-                r++;
+                arr[c++] = temp2[r++];
             }
         }
+
+        // Copy any remaining elements from temp1
         while (l < s1)
         {
-            arr[c] = temp1[l];
-            c++;
-            l++;
+            arr[c++] = temp1[l++];
         }
+
+        // Copy any remaining elements from temp2
         while (r < s2)
         {
-            arr[c] = temp2[r];
-            c++;
-            r++;
+            arr[c++] = temp2[r++];
         }
     }
 
-    // Time: O(N Log N)
-    // Space: O(N)
+    /**
+     * Merge Sort Algorithm
+     * --------------------
+     * Idea:
+     *  - Divide the array into two halves.
+     *  - Recursively sort each half.
+     *  - Merge the two sorted halves.
+     *
+     * Time Complexity:
+     *  - O(N log N) for all cases (divide: log N levels, merge: O(N) per level)
+     *
+     * Space Complexity:
+     *  - O(N) extra space for temporary arrays used during merging
+     *
+     * Stability:
+     *  - Stable (preserves relative order of equal elements).
+     */
     void mergeSort(vector<int> &arr, int low, int high)
     {
-
+        // Base case: if array has 1 or 0 elements, it's already sorted
         if (low >= high)
             return;
 
-        int mid = low - (low - high) / 2; // Trick to avoid integer overflow
+        // Compute mid-point carefully to avoid overflow
+        int mid = low + (high - low) / 2;
 
+        // Recursively sort left half
         mergeSort(arr, low, mid);
+
+        // Recursively sort right half
         mergeSort(arr, mid + 1, high);
 
+        // Merge the two sorted halves
         merge(arr, low, mid, high);
     }
 };

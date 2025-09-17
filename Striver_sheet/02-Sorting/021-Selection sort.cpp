@@ -31,15 +31,38 @@ Constraints:
 class Solution
 {
 public:
-    // Time: Best, Avg and worst case: O(N^2)
+    /**
+     * Selection Sort Algorithm
+     * ------------------------
+     * Idea:
+     *  - Iterate through the array.
+     *  - For each position `i`, find the smallest element in the subarray [i..n-1].
+     *  - Swap that smallest element with arr[i].
+     *  - After i iterations, the first i elements are already sorted.
+     *
+     * Time Complexity:
+     *  - Best Case:  O(N^2)   (still scans entire array for min every time)
+     *  - Average:   O(N^2)
+     *  - Worst:     O(N^2)
+     *
+     * Space Complexity:
+     *  - O(1) (in-place, no extra data structures)
+     *
+     * Stability:
+     *  - Not stable by default (equal elements can be swapped and change relative order).
+     */
     void selectionSort(vector<int> &arr)
     {
-        for (int i = 0; i < arr.size(); i++)
-        {
-            int mini = -1;
-            int minv = INT_MAX;
+        int n = arr.size();
 
-            for (int j = i; j < arr.size(); j++)
+        // Outer loop goes from 0 to n-1
+        for (int i = 0; i < n; i++)
+        {
+            int mini = -1;      // index of minimum element in current pass
+            int minv = INT_MAX; // value of minimum element
+
+            // Inner loop: find the smallest element in arr[i..n-1]
+            for (int j = i; j < n; j++)
             {
                 if (arr[j] < minv)
                 {
@@ -48,6 +71,7 @@ public:
                 }
             }
 
+            // Swap the found minimum element with the element at index i
             swap(arr[i], arr[mini]);
         }
     }

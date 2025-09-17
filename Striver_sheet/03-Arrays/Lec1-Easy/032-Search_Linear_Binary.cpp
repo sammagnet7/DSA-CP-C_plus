@@ -59,25 +59,30 @@ public:
     }
 
     // Binary search
-    //     bool searchInSorted(vector<int>& arr, int k) {
+    bool searchInSorted(vector<int> &arr, int k)
+    {
 
-    //         // Your code here
-    //         int len=arr.size();
+        // Your code here
+        int len = arr.size();
 
-    //         return binarySearch(arr,0,len,k);
+        return binarySearch(arr, 0, len, k);
+    }
 
-    //     }
+    bool binarySearch(vector<int> &arr, int l, int r, int k)
+    {
 
-    //     bool binarySearch(vector<int>& arr, int l, int r, int k){
+        if (l > r)
+            return false;
 
-    //         if(l>r) return false;
+        int mid = l + (r - l) / 2;
 
-    //         int mid= l - (l-r)/2;
-
-    //         if(arr[mid]==k) return true;
-    //         else if(k<arr[mid]) binarySearch(arr,l,mid-1,k);
-    //         else if(arr[mid]<k) binarySearch(arr,mid+1,r,k);
-    //     }
+        if (arr[mid] == k)
+            return true;
+        else if (k < arr[mid])
+            binarySearch(arr, l, mid - 1, k);
+        else if (arr[mid] < k)
+            binarySearch(arr, mid + 1, r, k);
+    }
 };
 
 int main()

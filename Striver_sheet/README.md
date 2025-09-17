@@ -246,4 +246,8 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 08/09/26: Step15:: SHEET 1 PASS COMPLETED[455/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
 
 ---
+## Revisions:
 
+---
+- 16/09/26: <span style="color: green;"> #31 [31/455]</span>
+- 17/09/26: <span style="color: green;"> #21 [52/455]</span>
