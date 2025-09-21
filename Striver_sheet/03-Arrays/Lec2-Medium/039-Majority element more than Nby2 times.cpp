@@ -54,40 +54,106 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Another approach : Using Frequency map
-    // Time: O(N Log N)
-    // SPace: O(N)
-    // int majorityElement(vector<int> &arr)
-    // {
-    // }
+    /**
+     * Majority Element — Frequency Map Approach
+     * -----------------------------------------
+     * Problem:
+     *   - Find the element that appears more than ⌊n/2⌋ times in the array.
+     *   - If no such element exists, return -1.
+     *
+     * Approach:
+     *   - Use a hash map (unordered_map) or map to count the frequency of each element.
+     *   - Traverse the array, increment count for each element.
+     *   - After counting, check which element (if any) has frequency > n/2.
+     *
+     * Time Complexity:
+     *   - O(N) average with unordered_map (hash table).
+     *   - O(N log N) if using ordered map (balanced BST).
+     *
+     * Space Complexity:
+     *   - O(N) for storing frequencies.
+     *
+     * Notes:
+     *   - Straightforward approach, easy to implement.
+     *   - Less space-efficient than Boyer–Moore (which uses O(1)).
+     */
+    int majorityElement_Map(vector<int> &arr)
+    {
+        int n = arr.size();
+        unordered_map<int, int> freq; // value -> count
 
-    // Approach: Using Counter
-    // Time: O(N)
-    // Space: O(1)
+        // Count frequencies
+        for (int x : arr)
+        {
+            freq[x]++;
+        }
+
+        // Find element with frequency > n/2
+        for (auto &p : freq)
+        {
+            if (p.second > n / 2)
+                return p.first;
+        }
+
+        return -1; // no majority element
+    }
+
+    /**
+     * Majority Element (Boyer–Moore Voting Algorithm)
+     * -----------------------------------------------
+     * Problem:
+     *   - Find the element that appears more than ⌊n/2⌋ times in the array.
+     *   - If no such element exists, return -1.
+     *
+     * Approach:
+     *   - Use the Boyer–Moore Majority Vote Algorithm.
+     *   - Maintain a candidate element `elem` and a counter `count`.
+     *   - Iterate through the array:
+     *       * If count == 0 → take current element as new candidate.
+     *       * If current element == candidate → increment count.
+     *       * If current element != candidate → decrement count.
+     *   - At the end, candidate may be the majority element.
+     *   - Do a final pass to confirm if candidate is indeed majority.
+     *
+     * Time Complexity:
+     *   - O(N) [single pass to find candidate + optional second pass to verify].
+     *
+     * Space Complexity:
+     *   - O(1) [constant space for counters].
+     *
+     * Notes:
+     *   - If the problem guarantees a majority element exists (like LeetCode 169),
+     *     the second verification loop can be skipped.
+     *   - This algorithm works because if we pair each occurrence of the candidate
+     *     with a different element, majority element will remain unpaired.
+     */
     int majorityElement(vector<int> &arr)
     {
-        int elem = 0;
-        int count = 0;
+        int elem = 0;  // candidate for majority
+        int count = 0; // vote counter
 
+        // Phase 1: Find potential candidate
         for (int i = 0; i < arr.size(); i++)
         {
             if (count == 0)
             {
+                // If no candidate, take current element as new candidate
                 elem = arr[i];
-                count++;
+                count = 1;
             }
             else if (arr[i] == elem)
             {
+                // If same as candidate, increment vote
                 count++;
             }
-            else if (arr[i] != elem)
+            else
             {
+                // Different element → cancel out one vote
                 count--;
             }
         }
 
-        // checking if the stored element is the majority element
-        // This check is needed if it not guaranteed that such an element always exists in the array
+        // Phase 2: Verify candidate (only needed if majority not guaranteed)
         count = 0;
         for (int i = 0; i < arr.size(); i++)
         {
@@ -95,9 +161,11 @@ public:
                 count++;
         }
 
-        if (count > (arr.size() / 2))
+        // Check if candidate occurs more than n/2 times
+        if (count > arr.size() / 2)
             return elem;
-        return -1;
+
+        return -1; // no majority element
     }
 };
 

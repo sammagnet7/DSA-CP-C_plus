@@ -122,70 +122,70 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 24/05/25: Step4:: Lec2: Binary Search on Answers [103/455] <span style="color: green;">[2 hours]</span>
 - 25/05/25: Step4:: Lec2: Binary Search on Answers [104/455] <span style="color: green;">[4 hours]</span>
 - 26/05/25: Step4:: Lec2: Binary Search on Answers Completed [105/455] <span style="color: green;">[2 hours]</span>
-- 27/05/26: Step4:: Lec3: BS on 2D arrays [108/455] <span style="color: green;">[4 hours]</span>
-- 28/05/26: Step4:: BS Completed[110/455] <span style="color: green;">[4 hours]</span>
-- 29/05/26: Step5:: Lec1: Basic Strings [115/455] <span style="color: green;">[4 hours]</span>
-- 30/05/26: Step5:: Lec1: Basic Strings completed [117/455] <span style="color: green;">[2 hours]</span>
-- 31/05/26: Step5:: Lec2: Medium Strings started [118/455] <span style="color: green;">[2 hours]</span>
+- 27/05/25: Step4:: Lec3: BS on 2D arrays [108/455] <span style="color: green;">[4 hours]</span>
+- 28/05/25: Step4:: BS Completed[110/455] <span style="color: green;">[4 hours]</span>
+- 29/05/25: Step5:: Lec1: Basic Strings [115/455] <span style="color: green;">[4 hours]</span>
+- 30/05/25: Step5:: Lec1: Basic Strings completed [117/455] <span style="color: green;">[2 hours]</span>
+- 31/05/25: Step5:: Lec2: Medium Strings started [118/455] <span style="color: green;">[2 hours]</span>
 
 ---
 
-- 01/06/26: Step5:: Lec2: Medium Strings started [122/455] <span style="color: green;">[4 hours]</span>
-- 02/06/26: <span style="color: red;">[0 hour]</span>
-- 03/06/26: <span style="color: red;">[0 hour]</span>
-- 04/06/26: Step5:: Lec2: Medium Strings completed [125/455] <span style="color: green;">[3 hours]</span>
-- 05/06/26: Step6:: Lec1: Learn Linked list  [126/455] <span style="color: green;">[1 hours]</span>
-- 06/06/26: Step6:: Lec2: Learn Doubly Linked list  [133/455] <span style="color: green;">[5 hours]</span>
-- 07/06/26: Step6:: Lec3: Medium problems of LL  [139/455] <span style="color: green;">[4 hours]</span>
-- 08/06/26: Step6:: Lec3: Medium problems of LL  [141/455] <span style="color: green;">[3 hours]</span>
-- 09/06/26: Step6:: Lec3: Medium problems of LL  [143/455] <span style="color: green;">[3 hours]</span>
-- 10/06/26: Step6:: Lec3: Medium problems of LL  [145/455] <span style="color: green;">[2 hours]</span>
-- 11/06/26: Step6:: Lec3: Medium problems of LL  [148/455] <span style="color: green;">[4 hours]</span>
-- 12/06/26: Step6:: Lec3, Lec4: Completed  [152/455] <span style="color: green;">[4 hours]</span>
-- 13/06/26: Step6:: Lec5: Continues  [154/455] <span style="color: green;">[2 hours]</span>
+- 01/06/25: Step5:: Lec2: Medium Strings started [122/455] <span style="color: green;">[4 hours]</span>
+- 02/06/25: <span style="color: red;">[0 hour]</span>
+- 03/06/25: <span style="color: red;">[0 hour]</span>
+- 04/06/25: Step5:: Lec2: Medium Strings completed [125/455] <span style="color: green;">[3 hours]</span>
+- 05/06/25: Step6:: Lec1: Learn Linked list  [126/455] <span style="color: green;">[1 hours]</span>
+- 06/06/25: Step6:: Lec2: Learn Doubly Linked list  [133/455] <span style="color: green;">[5 hours]</span>
+- 07/06/25: Step6:: Lec3: Medium problems of LL  [139/455] <span style="color: green;">[4 hours]</span>
+- 08/06/25: Step6:: Lec3: Medium problems of LL  [141/455] <span style="color: green;">[3 hours]</span>
+- 09/06/25: Step6:: Lec3: Medium problems of LL  [143/455] <span style="color: green;">[3 hours]</span>
+- 10/06/25: Step6:: Lec3: Medium problems of LL  [145/455] <span style="color: green;">[2 hours]</span>
+- 11/06/25: Step6:: Lec3: Medium problems of LL  [148/455] <span style="color: green;">[4 hours]</span>
+- 12/06/25: Step6:: Lec3, Lec4: Completed  [152/455] <span style="color: green;">[4 hours]</span>
+- 13/06/25: Step6:: Lec5: Continues  [154/455] <span style="color: green;">[2 hours]</span>
 
 ---
 #### Tracking problem count instead of time:
 
 ---
 
-- 14/06/26: Step6:: LinkedList Completed  [158/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 1 ] [ Hard : 3 ]</span> 
-- 15/06/26: Step6:: LinkedList Completed + Recursion Lec1  [162/455] <span style="color: green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 0 ]</span> 
-- 16/06/26: Step7:: Recursion Lec2  [168/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 05 ] [ Hard : 0 ]</span> 
-- 17/06/26: Step7:: Recursion Lec2 completed  [173/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 05 ] [ Hard : 0 ]</span> 
-- 18/06/26: Step7:: Recursion Lec 3  [179/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 02 ] [ Hard : 5 ]</span>
-- 19/06/26: Step7:: Recursion complete + Bit manipulation Lec1 [188/455] <span style="color: green;"> [ Easy : 08 ] [ Medium : 00 ] [ Hard : 02 ]</span>
-- 20/06/26: Step8:: Bit manipulation Lec2 [194/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 04 ] [ Hard : 02 ]</span>
-- 21/06/26: Step8:: Bit manipulation completes [195/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
-- 22/06/26: Step1:: Math completes [199/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
-- 23/06/26: Step9:: Stack and queues [202/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 00 ] [ Hard : 00 ]</span>
-- 24/06/26: Step9:: Stack and queues [209/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 03 ] [ Hard : 00 ]</span>
-- 25/06/26: Step9:: Stack and queues [216/455] <span style="color: green;"> [ Easy : 02 ] [ Medium : 06 ] [ Hard : 00 ]</span>
-- 26/06/26: Step9:: Stack and queues [220/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
-- 27/06/26: Step9:: Stack and queues [223/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 02 ]</span>
-- 28/06/26: Step9:: Stack and queues [227/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
-- 29/06/26: Step9:: Stack and queues completed [229/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 01 ]</span>
-- 30/06/26: Step9:: Stack and queues completed [231/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 14/06/25: Step6:: LinkedList Completed  [158/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 1 ] [ Hard : 3 ]</span> 
+- 15/06/25: Step6:: LinkedList Completed + Recursion Lec1  [162/455] <span style="color: green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 0 ]</span> 
+- 16/06/25: Step7:: Recursion Lec2  [168/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 05 ] [ Hard : 0 ]</span> 
+- 17/06/25: Step7:: Recursion Lec2 completed  [173/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 05 ] [ Hard : 0 ]</span> 
+- 18/06/25: Step7:: Recursion Lec 3  [179/455] <span style="color: green;"> [ Easy : 0 ] [ Medium : 02 ] [ Hard : 5 ]</span>
+- 19/06/25: Step7:: Recursion complete + Bit manipulation Lec1 [188/455] <span style="color: green;"> [ Easy : 08 ] [ Medium : 00 ] [ Hard : 02 ]</span>
+- 20/06/25: Step8:: Bit manipulation Lec2 [194/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 04 ] [ Hard : 02 ]</span>
+- 21/06/25: Step8:: Bit manipulation completes [195/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
+- 22/06/25: Step1:: Math completes [199/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
+- 23/06/25: Step9:: Stack and queues [202/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 00 ] [ Hard : 00 ]</span>
+- 24/06/25: Step9:: Stack and queues [209/455] <span style="color: green;"> [ Easy : 03 ] [ Medium : 03 ] [ Hard : 00 ]</span>
+- 25/06/25: Step9:: Stack and queues [216/455] <span style="color: green;"> [ Easy : 02 ] [ Medium : 06 ] [ Hard : 00 ]</span>
+- 26/06/25: Step9:: Stack and queues [220/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
+- 27/06/25: Step9:: Stack and queues [223/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 02 ]</span>
+- 28/06/25: Step9:: Stack and queues [227/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
+- 29/06/25: Step9:: Stack and queues completed [229/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 01 ]</span>
+- 30/06/25: Step9:: Stack and queues completed [231/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
   
 ---
 
-- 01/07/26: Step10:: Sliding window started [233/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 02/07/26: Step10:: Sliding window [235/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 03/07/26: Step10:: Sliding window [241/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 02 ]</span>
-- 04/07/26: Step11:: Heap [245/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 00 ]</span>
-- 05/07/26: Step11:: Heap [252/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 06 ] [ Hard : 01 ]</span>
-- 06/07/26: Step11:: Heap [256/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
-- 07/07/26: Step11:: Heap completed [258/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
-- 08/07/26: Step13:: Binary trees [271/455] <span style="color: green;"> [ Easy : 13 ] [ Medium : 00 ] [ Hard : 00 ]</span>
-- 09/07/26: Step13:: Binary trees [277/455] <span style="color: green;"> [ Easy : 04 ] [ Medium : 01 ] [ Hard : 01 ]</span>
-- 10/07/26: Step13:: Binary trees [284/455] <span style="color: green;"> [ Easy : 04 ] [ Medium : 03 ] [ Hard : 02 ]</span>
-- 11/07/26: Step13:: Binary trees Hard [289/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 02 ]</span>
-- 12/07/26: Step13:: Binary trees Hard [289/455] <span style="color: red;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 00 ]</span>
-- 13/07/26: Step13:: Binary trees Hard [294/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
-- 14/07/26: Step13:: Binary trees Completed [297/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
-- 15/07/26: Step14:: BST [298/455] <span style="color: Orange;"> [ Easy : 01 ] [ Medium : 00 ] [ Hard : 00 ]</span>
-- 16/07/26: Step14:: BST [304/455] <span style="color: Green;"> [ Easy : 04 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 17/07/26: Step14:: BST [305/455] <span style="color: Orange;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
+- 01/07/25: Step10:: Sliding window started [233/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 02/07/25: Step10:: Sliding window [235/455] <span style="color: orange;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 03/07/25: Step10:: Sliding window [241/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 02 ]</span>
+- 04/07/25: Step11:: Heap [245/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 00 ]</span>
+- 05/07/25: Step11:: Heap [252/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 06 ] [ Hard : 01 ]</span>
+- 06/07/25: Step11:: Heap [256/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
+- 07/07/25: Step11:: Heap completed [258/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
+- 08/07/25: Step13:: Binary trees [271/455] <span style="color: green;"> [ Easy : 13 ] [ Medium : 00 ] [ Hard : 00 ]</span>
+- 09/07/25: Step13:: Binary trees [277/455] <span style="color: green;"> [ Easy : 04 ] [ Medium : 01 ] [ Hard : 01 ]</span>
+- 10/07/25: Step13:: Binary trees [284/455] <span style="color: green;"> [ Easy : 04 ] [ Medium : 03 ] [ Hard : 02 ]</span>
+- 11/07/25: Step13:: Binary trees Hard [289/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 02 ]</span>
+- 12/07/25: Step13:: Binary trees Hard [289/455] <span style="color: red;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 00 ]</span>
+- 13/07/25: Step13:: Binary trees Hard [294/455] <span style="color: green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 01 ]</span>
+- 14/07/25: Step13:: Binary trees Completed [297/455] <span style="color: green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
+- 15/07/25: Step14:: BST [298/455] <span style="color: Orange;"> [ Easy : 01 ] [ Medium : 00 ] [ Hard : 00 ]</span>
+- 16/07/25: Step14:: BST [304/455] <span style="color: Green;"> [ Easy : 04 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 17/07/25: Step14:: BST [305/455] <span style="color: Orange;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 00 ]</span>
 - 18/05/25: <span style="color: red;">[0 hour]</span>
 - 19/05/25: <span style="color: red;">[0 hour]</span>
 - 20/05/25: <span style="color: red;">[0 hour]</span>
@@ -194,60 +194,65 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 23/05/25: <span style="color: red;">[0 hour]</span>
 - 24/05/25: <span style="color: red;">[0 hour]</span>
 - 25/05/25: <span style="color: red;">[0 hour]</span>
-- 26/07/26: <span style="color: red;">[0 hour]</span>
-- 27/07/26: Step14:: BST [311/455] <span style="color: Orange;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
-- 28/07/26: Step14:: BST Completes [316/455] <span style="color: Green;"> [ Easy : 04 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 29/07/26: Step12:: Greedy [321/455] <span style="color: Green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 30/07/26: Step12:: Greedy complete [329/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 01 ]</span>
+- 26/07/25: <span style="color: red;">[0 hour]</span>
+- 27/07/25: Step14:: BST [311/455] <span style="color: Orange;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
+- 28/07/25: Step14:: BST Completes [316/455] <span style="color: Green;"> [ Easy : 04 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 29/07/25: Step12:: Greedy [321/455] <span style="color: Green;"> [ Easy : 02 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 30/07/25: Step12:: Greedy complete [329/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 04 ] [ Hard : 01 ]</span>
 
 ---
 
-- 01/08/26: Step16:: DP  [335/455] <span style="color: Green;"> [ Easy : 03 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 02/08/26: Step16:: DP  [340/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 05 ] [ Hard : 00 ]</span>
-- 03/08/26: Step16:: DP  [342/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 01 ]</span>
-- 04/08/26: Step16:: DP  [344/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
-- 05/08/26: <span style="color: red;">[0 hour]</span>
-- 06/08/26: <span style="color: red;">[0 hour]</span>
-- 07/08/26: <span style="color: red;">[0 hour]</span>
-- 08/08/26: Step16:: DP  [348/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
-- 09/08/26: Step16:: DP  [349/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 10/08/26: Step16:: DP  [353/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
-- 11/08/26: <span style="color: red;">[0 hour]</span>
-- 12/08/26: <span style="color: red;">[0 hour]</span>
-- 13/08/26: <span style="color: red;">[0 hour]</span>
-- 14/08/26: <span style="color: red;">[0 hour]</span>
-- 15/08/26: Step16:: DP  [358/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
-- 16/08/26: Step16:: DP  [363/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 04 ]</span>
-- 17/08/26: Step16:: DP  [369/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 03 ]</span>
-- 18/08/26: Step16:: DP  [372/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
-- 19/08/26: Step16:: DP  [378/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 01 ]</span>
-- 20/08/26: Step16:: DP  [381/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 04 ]</span>
-- 21/08/26: Step16:: DP Completed [385/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
-- 22/08/26: Step15:: Graph [394/455] <span style="color: Green;"> [ Easy : 03 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 23/08/26: Step15:: Graph [398/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 03 ] [ Hard : 00 ]</span>
-- 24/08/26: <span style="color: red;">[0 hour]</span>
-- 25/08/26: Step15:: Graph [404/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 06 ] [ Hard : 03 ]</span>
-- 26/08/26: Step15:: Graph [412/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 02 ]</span>
-- 27/08/26: <span style="color: red;">[0 hour]</span>
-- 28/08/26: Step15:: Graph [417/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 05 ] [ Hard : 00 ]</span>
-- 29/08/26: Step15:: Graph [419/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 30/08/26: <span style="color: red;">[0 hour]</span>
-- 31/08/26: Step15:: Graph [422/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
+- 01/08/25: Step16:: DP  [335/455] <span style="color: Green;"> [ Easy : 03 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 02/08/25: Step16:: DP  [340/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 05 ] [ Hard : 00 ]</span>
+- 03/08/25: Step16:: DP  [342/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 01 ]</span>
+- 04/08/25: Step16:: DP  [344/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
+- 05/08/25: <span style="color: red;">[0 hour]</span>
+- 06/08/25: <span style="color: red;">[0 hour]</span>
+- 07/08/25: <span style="color: red;">[0 hour]</span>
+- 08/08/25: Step16:: DP  [348/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
+- 09/08/25: Step16:: DP  [349/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 10/08/25: Step16:: DP  [353/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 01 ]</span>
+- 11/08/25: <span style="color: red;">[0 hour]</span>
+- 12/08/25: <span style="color: red;">[0 hour]</span>
+- 13/08/25: <span style="color: red;">[0 hour]</span>
+- 14/08/25: <span style="color: red;">[0 hour]</span>
+- 15/08/25: Step16:: DP  [358/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
+- 16/08/25: Step16:: DP  [363/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 01 ] [ Hard : 04 ]</span>
+- 17/08/25: Step16:: DP  [369/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 03 ]</span>
+- 18/08/25: Step16:: DP  [372/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
+- 19/08/25: Step16:: DP  [378/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 01 ]</span>
+- 20/08/25: Step16:: DP  [381/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 04 ]</span>
+- 21/08/25: Step16:: DP Completed [385/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
+- 22/08/25: Step15:: Graph [394/455] <span style="color: Green;"> [ Easy : 03 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 23/08/25: Step15:: Graph [398/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 03 ] [ Hard : 00 ]</span>
+- 24/08/25: <span style="color: red;">[0 hour]</span>
+- 25/08/25: Step15:: Graph [404/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 06 ] [ Hard : 03 ]</span>
+- 26/08/25: Step15:: Graph [412/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 02 ]</span>
+- 27/08/25: <span style="color: red;">[0 hour]</span>
+- 28/08/25: Step15:: Graph [417/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 05 ] [ Hard : 00 ]</span>
+- 29/08/25: Step15:: Graph [419/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 30/08/25: <span style="color: red;">[0 hour]</span>
+- 31/08/25: Step15:: Graph [422/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
 
 ---
 
-- 01/09/26: Step15:: Graph [427/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 00 ]</span>
-- 02/09/26: Step15:: Graph [431/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 00 ]</span>
-- 03/09/26: Step15:: Graph [436/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 05 ]</span>
-- 04/09/26: Step15:: Graph completed [441/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 02 ]</span>
-- 05/09/26: Step15:: Trie completed [446/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
-- 06/09/26: Step15:: Strings HARD [449/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
-- 07/09/26: Step15:: Strings HARD [450/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
-- 08/09/26: Step15:: SHEET 1 PASS COMPLETED[455/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
+- 01/09/25: Step15:: Graph [427/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 04 ] [ Hard : 00 ]</span>
+- 02/09/25: Step15:: Graph [431/455] <span style="color: Green;"> [ Easy : 01 ] [ Medium : 02 ] [ Hard : 00 ]</span>
+- 03/09/25: Step15:: Graph [436/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 05 ]</span>
+- 04/09/25: Step15:: Graph completed [441/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 02 ]</span>
+- 05/09/25: Step15:: Trie completed [446/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 02 ]</span>
+- 06/09/25: Step15:: Strings HARD [449/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 03 ] [ Hard : 00 ]</span>
+- 07/09/25: Step15:: Strings HARD [450/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 00 ] [ Hard : 02 ]</span>
+- 08/09/25: Step15:: SHEET 1 PASS COMPLETED[455/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
 
 ---
 ## Revisions:
 
 ---
-- 16/09/26: <span style="color: green;"> #31 [31/455]</span>
-- 17/09/26: <span style="color: green;"> #21 [52/455]</span>
+- 16/09/25: <span style="color: green;"> #31 [31/455]</span>
+- 17/09/25: <span style="color: green;"> #21 [52/455]</span>
+- 18/09/25: <span style="color: red;">[0 hour]</span>
+- 19/09/25: <span style="color: red;">[0 hour]</span>
+- 20/09/25: <span style="color: red;">[0 hour]</span>
+- 21/09/25: <span style="color: green;"> #14 [66/455]</span>
+- 

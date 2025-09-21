@@ -8,7 +8,7 @@
 using namespace std;
 
 /*
-Kadane's Algorithm : Maximum Subarray Sum in an Array
+Kadane's Algorithm : Stock Buy and Sell
 
 https://takeuforward.org/data-structure/stock-buy-and-sell/
 https://takeuforward.org/plus/dsa/problems/best-time-to-buy-and-sell-stock?tab=editorial
@@ -56,80 +56,121 @@ OUTPUT::::::
 class Solution
 {
 public:
-    /*
-        Brute force
-        Time: O(N^2)
-        Space: O(1)
+    /**
+     * Best Time to Buy and Sell Stock (LeetCode 121)
+     * ----------------------------------------------
+     * Problem:
+     *   - You are given an array `prices` where prices[i] is the stock price on day i.
+     *   - You want to maximize your profit by choosing a single day to buy one stock
+     *     and a different day in the future to sell it.
+     *   - Return the maximum profit you can achieve. If no profit is possible, return 0.
+     *
+     * Approaches:
+     *   1. Brute Force
+     *   2. Better (with auxiliary array of suffix max values)
+     *   3. Optimal (two-pointer greedy)
      */
-    // int maxProfit(vector<int> &prices)
-    // {
-    //     int maxP = 0;
-    //     for (int i = 0; i < prices.size(); i++)
-    //     {
-    //         for (int j = i; j < prices.size(); j++)
-    //         {
-    //             if (prices[j] - prices[i] > maxP)
-    //                 maxP = prices[j] - prices[i];
-    //         }
-    //     }
 
-    //     return maxP;
-    // }
+    /*--------------------------------------------------------------
+      1. Brute Force Approach
+      --------------------------------------------------------------
+      Idea:
+      - Check every possible pair (i, j) with i < j.
+      - Compute profit = prices[j] - prices[i].
+      - Keep track of the maximum profit.
 
-    /*  Better Approach
-        Intuition:
-        Traverse the array from backwards. Compute and store a max elemement, which is the max from last until current index
-        Then traverse array from starting to end and find the max profit by substratcing to the backward max of that index.
-        Time complexity: O(N)
-        Space Complexity: O(N)
-     */
-    // int maxProfit(vector<int> &prices)
-    // {
-    //     int N = prices.size();
-    //     int maxP = 0;
-    //     int maxE = INT_MIN;
-
-    //     vector<int> maxArr(N);
-
-    //     for (int i = N - 1; i > 0; i--)
-    //     {
-    //         maxE = prices[i] > maxE ? prices[i] : maxE;
-    //         maxArr[i] = maxE;
-    //     }
-
-    //     for (int i = 0; i < N - 1; i++)
-    //     {
-    //         if (maxArr[i + 1] - prices[i] > maxP)
-    //         {
-    //             maxP = maxArr[i + 1] - prices[i];
-    //         }
-    //     }
-
-    //     return maxP;
-    // }
-
-    /*  Optimal Approach
-        Intuition: We will linearly travel the array.
-        We can maintain a minimum from the start of the array and compare it with every element of the array,
-        if it is greater than the minimum then take the difference and maintain it in max,
-        otherwise update the minimum.
-
-        Time complexity: O(N)
-        Space Complexity: O(1)
-     */
-    int maxProfit(vector<int> &arr)
+      Time Complexity:  O(N^2)   (two nested loops)
+      Space Complexity: O(1)     (only variables)
+    */
+    int maxProfit_bruteforce(vector<int> &prices)
     {
-        int maxPro = 0;
-        int n = arr.size();
-        int minPrice = INT_MAX;
+        int maxP = 0;
 
-        for (int i = 0; i < arr.size(); i++)
+        for (int i = 0; i < prices.size(); i++)
         {
-            minPrice = min(minPrice, arr[i]);
-            maxPro = max(maxPro, arr[i] - minPrice);
+            for (int j = i; j < prices.size(); j++)
+            {
+                // update max profit if selling at j after buying at i gives higher profit
+                if (prices[j] - prices[i] > maxP)
+                    maxP = prices[j] - prices[i];
+            }
         }
 
-        return maxPro;
+        return maxP;
+    }
+
+    /*--------------------------------------------------------------
+      2. Better Approach (Suffix Maximum Array)
+      --------------------------------------------------------------
+      Intuition:
+      - For each day i, the best possible selling price comes from
+        the maximum price on any future day.
+      - Precompute an array `maxArr[i]` = maximum price from day i..N-1.
+      - Then compute max profit as max(maxArr[i+1] - prices[i]).
+
+      Time Complexity:  O(N)    (two passes)
+      Space Complexity: O(N)    (for storing maxArr)
+    */
+    int maxProfit_better(vector<int> &prices)
+    {
+        int N = prices.size();
+        int maxP = 0;
+        int maxE = INT_MIN;
+
+        vector<int> maxArr(N);
+
+        // Build suffix max array: maxArr[i] = max price from day i to end
+        for (int i = N - 1; i > 0; i--)
+        {
+            maxE = max(prices[i], maxE);
+            maxArr[i] = maxE;
+        }
+
+        // Compute profit by buying at day i and selling at future max price
+        for (int i = 0; i < N - 1; i++)
+        {
+            maxP = max(maxP, maxArr[i + 1] - prices[i]);
+        }
+
+        return maxP;
+    }
+
+    /*--------------------------------------------------------------
+      3. Optimal Approach (Two-Pointer Greedy)
+      --------------------------------------------------------------
+      Intuition:
+      - Traverse prices with two pointers: l = buy day, r = sell day.
+      - For each r:
+          * Compute profit = prices[r] - prices[l].
+          * Update maxProfit if profit is higher.
+          * If prices[r] < prices[l], reset l = r (better buy point).
+      - This ensures we always buy at the lowest price so far,
+        and sell at the best price after it.
+
+      Time Complexity:  O(N)    (single pass)
+      Space Complexity: O(1)    (just variables)
+    */
+    int maxProfit(vector<int> &prices)
+    {
+        int n = prices.size();
+        int l = 0; // left pointer (buy day)
+        int r = 0; // right pointer (sell day)
+        int maxProfit = 0;
+
+        while (r < n)
+        {
+            int profit = prices[r] - prices[l];
+
+            maxProfit = max(maxProfit, profit);
+
+            // If a lower price is found at r, reset l = r (better buy opportunity)
+            if (prices[r] < prices[l])
+                l = r;
+
+            r++;
+        }
+
+        return maxProfit;
     }
 };
 

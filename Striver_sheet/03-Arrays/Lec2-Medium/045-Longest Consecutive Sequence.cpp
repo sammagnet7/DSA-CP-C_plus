@@ -68,34 +68,54 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Better approach: Sorting
-    // Time: O(N Log N)
-    // Space: O(1)
-    // int longestConsecutive(vector<int> &arr)
-    // {
-    //     sort(arr.begin(), arr.end());
+    /**
+     * Longest Consecutive Sequence — Sorting Approach
+     * ----------------------------------------------
+     * Idea:
+     *   - Sort the array.
+     *   - Traverse sorted array and count lengths of consecutive increasing runs.
+     *   - Handle duplicates: skip when arr[i] == arr[i-1].
+     *   - Track maximum consecutive length.
+     *
+     * Time Complexity:  O(N log N) [due to sorting]
+     * Space Complexity: O(1) extra (ignoring sorting cost)
+     *
+     * Notes:
+     *   - Simpler but slower than set-based approach.
+     */
 
-    //     int count = 1;
-    //     int maxC = 0;
+    int longestConsecutive_sort(vector<int> &arr)
+    {
+        if (arr.empty())
+            return 0;
 
-    //     for (int i = 1; i < arr.size(); i++)
-    //     {
-    //         if (arr[i] == arr[i - 1] + 1)
-    //         {
-    //             count++;
-    //             maxC = count > maxC ? count : maxC;
-    //         }
-    //         else if (arr[i] == arr[i - 1])
-    //         {
-    //             continue;
-    //         }
-    //         else
-    //         {
-    //             count = 1;
-    //         }
-    //     }
-    //     return maxC;
-    // }
+        sort(arr.begin(), arr.end());
+
+        int count = 1; // current consecutive streak
+        int maxC = 1;  // maximum streak found
+
+        for (int i = 1; i < arr.size(); i++)
+        {
+            if (arr[i] == arr[i - 1] + 1)
+            {
+                // Extend consecutive streak
+                count++;
+                maxC = max(maxC, count);
+            }
+            else if (arr[i] == arr[i - 1])
+            {
+                // Duplicate element → ignore
+                continue;
+            }
+            else
+            {
+                // Break in sequence → reset streak
+                count = 1;
+            }
+        }
+
+        return maxC;
+    }
 
     /*  Optimal approach: Using Set
         Intuition:
@@ -107,15 +127,35 @@ public:
                     (If not starting, then skip. If startng then find rest in sequence)
         Space: O(N)
     */
+
+    /**
+     * Longest Consecutive Sequence — Optimal Approach (Set)
+     * -----------------------------------------------------
+     * Intuition:
+     *   1. Insert all numbers into an unordered_set to remove duplicates
+     *      and allow O(1) lookups.
+     *   2. For each element, check if it is the **start of a sequence**:
+     *        - A number is a start if (num - 1) is not in the set.
+     *   3. If it’s a start, count how long the consecutive run continues
+     *      by repeatedly checking (num + 1), (num + 2), ...
+     *   4. Track the longest run.
+     *
+     * Time Complexity:
+     *   - O(N) average
+     *   - Building set = O(N), checking sequences = O(N) total
+     *   - Each element is processed at most twice (once as potential start,
+     *     once in a sequence).
+     *
+     * Space Complexity: O(N) for the set
+     *
+     * Notes:
+     *   - More efficient than sorting-based approach for large arrays.
+     */
     int longestConsecutive(vector<int> &arr)
     {
-        unordered_set<int> eset;
+        // creating set from the given array
+        unordered_set<int> eset(arr.begin(), arr.end());
         int maxC = 0;
-
-        for (int e : arr)
-        { // creating set from the given array
-            eset.insert(e);
-        }
 
         for (auto curr : eset)
         {

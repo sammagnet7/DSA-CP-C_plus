@@ -70,47 +70,85 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // // Approach: Brute force
-    // // Time: O(n*n)
-    // // Space: O(n*n)
-    // void rotate(vector<vector<int>> &matrix)
-    // {
-    //     int n = matrix.size();
-    //     vector<vector<int>> rotated(n, vector<int>(n, 0));
-
-    //     for (int i = 0; i < n; i++)
-    //     {
-    //         for (int j = 0; j < n; j++)
-    //         {
-    //             rotated[j][n - i - 1] = matrix[i][j];
-    //         }
-    //     }
-
-    //     for (int i = 0; i < n; i++)
-    //     {
-    //         for (int j = 0; j < n; j++)
-    //         {
-    //             matrix[i][j] = rotated[i][j];
-    //         }
-    //     }
-    // }
-
-    /*Approach: Optimal. Inplace
-    // Clockwise rotation:
-    // here observation is that nth column from original matrix becomes nth row in rotated matrix, but the elements get reversed
-    // rotated matrx = Transpose (original matrix) then reverse each ROW.
-    */
-
-    // For anti-clockwise rotation:
-    // Approach: Find the transpose of the matrix. Then Reverse every COLUMN of the matrix.
-
-    // Time: O(2*n*n)
-    // Space: O(1)
+    /**
+     * Rotate Image (LeetCode 48) — Using Extra Matrix
+     * -----------------------------------------------
+     * Problem:
+     *   - Given an n x n 2D matrix, rotate it by 90 degrees clockwise in-place.
+     *   - Here we solve it with an auxiliary matrix for clarity.
+     *
+     * Approach:
+     *   - For each cell (i, j) in the original matrix:
+     *       rotated[j][n - i - 1] = matrix[i][j]
+     *     This maps row -> column and column -> reversed row,
+     *     which achieves a 90° clockwise rotation.
+     *   - After constructing `rotated`, copy it back into the original matrix.
+     *
+     * Time Complexity:  O(n^2)  (two passes over all cells)
+     * Space Complexity: O(n^2)  (extra matrix of same size)
+     *
+     * Notes:
+     *   - This is not the in-place optimal solution, but it is simpler to implement
+     *     and good for understanding the rotation mapping.
+     */
     void rotate(vector<vector<int>> &matrix)
     {
         int n = matrix.size();
 
-        // Transposing matrix
+        // Step 1: Create an empty matrix to store rotated result
+        vector<vector<int>> rotated(n, vector<int>(n, 0));
+
+        // Step 2: Fill rotated matrix using rotation rule
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                // Place element at (i,j) into its rotated position
+                rotated[j][n - i - 1] = matrix[i][j];
+            }
+        }
+
+        // Step 3: Copy rotated matrix back into original
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                matrix[i][j] = rotated[i][j];
+            }
+        }
+    }
+
+    /**
+     * Rotate Image (LeetCode 48) — Optimal In-place Solution
+     * ------------------------------------------------------
+     * Problem:
+     *   - Given an n x n 2D matrix, rotate it 90 degrees clockwise in-place.
+     *
+     * Observation:
+     *   - A 90° clockwise rotation can be achieved in two steps:
+     *       1. Transpose the matrix
+     *           → Convert rows into columns.
+     *       2. Reverse every row
+     *           → Align columns to match clockwise rotation.
+     *
+     * For example:
+     *   Input:           After Transpose:       After Row Reversal:
+     *   1 2 3            1 4 7                  7 4 1
+     *   4 5 6     -->    2 5 8     -->          8 5 2
+     *   7 8 9            3 6 9                  9 6 3
+     *
+     * Anti-clockwise Rotation:
+     *   - Transpose the matrix.
+     *   - Then reverse each COLUMN instead of each row.
+     *
+     * Time Complexity:  O(2 * n^2) = O(n^2)
+     * Space Complexity: O(1)  (in-place)
+     */
+    void rotate(vector<vector<int>> &matrix)
+    {
+        int n = matrix.size();
+
+        // Step 1: Transpose the matrix (swap matrix[i][j] with matrix[j][i])
         for (int i = 0; i < n; i++)
         {
             for (int j = i + 1; j < n; j++)
@@ -119,7 +157,7 @@ public:
             }
         }
 
-        // Reverse each row
+        // Step 2: Reverse each row (to complete clockwise rotation)
         for (int i = 0; i < n; i++)
         {
             reverse(matrix[i].begin(), matrix[i].end());

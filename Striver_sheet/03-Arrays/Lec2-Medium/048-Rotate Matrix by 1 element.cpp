@@ -10,7 +10,7 @@
 using namespace std;
 
 /*
-Rotate Matric by 1 element clockwise
+Rotate Matrix by 1 element clockwise
 
 https://www.naukri.com/code360/problems/981260?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website&leftPanelTabValue=PROBLEM
 
@@ -102,28 +102,147 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Approach: when m!=n take min of m,n
-    // Time: O(M*N)
-    // Space: O(1)
-    void rotateMatrix(vector<vector<int>> &arr)
+    /**
+     * Rotate matrix elements by one position clockwise (in-place, O(1) extra),
+     * implemented using boundary shrinking (top/left/bottom/right) — the same
+     * boundary approach used in spiral traversal.
+     *
+     * Behavior:
+     *  - For each ring (outer → inner) that has at least two rows and two columns,
+     *    rotate its elements clockwise by one step.
+     *  - Rings that are a single row or a single column (i.e., the center when
+     *    min(m,n) is odd) are not rotated (this matches the usual "ring" notion
+     *    where only full rings are rotated).
+     *
+     * Complexity:
+     *  - Time:  O(m * n) — each element belongs to at most one ring and is visited O(1) times.
+     *  - Space: O(1) — only a constant number of temporaries used.
+     */
+    void rotateMatrix_inplace_boundaries(vector<vector<int>> &arr)
     {
-        int m = arr.size();    // no of rows
-        int n = arr[0].size(); // no of cols
+        int m = arr.size();
+        if (m == 0)
+            return;
+        int n = arr[0].size();
 
-        int N = min(m, n);                  // this is needed to handle the cases where m!=n
-        int noOfInnerMatrices = (int)N / 2; // Taking floor solves the issue where in the last iteration only a single element is left which should not be swapped.
+        // Initialize boundaries for the outermost ring
+        int top = 0, left = 0;
+        int bottom = m - 1, right = n - 1;
 
-        for (int k = 0; k < noOfInnerMatrices; k++)
+        // Process full rings while there is at least 2 rows and 2 columns remaining
+        // (i.e., a ring requires top < bottom && left < right)
+        while (top < bottom && left < right)
         {
-
-            int left = k;
-            int right = m - 1 - k;
-            int top = k;
-            int bot = n - 1 - k;
-
+            // Choose prev as the element that will move into (top,left) after one clockwise shift.
+            // The traversal order we will use is:
+            //   (top,left) -> (top,left+1) -> ... -> (top,right)
+            //   -> (top+1,right) -> ... -> (bottom,right)
+            //   -> (bottom,right-1) -> ... -> (bottom,left)
+            //   -> (bottom-1,left) -> ... -> (top+1,left)
+            // To rotate clockwise by one, the value that should be written into (top,left)
+            // is the element that currently sits just after (top,left) in the clockwise order's
+            // predecessor — a convenient choice is arr[top+1][left] (exists because top < bottom).
             int prev = arr[top + 1][left];
 
-            // traverse left to right in top row
+            // 1) Traverse top row: left -> right
+            for (int j = left; j <= right; ++j)
+            {
+                int cur = arr[top][j];
+                arr[top][j] = prev;
+                prev = cur;
+            }
+            // Move top boundary inward (the top row of this ring is done)
+            top++;
+
+            // 2) Traverse right column: top -> bottom
+            for (int i = top; i <= bottom; ++i)
+            {
+                int cur = arr[i][right];
+                arr[i][right] = prev;
+                prev = cur;
+            }
+            // Move right boundary inward
+            right--;
+
+            // 3) Traverse bottom row: right -> left (only if top <= bottom still true)
+            if (top <= bottom)
+            {
+                for (int j = right; j >= left; --j)
+                {
+                    int cur = arr[bottom][j];
+                    arr[bottom][j] = prev;
+                    prev = cur;
+                }
+                // Move bottom boundary inward
+                bottom--;
+            }
+
+            // 4) Traverse left column: bottom -> top (only if left <= right still true)
+            if (left <= right)
+            {
+                for (int i = bottom; i >= top; --i)
+                {
+                    int cur = arr[i][left];
+                    arr[i][left] = prev;
+                    prev = cur;
+                }
+                // Move left boundary inward
+                left++;
+            }
+
+            // After these four passes, the current ring has been rotated by one step clockwise.
+            // Loop will continue for the next inner ring if it exists (top < bottom && left < right).
+        }
+    }
+
+    /**
+     * Rotate Matrix Elements (Layer-by-Layer Rotation)
+     * ------------------------------------------------
+     * Problem:
+     *   - Rotate all elements of a matrix (not necessarily square) in a circular fashion.
+     *   - This rotates each "ring" (outer layer, then inner layer, etc.) by one position.
+     *
+     * Key Points:
+     *   - For square matrices (m == n), standard rotation rules apply.
+     *   - For rectangular matrices (m != n), only min(m, n) layers exist,
+     *     so we take N = min(m, n).
+     *   - Only floor(N/2) full layers can be rotated because if N is odd,
+     *     the central row/column would otherwise leave a single element, which doesn’t rotate.
+     *
+     * Approach:
+     *   - Process the matrix in layers (like peeling an onion).
+     *   - For each layer, traverse in 4 steps:
+     *       1. Top row (left → right)
+     *       2. Rightmost column (top → bottom)
+     *       3. Bottom row (right → left)
+     *       4. Leftmost column (bottom → top)
+     *   - Keep track of the "previous" element and swap as we move along,
+     *     effectively rotating elements by one position.
+     *
+     * Time Complexity:  O(m * n)  [every element visited once]
+     * Space Complexity: O(1)      [in-place]
+     */
+    void rotateMatrix(vector<vector<int>> &arr)
+    {
+        int m = arr.size();    // number of rows
+        int n = arr[0].size(); // number of columns
+
+        // Layers exist up to min(m, n) / 2
+        int N = min(m, n);
+        int noOfInnerMatrices = N / 2; // floor handles odd dimension (avoid single leftover element)
+
+        // Process each layer
+        for (int k = 0; k < noOfInnerMatrices; k++)
+        {
+            int left = k;          // left boundary
+            int right = m - 1 - k; // right boundary (row index)
+            int top = k;           // top boundary
+            int bot = n - 1 - k;   // bottom boundary (column index)
+
+            // Save the first element (to reinsert later)
+            int prev = arr[top + 1][left];
+
+            // 1. Traverse top row (left → right)
             for (int j = left; j <= right; j++)
             {
                 int temp = arr[top][j];
@@ -131,7 +250,7 @@ public:
                 prev = temp;
             }
 
-            // traverse top to bottom in right most column
+            // 2. Traverse right column (top → bottom)
             for (int i = top + 1; i <= bot; i++)
             {
                 int temp = arr[i][right];
@@ -139,7 +258,7 @@ public:
                 prev = temp;
             }
 
-            // traverse right to left in bottom row
+            // 3. Traverse bottom row (right → left)
             for (int j = right - 1; j >= left; j--)
             {
                 int temp = arr[bot][j];
@@ -147,7 +266,7 @@ public:
                 prev = temp;
             }
 
-            // traverse bottom to top in left most column
+            // 4. Traverse left column (bottom → top)
             for (int i = bot - 1; i >= top + 1; i--)
             {
                 int temp = arr[i][left];

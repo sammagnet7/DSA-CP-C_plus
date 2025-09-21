@@ -823,4 +823,9 @@ It can be of two types:
 ### revisit:
 1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
 2. [text](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
-3. 
+3. [next permutation](https://leetcode.com/problems/next-permutation/description/)
+4. [longest consecutive sequence](https://leetcode.com/problems/longest-consecutive-sequence/description/)
+5. [set matrix with zeros](https://leetcode.com/problems/set-matrix-zeroes/description/)
+6. [Roatate matrix by 1](https://www.naukri.com/code360/problems/981260?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website&leftPanelTabValue=PROBLEM)
+7. [Print Spiral matrix](https://leetcode.com/problems/spiral-matrix/description/)
+8. 

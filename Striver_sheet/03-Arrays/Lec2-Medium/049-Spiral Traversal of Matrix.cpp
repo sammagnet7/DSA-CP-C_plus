@@ -98,58 +98,70 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Approach: Works for m!=n
-    // Time: O(M*N)
-    // Space: O(1)
+    /**
+     * Spiral Matrix Traversal
+     * -----------------------
+     * Problem:
+     *   - Given an m x n matrix, return all elements in spiral order.
+     *
+     * Approach:
+     *   - Use four boundary pointers (top, bottom, left, right) to define
+     *     the current layer of the matrix to traverse.
+     *   - Traverse in 4 directions:
+     *       1. Left → Right   (across top row)
+     *       2. Top → Bottom   (along right column)
+     *       3. Right → Left   (across bottom row, if still valid)
+     *       4. Bottom → Top   (along left column, if still valid)
+     *   - After each direction, move the corresponding boundary inward:
+     *       * top++, right--, bottom--, left++
+     *   - Continue until all elements are traversed (while top ≤ bottom and left ≤ right).
+     *
+     * Time Complexity:  O(m * n)  [each element is visited once]
+     * Space Complexity: O(1) extra (apart from output vector)
+     *
+     * Works for:
+     *   - Both square (m == n) and rectangular (m != n) matrices.
+     */
     vector<int> spiralOrder(vector<vector<int>> &mat)
     {
-        // Define ans array to store the result.
-        vector<int> ans;
+        vector<int> ans; // stores elements in spiral order
 
-        int n = mat.size();    // no. of nows
-        int m = mat[0].size(); // no. of columns
+        int n = mat.size();    // number of rows
+        int m = mat[0].size(); // number of columns
 
-        // Initialize the pointers reqd for traversal.
+        // Initialize boundaries
         int top = 0, left = 0, bottom = n - 1, right = m - 1;
 
-        // Loop until all elements are not traversed.
+        // Traverse until boundaries cross
         while (top <= bottom && left <= right)
         {
-
-            // For moving left to right
+            // 1. Traverse top row (left → right)
             for (int i = left; i <= right; i++)
                 ans.push_back(mat[top][i]);
+            top++; // move top boundary down
 
-            top++;
-
-            // For moving top to bottom.
+            // 2. Traverse right column (top → bottom)
             for (int i = top; i <= bottom; i++)
                 ans.push_back(mat[i][right]);
+            right--; // move right boundary left
 
-            right--;
-
-            // For moving right to left.
-            // checking top-down pointer consistency again
+            // 3. Traverse bottom row (right → left), if still valid
             if (top <= bottom)
             {
-
-                for (int i = right; i >= left; i--) // checking left-right pointer consistency
+                for (int i = right; i >= left; i--)
                     ans.push_back(mat[bottom][i]);
-
-                bottom--;
+                bottom--; // move bottom boundary up
             }
 
-            // For moving bottom to top.
-            // checking left-right pointer consistency again
+            // 4. Traverse left column (bottom → top), if still valid
             if (left <= right)
             {
-
-                for (int i = bottom; i >= top; i--) // checking top-down pointer consistency
+                for (int i = bottom; i >= top; i--)
                     ans.push_back(mat[i][left]);
-
-                left++;
+                left++; // move left boundary right
             }
         }
+
         return ans;
     }
 };

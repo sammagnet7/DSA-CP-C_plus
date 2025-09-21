@@ -67,14 +67,13 @@ public:
         Space: O(1)
         using in-built function of C++
      */
-    // void nextPermutation(vector<int> &arr)
-    // {
-    //     int N = arr.size();
-    //     next_permutation(arr.begin(), arr.end());
-    // }
+    void nextPermutation(vector<int> &arr)
+    {
+        int N = arr.size();
+        next_permutation(arr.begin(), arr.end());
+    }
 
     /*
-        Algo:
         Observations:
             In case of next permutation there are some pattern to observe.
             1. Traverse digits from end to start. You will see digits increasing in order from end to upto an index.
@@ -89,11 +88,34 @@ public:
         Space: O(1)
 
      */
+    /**
+     * Next Permutation Algorithm
+     * --------------------------
+     * Problem:
+     *   - Rearrange numbers into the lexicographically next greater permutation of numbers.
+     *   - If such an arrangement is not possible, rearrange it as the lowest possible order (ascending).
+     *
+     * Algorithm (observations / steps):
+     *   1. Traverse digits from right to left to find the first index (pivotIdx)
+     *      such that arr[pivotIdx] < arr[pivotIdx + 1].
+     *      - This is the "pivot" where the increasing order from the end breaks.
+     *   2. If no such pivotIdx exists (array is completely non-increasing):
+     *      - It means we are at the last permutation.
+     *      - Reverse the whole array to get the first permutation.
+     *   3. Otherwise:
+     *      - From the right, find the smallest element greater than arr[pivotIdx].
+     *      - Swap it with arr[pivotIdx].
+     *      - Reverse the subarray to the right of pivotIdx to get the next smallest order.
+     *
+     * Time Complexity:  O(N)  [single pass to find pivot + single pass to find swap + reverse]
+     * Space Complexity: O(1)  [in-place]
+     */
     void nextPermutation(vector<int> &arr)
     {
         int N = arr.size();
         int pivotIdx = -1;
 
+        // Step 1: Find the pivot (first index from right where arr[i-1] < arr[i])
         for (int i = N - 1; i > 0; i--)
         {
             if (arr[i - 1] < arr[i])
@@ -102,21 +124,24 @@ public:
                 break;
             }
         }
+
+        // Step 2: If no pivot, array is the highest permutation → reverse to lowest
         if (pivotIdx == -1)
         {
             reverse(arr.begin(), arr.end());
             return;
         }
-        else
+
+        // Step 3: Find element just larger than arr[pivotIdx] from right side
+        for (int i = N - 1; i > pivotIdx; i--)
         {
-            for (int i = N - 1; i > pivotIdx; i--)
+            if (arr[i] > arr[pivotIdx])
             {
-                if (arr[i] > arr[pivotIdx])
-                {
-                    swap(arr[i], arr[pivotIdx]);
-                    reverse(arr.begin() + pivotIdx + 1, arr.end());
-                    return;
-                }
+                // Swap pivot with next greater element
+                swap(arr[i], arr[pivotIdx]);
+                // Reverse the suffix to get the smallest order
+                reverse(arr.begin() + pivotIdx + 1, arr.end());
+                return;
             }
         }
     }
