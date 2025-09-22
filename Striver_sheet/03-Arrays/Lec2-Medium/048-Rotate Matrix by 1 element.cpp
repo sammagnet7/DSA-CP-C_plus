@@ -102,97 +102,135 @@ OUTPUT::::::
 class Solution
 {
 public:
-    /**
-     * Rotate matrix elements by one position clockwise (in-place, O(1) extra),
-     * implemented using boundary shrinking (top/left/bottom/right) — the same
-     * boundary approach used in spiral traversal.
-     *
-     * Behavior:
-     *  - For each ring (outer → inner) that has at least two rows and two columns,
-     *    rotate its elements clockwise by one step.
-     *  - Rings that are a single row or a single column (i.e., the center when
-     *    min(m,n) is odd) are not rotated (this matches the usual "ring" notion
-     *    where only full rings are rotated).
-     *
-     * Complexity:
-     *  - Time:  O(m * n) — each element belongs to at most one ring and is visited O(1) times.
-     *  - Space: O(1) — only a constant number of temporaries used.
-     */
-    void rotateMatrix_inplace_boundaries(vector<vector<int>> &arr)
+    /*
+  rotateMatrix: Rotate the matrix elements layer-by-layer by one step clockwise, in-place.
+
+  Description:
+    - This function performs a single-step clockwise rotation of every element in the matrix,
+      working layer by layer (outer ring, then next inner ring, etc.).
+    - Each layer's elements are shifted one position clockwise:
+         top row  : left -> right
+         right col: top+1 -> bottom
+         bottom row: right-1 -> left
+         left col : bottom-1 -> top+1
+    - The rotation is done in-place using a temporary variable `prev` to carry the value
+      that will be written into the next cell, avoiding extra per-cell allocations.
+
+  Parameters:
+    - mat : reference to a 2D vector representing the matrix to rotate.
+            (Assumed rectangular with dimensions n x m.)
+    - n   : number of rows in mat
+    - m   : number of columns in mat
+
+  Notes on correctness and boundaries:
+    - We maintain four boundaries for the current layer: top, bot, left, right (inclusive).
+    - The outer loop iterates while there is at least a 2x2 area to rotate (top < bot && left < right).
+      This avoids degenerate 1-row or 1-column layers where a clockwise "one-step" rotation
+      would be ambiguous or trivial.
+    - `prev` holds the value that must be placed into the next cell; it is initialized to the
+      value just inside the top-left corner (mat[top+1][left]) so that the first replacement
+      at mat[top][left] correctly receives the predecessor value.
+    - The `if (top == bot || left == right) break;` guard prevents backward traversals from
+      re-visiting elements when the remaining layer becomes a single row or column after the
+      first two traversals.
+
+  Complexity:
+    - Time:  O(n * m) — every element is moved a constant number of times (once per performed rotation).
+    - Space: O(1) extra memory (in-place, only a few temporaries used).
+
+  Behavior:
+    - The function mutates `mat` in-place and returns no value.
+    - For matrices with n < 2 or m < 2, the loop body will not execute and `mat` remains unchanged.
+*/
+    void rotateMatrix(vector<vector<int>> &mat)
     {
-        int m = arr.size();
-        if (m == 0)
-            return;
-        int n = arr[0].size();
+        int m = mat.size();    // number of rows
+        int n = mat[0].size(); // number of columns
 
-        // Initialize boundaries for the outermost ring
-        int top = 0, left = 0;
-        int bottom = m - 1, right = n - 1;
+        /* Boundaries defining the current layer (inclusive indices) */
+        int left = 0;
+        int right = m - 1;
+        int top = 0;
+        int bot = n - 1;
 
-        // Process full rings while there is at least 2 rows and 2 columns remaining
-        // (i.e., a ring requires top < bottom && left < right)
-        while (top < bottom && left < right)
+        /*
+          Process layer by layer. Each iteration rotates the current outer layer by one step
+          clockwise. We require at least two rows and two columns in the current layer to
+          perform the 4-side rotation (hence top < bot && left < right).
+        */
+        while (top < bot && left < right)
         {
-            // Choose prev as the element that will move into (top,left) after one clockwise shift.
-            // The traversal order we will use is:
-            //   (top,left) -> (top,left+1) -> ... -> (top,right)
-            //   -> (top+1,right) -> ... -> (bottom,right)
-            //   -> (bottom,right-1) -> ... -> (bottom,left)
-            //   -> (bottom-1,left) -> ... -> (top+1,left)
-            // To rotate clockwise by one, the value that should be written into (top,left)
-            // is the element that currently sits just after (top,left) in the clockwise order's
-            // predecessor — a convenient choice is arr[top+1][left] (exists because top < bottom).
-            int prev = arr[top + 1][left];
 
-            // 1) Traverse top row: left -> right
-            for (int j = left; j <= right; ++j)
+            /*
+              `prev` holds the element that will be written into the next cell visited.
+              Initialize it with the element just inside the top-left corner of the current
+              layer (row = top+1, col = left). This choice aligns the value flow so that
+              the very first write (to mat[top][left]) receives the correct predecessor.
+            */
+            int prev = mat[top + 1][left];
+
+            /* 1) Traverse top row: left -> right
+               For each cell on the top row we:
+                 - store current cell in temp
+                 - write prev into current cell (effectively shifting prev forward)
+                 - update prev with temp (for next write)
+            */
+            for (int col = left; col <= right; col++)
             {
-                int cur = arr[top][j];
-                arr[top][j] = prev;
-                prev = cur;
+                int temp = mat[top][col];
+                mat[top][col] = prev;
+                prev = temp;
             }
-            // Move top boundary inward (the top row of this ring is done)
+
+            /* 2) Traverse right column: top+1 -> bot
+               Continue the same swap pattern down the rightmost column.
+               Start at top+1 to avoid re-writing the corner already handled above.
+            */
+            for (int row = top + 1; row <= bot; row++)
+            {
+                int temp = mat[row][right];
+                mat[row][right] = prev;
+                prev = temp;
+            }
+
+            /*
+              If after the top row and right column traversals the remaining submatrix
+              reduced to a single row or column, further backward traversals would
+              re-visit elements. Break out to avoid duplicates.
+            */
+            if (top == bot || left == right)
+                break;
+
+            /* 3) Traverse bottom row: right-1 -> left
+               Move left along the bottom row, continuing to place prev into each cell.
+               We start at right-1 to avoid re-writing the bottom-right corner.
+            */
+            for (int col = right - 1; col >= left; col--)
+            {
+                int temp = mat[bot][col];
+                mat[bot][col] = prev;
+                prev = temp;
+            }
+
+            /* 4) Traverse left column: bot-1 -> top+1 (upward)
+               Move up the leftmost column, again writing prev and updating it from temp.
+               Use row > top to avoid touching the top-left corner, already updated in step 1.
+            */
+            for (int row = bot - 1; row > top; row--)
+            {
+                int temp = mat[row][left];
+                mat[row][left] = prev;
+                prev = temp;
+            }
+
+            /* Move inward to the next layer */
             top++;
-
-            // 2) Traverse right column: top -> bottom
-            for (int i = top; i <= bottom; ++i)
-            {
-                int cur = arr[i][right];
-                arr[i][right] = prev;
-                prev = cur;
-            }
-            // Move right boundary inward
+            bot--;
+            left++;
             right--;
-
-            // 3) Traverse bottom row: right -> left (only if top <= bottom still true)
-            if (top <= bottom)
-            {
-                for (int j = right; j >= left; --j)
-                {
-                    int cur = arr[bottom][j];
-                    arr[bottom][j] = prev;
-                    prev = cur;
-                }
-                // Move bottom boundary inward
-                bottom--;
-            }
-
-            // 4) Traverse left column: bottom -> top (only if left <= right still true)
-            if (left <= right)
-            {
-                for (int i = bottom; i >= top; --i)
-                {
-                    int cur = arr[i][left];
-                    arr[i][left] = prev;
-                    prev = cur;
-                }
-                // Move left boundary inward
-                left++;
-            }
-
-            // After these four passes, the current ring has been rotated by one step clockwise.
-            // Loop will continue for the next inner ring if it exists (top < bottom && left < right).
         }
+
+        /* End: mat is rotated in-place by one clockwise step for each processed layer */
     }
 
     /**
@@ -222,59 +260,60 @@ public:
      * Time Complexity:  O(m * n)  [every element visited once]
      * Space Complexity: O(1)      [in-place]
      */
-    void rotateMatrix(vector<vector<int>> &arr)
-    {
-        int m = arr.size();    // number of rows
-        int n = arr[0].size(); // number of columns
+    
+    // void rotateMatrix(vector<vector<int>> &arr)
+    // {
+    //     int m = arr.size();    // number of rows
+    //     int n = arr[0].size(); // number of columns
 
-        // Layers exist up to min(m, n) / 2
-        int N = min(m, n);
-        int noOfInnerMatrices = N / 2; // floor handles odd dimension (avoid single leftover element)
+    //     // Layers exist up to min(m, n) / 2
+    //     int N = min(m, n);
+    //     int noOfInnerMatrices = N / 2; // floor handles odd dimension (avoid single leftover element)
 
-        // Process each layer
-        for (int k = 0; k < noOfInnerMatrices; k++)
-        {
-            int left = k;          // left boundary
-            int right = m - 1 - k; // right boundary (row index)
-            int top = k;           // top boundary
-            int bot = n - 1 - k;   // bottom boundary (column index)
+    //     // Process each layer
+    //     for (int k = 0; k < noOfInnerMatrices; k++)
+    //     {
+    //         int left = k;          // left boundary
+    //         int right = m - 1 - k; // right boundary (row index)
+    //         int top = k;           // top boundary
+    //         int bot = n - 1 - k;   // bottom boundary (column index)
 
-            // Save the first element (to reinsert later)
-            int prev = arr[top + 1][left];
+    //         // Save the first element (to reinsert later)
+    //         int prev = arr[top + 1][left];
 
-            // 1. Traverse top row (left → right)
-            for (int j = left; j <= right; j++)
-            {
-                int temp = arr[top][j];
-                arr[top][j] = prev;
-                prev = temp;
-            }
+    //         // 1. Traverse top row (left → right)
+    //         for (int j = left; j <= right; j++)
+    //         {
+    //             int temp = arr[top][j];
+    //             arr[top][j] = prev;
+    //             prev = temp;
+    //         }
 
-            // 2. Traverse right column (top → bottom)
-            for (int i = top + 1; i <= bot; i++)
-            {
-                int temp = arr[i][right];
-                arr[i][right] = prev;
-                prev = temp;
-            }
+    //         // 2. Traverse right column (top → bottom)
+    //         for (int i = top + 1; i <= bot; i++)
+    //         {
+    //             int temp = arr[i][right];
+    //             arr[i][right] = prev;
+    //             prev = temp;
+    //         }
 
-            // 3. Traverse bottom row (right → left)
-            for (int j = right - 1; j >= left; j--)
-            {
-                int temp = arr[bot][j];
-                arr[bot][j] = prev;
-                prev = temp;
-            }
+    //         // 3. Traverse bottom row (right → left)
+    //         for (int j = right - 1; j >= left; j--)
+    //         {
+    //             int temp = arr[bot][j];
+    //             arr[bot][j] = prev;
+    //             prev = temp;
+    //         }
 
-            // 4. Traverse left column (bottom → top)
-            for (int i = bot - 1; i >= top + 1; i--)
-            {
-                int temp = arr[i][left];
-                arr[i][left] = prev;
-                prev = temp;
-            }
-        }
-    }
+    //         // 4. Traverse left column (bottom → top)
+    //         for (int i = bot - 1; i >= top + 1; i--)
+    //         {
+    //             int temp = arr[i][left];
+    //             arr[i][left] = prev;
+    //             prev = temp;
+    //         }
+    //     }
+    // }
 };
 
 int main()

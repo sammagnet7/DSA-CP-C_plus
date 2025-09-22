@@ -828,4 +828,5 @@ It can be of two types:
 5. [set matrix with zeros](https://leetcode.com/problems/set-matrix-zeroes/description/)
 6. [Roatate matrix by 1](https://www.naukri.com/code360/problems/981260?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website&leftPanelTabValue=PROBLEM)
 7. [Print Spiral matrix](https://leetcode.com/problems/spiral-matrix/description/)
-8. 
+8. [Find element in rth row and cth col in Pascal's triangle](https://www.geeksforgeeks.org/dsa/find-the-nth-row-in-pascals-triangle/)
+9. 

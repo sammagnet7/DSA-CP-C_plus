@@ -98,68 +98,101 @@ OUTPUT::::::
 class Solution
 {
 public:
-    /**
-     * Spiral Matrix Traversal
-     * -----------------------
-     * Problem:
-     *   - Given an m x n matrix, return all elements in spiral order.
-     *
-     * Approach:
-     *   - Use four boundary pointers (top, bottom, left, right) to define
-     *     the current layer of the matrix to traverse.
-     *   - Traverse in 4 directions:
-     *       1. Left → Right   (across top row)
-     *       2. Top → Bottom   (along right column)
-     *       3. Right → Left   (across bottom row, if still valid)
-     *       4. Bottom → Top   (along left column, if still valid)
-     *   - After each direction, move the corresponding boundary inward:
-     *       * top++, right--, bottom--, left++
-     *   - Continue until all elements are traversed (while top ≤ bottom and left ≤ right).
-     *
-     * Time Complexity:  O(m * n)  [each element is visited once]
-     * Space Complexity: O(1) extra (apart from output vector)
-     *
-     * Works for:
-     *   - Both square (m == n) and rectangular (m != n) matrices.
-     */
+    /*
+       Return the elements of matrix `mat` in spiral (clockwise) order.
+
+       Inputs:
+         - mat : a non-empty 2D vector with dimensions n x m (n rows, m cols)
+       Output:
+         - a vector<int> containing all elements of mat visited in spiral order.
+
+       Intuition and approach (high level):
+         - Maintain four boundaries: top, bot, left, right that describe the
+           current outer rectangle (inclusive).
+         - Repeatedly traverse the outer boundary in 4 steps:
+             1) left -> right along top row
+             2) top+1 -> bot along right column
+             3) right-1 -> left along bottom row (if still valid)
+             4) bot-1 -> top+1 along left column (if still valid)
+         - After visiting one ring, move the boundaries inward:
+             top++, bot--, left++, right--
+         - Stop when top > bot or left > right (no cells left).
+
+       Correctness notes:
+         - The checks for single row or single column (top == bot or left == right)
+           before the backward traversals prevent double-visiting the same cells.
+         - We use top+1 and bot-1 for vertical traversals to avoid corner duplicates.
+
+       Complexity:
+         - Time: O(n * m) because each matrix element is visited exactly once.
+         - Space: O(1) extra (ignoring the output vector which holds n*m elements).
+    */
     vector<int> spiralOrder(vector<vector<int>> &mat)
     {
-        vector<int> ans; // stores elements in spiral order
 
-        int n = mat.size();    // number of rows
-        int m = mat[0].size(); // number of columns
+        int n = mat.size();    /* number of rows */
+        int m = mat[0].size(); /* number of columns (assume non-empty) */
 
-        // Initialize boundaries
-        int top = 0, left = 0, bottom = n - 1, right = m - 1;
+        vector<int> ans;
+        ans.reserve(n * m); /* optional: reserve space for performance */
 
-        // Traverse until boundaries cross
-        while (top <= bottom && left <= right)
+        /* Boundaries for the current outer layer (inclusive indices) */
+        int top = 0;
+        int bot = n - 1;
+        int left = 0;
+        int right = m - 1;
+
+        /*
+           Loop until boundaries cross.
+           At each iteration we walk the current outer ring in 4 steps.
+        */
+        while (top <= bot && left <= right)
         {
-            // 1. Traverse top row (left → right)
-            for (int i = left; i <= right; i++)
-                ans.push_back(mat[top][i]);
-            top++; // move top boundary down
 
-            // 2. Traverse right column (top → bottom)
-            for (int i = top; i <= bottom; i++)
-                ans.push_back(mat[i][right]);
-            right--; // move right boundary left
-
-            // 3. Traverse bottom row (right → left), if still valid
-            if (top <= bottom)
+            /* 1) Traverse top row from left to right (columns left..right) */
+            for (int col = left; col <= right; col++)
             {
-                for (int i = right; i >= left; i--)
-                    ans.push_back(mat[bottom][i]);
-                bottom--; // move bottom boundary up
+                int temp = mat[top][col];
+                ans.push_back(temp);
             }
 
-            // 4. Traverse left column (bottom → top), if still valid
-            if (left <= right)
+            /* 2) Traverse right column from row (top+1) to bot.
+               Start at top+1 to avoid re-visiting the top-right corner. */
+            for (int row = top + 1; row <= bot; row++)
             {
-                for (int i = bottom; i >= top; i--)
-                    ans.push_back(mat[i][left]);
-                left++; // move left boundary right
+                int temp = mat[row][right];
+                ans.push_back(temp);
             }
+
+            /*
+               If remaining submatrix is a single row or a single column,
+               the backward traversals (bottom row leftwards and left column upwards)
+               would re-visit elements already added. Break in that case.
+            */
+            if (top == bot || left == right)
+                break;
+
+            /* 3) Traverse bottom row from right-1 down to left (inclusive).
+               Start at right-1 to avoid the bottom-right corner (visited in step 2). */
+            for (int col = right - 1; col >= left; col--)
+            {
+                int temp = mat[bot][col];
+                ans.push_back(temp);
+            }
+
+            /* 4) Traverse left column from bot-1 up to top+1.
+               Use row > top to avoid the top-left corner (visited in step 1). */
+            for (int row = bot - 1; row > top; row--)
+            {
+                int temp = mat[row][left];
+                ans.push_back(temp);
+            }
+
+            /* Move boundaries inward to process the next inner ring */
+            top++;
+            bot--;
+            left++;
+            right--;
         }
 
         return ans;
