@@ -105,6 +105,7 @@ https://takeuforward.org/plus/dsa/problems/kmp-algorithm-or-lps-array?tab=editor
 https://www.youtube.com/watch?v=ynv7bbcSLKE
 https://www.youtube.com/watch?v=V5-7GzOfADQ
 https://www.youtube.com/watch?v=GTJr8OvyEVQ
+https://www.youtube.com/watch?v=yKhPWrdA6U8
 
 
 Problem statement:
@@ -114,10 +115,12 @@ Note: Return an empty list in case of no occurrences of pattern.
 Examples :
 Input: txt = "abcab", pat = "ab"
 Output: [0, 3]
-Explanation: The string "ab" occurs twice in txt, one starts at index 0 and the other at index 3. 
+Explanation: The string "ab" occurs twice in txt, one starts at index 0 and the other at index 3.
+
 Input: txt = "abesdu", pat = "edu"
 Output: []
 Explanation: There's no substring "edu" present in txt.
+
 Input: txt = "aabaacaadaabaaba", pat = "aaba"
 Output: [0, 9, 12]
 Explanation:
@@ -444,61 +447,68 @@ public:
     }
 
     /*
-     * search(pat, txt)
-     * -----------------
-     * Purpose / Idea:
-     *   - Use the LPS array of the pattern to scan the text and identify all
-     *     starting indices where the pattern occurs in the text.
-     *   - This implementation stores for every text index the length of the
-     *     matched prefix of the pattern up to that text index in LPS_txt[].
-     *   - After scanning the whole text, positions where LPS_txt[i] == m indicate
-     *     a full match of the pattern that ends at index i in the text. The
-     *     corresponding start index is i - m + 1.
-     *
-     * Algorithm steps:
-     *   1. Compute LPS for the pattern: LPS_pat = buildLPS(pat)
-     *   2. Initialize two pointers:
-     *        i -> current index in text (scans forward)
-     *        j -> current index in pattern (how many characters matched so far)
-     *   3. While i < n:
-     *        - If txt[i] == pat[j] then we matched one more character:
-     *            LPS_txt[i] = j + 1; // matched length at text index i
-     *            i++; j++;
-     *        - If mismatch:
-     *            If j == 0 -> advance i (no prefix matched)
-     *            Else        -> set j = LPS_pat[j - 1] (fall back to next border)
-     *   4. After the scan, collect indices where LPS_txt[i] == m and compute
-     *      starting positions by (i - m + 1).
-     *
-     * Complexity:
-     *   - Time:  O(n + m)
-     *       * buildLPS takes O(m)
-     *       * scanning the text with the help of LPS_pat is linear O(n)
-     *   - Space: O(n + m)
-     *       * LPS_pat: O(m)
-     *       * LPS_txt: O(n) (this particular implementation stores match-lengths for text)
-     *       * ans: up to O(n) in worst case (many matches)
-     *
-     * Notes on design:
-     *   - Typical KMP implementations output matches immediately when j == m
-     *     inside the main loop; this version instead records matched lengths in
-     *     LPS_txt and post-processes them to produce starting indices. Both are
-     *     correct; the choice here trades immediate pushes for a separate pass.
-     */
+  search(pat, txt)
+  ----------------
+  KMP-based pattern search without storing per-text matched lengths (LPS_txt).
+  This version uses the standard KMP scanning approach and emits matches
+  immediately when the pattern is fully matched.
+
+  Intuition:
+    - Precompute the prefix-function (LPS_pat) for the pattern. LPS_pat[k]
+      is the length of the longest proper prefix of pat[0..k] that is also a suffix.
+    - Scan the text with two indices:
+        i -> current position in text (0..n-1)
+        j -> length of current match in pattern (0..m)
+      When txt[i] == pat[j] we can advance both; on mismatch we fall back j
+      using LPS_pat so we avoid re-checking characters.
+    - Whenever j reaches m (full pattern matched), we immediately record
+      the start index (i - m) and then set j = LPS_pat[m-1] to continue
+      searching for overlapping matches.
+
+  Why we removed LPS_txt:
+    - LPS_txt was an auxiliary array that stored, for each text index, the
+      matched-length so far. It is redundant if we only need to collect match
+      start positions — standard KMP reports matches as soon as j == m.
+    - Removing LPS_txt reduces space from O(n + m) to O(m) (only LPS_pat remains).
+
+  Algorithm steps (concrete):
+    1) Compute LPS_pat = buildLPS(pat) in O(m).
+    2) Initialize i = 0, j = 0.
+    3) While i < n:
+         - If txt[i] == pat[j]: i++; j++;
+           If j == m: record match at (i - m); j = LPS_pat[j-1].
+         - Else (mismatch):
+           If j > 0: j = LPS_pat[j-1] (fall back in pattern)
+           Else: i++ (advance text when no prefix matched)
+    4) Return the collected starting indices in ans.
+
+  Complexity:
+    - Time: O(n + m). Each text character is compared a constant number of times
+      because j never moves left by more than it fell back via LPS_pat.
+    - Space: O(m) for LPS_pat plus O(k) for ans (k = number of matches).
+
+  Notes and pitfalls:
+    - buildLPS should compute prefix-function in O(m).
+    - This implementation emits overlapping matches correctly (because after a
+      match we set j = LPS_pat[m-1] and continue).
+    - Be careful with empty pattern or empty text (handle m == 0 separately if needed).
+    - If pattern length m is 0, many definitions consider every index a match;
+      typically you should guard and return empty or all indices depending on spec.
+*/
     vector<int> search(string &pat, string &txt)
     {
-        // code here
+        int n = (int)txt.size(); // length of text
+        int m = (int)pat.size(); // length of pattern
 
-        int n = txt.size(); // length of text
-        int m = pat.size(); // length of pattern
+        // Edge cases: empty pattern or empty text
+        if (m == 0)
+            return {}; // choose behavior: here return no matches
+        if (n == 0)
+            return {}; // empty text -> no matches
 
         // Build prefix-function for pattern (LPS for pattern)
         vector<int> LPS_pat = buildLPS(pat);
 
-        // LPS_txt[i] will hold the number of characters of the pattern that are
-        // matched ending exactly at txt[i]. This is an auxiliary array used by
-        // this implementation to mark matches; many KMP variants don't store this.
-        vector<int> LPS_txt(n, 0);
         vector<int> ans; // result list of starting indices
 
         int i = 0; // index into text
@@ -507,47 +517,34 @@ public:
         // Scan text once using KMP logic
         while (i < n)
         {
-
             if (txt[i] == pat[j])
             {
-                // characters match: record the matched length at this text index
-                LPS_txt[i] = j + 1; // matched with pattern up to j-th index
-                i++;                // advance in text
-                j++;                // advance in pattern (one more matched)
+                // characters match: advance both pointers
+                i++;
+                j++;
 
-                // Note: many implementations would check `if (j == m)` here and
-                // immediately record a match (i - m) and then set j = LPS_pat[j - 1].
-                // This code instead defers adding matches until after the loop and
-                // populates LPS_txt for all positions.
-
-                // Example of immediate handling (commented out in original):
-                // if (j == m) {
-                //     ans.push_back(i - m);      // pattern found ending at i-1
-                //     j = LPS_pat[j - 1];        // continue searching for next match
-                // }
+                // If full pattern is matched, record the starting position
+                // and fall back using LPS to continue searching (handles overlaps).
+                if (j == m)
+                {
+                    ans.push_back(i - m); // match starts at i-m
+                    j = LPS_pat[j - 1];   // continue searching (allow overlaps)
+                }
             }
             else
             {
-                // Mismatch: need to decide how to recover
+                // Mismatch: recover using prefix function
                 if (j == 0)
                 {
-                    // No prefix matched so far; advance text pointer
+                    // no prefix matched so far, advance text
                     i++;
                 }
                 else
-                    // Fall back in the pattern to try a shorter matching prefix.
-                    // LPS_pat[j-1] gives the length of the longest proper prefix
-                    // which is also a suffix for pat[0..j-1].
+                {
+                    // fall back to the next best prefix length for pattern
                     j = LPS_pat[j - 1];
+                }
             }
-        }
-
-        // Post-processing: any index i in text with LPS_txt[i] == m indicates the
-        // pattern fully matched ending at i, so starting index is i - m + 1.
-        for (int i = 0; i < n; i++)
-        {
-            if (LPS_txt[i] == m)
-                ans.push_back(i - m + 1);
         }
 
         return ans;

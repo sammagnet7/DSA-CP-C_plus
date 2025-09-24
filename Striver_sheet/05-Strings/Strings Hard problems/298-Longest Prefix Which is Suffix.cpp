@@ -21,6 +21,7 @@ using namespace std;
 1. Title: Longest Prefix Which is Suffix
 
 Links:
+https://takeuforward.org/plus/dsa/problems/longest-happy-prefix?tab=editorial
 https://www.naukri.com/code360/problems/longest-prefix-which-is-suffix_3146849?leftPanelTabValue=PROBLEM
 https://www.geeksforgeeks.org/problems/longest-prefix-suffix2527/1
 https://leetcode.com/problems/longest-happy-prefix/description/
