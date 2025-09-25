@@ -259,9 +259,15 @@
           ```cpp
           { name, email1, email2, ... }
           ```
+   - The `std::vector::reserve()` method 
+     - requests that the vector's capacity be increased to a size that's at least large enough to contain a specified number of elements.
+     - It is a performance optimization used to pre-allocate memory, preventing frequent reallocations when you know in advance how many elements you will be adding to the vector.
+   - `Size` vs. `Capacity`
+     - Size: The number of elements currently in the vector. You get this with `size()`.
+     - Capacity: The number of elements the vector can hold in its currently allocated block of memory before it needs to allocate a new, larger block. You get this with `capacity()`.
+   - y
    - z
    - x
-   - y
 
 ---
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
@@ -492,20 +498,20 @@ Whenever the problem is related to picking up elements from an array to form a c
                     return false;
           }
     ```
-4.   How to push back and pop back a **string** to a **string**?
+4.    How to push back and pop back a **string** to a **string**?
      ```cpp
           string cur = "test";
           size_t oldSize = expression.size();
           expression.append(cur);
           expression.resize(oldSize);
      ```
-5.   How to push back and pop back a **char** to a **string**?
+5.    How to push back and pop back a **char** to a **string**?
      ```cpp
           char cur = 'x';
           expression.push_back(cur);
           expression.pop_back();
      ```
-6.  Convert char/string to int and vice-versa: 
+6.   Convert char/string to int and vice-versa: 
      ```cpp 
           int c =  'x' - 'a';
      ```
@@ -525,7 +531,7 @@ Whenever the problem is related to picking up elements from an array to form a c
           string str_num = "123";
           int num = stoi(str_num);
      ```
-7.  How to parse comma:
+7.   How to parse comma:
     ```cpp
           stringstream ss(data);
           string s;
@@ -534,15 +540,17 @@ Whenever the problem is related to picking up elements from an array to form a c
                cout << s << endl;
           }
      ```
-8.  Floor and Ceil:
+8.   Floor and Ceil:
   - Floor of a x is the greatest integer less than or equal to x.
   - Ceil of x is the least integer greater than or equal to x.
 
-9. Creating object:
+9.  Creating object:
    * `MyClass obj;` → object lives on stack, auto destroyed, safer.
    * `MyClass *obj = new MyClass();` → object lives on heap, must `delete` manually (or use smart pointer).
   
-10. 
+10. Program's default memory limit: few hundreds of MB (i.e. ~10^7 Bytes). [Note: 2^10 ~ 1K i.e. 1e3; 2^20 ~ 1M i.e. 1e6;] 
+11. 
+12.  
 
 ---
 <span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>

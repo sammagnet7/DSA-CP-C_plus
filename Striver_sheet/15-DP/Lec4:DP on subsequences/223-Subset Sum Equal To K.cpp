@@ -97,7 +97,7 @@ public:
     // 1. Title: Subset Sum Equal To K
     //-------------------------------------------------------------------------------
 
-    // Approach1
+    // Approach1: Recursive
     /**
      * @brief Recursive helper to determine if a subset with the given target sum exists.
      *
@@ -174,8 +174,31 @@ public:
      *
      * @return true if such subset exists, false otherwise.
      *
-     * Time Complexity: O(n * k)
-     * Space Complexity: O(n * k) + O(n) recursion stack
+     * Approach:
+     *   - Standard Subset Sum dynamic programming with memoization.
+     *   - State: dp[i][target] = whether it is possible to form "target" using
+     *     elements from arr[0..i].
+     *   - Transition: include arr[i] or exclude arr[i].
+     *   - Recursion depth O(n), total states O(n * k).
+     *
+     * Complexity:
+     *   - Time Complexity: O(n * k) (each state solved once).
+     *   - Space Complexity: O(n * k) for the DP table + O(n) recursion stack.
+     *
+     * Practical limits (important):
+     *   - Memory use ≈ n * (k+1) integers.
+     *     * With 4-byte ints: ~4 * n * k bytes.
+     *   - For n ~ 100 and k ~ 10^5 → ~40 MB (borderline but feasible).
+     *   - For n ~ 1000 and k ~ 10^4 → ~40 MB (feasible).
+     *   - For k ~ 10^6 and n ~ 100 → ~400 MB (too large).
+     *   - For very large k (like 10^9, as in "Meet in the Middle" problem),
+     *     this DP is **impossible** due to memory/time blowup.
+     *
+     * Rule of thumb:
+     *   - Suitable if n * k ≤ ~10^7 (time) and memory ≤ a few hundred MB.
+     *   - If k is very large (≥10^7–10^8), switch to:
+     *       • Bitset optimization (O(n*k/word_size)) for feasibility,
+     *       • Or alternative strategies like "Meet in the Middle" if n ≤ 40.
      */
     bool subsetSumToK(int n, int k, vector<int> &arr)
     {
@@ -187,7 +210,7 @@ public:
     }
 
     //-------------------------------------------------------------------------------
-    // Approach2
+    // Approach2: Iterative
     /**
      * Function: subsetSumToK
      * ----------------------
@@ -238,7 +261,7 @@ public:
     }
 
     //-------------------------------------------------------------------------------
-    // Approach3: [OPTIMAL]
+    // Approach3: Iterative 2 1D arrays[OPTIMAL]
     /**
      * Function: subsetSumToK
      * ----------------------
