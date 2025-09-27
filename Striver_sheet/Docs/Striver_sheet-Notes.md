@@ -286,8 +286,26 @@
      [STL-TUF](https://takeuforward.org/c/c-stl-tutorial-most-frequent-used-stl-containers/)
    - `sort`, `find`, `count`, `next_permutation`, `accumulate`, `max_element`, `reverse`, `pow` from `<cmath>`, `popcount` from `<bit>`.
    - `<string>` methods: `isalnum`, `tolower`.
-   - y
+   - **`std::inplace_merge(first, middle, last)`** (in `<algorithm>`)  
+  → Merges two consecutive sorted ranges `[first, middle)` and `[middle, last)` into one sorted range `[first, last)`.
+
+     **Example:**
+     ```cpp
+     #include <algorithm>
+     #include <vector>
+     #include <iostream>
+     using namespace std;
+
+     int main() {
+     vector<int> v = {1, 3, 5, 2, 4, 6};
+     inplace_merge(v.begin(), v.begin() + 3, v.end()); 
+     for (int x : v) cout << x << " ";  // Output: 1 2 3 4 5 6
+     }
+     ```
+
    - z
+   - x
+   - y
 
 ---
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
@@ -822,7 +840,7 @@ It can be of two types:
 
 ### revisit:
 1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
-2. [text](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
+2. [check if rotated-array sorted](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
 3. [next permutation](https://leetcode.com/problems/next-permutation/description/)
 4. [longest consecutive sequence](https://leetcode.com/problems/longest-consecutive-sequence/description/)
 5. [set matrix with zeros](https://leetcode.com/problems/set-matrix-zeroes/description/)
@@ -830,4 +848,5 @@ It can be of two types:
 7. [Print Spiral matrix](https://leetcode.com/problems/spiral-matrix/description/)
 8. [Find element in rth row and cth col in Pascal's triangle](https://www.geeksforgeeks.org/dsa/find-the-nth-row-in-pascals-triangle/)
 9. [3sum](https://leetcode.com/problems/3sum/description/)
-10. 
+10. [find Repeating-missing number](https://www.naukri.com/code360/problems/missing-and-repeating-numbers_6828164?utm_source=striver&utm_medium=website&utm_campaign=codestudio_a_zcourse)
+11. 

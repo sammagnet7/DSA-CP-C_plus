@@ -19,7 +19,6 @@ https://www.naukri.com/code360/problems/subarray-with-maximum-product_6890008?ut
 Problem statement:
 Given an array that contains both negative and positive integers, find the maximum product subarray.
 
-Note: What is an inversion of an array? Definition: for all i & j < size of array, if i < j then you have to find pair (A[i],A[j]) such that A[j] < A[i].
 
 Examples:
 
@@ -31,7 +30,8 @@ Explanation:    In the given array, we can see 1×2×3×4×5 gives maximum produ
 Example 2:
 Input:  Nums = [1,2,-3,0,-4,-5]
 Output: 20
-Explanation:    In the given array, we can see (-4)×(-5) gives maximum product value.
+Explanation:    In the given array, we can see
+Note: What is an inversion of an array? Definition: for all i & j < size of array, if i < j then you have to find pair (A[i],A[j]) such that A[j] < A[i]. (-4)×(-5) gives maximum product value.
 
 Example 3:
 Input: nums = [2,3,-2,4]
@@ -61,51 +61,131 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Approach: Optimal :: kadane's algo
-    // Intuition: Maintain min_prod for largest -ve product till now. maintain max_prod for largest +ve product till now. Take Max of these.
-    // Time: O(N)
-    // Spae: O(1)
-    int maxProduct(vector<int> &arr)
-    {
-        int max_prod = 1, min_prod = 1;
-        int ans = INT_MIN;
+    /*
+        [NOT INTUITIVE: DON'T GO WITH THIS APPROACH  ❌]
+        Approach 1: Dynamic Kadane-like method for Maximum Product Subarray
+        ------------------------------------------------------------------
+        Intuition / idea:
+            - For sum-subarray problems Kadane's algorithm keeps one running max.
+            For product we must track two values at each step:
+                * max_prod: the maximum product of a subarray ending at current element
+                * min_prod: the minimum product of a subarray ending at current element
+            Why two values?
+                - A negative number flips signs: a very small (large negative) product
+                multiplied by a negative current element can become the new maximum.
+                - So we keep both the best positive product and the most negative product
+                (which could become large positive later).
+            - At each element e we consider three possibilities for new subarray ending here:
+                1) start fresh at e
+                2) extend previous max_prod by e
+                3) extend previous min_prod by e
+            The new max_prod is the maximum of those; the new min_prod is the minimum.
+            - Track the global maximum `ans` over all positions.
 
-        for (int e : arr)
-        {
-            int temp1 = max({e, (max_prod * e), (min_prod * e)});
-            int temp2 = min({e, (max_prod * e), (min_prod * e)});
+        Correctness sketch:
+            - The recurrence considers every subarray that ends at the current index:
+            either it is only `e` or it extends a prior subarray (tracked via max_prod/min_prod).
+            - By keeping both extremes we correctly handle sign flips caused by negatives.
 
-            max_prod = temp1;
-            min_prod = temp2;
+        Edge cases handled:
+            - Zero resets influence: multiplying by zero yields zero, and later starting a new subarray
+            at the next element is considered since we include `e` as a candidate.
+            - Single-element arrays and all-negative arrays are handled naturally.
 
-            ans = max(ans, max_prod);
-        }
+        Complexity:
+            - Time: O(N) — one pass through the array.
+            - Space: O(1) — just a few variables.
 
-        return ans;
-    }
+        Note:
+            - Uses int arithmetic; if products may overflow 32-bit, use 64-bit types.
+        */
+    // int maxProduct(vector<int> &arr)
+    // {
+    //     int max_prod = 1;  // maximum product ending at previous index
+    //     int min_prod = 1;  // minimum product (most negative) ending at previous index
+    //     int ans = INT_MIN; // global maximum product seen so far
 
-    // // Approach: Optimal :: Prefix and postfix product
-    // // Max product will be product of an array having no -ve or an array with even -ve elements.
-    // // So in odd -ve elements' case either remove the 1st -ve or last -ve element.
-    // // Time: O(N)
-    // // Spae: O(1)
-    // int maxProduct(vector<int>& arr) {
-    //     int N= arr.size();
-    //     int pre_prod=1, post_prod=1;
-    //     int max_prod=INT_MIN;
+    //     for (int e : arr)
+    //     {
+    //         // compute possible candidates using previous max/min and current element
+    //         int temp1 = max({e, (max_prod * e), (min_prod * e)}); // new max ending here
+    //         int temp2 = min({e, (max_prod * e), (min_prod * e)}); // new min ending here
 
-    //     for(int i=0; i<N; i++){
-    //         if(pre_prod == 0) pre_prod=1;    // Handling zero values
-    //         if(post_prod == 0) post_prod=1;  // Handling zero values
+    //         max_prod = temp1;
+    //         min_prod = temp2;
 
-    //         pre_prod *= arr[i];
-    //         post_prod *= arr[N-1-i];
-
-    //         max_prod = max({max_prod, pre_prod, post_prod});
+    //         // update global answer
+    //         ans = max(ans, max_prod);
     //     }
 
-    //     return max_prod;
+    //     return ans;
     // }
+
+
+    /*
+      [INTUITIVE : GO WITH THIS APPROACH ✅]
+      Approach 2: Prefix & Postfix product scan (another intuitive O(N) method)
+      -------------------------------------------------------------------------
+      Intuition / idea:
+        - Consider the product of every prefix (from left) and every prefix from the right
+          (postfix when viewed from left to right). The maximum subarray product will be
+          one of these prefix or postfix cumulative products after handling zeros.
+        - More concretely:
+            * If there are an even number of negatives in the subarray, the product is positive;
+              including the whole span gives the max.
+            * If odd number of negatives, we can drop either the prefix up to the first negative
+              or the suffix after the last negative to make it even — effectively this corresponds
+              to checking prefix products and suffix products.
+        - By scanning forward and backward simultaneously, and resetting product to 1 when encountering 0,
+          we capture candidates for maximum product subarrays without explicitly enumerating endpoints.
+
+      How it works step-by-step:
+        - pre_prod accumulates product from left to right.
+        - post_prod accumulates product from right to left (by accessing arr[N-1-i]).
+        - On encountering zero, reset the corresponding product to 1 because subarrays crossing the zero
+          cannot have product larger than zero (and we can start a new subarray after the zero).
+        - At each step update max_prod with pre_prod and post_prod. This covers subarrays that end at i
+          and start at i respectively and effectively considers trimming first/last negatives when necessary.
+
+      Edge cases handled:
+        - Zeros: reset product and continue; a single zero may itself be the maximum if all other products are negative.
+        - All-negative arrays: the best will be captured by prefix/postfix behavior (keeping appropriate trims).
+        - Single-element arrays naturally handled.
+
+      Complexity:
+        - Time: O(N) — a single scan with two accumulators.
+        - Space: O(1) — constant extra memory.
+
+      Notes:
+        - This method is very concise and often easier to implement. It is especially elegant
+          when combined with the trick of resetting to 1 on zero.
+        - Both approaches are valid; Kadane-like method is more standard and explicitly maintains
+          the necessary state (max/min). Prefix/postfix is a neat alternative that relies on symmetry.
+        - Again, use 64-bit if intermediate products can overflow int.
+    */
+    int maxProduct(vector<int> &arr)
+    {
+        int N = (int)arr.size();
+        int pre_prod = 1, post_prod = 1;
+        int max_prod = INT_MIN;
+
+        for (int i = 0; i < N; i++)
+        {
+            // Reset on zero because product of any subarray containing zero is zero,
+            // and future subarrays should start fresh after zero.
+            if (pre_prod == 0)
+                pre_prod = 1;
+            if (post_prod == 0)
+                post_prod = 1;
+
+            pre_prod *= arr[i];
+            post_prod *= arr[N - 1 - i];
+
+            max_prod = max({max_prod, pre_prod, post_prod});
+        }
+
+        return max_prod;
+    }
 };
 
 int main()

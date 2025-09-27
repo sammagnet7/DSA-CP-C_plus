@@ -54,47 +54,58 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Approach: OPTIMAL: Follows mergeSort() algo
-    // Intuition: If two sorted arrays are given then, finding inversionCount takes O(N) time.
-    // because whenever we find leftSortedArray[i] > rightSortedArray[j], we know all the elements further right in the leftSortedArray also will be greater than rightSortedArray[j] element(as arrays are sorted)
-    // So in that case we could easily compute inversionCount as (leftSortedArraySize - i).
-    // And can find overall inversionCount in O(N)
-    //
-    // Now to utilize this we need to feed two sorted arrays, which is done by Divide-and-Conquer strategy in O(Log N) time
-    //
-    // Time: O(N Log N)
-    // Space: O(N)
-    int inversionCount(vector<int> &arr)
-    {
-        int N = arr.size();
+    /*
+        Problem:
+            - Given an array arr[0..n-1].
+            - Count the number of inversions in the array.
+            - An inversion is a pair (i, j) such that i < j and arr[i] > arr[j].
 
-        return mergeSort(arr, 0, N - 1);
-    }
+        Approach:
+            - Use modified merge sort.
+            - During the merge step, whenever we take an element from the right half
+            before one from the left half, it means all remaining elements in the left
+            half form inversions with that right element.
+            - Merge sort splits array recursively (O(log n) levels),
+            and each merge operation scans its subarrays linearly (O(n) per level).
+            - Total time complexity = O(n log n).
 
-private:
-    // O(N Log N)
-    int mergeSort(vector<int> &arr, int start, int end)
-    {
-        if (start >= end)
-            return 0;
-        int inversionCount = 0;
+        Key intuition:
+            - Brute force: O(n^2) checking all pairs.
+            - Optimized: Merge sort naturally compares left and right halves.
+            - When left[l] > right[r]:
+                * Because both halves are sorted, all elements left[l..end] are also > right[r].
+                * So we can count all those inversions in O(1).
+            - This reduces repeated comparisons.
 
-        int mid = start - (start - end) / 2;
+        Functions:
+            1. mergeAndCountInversions:
+                - Merges two sorted halves arr[start..mid] and arr[mid+1..end].
+                - While merging:
+                    * If left[l] <= right[r], copy left[l].
+                    * Else left[l] > right[r], so (mid - l + 1) inversions exist.
+                    * Copy right[r].
+                - Returns number of inversions during merge.
 
-        inversionCount += mergeSort(arr, start, mid);
-        inversionCount += mergeSort(arr, mid + 1, end);
+            2. mergeSort:
+                - Standard recursive merge sort.
+                - Splits array, recursively sorts left and right.
+                - Counts inversions in left, right, and across them using mergeAndCountInversions.
 
-        // inversionCount += countInversions(arr, start, end, mid);
-        inversionCount += mergeAndCountInversions(arr, start, end, mid);
+            3. numberOfInversions:
+                - Wrapper function that makes a copy of arr to avoid modifying the input.
+                - Calls mergeSort and returns the inversion count.
 
-        return inversionCount;
-    }
+        Complexity:
+            - mergeAndCountInversions: O(n) per merge.
+            - mergeSort: O(n log n) overall.
+            - Space: O(n) auxiliary for temporary arrays.
+    */
 
-    // O(N)
+    // Merge step: merges two sorted halves and counts inversions
     int mergeAndCountInversions(vector<int> &arr, int start, int end, int mid)
     {
+        // Copy left and right halves into temp arrays
         vector<int> temp1(mid - start + 1), temp2(end - mid);
-
         for (int i = start; i <= mid; i++)
         {
             temp1[i - start] = arr[i];
@@ -105,67 +116,59 @@ private:
         }
 
         int inversionCount = 0;
+        int l = 0, r = 0, c = start;
+        int s1 = temp1.size(), s2 = temp2.size();
 
-        int l = 0;
-        int r = 0;
-        int c = start;
-        int s1 = temp1.size();
-        int s2 = temp2.size();
-
+        // Merge while counting inversions
         while (l < s1 && r < s2)
         {
             if (temp1[l] <= temp2[r])
             {
-                arr[c] = temp1[l];
-                c++;
-                l++;
+                arr[c++] = temp1[l++];
             }
-            else if (temp1[l] > temp2[r])
+            else
             {
-                inversionCount += s1 - l; // Counting inversions when lsftArray element is greater than rightArray element
-                arr[c] = temp2[r];
-                c++;
-                r++;
+                // temp1[l] > temp2[r] ⇒ all remaining elements in temp1[l..end] are > temp2[r]
+                inversionCount += (s1 - l);
+                arr[c++] = temp2[r++];
             }
         }
+
+        // Copy leftovers
         while (l < s1)
-        {
-            arr[c] = temp1[l];
-            c++;
-            l++;
-        }
+            arr[c++] = temp1[l++];
         while (r < s2)
-        {
-            arr[c] = temp2[r];
-            c++;
-            r++;
-        }
+            arr[c++] = temp2[r++];
 
         return inversionCount;
     }
 
-    // REVERSE PAIRs
-    // This method will be used to 'Count Reverse Pairs': https://takeuforward.org/data-structure/count-reverse-pairs/
-    // Reverse Pairs are those pairs where i<j and arr[i]>2*arr[j]
-    // So inside merge algo we can not count Reverse pair. Because if temp1[l]>temp2[r] => we can not simply inversionCount++ => we do r++ => but there can be possible elements in temp1 where temp1[l++]>2*temp2[r], which we missed in merge algo
-    // So we need this explicit method to return `inversionCount` and merge algo will return void
-    // Time: O(N)
-    // Space: O(1)
-    int countInversions(vector<int> &arr, int start, int end, int mid){
-        int inversions=0;
-        int l=start, r=mid+1;
+    // Recursive merge sort with inversion count
+    int mergeSort(vector<int> &arr, int start, int end)
+    {
+        if (start >= end)
+            return 0;
 
-        while(l<=mid && r<=end){
-            if((long long)arr[l] > (2*(long long)arr[r]) ){
-                inversions += (mid-l+1);
-                r++;
-            }
-            else {
-                l++;
-            }
-        }
+        int inversionCount = 0;
+        int mid = start + (end - start) / 2;
 
-        return inversions;
+        // Count inversions in left half
+        inversionCount += mergeSort(arr, start, mid);
+
+        // Count inversions in right half
+        inversionCount += mergeSort(arr, mid + 1, end);
+
+        // Count inversions across halves
+        inversionCount += mergeAndCountInversions(arr, start, end, mid);
+
+        return inversionCount;
+    }
+
+    // Wrapper to count inversions in the array
+    int numberOfInversions(vector<int> &arr, int n)
+    {
+        vector<int> workArr(arr.begin(), arr.end()); // copy to avoid modifying original
+        return mergeSort(workArr, 0, n - 1);
     }
 };
 
@@ -191,7 +194,7 @@ int main()
 
         Solution ob;
 
-        cout << ob.inversionCount(arr);
+        cout << ob.numberOfInversions(arr, arr.size());
         cout << endl;
     }
     return 0;

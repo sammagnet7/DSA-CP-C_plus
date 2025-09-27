@@ -9,7 +9,7 @@
 using namespace std;
 
 /*
-Merge Overlapping Sub-intervals
+Find the repeating and missing number
 
 https://takeuforward.org/data-structure/find-the-repeating-and-missing-numbers/
 https://www.geeksforgeeks.org/problems/find-missing-and-repeating2512/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=find-missing-and-repeating
@@ -54,155 +54,243 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // // Approach: Better: Hashing
-    // // Time: O(N)
-    // // Space: O(N)
-    // vector<int> findTwoElement(vector<int> &arr)
-    // {
-
-    //     int N = arr.size();
-    //     vector<int> res(2);
-
-    //     vector<int> hash(N + 1, 0);
-
-    //     for (int e : arr)
-    //     {
-    //         hash[e]++;
-    //     }
-
-    //     int count = 0;
-    //     for (int i = 1; i <= N; i++)
-    //     {
-
-    //         if (hash[i] == 2)
-    //         {
-    //             res[0] = i;
-    //             count++;
-    //         }
-
-    //         else if (hash[i] == 0)
-    //         {
-    //             res[1] = i;
-    //             count++;
-    //         }
-
-    //         if (count == 2)
-    //             break;
-    //     }
-
-    //     return res;
-    // }
-
-    // Approach: Optimal 1: Math based
-    // find 2 equations: x + y and x - y.. To find these use 2 AP formulas: sum of first N numbers and sum of first N^2s
-    // Time: O(N)
-    // Space: O(1)
+    // Approach: Hashing
+    // - Use a frequency array (hash) of size N+1 to track counts of each number.
+    // - Traverse arr, incrementing counts.
+    // - The number with count==2 → duplicate.
+    // - The number with count==0 → missing.
+    // Time: O(N)   Space: O(N)
     vector<int> findTwoElement(vector<int> &arr)
     {
+        int N = arr.size();
+        vector<int> res(2);
+        vector<int> hash(N + 1, 0);
 
-        long long N = arr.size(); // make it long
+        // Count occurrences
+        for (int e : arr)
+        {
+            hash[e]++;
+        }
 
-        long long sumOfNs = N * (N + 1) / 2; // Apply formula to find sum of first N natural numbers
+        // Identify duplicate and missing
+        for (int i = 1; i <= N; i++)
+        {
+            if (hash[i] == 2)
+                res[0] = i; // duplicate
+            if (hash[i] == 0)
+                res[1] = i; // missing
+        }
+        return res;
+    }
 
-        long long sumOfNSquares = N * (N + 1) * (2 * N + 1) / 6; // Apply formula to find sum of first N natural numbers' squares
+    /*
+    findTwoElement
+    ---------------
+    Problem:
+        - You are given an array of size N containing numbers from 1..N.
+        - Exactly one number is missing and one number is duplicated.
+        - Find both numbers.
 
-        long long actualSum = 0;
-        long long actualSquareSum = 0;
+    Approach: Optimal 1 (Math-based using sum formulas)
+    ---------------------------------------------------
+    Intuition:
+        - Let:
+            x = missing number
+            y = repeating number
+        - Two facts:
+            1) Difference in total sums:
+                (1 + 2 + ... + N) - (sum of array)
+                = (x + rest) - (y + rest)
+                = x - y
+                => x - y = sumOfNs - actualSum
+            2) Difference in sum of squares:
+                (1^2 + 2^2 + ... + N^2) - (sum of squares of array)
+                = (x^2 + rest) - (y^2 + rest)
+                = x^2 - y^2
+                => (x - y)(x + y) = x2MinusY2
+                => x + y = (x2MinusY2 / (x - y))
+        - Now we have two equations:
+            x - y  (from sums)
+            x + y  (from squares)
+        - Solve them to get x and y:
+            x = ( (x+y) + (x-y) ) / 2
+            y = ( (x+y) - (x-y) ) / 2
+        - Finally, confirm which one is repeating by counting.
+
+    Complexity:
+        - Time: O(N) (one pass for sums, one pass to verify duplicate).
+        - Space: O(1) (only variables, no extra arrays).
+
+    Example:
+        arr = [1, 3, 3]
+        N=3
+        sumOfNs = 6, actualSum = 7 → x-y = -1
+        sumOfSquares = 14, actualSquares=19 → x^2-y^2 = -5
+        x+y = (x^2-y^2)/(x-y) = (-5)/(-1) = 5
+        Solve: x=2, y=3
+*/
+    vector<int> findTwoElement(vector<int> &arr)
+    {
+        long long N = arr.size();
+
+        // Expected sums
+        long long sumOfNs = N * (N + 1) / 2;                     // formula: N(N+1)/2
+        long long sumOfNSquares = N * (N + 1) * (2 * N + 1) / 6; // formula: N(N+1)(2N+1)/6
+
+        // Actual sums from array
+        long long actualSum = 0, actualSquareSum = 0;
         for (int e : arr)
         {
             actualSum += e;
-            actualSquareSum += (e * e);
+            actualSquareSum += (1LL * e * e);
         }
 
+        // Step 1: find x-y
         int xMinusY = sumOfNs - actualSum;
+
+        // Step 2: find x^2-y^2
         int x2MinusY2 = sumOfNSquares - actualSquareSum;
 
+        // Step 3: derive x+y
         int xPlusY = x2MinusY2 / xMinusY;
 
-        int val1 = (xPlusY + xMinusY) / 2;
-        int val2 = (xPlusY - xMinusY) / 2;
+        // Step 4: solve equations
+        int val1 = (xPlusY + xMinusY) / 2; // candidate for x
+        int val2 = (xPlusY - xMinusY) / 2; // candidate for y
 
-        int c = 0;
+        // Step 5: verify which is repeating
+        int count = 0;
         for (int e : arr)
         {
             if (e == val1)
-            {
-                c++;
-            }
+                count++;
         }
 
-        if (c == 2)
+        if (count == 2)
         {
+            // val1 is repeating, val2 is missing
             return {val1, val2};
         }
         else
+        {
+            // val2 is repeating, val1 is missing
             return {val2, val1};
+        }
     }
 
-    // // Approach: Optimal 2: XOR based
-    // // See the TakeUForward blog
-    // // Time: O(3 N)
-    // // Space: O(1)
-    // vector<int> findTwoElement(vector<int> &arr)
-    // {
+    /*
+        findTwoElement
+        ---------------
+        Problem:
+            - Given an array of size N containing numbers from 1..N.
+            - Exactly one number is missing and one number is duplicated.
+            - Find both numbers.
 
-    //     long long N = arr.size(); // make it long
+        Approach: Optimal 2 (XOR-based)
+        --------------------------------
+        Intuition:
+            - Let:
+                x = missing number
+                y = repeating number
+            - XOR trick:
+                1. XOR of all elements in the array (actualXor).
+                2. XOR of all numbers from 1..N (xorOfNs).
+                3. Their XOR (actualXor ^ xorOfNs) cancels out all common numbers,
+                leaving: XxorY = x ^ y.
+            - Now we must separate x and y.
+            - Idea: In binary, if x ≠ y, then XxorY has at least one set bit (1).
+                    → That bit indicates a position where x and y differ.
+            - Use this bit (bitPos) to partition all numbers into two buckets:
+                Bucket1: numbers with bitPos set
+                Bucket2: numbers with bitPos unset
+            - XOR numbers in each bucket (both arr[i] and i+1).
+            Because every number except x and y occurs once in both array and range,
+            everything cancels out, leaving either x or y in each bucket.
+            - At the end, buck1 and buck2 hold x and y (order unknown).
+            - Verify by counting which one is repeating in arr.
 
-    //     int actualXor = 0;
-    //     int xorOfNs = 0;
+        Complexity:
+            - Time: O(3N)
+                * O(N) for first XOR pass
+                * O(N) for bucket partition
+                * O(N) for verification
+            - Space: O(1) extra.
 
-    //     for (int i = 0; i < N; i++)
-    //     { // xor of all array elements and all elements from 1 to N
-    //         actualXor ^= arr[i];
-    //         xorOfNs ^= i + 1;
-    //     }
+        Example:
+            arr = [1, 3, 3]
+            N=3
+            actualXor = 1 ^ 3 ^ 3 = 1
+            xorOfNs   = 1 ^ 2 ^ 3 = 0
+            XxorY = 1 ^ 0 = 1 (binary: 001) → lowest set bit at pos 0
+            Partition:
+                Bucket1: numbers with bit0=1 → {1,3,3} and {1,3}
+                Bucket2: numbers with bit0=0 → { } and {2}
+            After XOR:
+                buck1 = 3, buck2 = 2
+            Check: 3 occurs twice → repeating=3, missing=2
 
-    //     int XxorY = actualXor ^ xorOfNs;
+    */
+    vector<int> findTwoElement(vector<int> &arr)
+    {
+        long long N = arr.size();
 
-    //     int bitPos = -1;
+        // Step 1: XOR of all elements and XOR of 1..N
+        int actualXor = 0;
+        int xorOfNs = 0;
+        for (int i = 0; i < N; i++)
+        {
+            actualXor ^= arr[i];
+            xorOfNs ^= (i + 1);
+        }
 
-    //     for (int i = 0; i < 32; i++)
-    //     { // Find the bit index from right where x and y differs. To get that find first bit value 1 from right in xored product
-    //         if ((XxorY >> i) & 1)
-    //         {
-    //             bitPos = i;
-    //             break;
-    //         }
-    //     }
+        // Step 2: XOR of missing and repeating numbers
+        int XxorY = actualXor ^ xorOfNs;
 
-    //     int buck1 = 0, buck2 = 0; // 2 buckets: Bucket1 will consists of the xor of elements having 1 at index 'bitPos'
-    //                               // Bucket2 will consists of the xor of elements having 0 at index 'bitPos'
+        // Step 3: find a set bit position (where x and y differ)
+        int bitPos = -1;
+        for (int i = 0; i < 32; i++)
+        {
+            if ((XxorY >> i) & 1)
+            {
+                bitPos = i;
+                break;
+            }
+        }
 
-    //     for (int i = 0; i < N; i++)
-    //     { // Segregating elements having one vs zero at the bit index
+        // Step 4: partition numbers into two buckets based on bitPos
+        int buck1 = 0, buck2 = 0;
+        for (int i = 0; i < N; i++)
+        {
+            if ((arr[i] >> bitPos) & 1)
+                buck1 ^= arr[i];
+            else
+                buck2 ^= arr[i];
 
-    //         if ((arr[i] >> bitPos) & 1)
-    //             buck1 ^= arr[i];
-    //         else
-    //             buck2 ^= arr[i];
+            if (((i + 1) >> bitPos) & 1)
+                buck1 ^= (i + 1);
+            else
+                buck2 ^= (i + 1);
+        }
 
-    //         if (((i + 1) >> bitPos) & 1)
-    //             buck1 ^= i + 1;
-    //         else
-    //             buck2 ^= i + 1;
-    //     }
+        // Step 5: verify which bucket is repeating
+        int count = 0;
+        for (int e : arr)
+        {
+            if (e == buck1)
+                count++;
+        }
 
-    //     int c = 0; // counter
-    //     for (int e : arr)
-    //     { // Checking which one of the variable is missing vs repeating
-    //         if (e == buck1)
-    //         {
-    //             c++;
-    //         }
-    //     }
-
-    //     if (c == 2)
-    //     {
-    //         return {buck1, buck2};
-    //     }
-    //     else
-    //         return {buck2, buck1};
-    // }
+        if (count == 2)
+        {
+            // buck1 is repeating, buck2 is missing
+            return {buck1, buck2};
+        }
+        else
+        {
+            // buck2 is repeating, buck1 is missing
+            return {buck2, buck1};
+        }
+    }
 };
 
 int main()

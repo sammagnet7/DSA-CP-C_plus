@@ -56,41 +56,88 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // Aproach: Optimal1
-    // Make arr1 containing all the smaller elements than arr2.
-    // Then sort arr1 and arr2 individually
-    // Time: O( min(M,N)+ LogM LogN+)
-    // Space: O(1)
+    /*
+    mergeTwoSortedArraysWithoutExtraSpace
+    -------------------------------------
+    Problem:
+        - Given two sorted arrays arr1 and arr2.
+        - Merge them in-place (without using extra space) such that:
+              * After merging, arr1 contains the smaller elements,
+              * arr2 contains the larger elements,
+              * Both arr1 and arr2 remain sorted individually.
+
+    Approach: Optimal1 (Swap + Re-sort)
+    -----------------------------------
+    Intuition:
+        - The largest elements of arr1 (at the end) might be greater than
+          the smallest elements of arr2 (at the beginning).
+        - If so, those elements are "out of place" across the two arrays.
+        - To fix:
+            1. Traverse arr1 from the back (largest elements) and arr2 from the front (smallest elements).
+            2. If arr1[i] > arr2[j], swap them.
+               → This moves the smaller element into arr1 and the larger into arr2.
+            3. Keep doing this until the arrays are "partitioned correctly".
+        - At this point, arr1 may not be fully sorted internally, and same for arr2,
+          but we know all elements in arr1 ≤ all elements in arr2.
+        - Finally, sort arr1 and arr2 individually to restore sorted order.
+
+    Example:
+        arr1 = [1, 4, 7, 8, 10]
+        arr2 = [2, 3, 9]
+        - Compare arr1[4]=10 with arr2[0]=2 → swap → arr1=[1,4,7,8,2], arr2=[10,3,9]
+        - Compare arr1[3]=8 with arr2[1]=3 → swap → arr1=[1,4,7,3,2], arr2=[10,8,9]
+        - Compare arr1[2]=7 with arr2[2]=9 → no swap (arrays partitioned).
+        - Sort both:
+            arr1 = [1,2,3,4,7]
+            arr2 = [8,9,10]
+
+    Complexity:
+        - Swap pass: O(min(m, n)) comparisons/swaps.
+        - Sorting arr1: O(m log m).
+        - Sorting arr2: O(n log n).
+        - Total time: O(min(m, n) + m log m + n log n).
+        - Space: O(1) extra (in-place).
+
+    Limitations:
+        - Requires final sorting of both arrays → adds log factors.
+        - There exists a more optimal "Gap method" (Shell sort style) that avoids full sorting.
+
+*/
     void mergeTwoSortedArraysWithoutExtraSpace(vector<long long> &arr1, vector<long long> &arr2)
     {
         int m = arr1.size();
         int n = arr2.size();
 
-        int i = m - 1;
-        int j = 0;
+        int i = m - 1; // pointer starting at end of arr1
+        int j = 0;     // pointer starting at beginning of arr2
 
-        // Traverese arr1 in reverse and arr2 forward
+        // Step 1: Swap misplaced elements between arr1 and arr2
         while (i >= 0 && j < n)
         {
             if (arr2[j] < arr1[i])
             {
-                swap(arr1[i--], arr2[j++]);
+                swap(arr1[i--], arr2[j++]); // move smaller into arr1, larger into arr2
             }
             else
             {
-                break;
+                break; // arrays are partitioned correctly
             }
         }
 
+        // Step 2: Sort each array individually
         sort(arr1.begin(), arr1.end());
         sort(arr2.begin(), arr2.end());
     }
 
-    // Aproach: Optimal2
-    // Follows `SHELL SORT` inplace sorting algorithm based upon `GAP = [ceil of {(m+n)/2}] -> then [ceil of{GAP/2}]`
-    // Time: O((M+N)* Log (M+N))
-    // Space: O(1)
-    // ..
+    /*
+        Aproach: Optimal2
+
+        Follows `SHELL SORT` inplace sorting algorithm based upon `GAP = [ceil of {(m+n)/2}] -> then [ceil of{GAP/2}]`
+
+        Time: O((M+N)* Log (M+N))
+        Space: O(1)
+        ..
+    */
 };
 
 int main()
