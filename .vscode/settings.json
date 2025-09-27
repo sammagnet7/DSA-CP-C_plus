@@ -57,6 +57,7 @@
         "unordered_set": "cpp",
         "format": "cpp",
         "numeric": "cpp",
-        "text_encoding": "cpp"
+        "text_encoding": "cpp",
+        "bitset": "cpp"
     }
 }

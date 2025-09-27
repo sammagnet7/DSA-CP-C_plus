@@ -53,98 +53,126 @@ public:
     // Better Approach : Using Frequency map
     // Time: O(N Log N)
     // Space: O(N)
-    // vector<int> majorityElement(vector<int> arr)
-    // {
-    //     int n = arr.size();
-    //     vector<int> res;
-
-    //     unordered_map<int, int> mpp;
-
-    //     // least occurrence of the majority element:
-    //     int threshold = n / 3;
-
-    //     for (int i = 0; i < n; i++)
-    //     {
-    //         if (res.size() > 0 && res[0] == arr[i])
-    //             continue; // Skips if already selected as majority element
-
-    //         mpp[arr[i]]++;
-
-    //         // checking if arr[i] is the majority element:
-    //         if (mpp[arr[i]] > threshold)
-    //         {
-    //             res.push_back(arr[i]);
-    //         }
-    //         if (res.size() == 2)
-    //             break;
-    //     }
-
-    //     return res;
-    // }
-
-    // Approach: Moore’s Voting Algorithm : Using Counter
-    // Time: O(N)
-    // Space: O(1)
-    vector<int> majorityElement(vector<int> &arr)
+    vector<int> majorityElement_MAP(vector<int> arr)
     {
+        int n = arr.size();
         vector<int> res;
-        int cnt1 = 0, cnt2 = 0;
+
+        unordered_map<int, int> mpp;
+
+        // least occurrence of the majority element:
+        int threshold = n / 3;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (res.size() > 0 && res[0] == arr[i])
+                continue; // Skips if already selected as majority element
+
+            mpp[arr[i]]++;
+
+            // checking if arr[i] is the majority element:
+            if (mpp[arr[i]] > threshold)
+            {
+                res.push_back(arr[i]);
+            }
+            if (res.size() == 2)
+                break;
+        }
+
+        return res;
+    }
+
+    /*
+        majorityElement
+        ----------------
+        Problem:
+            - Find all elements in the array that appear more than ⌊n/3⌋ times.
+            - Constraint: There can be at most 2 such elements (pigeonhole principle).
+
+        Approach: Extended Moore’s Voting Algorithm
+        --------------------------------------------
+        Intuition:
+            - For n/2 majority element problem, Moore’s Voting Algorithm maintains one candidate + counter.
+            - For n/3 majority element problem, at most 2 numbers can qualify, so we track two candidates.
+            - Cancellation process:
+                * If current number matches one of the candidates, increment its counter.
+                * If one candidate's counter is 0 and the current number is not the other candidate,
+                  assign it as new candidate.
+                * If it matches none and both counters > 0, decrement both counters.
+              → This ensures that frequent numbers survive after the full pass, while less frequent ones cancel out.
+
+        Verification:
+            - After first pass, el1 and el2 are *candidates* only.
+            - Must verify by counting actual occurrences in a second pass.
+
+        Complexity:
+            - Time: O(n)  (two passes over nums)
+            - Space: O(1) (only counters and candidates)
+
+    */
+    vector<int> majorityElement(vector<int> &nums)
+    {
+
+        int n = nums.size();
+        int threshold = n / 3; // frequency needed to qualify
+
+        // Two potential candidates and their counts
+        int count1 = 0, count2 = 0;
         int el1 = INT_MIN, el2 = INT_MIN;
 
-        int threshold = arr.size() / 3;
-
-        for (int i = 0; i < arr.size(); i++)
+        // --- First Pass: Find potential candidates ---
+        for (int i = 0; i < n; i++)
         {
-            if (el1 == arr[i])
-                cnt1++;
-            else if (el2 == arr[i])
-                cnt2++;
-            else if (cnt1 == 0)
+            int cur = nums[i];
+
+            if (count1 == 0 && el2 != cur)
             {
-                el1 = arr[i];
-                cnt1++;
+                // Candidate 1 slot is free, and current is not candidate 2
+                el1 = cur;
+                count1 = 1;
             }
-            else if (cnt2 == 0)
+            else if (count2 == 0 && el1 != cur)
             {
-                el2 = arr[i];
-                cnt2++;
+                // Candidate 2 slot is free, and current is not candidate 1
+                el2 = cur;
+                count2 = 1;
+            }
+            else if (el1 == cur)
+            {
+                // Current matches candidate 1
+                count1++;
+            }
+            else if (el2 == cur)
+            {
+                // Current matches candidate 2
+                count2++;
             }
             else
-            { // matches none
-                cnt1--;
-                cnt2--;
-            }
-            if (cnt1 > threshold && (res.size() == 0 || res[0] != el1))
             {
-                res.push_back(el1);
+                // Current matches neither → cancel one from both
+                count1--;
+                count2--;
             }
-
-            else if (cnt2 > threshold && (res.size() == 0 || res[0] != el2))
-            {
-                res.push_back(el2);
-            }
-
-            // If already 2 majors found, then return
-            if (res.size() == 2)
-                return res;
         }
 
-        // Now have to check whole array with the el1 and el2 for possible answers
-        vector<int> res1;
-        cnt1 = 0, cnt2 = 0;
-        for (int i = 0; i < arr.size(); i++)
+        // --- Second Pass: Verify candidates ---
+        count1 = 0;
+        count2 = 0;
+        for (int i = 0; i < n; i++)
         {
-            if (arr[i] == el1)
-                cnt1++;
-            else if (arr[i] == el2)
-                cnt2++;
+            if (nums[i] == el1)
+                count1++;
+            if (nums[i] == el2)
+                count2++;
         }
-        if (cnt1 > threshold)
-            res1.push_back(el1);
-        if (cnt2 > threshold)
-            res1.push_back(el2);
 
-        return res1;
+        vector<int> ans;
+        if (count1 > threshold)
+            ans.push_back(el1);
+        if (count2 > threshold)
+            ans.push_back(el2);
+
+        return ans;
     }
 };
 
