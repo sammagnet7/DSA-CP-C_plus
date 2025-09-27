@@ -260,4 +260,5 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 24/09/25: <span style="color: orange;"> #2 [67/455]</span>
 - 25/09/25: <span style="color: orange;"> #1 [67/455]</span>
 - 26/09/25: <span style="color: green;"> #3 [70/455]</span>
+- 27/09/25: <span style="color: green;"> #8 [78/455]</span>
 - 
