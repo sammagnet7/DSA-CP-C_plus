@@ -46,54 +46,88 @@ OUTPUT::::::
 class Solution
 {
 public:
+    /*
+    count(arr, target)
+    ------------------
+    Problem:
+        - Given a sorted array `arr` and a target value, return how many times
+          the target appears in the array.
+
+    Intuition / Approach:
+        - In a sorted array, duplicates of `target` appear consecutively.
+        - So if we can find:
+            * `start` = index of the **first occurrence** of target
+            * `end`   = index of the **last occurrence** of target
+          then count = end - start + 1.
+        - Both can be found using binary search in O(log N):
+            * To find `start`, when we see target at mid, we move left (r = mid - 1)
+              to check if an earlier occurrence exists.
+            * To find `end`, when we see target at mid, we move right (l = mid + 1)
+              to check if a later occurrence exists.
+        - If `target` is not found, return 0.
+
+    Complexity:
+        - Time: O(log N) + O(log N) = O(log N)
+          (two binary searches).
+        - Space: O(1).
+
+    Edge cases handled:
+        - Target not in array → returns 0.
+        - Target occurs once → returns 1.
+        - Multiple occurrences → returns correct count.
+*/
     int count(vector<int> &arr, int target)
     {
-        int N= arr.size();
+        int N = arr.size();
         int l = 0, r = N - 1;
         int start = -1, end = -1;
 
+        // First binary search: find the first occurrence (leftmost index)
         while (l <= r)
         {
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2; // safer midpoint calculation
 
             if (arr[mid] == target)
             {
-                start = mid;
-                r = mid - 1;
+                start = mid; // possible candidate for first occurrence
+                r = mid - 1; // but keep searching left side
             }
             else if (target < arr[mid])
             {
-                r = mid - 1;
+                r = mid - 1; // target is smaller → search left
             }
-            else if (arr[mid] < target)
+            else
             {
-                l = mid + 1;
+                l = mid + 1; // target is larger → search right
             }
         }
 
+        // If start is still -1, target not present
         if (start == -1)
             return 0;
 
+        // Second binary search: find the last occurrence (rightmost index)
         l = 0, r = N - 1;
         while (l <= r)
         {
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
             if (arr[mid] == target)
             {
-                end = mid;
-                l = mid + 1;
+                end = mid;   // possible candidate for last occurrence
+                l = mid + 1; // but keep searching right side
             }
             else if (target < arr[mid])
             {
-                r = mid - 1;
+                r = mid - 1; // target is smaller → search left
             }
-            else if (arr[mid] < target)
+            else
             {
-                l = mid + 1;
+                l = mid + 1; // target is larger → search right
             }
         }
 
+        // Both start and end found → return count
         return (end - start + 1);
     }
 };

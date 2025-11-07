@@ -90,20 +90,16 @@ public:
         while (l <= r)
         {
 
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
-            if(arr[mid] == target){
+            if (target <= arr[mid])
+            {
                 ans = mid; // smallest i where arr[i]>=target
                 r = mid - 1;
             }
             else if (arr[mid] < target)
             {
                 l = mid + 1;
-            }
-            else if (target < arr[mid])
-            {
-                ans = mid; // smallest i where arr[i]>=target
-                r = mid - 1;
             }
         }
 
@@ -117,19 +113,16 @@ public:
     int upperBound(vector<int> &arr, int N, int target)
     {
 
-        int l = 0, r = N;
+        int l = 0, r = N-1;
 
         int ans = N; // in case target is greater than any elements in the array
 
         while (l <= r)
         {
 
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
-            if(arr[mid] == target){
-                l = mid + 1;
-            }
-            else if (arr[mid] < target)
+            if (arr[mid] <= target)
             {
                 l = mid + 1;
             }
@@ -146,32 +139,31 @@ public:
 
 int main()
 {
-    int t;
-    cin >> t;
-    cin.ignore(); // Ignore trailing newline character
+    // Static input: same as provided
+    vector<pair<int, vector<int>>> testCases = {
+        {2, {1, 2, 2, 3}},
+        {9, {3, 5, 8, 9, 15, 19}},
+        {4, {1, 2, 2, 3}},
+        {7, {1, 4, 7, 8, 10}},
+        {10, {1, 2, 5, 6, 10}},
+        {5, {1, 5, 5, 7, 7, 9, 10}}};
 
-    while (t--)
+    Solution ob; // Your class with lowerBound & upperBound
+
+    for (auto &tc : testCases)
     {
-        int target;
-        cin >> target;
-        cin.ignore();
+        int target = tc.first;
+        vector<int> arr = tc.second;
 
-        string input;
-        getline(cin, input);
+        cout << "Target: " << target << " | Array: ";
+        for (int e : arr)
+            cout << e << " ";
+        cout << "\n";
 
-        vector<int> arr;
-        stringstream ss(input);
-        int num;
-
-        while (ss >> num)
-        {
-            arr.push_back(num);
-        }
-
-        Solution ob;
-
-        cout << "Lower bound: "<< ob.lowerBound(arr, arr.size(), target) <<" Upper bound: "<<ob.upperBound(arr, arr.size(), target);
-        cout << endl;
+        cout << "Lower bound: " << ob.lowerBound(arr, arr.size(), target)
+             << " Upper bound: " << ob.upperBound(arr, arr.size(), target)
+             << "\n\n";
     }
+
     return 0;
 }

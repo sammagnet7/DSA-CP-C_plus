@@ -27,7 +27,7 @@ Floor of `target` doesn’t exist if `target` is smaller than smallest element o
 What is Ceil?
 Ceil of `target` is the smallest element (or smallest index) in arr[] which is >= `target`.
 In case of multiple occurrences of Ceil of `target`, return the index of the first occurrence.
-Ceil of`target` doesn’t exist if `target` is smaller than smallest element of arr[].
+Ceil of`target` doesn’t exist if `target` is greater than greatest element of arr[].
 
 
 Examples:
@@ -107,16 +107,11 @@ public:
         while (l <= r)
         {
 
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
-            if (arr[mid] == target)
+            if (arr[mid] <= target)
             {
                 ans = mid;  // Possible arr[i]=target
-                l = mid + 1;
-            }
-            else if (arr[mid] < target)
-            {
-                ans = mid;  // Possible arr[i]<target
                 l = mid + 1;
             }
             else if (target < arr[mid])
@@ -131,7 +126,7 @@ public:
     // Approach: optimal :: Binary search
     // Ceil of `target` is the smallest element (or smallest index) in arr[] which is >= `target`.
     // In case of multiple occurrences of Ceil of `target`, return the index of the first occurrence.
-    // Ceil of`target` doesn’t exist if `target` is smaller than smallest element of arr[]
+    // Ceil of`target` doesn’t exist if `target` is greater than greatest element of arr[]
     //
     // Always focus on the condition in which the array element can be a possible ans, here i.e. arr[i]>=target 
     // Time: O(Log N)
@@ -147,9 +142,9 @@ public:
         while (l <= r)
         {
 
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
-            if (arr[mid] == target)
+            if (target <= arr[mid])
             {
                 ans = mid;
                 r = mid - 1;
@@ -158,11 +153,6 @@ public:
             {
                 l = mid + 1;
             }
-            else if (target < arr[mid])
-            {
-                ans = mid;
-                r = mid - 1;
-            }
         }
 
         return ans;
@@ -170,7 +160,7 @@ public:
 };
 
 int main()
-{
+{ cout<<"Test";
     int t;
     cin >> t;
     cin.ignore(); // Ignore trailing newline character

@@ -91,11 +91,11 @@ class Solution
 public:
     // Optimal approach
     //
-    // Approach w/o duplicates: 
+    // Approach w/o duplicates:
     // As the array is rotated, whichever index we take,
     // either side of it is sorted and the other side may not be sorted
     // Use Binary search on the sorted side.
-    // If element is not found then 
+    // If element is not found then
     // in the other unsorted side, again try to find sorted half and Binary search on it.
     // Likewise continue
     //
@@ -126,11 +126,12 @@ public:
             }
 
             // if true means left half is sorted and right half may not be sorted.
-            bool dirL = arr[l] <= arr[mid];     // left side is sorted
-            bool dirR = arr[mid] <= arr[r];     // right side is sorted
-            bool edgeCase = (arr[l] == arr[mid]) && (arr[mid]==arr[r]);     //[*Duplicate handle]   // None of the sides are sorted
+            bool dirL = arr[l] <= arr[mid];                               // left side is sorted
+            bool dirR = arr[mid] <= arr[r];                               // right side is sorted
+            bool edgeCase = (arr[l] == arr[mid]) && (arr[mid] == arr[r]); //[*Duplicate handle]   // None of the sides are sorted
 
-            if(edgeCase){   //[*Duplicate handle]
+            if (edgeCase)
+            { //[*Duplicate handle]
                 // No BS
             }
             else if (dirL)
@@ -138,7 +139,7 @@ public:
                 if (arr[l] <= target && target <= arr[mid])
                     res = doBinarySearch(arr, l, mid - 1, target);
             }
-            else if(dirR)
+            else if (dirR)
             { //  make BS on the right sorted side
                 if (arr[mid] <= target && target <= arr[r])
                     res = doBinarySearch(arr, mid + 1, r, target);
@@ -148,7 +149,8 @@ public:
                 return res; // already target is found
             else
             {
-                if(edgeCase){   //[*Duplicate handle]
+                if (edgeCase)
+                { //[*Duplicate handle]
                     l++;
                     r--;
                 }
@@ -195,48 +197,48 @@ public:
 
     // Same approach with diff code style
     // Time: O(Log N)
-    // int search(vector<int> &arr, int k)
-    // {
-    //     int n = arr.size();
-    //     int low = 0, high = n - 1;
-    //     while (low <= high)
-    //     {
-    //         int mid = (low + high) / 2;
+    int search(vector<int> &arr, int k)
+    {
+        int n = arr.size();
+        int low = 0, high = n - 1;
+        while (low <= high)
+        {
+            int mid = (low + high) / 2;
 
-    //         // if mid points the target
-    //         if (arr[mid] == k)
-    //             return mid;
+            // if mid points the target
+            if (arr[mid] == k)
+                return mid;
 
-    //         // if left part is sorted:
-    //         if (arr[low] <= arr[mid])
-    //         {
-    //             if (arr[low] <= k && k <= arr[mid])
-    //             {
-    //                 // element exists:
-    //                 high = mid - 1;
-    //             }
-    //             else
-    //             {
-    //                 // element does not exist:
-    //                 low = mid + 1;
-    //             }
-    //         }
-    //         else
-    //         { // if right part is sorted:
-    //             if (arr[mid] <= k && k <= arr[high])
-    //             {
-    //                 // element exists:
-    //                 low = mid + 1;
-    //             }
-    //             else
-    //             {
-    //                 // element does not exist:
-    //                 high = mid - 1;
-    //             }
-    //         }
-    //     }
-    //     return -1;
-    // }
+            // if left part is sorted:
+            if (arr[low] <= arr[mid])
+            {
+                if (arr[low] <= k && k <= arr[mid])
+                {
+                    // element exists:
+                    high = mid - 1;
+                }
+                else
+                {
+                    // element does not exist:
+                    low = mid + 1;
+                }
+            }
+            else
+            { // if right part is sorted:
+                if (arr[mid] <= k && k <= arr[high])
+                {
+                    // element exists:
+                    low = mid + 1;
+                }
+                else
+                {
+                    // element does not exist:
+                    high = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
 };
 
 int main()
