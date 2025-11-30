@@ -151,6 +151,8 @@ public:
         vector<int> dist(V, 1e8);
         dist[src] = 0; // distance to source is always 0
 
+        //vector<int> temp = dist;
+
         // Step 2: Relax all edges (V-1) times
         for (int i = 1; i <= V - 1; i++)
         {

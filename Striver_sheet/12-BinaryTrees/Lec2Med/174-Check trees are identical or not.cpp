@@ -82,7 +82,7 @@ public:
       return false;
     else
     {
-      return (isSameTree(p->left, q->left) & isSameTree(p->right, q->right));
+      return (isSameTree(p->left, q->left) && isSameTree(p->right, q->right));
     }
   }
 };

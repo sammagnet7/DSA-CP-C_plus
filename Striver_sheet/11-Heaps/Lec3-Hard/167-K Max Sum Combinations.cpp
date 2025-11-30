@@ -120,7 +120,7 @@ public:
    * Time Complexity:
    * - Sorting: O(N log N)
    * - Each heap operation: O(log K)
-   * - We perform up to K operations ? Total: O(N log N + K log K)
+   * - We perform up to K operations -> Total: O(N log N + K log K)
    *
    * Space Complexity:
    * - Heap: O(K)
@@ -135,20 +135,20 @@ public:
     sort(a.begin(), a.end(), greater<int>());
     sort(b.begin(), b.end(), greater<int>());
 
-    // Step 3: Visited set to avoid pushing same pair again ? O(1) init
+    // Step 3: Visited set to avoid pushing same pair again -> O(1) init
     set<pair<int, int>> uniqIdxPair;
 
-    // To store final top-K sums ? O(K) space
+    // To store final top-K sums -> O(K) space
     vector<int> ans;
 
-    // Step 2: Initialize a max-heap to store {sum, indexA, indexB} ? O(1)
+    // Step 2: Initialize a max-heap to store {sum, indexA, indexB} -> O(1)
     priority_queue<tuple<int, int, int>> pq;
 
-    // Step 4: Push the first (maximum) pair sum ? O(log 1) = O(1)
+    // Step 4: Push the first (maximum) pair sum -> O(log 1) = O(1)
     pq.push(make_tuple(a[0] + b[0], 0, 0));
     uniqIdxPair.insert({0, 0});
 
-    // Step 5: Extract top K combinations from heap ? O(K log K)
+    // Step 5: Extract top K combinations from heap -> O(K log K)
     while (ans.size() < k)
     {
 

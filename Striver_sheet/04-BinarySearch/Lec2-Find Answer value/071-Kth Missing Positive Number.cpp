@@ -67,7 +67,7 @@ public:
 
         while (l <= r)
         {
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
             int lcNum = arr[mid - 1]; // Use [mid-1] instead of [mid] to convert to 0th based indexing
             int lcDiff = lcNum - mid;
@@ -90,17 +90,17 @@ public:
     // Approach: Linear search
     // Time: O(N)
     // Space: O(1)
-    // int missingK(vector<int> vec, int n, int k)
-    // {
-    //     for (int i = 0; i < n; i++)
-    //     {
-    //         if (vec[i] <= k)
-    //             k++; // shifting k
-    //         else
-    //             break;
-    //     }
-    //     return k;
-    // }
+    int missingK(vector<int> vec, int n, int k)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (vec[i] <= k)
+                k++; // shifting k
+            else
+                break;
+        }
+        return k;
+    }
 };
 
 int main()

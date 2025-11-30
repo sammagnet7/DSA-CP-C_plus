@@ -22,7 +22,7 @@ https://leetcode.com/problems/middle-of-the-linked-list/submissions/1656289794/
 
 Reverse a Linked List:
 https://takeuforward.org/data-structure/reverse-a-linked-list/
-https://leetcode.com/problems/reverse-linked-list/submissions/1656346430/
+https://leetcode.com/problems/reverse-linked-list/
 
 --------------------------------------------------------
 
@@ -78,14 +78,17 @@ public:
     // Optimal approach: iterative
     // Time: O(N)
     // Space: O(1)
-    ListNode* reverseListIter(ListNode* head) {
-        if(head==NULL || head->next==NULL) return head;
+    ListNode *reverseListIter(ListNode *head)
+    {
+        if (head == NULL || head->next == NULL)
+            return head;
 
-        ListNode* cur = head;
-        ListNode* curNext = NULL;
-        ListNode* tobeNext = NULL;
+        ListNode *cur = head;
+        ListNode *curNext = NULL;
+        ListNode *tobeNext = NULL;
 
-        while(cur != NULL){
+        while (cur != NULL)
+        {
             curNext = cur->next;
             cur->next = tobeNext;
             tobeNext = cur;
@@ -100,7 +103,7 @@ public:
     // Space: O(1)
     ListNode *reverseListRec(ListNode *head)
     {
-        if (head == nullptr || head->next == nullptr)   // Note the base cases here
+        if (head == nullptr || head->next == nullptr) // Note the base cases here
         {
             return head;
         }
@@ -111,6 +114,31 @@ public:
         head->next = NULL;       // This makes sure that the tail element's next points to NULL
 
         return newHead;
+    }
+
+    // -----------------------------------------------------------
+    // Another approach
+    ListNode *recReverse(ListNode *prev, ListNode *cur)
+    {
+
+        if (cur->next == nullptr)
+        {
+            cur->next = prev;
+            return cur;
+        }
+
+        ListNode *head = recReverse(cur, cur->next);
+
+        cur->next = prev;
+
+        return head;
+    }
+
+    ListNode *reverseList(ListNode *head)
+    {
+        if (head == nullptr)
+            return head;
+        return recReverse(nullptr, head);
     }
 };
 

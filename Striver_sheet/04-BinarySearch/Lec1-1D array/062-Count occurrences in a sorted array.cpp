@@ -130,6 +130,21 @@ public:
         // Both start and end found → return count
         return (end - start + 1);
     }
+
+// --------------------------------------------------------
+// Another approach
+#include <algorithm> // For std::lower_bound, std::upper_bound
+
+    int count(vector<int> &arr, int n, int target)
+    {
+        // Write Your Code Here
+
+        auto lower = std::lower_bound(arr.begin(), arr.end(), target);
+        auto upper = std::upper_bound(arr.begin(), arr.end(), target);
+
+        // std::distance calculates the difference between the two iterators
+        return std::distance(lower, upper);
+    }
 };
 
 int main()

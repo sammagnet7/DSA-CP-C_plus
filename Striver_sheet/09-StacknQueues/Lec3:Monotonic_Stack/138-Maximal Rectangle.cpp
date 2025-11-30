@@ -57,7 +57,7 @@ OUTPUT::::::
 
 //------------------------------------------------------------------------
 // 1. Title: Maximal Rectangle
-//           Maximum Rectangle Area with all 1's | DP on Rectangles: DP 55
+//           Maximum Rectangle Area with all 1's
 //------------------------------------------------------------------------
 
 /*

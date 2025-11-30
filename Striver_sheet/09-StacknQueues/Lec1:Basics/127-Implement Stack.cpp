@@ -261,63 +261,74 @@ public:
 // Approach1: Sub-optimal approach beacuse of higher space taken
 // Implementing Stack using double queue
 // Space: O(2N)
-// class MyStack {
-//     queue<int> q1, q2;
-//     queue<int> *cur, *other, *tmp;
-// public:
-//     MyStack() {
-//         cur = &q1;
-//         other = &q2;
-//     }
+class MyStack
+{
+    queue<int> q1, q2;
+    queue<int> *cur, *other, *tmp;
 
-//     void push(int x) {
-//         cur->push(x);
-//     }
+public:
+    MyStack()
+    {
+        cur = &q1;
+        other = &q2;
+    }
 
-//     int pop() {
+    void push(int x)
+    {
+        cur->push(x);
+    }
 
-//         int top = -1;
+    int pop()
+    {
 
-//         if(cur->empty()) return top;
+        int top = -1;
 
-//         while(cur->size()>1){
-//             int el = cur->front();
-//             cur->pop();
-//             other->push(el);
-//         }
+        if (cur->empty())
+            return top;
 
-//         top = cur->front();
-//         cur->pop();
+        while (cur->size() > 1)
+        {
+            int el = cur->front();
+            cur->pop();
+            other->push(el);
+        }
 
-//         tmp = cur;
-//         cur = other;
-//         other = tmp;
+        top = cur->front();
+        cur->pop();
 
-//         return top;
-//     }
+        tmp = cur;
+        cur = other;
+        other = tmp;
 
-//     int top() {
+        return top;
+    }
 
-//         int top = -1;
-//         if(cur->empty()) return top;
+    int top()
+    {
 
-//         while(!cur->empty()){
-//             top = cur->front();
-//             cur->pop();
-//             other->push(top);
-//         }
+        int top = -1;
+        if (cur->empty())
+            return top;
 
-//         tmp = cur;
-//         cur = other;
-//         other = tmp;
+        while (!cur->empty())
+        {
+            top = cur->front();
+            cur->pop();
+            other->push(top);
+        }
 
-//         return top;
-//     }
+        tmp = cur;
+        cur = other;
+        other = tmp;
 
-//     bool empty() {
-//         return cur->empty();
-//     }
-// };
+        return top;
+    }
+
+    bool empty()
+    {
+        return cur->empty();
+    }
+};
 
 // Approach2: Implementing Stack using single queue i.e. taking lower space
 // Note: Here we are reversing at the time of push()

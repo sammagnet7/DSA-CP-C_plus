@@ -53,28 +53,29 @@ public:
      * Stability:
      *  - Stable (does not change relative order of equal elements).
      */
-    void bubbleSort(vector<int> &arr)
+    void bubbleSort(std::vector<int> &arr)
     {
-        // Outer loop controls the number of passes
-        // i goes from 0 to n-1, j decreases from n to 1
-        for (int i = 0, j = arr.size(); i < j; j--)
-        {
-            bool isSwapped = false; // tracks if any swap happened in this pass
+        int n = arr.size();
+        bool swapped; // Optimization: to check if any swaps happened in a pass
 
-            // Inner loop: bubble up the largest element to index j-1
-            for (int k = 0; k < j - 1; k++)
+        for (int i = 0; i < n - 1; ++i)
+        {
+            swapped = false; // Reset swapped flag for each pass
+            for (int j = 0; j < n - i - 1; ++j)
             {
-                // If current element is greater than next, swap
-                if (arr[k] > arr[k + 1])
+                // Compare adjacent elements
+                if (arr[j] > arr[j + 1])
                 {
-                    swap(arr[k], arr[k + 1]);
-                    isSwapped = true;
+                    // Swap if they are in the wrong order
+                    std::swap(arr[j], arr[j + 1]);
+                    swapped = true; // Mark that a swap occurred
                 }
             }
-
-            // Optimization: if no swaps in this pass, array is already sorted
-            if (!isSwapped)
-                return;
+            // If no two elements were swapped by inner loop, then array is sorted
+            if (!swapped)
+            {
+                break;
+            }
         }
     }
 
@@ -107,7 +108,6 @@ public:
 
 int main()
 {
-
     int t;
     cin >> t;
     cin.ignore();
@@ -129,9 +129,9 @@ int main()
         }
 
         Solution ob;
-        // ob.bubbleSort(arr);
+        ob.bubbleSort(arr);
 
-        ob.recursive_bubbleSort(arr, arr.size());
+        // ob.recursive_bubbleSort(arr, arr.size());
 
         for (auto i : arr)
         {

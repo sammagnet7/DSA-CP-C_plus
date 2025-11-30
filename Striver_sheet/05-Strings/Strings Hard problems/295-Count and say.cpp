@@ -225,11 +225,8 @@ public:
             }
 
             // append the final run
-            if (count >= 1)
-            {
-                tmp.append(to_string(count));
-                tmp.push_back(ch);
-            }
+            tmp.append(to_string(count));
+            tmp.push_back(ch);
 
             // move to the next term
             RLE = tmp;

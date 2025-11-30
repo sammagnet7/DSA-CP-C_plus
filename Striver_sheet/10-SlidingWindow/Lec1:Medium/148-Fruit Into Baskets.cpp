@@ -35,7 +35,7 @@ Starting from any tree of your choice, you must pick exactly one fruit from ever
 Once you reach a tree with fruit that cannot fit in your baskets, you must stop.
 Given the integer array fruits, return the maximum number of fruits you can pick.
 
- 
+
 Examples:
     Example 1:
     Input: fruits = [1,2,1]
@@ -71,59 +71,58 @@ class Solution
 {
 public:
     // 1. Title: Fruit Into Baskets
-    //Approach1:
+    // Approach1:
 
+    // SuboOptimal approach: two passes sliding window
+    // Time: O(2N)
+    // Space: O(1)
+    int totalFruit(vector<int> &fruits)
+    {
 
-    // // SuboOptimal approach: two passes sliding window
-    // // Time: O(2N)
-    // // Space: O(1)
-    // int totalFruit(vector<int> &fruits)
-    // {
+        int ans = 0;
+        int N = fruits.size();
 
-    //     int ans = 0;
-    //     int N = fruits.size();
+        unordered_map<int, int> mp; // O(2)
 
-    //     unordered_map<int, int> mp; // O(2)
+        int l = 0;
+        int r = 0;
 
-    //     int l = 0;
-    //     int r = 0;
+        while (r < N)
+        {
 
-    //     while (r < N)
-    //     {
+            if (mp.find(fruits[r]) != mp.end())
+            {
+                mp[fruits[r]]++;
+            }
+            else
+            {
+                if (mp.size() < 2)
+                {
+                    mp[fruits[r]]++;
+                }
+                else
+                {
+                    while (mp.size() >= 2)
+                    {
+                        mp[fruits[l]]--;
+                        if (mp[fruits[l]] == 0)
+                        {
+                            mp.erase(fruits[l]);
+                        }
+                        l++;
+                    }
+                    mp[fruits[r]]++;
+                }
+            }
 
-    //         if (mp.find(fruits[r]) != mp.end())
-    //         {
-    //             mp[fruits[r]]++;
-    //         }
-    //         else
-    //         {
-    //             if (mp.size() < 2)
-    //             {
-    //                 mp[fruits[r]]++;
-    //             }
-    //             else
-    //             {
-    //                 while (mp.size() >= 2)
-    //                 {
-    //                     mp[fruits[l]]--;
-    //                     if (mp[fruits[l]] == 0)
-    //                     {
-    //                         mp.erase(fruits[l]);
-    //                     }
-    //                     l++;
-    //                 }
-    //                 mp[fruits[r]]++;
-    //             }
-    //         }
+            int count = r - l + 1;
+            ans = max(ans, count);
 
-    //         int count = r - l + 1;
-    //         ans = max(ans, count);
+            r++;
+        }
 
-    //         r++;
-    //     }
-
-    //     return ans;
-    // }
+        return ans;
+    }
 
     // Approach2:
     //

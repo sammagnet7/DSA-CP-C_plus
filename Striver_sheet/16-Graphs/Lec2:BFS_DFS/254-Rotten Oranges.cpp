@@ -145,98 +145,193 @@ public:
     *  - O(m * n) for the 'vis' matrix and BFS queue in the worst case (all cells are oranges).
     */
 
+    // int orangesRotting(vector<vector<int>> &grid)
+    // {
+
+    //     int m = grid.size();    // Number of rows
+    //     int n = grid[0].size(); // Number of columns
+
+    //     // Visited matrix to track processed cells:
+    //     // 1 -> processed (either empty cell or rotten orange)
+    //     // 0 -> fresh orange (unprocessed)
+    //     vector<vector<int>> vis(m, vector<int>(n, 1));
+
+    //     // Queue for BFS to store positions of rotten oranges
+    //     queue<pair<int, int>> rotten;
+
+    //     // Initialize 'vis' and 'rotten' queue
+    //     for (int i = 0; i < m; i++)
+    //     {
+    //         for (int j = 0; j < n; j++)
+    //         {
+
+    //             if (grid[i][j] == 1)
+    //             {
+    //                 // Fresh orange found -> mark as unprocessed in vis
+    //                 vis[i][j] = 0;
+    //             }
+    //             else if (grid[i][j] == 2)
+    //             {
+    //                 // Rotten orange -> add its position to BFS queue
+    //                 rotten.push({i, j});
+    //             }
+    //             // If grid[i][j] == 0 (empty cell), keep vis[i][j] = 1 (already processed)
+    //         }
+    //     }
+
+    //     int time = 0; // To count the time (in minutes) for all oranges to rot
+
+    //     // Directions array to move in 4 directions: up, down, left, right
+    //     int dirs[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    //     // BFS traversal
+    //     while (!rotten.empty())
+    //     {
+
+    //         int qSize = rotten.size(); // Number of rotten oranges to process at current level (time step)
+    //         bool isNewRot = false;     // To check if any new orange rotted in this iteration
+
+    //         // Process all oranges at current time step
+    //         while (qSize--)
+    //         {
+
+    //             auto [i, j] = rotten.front();
+    //             rotten.pop();
+
+    //             // Explore all 4 adjacent cells
+    //             for (auto &d : dirs)
+    //             {
+
+    //                 int ni = i + d[0]; // New row index
+    //                 int nj = j + d[1]; // New column index
+
+    //                 // Check boundaries and whether it's an unprocessed fresh orange
+    //                 if (ni >= 0 && nj >= 0 && ni < m && nj < n && !vis[ni][nj])
+    //                 {
+    //                     vis[ni][nj] = 1;       // Mark as processed (rotten now)
+    //                     rotten.push({ni, nj}); // Add to queue for next BFS level
+    //                     isNewRot = true;       // At least one new orange rotted
+    //                 }
+    //             }
+    //         }
+
+    //         // Increment time if any new orange rotted in this round
+    //         if (isNewRot)
+    //         {
+    //             time++;
+    //         }
+    //     }
+
+    //     // After BFS, check if any fresh orange remains unprocessed
+    //     for (int i = 0; i < m; i++)
+    //     {
+    //         for (int j = 0; j < n; j++)
+    //         {
+    //             if (vis[i][j] == 0)
+    //                 return -1; // Impossible to rot all oranges
+    //         }
+    //     }
+
+    //     return time; // Minimum time required for all oranges to rot
+    // }
+
     int orangesRotting(vector<vector<int>> &grid)
     {
+        // Dimensions of the grid
+        int m = grid.size();
+        int n = grid[0].size();
 
-        int m = grid.size();    // Number of rows
-        int n = grid[0].size(); // Number of columns
+        // Work on a copy so the original grid isn't mutated (not strictly necessary)
+        vector<vector<int>> copiedGrid(m, vector<int>(n, 0));
 
-        // Visited matrix to track processed cells:
-        // 1 -> processed (either empty cell or rotten orange)
-        // 0 -> fresh orange (unprocessed)
-        vector<vector<int>> vis(m, vector<int>(n, 1));
-
-        // Queue for BFS to store positions of rotten oranges
+        // Queue of currently rotten oranges (BFS frontier for this minute)
         queue<pair<int, int>> rotten;
 
-        // Initialize 'vis' and 'rotten' queue
+        // Initialize the copied grid and enqueue all initially rotten oranges
         for (int i = 0; i < m; i++)
         {
             for (int j = 0; j < n; j++)
             {
-
-                if (grid[i][j] == 1)
+                copiedGrid[i][j] = grid[i][j];
+                if (grid[i][j] == 2)
                 {
-                    // Fresh orange found -> mark as unprocessed in vis
-                    vis[i][j] = 0;
-                }
-                else if (grid[i][j] == 2)
-                {
-                    // Rotten orange -> add its position to BFS queue
                     rotten.push({i, j});
                 }
-                // If grid[i][j] == 0 (empty cell), keep vis[i][j] = 1 (already processed)
             }
         }
 
-        int time = 0; // To count the time (in minutes) for all oranges to rot
+        // Elapsed minutes. In this version it's incremented at the start of each outer loop
+        // and compensated by returning (elapsed - 1) at the end.
+        int elapsed = 0;
 
-        // Directions array to move in 4 directions: up, down, left, right
-        int dirs[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        // 4-directional movement: left, right, up, down
+        int dir[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
-        // BFS traversal
-        while (!rotten.empty())
+        // Multi-source BFS: each outer iteration represents one "minute"
+        while (1)
         {
+            elapsed++; // assume a minute passes; will be corrected later via return (elapsed - 1)
 
-            int qSize = rotten.size(); // Number of rotten oranges to process at current level (time step)
-            bool isNewRot = false;     // To check if any new orange rotted in this iteration
+            // Will hold oranges that become rotten during THIS minute
+            queue<pair<int, int>> newlyRotten;
 
-            // Process all oranges at current time step
-            while (qSize--)
+            // Process all oranges that were rotten at the start of this minute
+            while (!rotten.empty())
             {
-
-                auto [i, j] = rotten.front();
+                int curI = rotten.front().first;
+                int curJ = rotten.front().second;
                 rotten.pop();
 
-                // Explore all 4 adjacent cells
-                for (auto &d : dirs)
+                // Try to rot 4-neighbors
+                for (int k = 0; k < 4; k++)
                 {
+                    int newI = curI + dir[k][0];
+                    int newJ = curJ + dir[k][1];
 
-                    int ni = i + d[0]; // New row index
-                    int nj = j + d[1]; // New column index
-
-                    // Check boundaries and whether it's an unprocessed fresh orange
-                    if (ni >= 0 && nj >= 0 && ni < m && nj < n && !vis[ni][nj])
+                    // Bounds check
+                    if (newI < 0 || newI >= (int)copiedGrid.size() ||
+                        newJ < 0 || newJ >= (int)copiedGrid[0].size())
                     {
-                        vis[ni][nj] = 1;       // Mark as processed (rotten now)
-                        rotten.push({ni, nj}); // Add to queue for next BFS level
-                        isNewRot = true;       // At least one new orange rotted
+                        continue;
+                    }
+
+                    // If neighbor is fresh, rot it and add to next minute's frontier
+                    if (copiedGrid[newI][newJ] == 1)
+                    {
+                        copiedGrid[newI][newJ] = 2;
+                        newlyRotten.push({newI, newJ});
                     }
                 }
             }
 
-            // Increment time if any new orange rotted in this round
-            if (isNewRot)
+            // If no new oranges became rotten this minute, we're done spreading
+            if (newlyRotten.empty())
             {
-                time++;
+                break;
             }
+
+            // Next minute will process these newly rotten oranges
+            rotten = newlyRotten;
         }
 
-        // After BFS, check if any fresh orange remains unprocessed
-        for (int i = 0; i < m; i++)
+        // After BFS finishes, if any fresh orange remains, it's impossible
+        for (int i = 0; i < (int)copiedGrid.size(); i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < (int)copiedGrid[0].size(); j++)
             {
-                if (vis[i][j] == 0)
-                    return -1; // Impossible to rot all oranges
+                if (copiedGrid[i][j] == 1)
+                {
+                    // Early return - impossible to rot all
+                    return -1;
+                }
             }
         }
 
-        return time; // Minimum time required for all oranges to rot
+        // We incremented 'elapsed' once even on the final iteration where no new rotting occurred,
+        // so subtract 1 to get the actual minutes elapsed.
+        return elapsed - 1;
     }
 
-
-    
     //-------------------------------------------------------------------------------
     // 2. Title: Flood Fill Algorithm - Graphs
     //-------------------------------------------------------------------------------

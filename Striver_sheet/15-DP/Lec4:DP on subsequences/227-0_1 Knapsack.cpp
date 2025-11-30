@@ -96,7 +96,7 @@ public:
 
         Space Complexity:
         -----------------
-        O(n * maxWeight)  ? DP table
+        O(n * maxWeight)  -> DP table
         O(n) recursion stack (due to function calls)
         Total: O(n * maxWeight + n)
 

@@ -115,92 +115,91 @@ public:
     // ----------------------------------------------------------------
     // 1. Title: Single Number I:
 
-    // // Optimal approach: Do Xor of all the numbers.
-    // // Duplicates will be cancelled out
-    // // Final XOR value will give the left out int
-    // //
-    // // Time: O(N) where N is length of nums array
-    // // Space: O(1)
-    // int singleNumberONE(vector<int> &nums)
-    // {
+    // Optimal approach: Do Xor of all the numbers.
+    // Duplicates will be cancelled out
+    // Final XOR value will give the left out int
+    //
+    // Time: O(N) where N is length of nums array
+    // Space: O(1)
+    int singleNumberONE(vector<int> &nums)
+    {
+        int xori = 0;
 
-    //     int xori = 0;
+        for (int e : nums)
+        {
+            xori ^= e;
+        }
 
-    //     for (int e : nums)
-    //     {
-    //         xori ^= e;
-    //     }
+        return xori;
+    }
 
-    //     return xori;
-    // }
+    // ------------------------------------------------------------------------------
+    // Title: Single Number II : Approach 1
 
-    // // ------------------------------------------------------------------------------
-    // // Title: Single Number II : Approach 1
+    // Primary approach: If we count 0/1 for each bits of all the numbers
+    // if count of bit value==1 divides by 3 then the lone number's digit must be the opposit i.e. 0
+    //
+    // Time: O(N * 32)
+    // SPace: O(1)
+    int singleNumberTWO(vector<int> &nums)
+    {
 
-    // // Primary approach: If we count 0/1 for each bits of all the numbers
-    // // if count of bit value==1 divides by 3 then the lone number's digit must be the opposit i.e. 0
-    // //
-    // // Time: O(N * 32)
-    // // SPace: O(1)
-    // int singleNumberTWO(vector<int> &nums)
-    // {
+        int ans = 0;
 
-    //     int ans = 0;
+        // O(32)
+        for (int i = 0; i < 32; i++)
+        { // iterating over bits of a int from 0 to 31
 
-    //     // O(32)
-    //     for (int i = 0; i < 32; i++)
-    //     { // iterating over bits of a int from 0 to 31
+            int ansIthBit;
+            int ithSetBitsCount = 0;
 
-    //         int ansIthBit;
-    //         int ithSetBitsCount = 0;
+            // O(N)
+            for (int j = 0; j < nums.size(); j++)
+            { // iterating over given numbers
 
-    //         // O(N)
-    //         for (int j = 0; j < nums.size(); j++)
-    //         { // iterating over given numbers
+                int cur = nums[j];
+                int ithBit = cur & (1 << i);
 
-    //             int cur = nums[j];
-    //             int ithBit = cur & (1 << i);
+                if (ithBit)
+                    ithSetBitsCount++;
+            }
 
-    //             if (ithBit)
-    //                 ithSetBitsCount++;
-    //         }
+            if ((ithSetBitsCount % 3) == 0)
+                ansIthBit = 0; // because count of 1s at ith bit position is in 3's multiple.
+                               // So the lone number's ith bit is not 1
+            else
+                ansIthBit = 1;
 
-    //         if ((ithSetBitsCount % 3) == 0)
-    //             ansIthBit = 0; // because count of 1s at ith bit position is in 3's multiple.
-    //                            // So the lone number's ith bit is not 1
-    //         else
-    //             ansIthBit = 1;
+            ans += (ansIthBit * 1 << i);
+        }
 
-    //         ans += (ansIthBit * 1 << i);
-    //     }
-
-    //     return ans;
-    // }
+        return ans;
+    }
 
     // ------------------------------------
     // Title: Single Number II : Approach 2
 
-    // // Better approach: Sort the vector and then count occurences of numbers
-    // // Here as elements appeares 3 times,
-    // // while counting we jump 3 elements at a time for optimizing time
-    // //
-    // // Time: O(N Log N + N/3)
-    // // SPace: O(1)
-    // int singleNumberTWO(vector<int> &nums)
-    // {
+    // Better approach: Sort the vector and then count occurences of numbers
+    // Here as elements appeares 3 times,
+    // while counting we jump 3 elements at a time for optimizing time
+    //
+    // Time: O(N Log N + N/3)
+    // SPace: O(1)
+    int singleNumberTWO(vector<int> &nums)
+    {
 
-    //     sort(nums.begin(), nums.end());
+        sort(nums.begin(), nums.end());
 
-    //     int N = nums.size();
+        int N = nums.size();
 
-    //     for (int i = 0; i < N - 1; i += 3)
-    //     { // O(N/3)
-    //         if (nums[i] != nums[i + 1])
-    //             return nums[i];
-    //     }
+        for (int i = 0; i < N - 1; i += 3)
+        { // O(N/3)
+            if (nums[i] != nums[i + 1])
+                return nums[i];
+        }
 
-    //     return nums[N - 1];
-    // }
+        return nums[N - 1];
+    }
 
     // ------------------------------------
     // Title: Single Number II : Approach 3

@@ -103,7 +103,7 @@ public:
      *  2. Traverse `mat`:
      *      - For every cell with value 0:
      *          - Mark its distance as 0 in `vis`.
-     *          - Push it into the queue with depth 0.
+     *          - Push it into the queue.
      *  3. Perform BFS:
      *      - For each cell, check its 4 neighbors (up, down, left, right).
      *      - If the neighbor is within bounds and unvisited:
@@ -128,8 +128,8 @@ public:
         // Initialize visited/distance matrix with -1 (unvisited)
         vector<vector<int>> vis(m, vector<int>(n, -1));
 
-        // Queue will store ((row, col), distance)
-        queue<pair<pair<int, int>, int>> q;
+        // Queue will store (row, col)
+        queue<pair<int, int>> q;
 
         // 4 possible directions: up, down, left, right
         int dist[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -141,7 +141,7 @@ public:
             {
                 if (mat[i][j] == 0)
                 {
-                    q.push({{i, j}, 0});
+                    q.push({i, j});
                     vis[i][j] = 0; // Distance of 0-cell to nearest 0 is 0
                 }
             }
@@ -153,9 +153,8 @@ public:
             auto p = q.front();
             q.pop();
 
-            int i = p.first.first;
-            int j = p.first.second;
-            int depth = p.second;
+            int i = p.first;
+            int j = p.second;
 
             // Explore all 4 directions
             for (int k = 0; k < 4; k++)
@@ -172,8 +171,8 @@ public:
                     continue;
 
                 // Assign distance and push into queue
-                vis[r][c] = depth + 1;
-                q.push({{r, c}, depth + 1});
+                vis[r][c] = vis[i][j] + 1;
+                q.push({r, c});
             }
         }
 

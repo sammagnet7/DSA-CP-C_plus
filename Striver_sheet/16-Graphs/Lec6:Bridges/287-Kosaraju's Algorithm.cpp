@@ -82,7 +82,6 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 //
 
-// Position this line where user code will be pasted.
 class Solution
 {
 

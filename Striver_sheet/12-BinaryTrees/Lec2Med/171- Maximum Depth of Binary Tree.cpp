@@ -91,36 +91,36 @@ public:
   // // Optimal approach: using iteration
   // // Time: O(N)
   // // Space: O(N/2) because at last level N/2 leaf nodes stays
-  // int maxDepth(TreeNode* root) {
+  int maxDepth(TreeNode* root) {
 
-  //     if (root == NULL)
-  //         return 0;
+      if (root == NULL)
+          return 0;
 
-  //     int ans = 0;
+      int ans = 0;
 
-  //     queue<TreeNode *> q;    // O(N/2)
-  //     q.push(root);
+      queue<TreeNode *> q;    // O(N/2)
+      q.push(root);
 
-  //     while (!q.empty())
-  //     {
-  //         ans++;
+      while (!q.empty())
+      {
+          ans++;
 
-  //         int preLvlSize = q.size();
+          int preLvlSize = q.size();
 
-  //         for (int i = 0; i < preLvlSize; i++)
-  //         {
-  //             TreeNode *node = q.front();
-  //             q.pop();
+          for (int i = 0; i < preLvlSize; i++)
+          {
+              TreeNode *node = q.front();
+              q.pop();
 
-  //             if (node->left != NULL)
-  //                 q.push(node->left);
-  //             if (node->right != NULL)
-  //                 q.push(node->right);
-  //         }
-  //     }
+              if (node->left != NULL)
+                  q.push(node->left);
+              if (node->right != NULL)
+                  q.push(node->right);
+          }
+      }
 
-  //     return ans;
-  // }
+      return ans;
+  }
 };
 
 int main()

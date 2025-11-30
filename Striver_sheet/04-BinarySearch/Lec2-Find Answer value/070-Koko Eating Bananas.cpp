@@ -36,8 +36,7 @@ Similar kind of problems:
 [
     problem: Capacity to Ship Packages within D Days
     https://takeuforward.org/arrays/capacity-to-ship-packages-within-d-days/    (*)
-    https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/submissions/1624525643/
-]
+    https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/]
 
 Examples:
 
@@ -97,7 +96,7 @@ public:
         while (l <= r)
         {
 
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
             int hoursReq = 0;
 

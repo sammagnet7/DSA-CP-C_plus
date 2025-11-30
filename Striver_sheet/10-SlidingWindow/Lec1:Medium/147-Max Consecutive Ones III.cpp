@@ -56,39 +56,44 @@ OUTPUT::::::
 // 1. Approach1:
 //
 
-// // Better approach: Sliding window.
-// // Time: O(2N)
-// // Space: O(1)
-// int longestOnes(vector<int>& nums, int k) {
+// Better approach: Sliding window.
+// Time: O(2N)
+// Space: O(1)
+int longestOnes(vector<int> &nums, int k)
+{
 
-//     int ans = 0;
+    int ans = 0;
 
-//     int N = nums.size();
-//     int l=0;
-//     int r=0;
+    int N = nums.size();
+    int l = 0;
+    int r = 0;
 
-//     while(l<N && r<N){
+    while (l < N && r < N)
+    {
 
-//         int cur=nums[r];
+        int cur = nums[r];
 
-//         if(cur==0){
-//             k--;
-//         }
+        if (cur == 0)
+        {
+            k--;
+        }
 
-//         while(k<0){
-//             if(nums[l]==0){
-//                 k++;
-//             }
-//             l++;
-//         }
+        while (k < 0)
+        {
+            if (nums[l] == 0)
+            {
+                k++;
+            }
+            l++;
+        }
 
-//         int len = (r-l+1);
-//         ans = max(ans,len);
-//         r++;
-//     }
+        int len = (r - l + 1);
+        ans = max(ans, len);
+        r++;
+    }
 
-//     return ans;
-// }
+    return ans;
+}
 
 //--------------------------------------------------------
 // Approach2:
@@ -107,7 +112,6 @@ int longestOnes(vector<int> &nums, int k)
 
     while (l < N && r < N)
     {
-
         int cur = nums[r];
 
         if (cur == 0)

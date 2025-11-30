@@ -20,7 +20,7 @@ using namespace std;
 
 Links:
 https://www.youtube.com/watch?v=qQd-ViW7bfk
-https://www.naukri.com/code360/problems/check-whether-k-th-bit-is-set-or-not_5026446?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/check-whether-k-th-bit-is-set-or-not_5026446?leftPanelTabValue=PROBLEM
 
 
 Problem statement:
@@ -182,9 +182,9 @@ https://www.naukri.com/code360/problems/bit-manipulation_8142533?leftPanelTabVal
 Problem statement:
 You have a 32-bit unsigned integer called 'num' and another integer called 'i'.
 You need to perform the following operations on the 'num' integer based on the value of 'i':
-1. Get the bit value at the "i"th position of "num".
-2. Set the bit at the "i"th position of "num".
-3. Clear the bit at the "i"th position of "num".
+    1. Get the bit value at the "i"th position of "num".
+    2. Set the bit at the "i"th position of "num".
+    3. Clear the bit at the "i"th position of "num".
 
 We are starting bits from 1 instead of 0. (1-based)
 
@@ -309,7 +309,7 @@ public:
     // O(1)
     bool isPowerOfTwo(int N)
     {
-        int removedRightMostSetBit = N & (N - 1);
+        int removedRightMostSetBit = N & (N - 1);  // 00100000 & 00011111 = 00000000
         bool isSingleSetBit = removedRightMostSetBit == 0 ? true : false;
 
         return isSingleSetBit;
@@ -323,11 +323,11 @@ public:
     int setBits(int N)
     {
 
-        bool ifAllOnes = N & (N + 1);          // check if no zeros exists
+        bool ifAllOnes = N & (N + 1);          // check if no zeros exists: returns zero if all onesf
         int setRightMostzeroBit = N | (N + 1); // sets rightmost unset bit
 
         if (ifAllOnes)
-            return setRightMostzeroBit;
+            return setRightMostzeroBit; // If zero exists
         else
             return N; // if no zeros then no need to set
     }
@@ -410,7 +410,6 @@ public:
         // O(Log N)
         while (n)
         {
-
             int tmp = n;
 
             while (tmp)
@@ -422,7 +421,7 @@ public:
                     count = (count % mod);
                 }
 
-                tmp = tmp / 2;
+                tmp = tmp >> 1;
             }
 
             n--;

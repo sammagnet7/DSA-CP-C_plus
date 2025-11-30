@@ -50,7 +50,7 @@ Example 2:
 
 Constraints:
     1 <= nums1.length <= nums2.length <= 1000
-    0 <= nums1[i], nums2[i] <= 104
+    0 <= nums1[i], nums2[i] <= 10^4
     All integers in nums1 and nums2 are unique.
     All the integers of nums1 also appear in nums2.
 
@@ -172,6 +172,48 @@ vector<int> nextGreaterElement(vector<int> &nums1, vector<int> &nums2)
     return ans;
 }
 
+// Approach: from start to end
+// Optimal approach: Using Monotonic stack
+// Time:  O(2N)
+// Space: O(2N)
+vector<int> nextGreaterElement(vector<int> &nums1, vector<int> &nums2)
+{
+
+    stack<int> st;
+    unordered_map<int, int> mp;
+
+    for (int i : nums2)
+    {
+        if (st.empty())
+        {
+            st.push(i);
+            continue;
+        }
+
+        while (!st.empty() && st.top() < i)
+        {
+            mp[st.top()] = i;
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    while (!st.empty())
+    {
+        mp[st.top()] = -1;
+        st.pop();
+    }
+
+    vector<int> ans;
+
+    for (int j : nums1)
+    {
+        ans.push_back(mp[j]);
+    }
+
+    return ans;
+}
+
 //-----------------------------------------------------------------------
 // 2. Title: Next Greater Element II
 //
@@ -244,6 +286,45 @@ vector<int> nextGreaterElements(vector<int> &nums)
     return ans;
 }
 
+// Approach: from start to end
+// Optimal approach: Using monotonic stack + looping the array twice
+// Time: O(2N)
+// Space: O(N)
+vector<int> nextGreaterElements(vector<int> &nums)
+{
+    int N = nums.size();
+
+    stack<pair<int, int>> st;
+    vector<int> ans(N, -1);
+
+    for (int k = 0; k < 2 * N; k++)
+    {
+        int i = k % N;
+
+        if (st.empty())
+        {
+            st.push({nums[i], i});
+            continue;
+        }
+
+        while (!st.empty() && st.top().first < nums[i])
+        {
+            if (ans[st.top().second] != -1)
+            {
+                st.pop();
+                continue;
+            }
+
+            ans[st.top().second] = nums[i];
+            st.pop();
+        }
+
+        st.push({nums[i], i});
+    }
+
+    return ans;
+}
+
 //-----------------------------------------------------------------------
 // 3. Title: Next Smaller Element
 //
@@ -275,6 +356,37 @@ vector<int> nextSmallerElement(vector<int> &arr, int n)
         }
 
         st.push(cur);
+    }
+
+    return ans;
+}
+
+// Approach from start to end
+// Optimal approach : Using monotonic stack
+// Time: O(2N)
+// Space: O(N + N) : stack ds space + `ans` space
+vector<int> nextSmallerElement(vector<int> &arr, int n)
+{
+    // Write your code here.
+
+    stack<pair<int, int>> st;
+    vector<int> ans(n, -1);
+
+    for (int i = 0; i < arr.size(); i++)
+    {
+
+        if (st.empty())
+        {
+            st.push({arr[i], i});
+            continue;
+        }
+
+        while (!st.empty() && arr[i] < st.top().first)
+        {
+            ans[st.top().second] = arr[i];
+            st.pop();
+        }
+        st.push({arr[i], i});
     }
 
     return ans;

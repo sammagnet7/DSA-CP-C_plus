@@ -57,10 +57,46 @@ OUTPUT::::::
 //-----------------------------------------------------------------------
 // 1. Title: Implement Min Stack
 
-// Another sub-optimal approach: In stack with value save `till now min value` as well in O(2N)
+// Sub-optimal approach: In stack with value save `till now min value` as well in O(2N)
+class MinStack
+{
+    stack<pair<int, int>> st;
 
-// Optimal approach: 
-// Time: O(1) 
+public:
+    MinStack()
+    {
+    }
+
+    void push(int val)
+    {
+        if (st.size() == 0)
+        {
+            st.push({val, val});
+        }
+        else
+        {
+            st.push({val, min(st.top().second, val)});
+        }
+    }
+
+    void pop()
+    {
+        st.pop();
+    }
+
+    int top()
+    {
+        return st.top().first;
+    }
+
+    int getMin()
+    {
+        return st.top().second;
+    }
+};
+
+// Optimal approach:
+// Time: O(1)
 // Space: O(N); stack space
 class MinStack
 {

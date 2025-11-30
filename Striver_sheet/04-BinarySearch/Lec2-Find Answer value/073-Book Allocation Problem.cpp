@@ -16,7 +16,7 @@ or
 Split Array - Largest Sum
 
 https://takeuforward.org/data-structure/allocate-minimum-number-of-pages/
-https://www.naukri.com/code360/problems/allocate-books_1090540?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/allocate-books_1090540?leftPanelTabValue=PROBLEM
 
 
 Problem statement:
@@ -33,12 +33,12 @@ Similar problem:
 [   
     Split Array - Largest Sum:
     https://takeuforward.org/arrays/split-array-largest-sum/
-    https://leetcode.com/problems/split-array-largest-sum/submissions/1625848561/
+    https://leetcode.com/problems/split-array-largest-sum/
 ]
 [
     Painter's Partition Problem
     https://takeuforward.org/arrays/painters-partition-problem/
-    https://www.naukri.com/code360/problems/painter-s-partition-problem_1089557?leftPanelTabValue=SUBMISSION
+    https://www.naukri.com/code360/problems/painter-s-partition-problem_1089557?leftPanelTabValue=PROBLEM
 ]
 
 Examples:
@@ -101,7 +101,7 @@ public:
         {
             int pages_mid = l + (r - l) / 2;
 
-            int st_count = 1;
+            int std_count = 1;
             long long pages_cum = arr[0];
 
             // O(N)
@@ -112,22 +112,23 @@ public:
 
                 if (pages_cum > pages_mid)
                 {
-                    st_count++;
+                    std_count++;
                     pages_cum = arr[i];
                 }
 
-                if (st_count > ms)
+                if (std_count > ms)
                     break;
             }
 
-            if (st_count <= ms) // In case of student count less target count,
+            if (std_count <= ms) // Handling the edge case (std_count < ms): In case of student count less target count,
                                 // we can segregate some books(from students having more than 1 book)
                                 // into other students to increase the count
+                                // This works because at atsrting we have checked that existing book counts is greater than number of students
             {
                 ans = min(ans, pages_mid);
                 r = pages_mid - 1;
             }
-            else if (st_count > ms)
+            else if (std_count > ms)
             {
 
                 l = pages_mid + 1;

@@ -18,7 +18,7 @@ using namespace std;
 Rotate List:
 
 https://takeuforward.org/data-structure/rotate-a-linked-list/
-https://leetcode.com/problems/rotate-list/submissions/1662639369/
+https://leetcode.com/problems/rotate-list/description/
 
 
 Problem statement:

@@ -18,7 +18,8 @@ using namespace std;
 Find intersection of Two Linked Lists:
 
 https://takeuforward.org/data-structure/find-intersection-of-two-linked-lists/
-https://leetcode.com/problems/intersection-of-two-linked-lists/submissions/1660696832/
+https://leetcode.com/problems/intersection-of-two-linked-lists/
+
 
 Problem statement:
 Given the heads of two singly linked-lists headA and headB, return the node at which the two lists intersect. If the two linked lists have no intersection at all, return null.
@@ -67,7 +68,7 @@ public:
     
     // Optimal approach
     // Idea: First find the length difference between two linked lists
-    // Then straverse the extra nodes from starting of the longer list
+    // Then traverse the extra nodes from starting of the longer list
     // Then traverse both the list together until a same node is found
     // TIme: O(~3N)
     // Space: O(1)

@@ -18,10 +18,10 @@ using namespace std;
 Flattening a Linked List:
 
 https://takeuforward.org/data-structure/flattening-a-linked-list/
-https://www.naukri.com/code360/problems/flatten-a-linked-list_1112655?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/flatten-a-linked-list_1112655?leftPanelTabValue=PROBLEM
 
 Helper: Merge Two Sorted Linked Lists:
-https://www.naukri.com/code360/problems/800332?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/800332?leftPanelTabValue=PROBLEM
 
 Problem statement:
 Given a linked list containing ‘N’ head nodes where every node in the linked list contains two pointers:
@@ -161,6 +161,44 @@ public:
         return head;
     }
 };
+
+
+// Another approach of the helper
+// Node<int>* sortTwoLists(Node<int>* first, Node<int>* second)
+// {
+//     // Write your code here.
+
+//     Node<int>* ans = new Node<int>(0);
+//     Node<int>* ansHead = ans;
+
+//     while(first && second){
+//         if(first->data <= second->data){
+//             ans->next = first;
+//             ans = ans->next;
+
+//             first = first->next;
+//         }
+//         else{
+//             ans->next = second;
+//             ans = ans->next;
+
+//             second = second->next;
+//         }
+//     }
+
+//     if(first){
+//         ans->next = first;
+//     }
+//     else if(second){
+//         ans->next = second;
+//     }
+//     else{
+//         ans->next = nullptr;
+//     }
+    
+
+//     return ansHead->next;
+// }
 
 int main()
 {

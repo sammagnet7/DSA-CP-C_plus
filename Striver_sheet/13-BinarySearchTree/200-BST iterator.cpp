@@ -153,12 +153,10 @@ public:
         int ret = el->val;
 
         // If right child exists, push all left children of right subtree
-        if (el->right) {
-            el = el->right;
-            while (el) {
-                st.push(el);
-                el = el->left;
-            }
+        el = el->right;
+        while (el) {
+            st.push(el);
+            el = el->left;
         }
 
         return ret;

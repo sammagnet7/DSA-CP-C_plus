@@ -103,7 +103,7 @@ int priority(char c)
 
 // Optimal Approach: Traverse string from left to right
 // If operands, then add to `ans` immediately.
-// If operand then push to stack only if priority is greater than operator top of stack
+// If operator, then push to stack only if priority is greater than operator top of stack
 // pop from stack all higher or equal priority operator and add to `ans`
 // then push the current operator into stack
 // if closing bracket is found then pop until the prev starting bracket is poped and add ops to `ans`

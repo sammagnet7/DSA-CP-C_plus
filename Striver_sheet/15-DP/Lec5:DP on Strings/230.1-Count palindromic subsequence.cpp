@@ -21,9 +21,9 @@ using namespace std;
 1. Title: Count palindromic subsequence in given string
 
 Links:
-https://www.geeksforgeeks.org/problems/count-palindromic-subsequences/1
 https://www.youtube.com/watch?v=9hsnkf0MRhQ&t=3s
 https://www.youtube.com/watch?v=JbeHChnm09Q&t=16s
+https://www.geeksforgeeks.org/problems/count-palindromic-subsequences/1
 
 
 Problem statement:

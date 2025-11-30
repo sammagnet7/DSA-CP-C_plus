@@ -234,12 +234,12 @@ public:
             // If u and v are in different sets, add this edge to MST
             if (!DS.isSameSet(u, v))
             {
-                DS.unionBySize(u, v);  // merge sets
-                MST.push_back({u, v}); // include edge in MST
-                MST_wt += wt;          // add weight
-            }
+                    DS.unionBySize(u, v);  // merge sets
+                    MST.push_back({u, v}); // include edge in MST
+                    MST_wt += wt;          // add weight
+                }
 
-            if (MST.size() == V - 1)
+                if (MST.size() == V - 1)
                 break;
         }
 

@@ -294,7 +294,7 @@ public:
   // ---------------------------- Approach1 -------------------------------------------------
   // Method: reverseInorder
   // -----------------------
-  // Performs Reverse Inorder Traversal (Right ? Node ? Left) to find the Kth
+  // Performs Reverse Inorder Traversal (Right -> Node -> Left) to find the Kth
   // largest element in a BST.
   //
   // Approach:
@@ -358,8 +358,8 @@ public:
    * Finds the k-th largest element in a Binary Search Tree using **reverse Morris Inorder Traversal**.
    *
    * ? Approach:
-   * - In a BST, the **inorder traversal** (Left ? Root ? Right) gives elements in ascending order.
-   * - To get the **k-th largest**, we perform **reverse inorder traversal** (Right ? Root ? Left),
+   * - In a BST, the **inorder traversal** (Left -> Root -> Right) gives elements in ascending order.
+   * - To get the **k-th largest**, we perform **reverse inorder traversal** (Right -> Root -> Left),
    *   which gives elements in descending order.
    *
    * ? Optimization:
@@ -392,7 +392,7 @@ public:
     {
       if (cur->right == NULL)
       {
-        // Case 1: No right child ? visit current node and go to left
+        // Case 1: No right child -> visit current node and go to left
         count++;
         if (count == k)
           result = cur->data;
@@ -400,7 +400,7 @@ public:
       }
       else
       {
-        // Case 2: Has a right child ? find its inorder predecessor
+        // Case 2: Has a right child -> find its inorder predecessor
         TreeNodeN<int> *tmp = cur->right;
         while (tmp->left && tmp->left != cur)
         {
@@ -409,13 +409,13 @@ public:
 
         if (tmp->left == NULL)
         {
-          // First time visiting tmp ? create a thread back to current
+          // First time visiting tmp -> create a thread back to current
           tmp->left = cur;
           cur = cur->right;
         }
         else
         {
-          // Thread already exists ? remove it, visit current, go left
+          // Thread already exists -> remove it, visit current, go left
           tmp->left = NULL;
           count++;
           if (count == k)

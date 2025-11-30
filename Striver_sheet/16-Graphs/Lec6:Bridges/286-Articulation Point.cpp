@@ -159,7 +159,7 @@ class Solution
                 // If the earliest reachable ancestor from child adjN is NOT earlier
                 // than cur's discovery, then removing `cur` disconnects child’s subtree.
                 // This condition applies only if `cur` is NOT the DFS root.
-                if (minAdjTime[adjN] >= visTime[cur] && par != -1)
+                if (visTime[cur] <= minAdjTime[adjN] && par != -1)
                 { // NOTE
                     cutVertices[cur] = 1;
                 }

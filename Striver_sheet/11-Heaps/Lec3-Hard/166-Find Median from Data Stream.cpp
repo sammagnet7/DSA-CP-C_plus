@@ -34,7 +34,7 @@ Implement the MedianFinder class:
 
 MedianFinder() initializes the MedianFinder object.
 void addNum(int num) adds the integer num from the data stream to the data structure.
-double findMedian() returns the median of all elements so far. Answers within 10-5 of the actual answer will be accepted.
+double findMedian() returns the median of all elements so far. Answers within 10^-5 of the actual answer will be accepted.
 
 
 Example 1:
@@ -56,9 +56,9 @@ medianFinder.findMedian(); // return 2.0
 
 Constraints:
 
--105 <= num <= 105
+-10^5 <= num <= 10^5
 There will be at least one element in the data structure before calling findMedian.
-At most 5 * 104 calls will be made to addNum and findMedian.
+At most 5 * 10^4 calls will be made to addNum and findMedian.
 
 
 Follow up:

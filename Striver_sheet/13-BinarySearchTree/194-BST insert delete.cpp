@@ -46,9 +46,9 @@ Examples:
 
 Constraints:
   The number of nodes in the tree will be in the range [0, 104].
-  -108 <= Node.val <= 108
+  -10^8 <= Node.val <= 10^8
   All the values Node.val are unique.
-  -108 <= val <= 108
+  -10^8 <= val <= 10^8
   It's guaranteed that val does not exist in the original BST.
 
 
@@ -249,11 +249,11 @@ public:
       // Step 2: If target node is the root of the tree
       if (targetN == root)
       {
-        return deleteRoot(targetN); // Replace root with proper child/subtree
+        return deleteRandomNode(targetN); // Replace root with proper child/subtree
       }
 
       // Step 3: Delete the target node and get its replacement subtree
-      TreeNode *replacement = deleteRoot(targetN);
+      TreeNode *replacement = deleteRandomNode(targetN);
 
       // Step 4: Reconnect the replacement node with the parent
       if (prev->left == targetN)
@@ -284,7 +284,7 @@ public:
      * Space Complexity: O(1)
      *     - Constant space used.
      */
-    TreeNode *deleteRoot(TreeNode *node)
+    TreeNode *deleteRandomNode(TreeNode *node)
     {
       // Case 1: No children
       if (node->left == NULL && node->right == NULL)

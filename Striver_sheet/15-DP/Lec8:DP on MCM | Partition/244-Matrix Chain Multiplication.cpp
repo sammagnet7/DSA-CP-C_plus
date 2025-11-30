@@ -89,7 +89,7 @@ public:
      - Define recMatrix(i, j) as the minimum number of multiplications
        required to multiply matrices from index i to j.
      - Base case:
-         If i == j, only one matrix ? No multiplication needed ? return 0
+         If i == j, only one matrix -> No multiplication needed -> return 0
      - Transition:
          Try splitting the chain at every position k (i <= k < j):
              cost = cost of left chain (i..k)

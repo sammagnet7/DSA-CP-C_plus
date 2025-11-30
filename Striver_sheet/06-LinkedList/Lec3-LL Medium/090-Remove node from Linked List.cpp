@@ -18,7 +18,7 @@ using namespace std;
 Remove N-th node from the end of a Linked List:
 
 https://takeuforward.org/data-structure/remove-n-th-node-from-the-end-of-a-linked-list/
-https://leetcode.com/problems/remove-nth-node-from-end-of-list/submissions/1658970211/
+https://leetcode.com/problems/remove-nth-node-from-end-of-list/
 
 
 Problem statement:
@@ -49,7 +49,8 @@ OUTPUT::::::
 
 Delete the Middle Node of the Linked List:
 https://takeuforward.org/linked-list/delete-the-middle-node-of-the-linked-list
-https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/submissions/1659382079/
+https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
+
 
 Problem statement:
 You are given the head of a linked list. Delete the middle node, and return the head of the modified linked list.

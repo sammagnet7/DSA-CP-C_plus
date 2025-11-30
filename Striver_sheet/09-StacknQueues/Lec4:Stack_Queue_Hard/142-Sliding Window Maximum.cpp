@@ -97,6 +97,39 @@ public:
 
         return ans;
     }
+
+    // Approach: Using priority queue
+    // Time: O(N Log N)
+    vector<int> maxSlidingWindow(vector<int> &nums, int k)
+    {
+
+        priority_queue<pair<int, int>> pq; // <val, -ve(index)>
+
+        for (int i = 0; i < k; i++)
+        {
+            pq.push({nums[i], (-1 * i)});
+        }
+
+        vector<int> ans;
+        ans.push_back(pq.top().first);
+
+        for (int i = k; i < nums.size(); i++)
+        {
+
+            int windowStartIdx = i - k + 1;
+
+            while (!pq.empty() && (pq.top().second * -1) < windowStartIdx)
+            {
+                pq.pop();
+            }
+
+            pq.push({nums[i], (-1 * i)});
+
+            ans.push_back(pq.top().first);
+        }
+
+        return ans;
+    }
 };
 
 int main()

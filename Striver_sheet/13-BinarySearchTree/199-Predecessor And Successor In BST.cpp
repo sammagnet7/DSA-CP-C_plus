@@ -140,7 +140,7 @@ public:
 
     while (root)
     {
-      if (root->data > key)
+      if (key < root->data)
       {
         ans = min(ans, root->data);
         root = root->left; // Try to find a smaller candidate

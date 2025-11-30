@@ -341,6 +341,7 @@ public:
                     // Perform DFS and collect normalized coordinates
                     dfs(i, j, norm_coord, grid, vis, m, n, {i, j});
 
+                    sort(norm_coord.begin(), norm_coord.end());
                     // Insert island shape into set
                     dist_islands.insert(norm_coord);
                 }

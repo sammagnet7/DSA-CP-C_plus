@@ -55,32 +55,32 @@ public:
     // Time: O(N)
     // Space: O(1)
     // Approach: Swap zero elements to the back
-    // void moveZeroes(vector<int> &nums)
-    // {
-    //     int len = nums.size();
-    //     int st_nz_idx = -1;
+    void moveZeroes(vector<int> &nums)
+    {
+        int len = nums.size();
+        int st_nz_idx = -1;
 
-    //     // Loop for finding zeros
-    //     for (int i = 0; i < len; i++)
-    //     {
-    //         if (nums[i] == 0)
-    //         {
-    //             if (st_nz_idx < i)
-    //                 st_nz_idx = i;
+        // Loop for finding zeros
+        for (int i = 0; i < len; i++)
+        {
+            if (nums[i] == 0)
+            {
+                if (st_nz_idx < i)
+                    st_nz_idx = i;
 
-    //             // Loop for finding non zeros
-    //             for (int j = st_nz_idx; j < len; j++)
-    //             {
-    //                 if (nums[j] != 0)
-    //                 {
-    //                     swap(nums[i], nums[j]);
-    //                     st_nz_idx = j;
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+                // Loop for finding non zeros
+                for (int j = st_nz_idx; j < len; j++)
+                {
+                    if (nums[j] != 0)
+                    {
+                        swap(nums[i], nums[j]);
+                        st_nz_idx = j;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     // Approach 1: Two-Pass with Explicit Zero Detection
     // -------------------------------------------------
@@ -144,6 +144,25 @@ public:
             {
                 // Swap current non-zero element into the 'nz' position
                 swap(nums[nz++], nums[i]);
+            }
+        }
+    }
+
+
+    // Approach: Easiest
+    void moveZeroes(vector<int> &nums)
+    {
+
+        int N = nums.size();
+
+        int z = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+
+            if (nums[i] != 0)
+            {
+                swap(nums[z++], nums[i]);
             }
         }
     }

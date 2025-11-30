@@ -233,7 +233,7 @@ public:
 
         while (!pq.empty())
         {
-            auto [curDist, curN] = pq.top();
+            auto [curDist, curN] = pq.top(); // tuple!
             pq.pop();
 
             if (curDist > dist[curN])

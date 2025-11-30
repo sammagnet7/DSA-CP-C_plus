@@ -32,6 +32,7 @@ You are given 'Q' queries, and for each query, you are given an index(0-based in
 Answer to each query is the number of the strictly greater elements to the right of the given index element.
 You must return an array 'answer' of length ’N’, where ‘answer[i]’ is the answer to the ‘ith’ query.
 
+
 Examples:
     Input:
     arr = [5, 2, 10, 4], N=4, Q=2, query = [0, 1]

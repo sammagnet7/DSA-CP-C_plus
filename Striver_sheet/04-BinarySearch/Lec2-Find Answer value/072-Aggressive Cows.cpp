@@ -82,7 +82,7 @@ public:
         while (l <= r)
         {
 
-            int mid_dis = l - (l - r) / 2;
+            int mid_dis = l + (r - l) / 2;
 
             int prevPos = arr[0]; // First cow always be placed at the starting stall
             int cow_count = 1;    // First cow always be counted

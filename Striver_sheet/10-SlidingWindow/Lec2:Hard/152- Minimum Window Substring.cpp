@@ -78,61 +78,117 @@ public:
     //
     //  Time: O(2M + N)
     //  Space: O(256)
+    // string minWindow(string s, string t)
+    // {
+
+    //     int m = s.size();
+    //     int n = t.size();
+
+    //     vector<int> hash(256);
+    //     int totUniqCount;
+
+    //     for (int i = 0; i < n; i++)
+    //     { // O(N)
+    //         if (hash[t[i]] == 0)
+    //             totUniqCount++;
+    //         hash[t[i]]++;
+    //     }
+
+    //     int minLen = INT_MAX;
+    //     int startIdx = -1;
+    //     // int totUniqCount = mp.size();
+    //     int curUniqCount = 0;
+    //     int l = 0;
+    //     int r = 0;
+
+    //     while (r < m)
+    //     { // O(M)
+    //         hash[s[r]]--;
+
+    //         if (hash[s[r]] == 0)
+    //         { // cur char's all occurences found
+    //             curUniqCount++;
+    //         }
+
+    //         while (curUniqCount == totUniqCount)
+    //         { // O(M) : Shrinking to find minimum one
+    //             int len = r - l + 1;
+    //             if (len < minLen)
+    //             {
+    //                 minLen = len;
+    //                 startIdx = l;
+    //             }
+
+    //             hash[s[l]]++;
+    //             if (hash[s[l]] == 1)
+    //             { // Current char's atleast one occurences is missing
+    //                 curUniqCount--;
+    //             }
+    //             l++;
+    //         }
+
+    //         r++;
+    //     }
+
+    //     if (startIdx == -1) // edge case handle
+    //         return "";
+    //     return s.substr(startIdx, minLen);
+    // }
+
+
+    // Approach 2: mostly same
+    bool isValidStr(unordered_map<char, int> &mp)
+    {
+        for (auto e : mp)
+        {
+            if (e.second > 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     string minWindow(string s, string t)
     {
 
-        int m = s.size();
-        int n = t.size();
+        unordered_map<char, int> mp;
 
-        vector<int> hash(256);
-        int totUniqCount;
-
-        for (int i = 0; i < n; i++)
-        { // O(N)
-            if (hash[t[i]] == 0)
-                totUniqCount++;
-            hash[t[i]]++;
+        for (int i = 0; i < t.size(); i++)
+        {
+            mp[t[i]]++;
         }
 
+        int N = s.size();
+        int i = 0;
+        int j = 0;
         int minLen = INT_MAX;
-        int startIdx = -1;
-        // int totUniqCount = mp.size();
-        int curUniqCount = 0;
-        int l = 0;
-        int r = 0;
+        int minI = -1;
+        int minJ = -1;
+        // string ans = "";
 
-        while (r < m)
-        { // O(M)
-            hash[s[r]]--;
+        while (i < N)
+        {
 
-            if (hash[s[r]] == 0)
-            { // cur char's all occurences found
-                curUniqCount++;
-            }
+            mp[s[i]]--;
 
-            while (curUniqCount == totUniqCount)
-            { // O(M) : Shrinking to find minimum one
-                int len = r - l + 1;
-                if (len < minLen)
+            while (isValidStr(mp) && j <= i)
+            {
+                if (i - j + 1 < minLen)
                 {
-                    minLen = len;
-                    startIdx = l;
+                    minI = i;
+                    minJ = j;
+                    minLen = i - j + 1;
                 }
-
-                hash[s[l]]++;
-                if (hash[s[l]] == 1)
-                { // Current char's atleast one occurences is missing
-                    curUniqCount--;
-                }
-                l++;
+                mp[s[j]]++;
+                j++;
             }
 
-            r++;
+            i++;
         }
-
-        if (startIdx == -1) // edge case handle
+        if (minI == -1)
             return "";
-        return s.substr(startIdx, minLen);
+        return s.substr(minJ, minI - minJ + 1);
     }
 };
 

@@ -173,58 +173,97 @@ public:
         - DP table of size O(N * total)
     */
 
-    // Recursive helper function to explore subset sums
-    // nums         : input array
-    // dp           : 2D memoization table to store minimum difference at [idx][curSum]
-    // minDiff      : reference to global minimum difference so far
-    // total        : total sum of all elements in the array
-    // targetLength : number of elements we aim to pick (not essential here, but kept for generality)
-    // curSum       : current accumulated sum of picked elements
-    // idx          : current index in nums we are processing
-    void traverseMinDiff(vector<int> &nums, vector<vector<int>> &dp, int &minDiff, int total, int targetLength, int curSum, int idx)
+    // // Recursive helper function to explore subset sums
+    // // nums         : input array
+    // // dp           : 2D memoization table to store minimum difference at [idx][curSum]
+    // // minDiff      : reference to global minimum difference so far
+    // // total        : total sum of all elements in the array
+    // // targetLength : number of elements we aim to pick (not essential here, but kept for generality)
+    // // curSum       : current accumulated sum of picked elements
+    // // idx          : current index in nums we are processing
+    // void traverseMinDiff(vector<int> &nums, vector<vector<int>> &dp, int &minDiff, int total, int targetLength, int curSum, int idx)
+    // {
+
+    //     // Calculate the current difference between two subsets
+    //     int absDiff = abs(total - 2 * curSum); // (Sum of other subset - curSum)
+
+    //     // Update minimum difference
+    //     minDiff = min(minDiff, absDiff);
+
+    //     // Base case: if index is out of bounds or we've already computed this state
+    //     if (idx == nums.size() || dp[idx][curSum] != INT_MIN)
+    //         return;
+
+    //     // Explore possibility of excluding the current element
+    //     traverseMinDiff(nums, dp, minDiff, total, targetLength, curSum, idx + 1);
+
+    //     // Explore possibility of including the current element
+    //     traverseMinDiff(nums, dp, minDiff, total, --targetLength, curSum + nums[idx], idx + 1);
+
+    //     // Memoize the result to avoid recomputation
+    //     dp[idx][curSum] = minDiff;
+    // }
+
+    // // Main function to compute the minimum subset sum difference
+    // int minSubsetSumDifference(vector<int> &nums, int N)
+    // {
+    //     int minDiff = INT_MAX;   // Initialize answer with a large number
+    //     int total = 0;           // Will hold the sum of all elements
+    //     int n = nums.size() / 2; // Not essential here; retained from previous context
+
+    //     // Compute total sum of the array
+    //     for (int el : nums)
+    //     {
+    //         total += el;
+    //     }
+
+    //     // Create a 2D DP array initialized with INT_MIN
+    //     // dp[i][j] represents the minimum difference possible using first i elements and current sum j
+    //     vector<vector<int>> dp(nums.size(), vector<int>(total + 1, INT_MIN));
+
+    //     // Start recursive traversal
+    //     traverseMinDiff(nums, dp, minDiff, total, n, 0, 0);
+
+    //     // Return the minimum difference found
+    //     return minDiff;
+    // }
+
+    // my approach
+    void rec(int idx, int sum, int totalSum, int &minDiff, vector<int> &arr, vector<vector<int>> &dp)
     {
 
-        // Calculate the current difference between two subsets
-        int absDiff = abs(total - 2 * curSum); // (Sum of other subset - curSum)
-
-        // Update minimum difference
-        minDiff = min(minDiff, absDiff);
-
-        // Base case: if index is out of bounds or we've already computed this state
-        if (idx == nums.size() || dp[idx][curSum] != INT_MIN)
-            return;
-
-        // Explore possibility of excluding the current element
-        traverseMinDiff(nums, dp, minDiff, total, targetLength, curSum, idx + 1);
-
-        // Explore possibility of including the current element
-        traverseMinDiff(nums, dp, minDiff, total, --targetLength, curSum + nums[idx], idx + 1);
-
-        // Memoize the result to avoid recomputation
-        dp[idx][curSum] = minDiff;
-    }
-
-    // Main function to compute the minimum subset sum difference
-    int minSubsetSumDifference(vector<int> &nums, int N)
-    {
-        int minDiff = INT_MAX;   // Initialize answer with a large number
-        int total = 0;           // Will hold the sum of all elements
-        int n = nums.size() / 2; // Not essential here; retained from previous context
-
-        // Compute total sum of the array
-        for (int el : nums)
+        if (idx < 0)
         {
-            total += el;
+            int diff = abs((totalSum - sum) - sum);
+            minDiff = min(minDiff, diff);
+            return;
+        }
+        if (dp[idx][sum] != -1)
+        {
+            return;
         }
 
-        // Create a 2D DP array initialized with INT_MIN
-        // dp[i][j] represents the minimum difference possible using first i elements and current sum j
-        vector<vector<int>> dp(nums.size(), vector<int>(total + 1, INT_MIN));
+        rec(idx - 1, sum, totalSum, minDiff, arr, dp);
+        rec(idx - 1, sum + arr[idx], totalSum, minDiff, arr, dp);
 
-        // Start recursive traversal
-        traverseMinDiff(nums, dp, minDiff, total, n, 0, 0);
+        dp[idx][sum] = minDiff;
+    }
 
-        // Return the minimum difference found
+    int minSubsetSumDifference(vector<int> &arr, int n)
+    {
+        // Write your code here.
+        int totalSum = 0;
+
+        for (int i = 0; i < n; i++)
+        {
+            totalSum += arr[i];
+        }
+
+        vector<vector<int>> dp(n, vector<int>(totalSum + 1, -1)); // index -> sum
+        int minDiff = INT_MAX;
+
+        rec(n - 1, 0, totalSum, minDiff, arr, dp);
+
         return minDiff;
     }
 

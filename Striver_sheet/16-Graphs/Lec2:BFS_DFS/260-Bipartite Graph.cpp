@@ -95,7 +95,7 @@ class Solution
 {
 public:
     //-------------------------------------------------------------------------------
-    // 1. Title: Bipartite Graph | DFS Implementation
+    // 1. Title: Bipartite Graph | BFS Implementation
     //-------------------------------------------------------------------------------
 
     /**

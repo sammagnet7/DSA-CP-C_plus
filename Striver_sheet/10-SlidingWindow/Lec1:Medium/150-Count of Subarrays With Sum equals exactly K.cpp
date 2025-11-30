@@ -42,10 +42,10 @@ Examples:
     Input: nums = [1,0,1,0,1], goal = 2
     Output: 4
     Explanation: The 4 subarrays are bolded and underlined below:
-    [1,0,1,0,1]
-    [1,0,1,0,1]
-    [1,0,1,0,1]
-    [1,0,1,0,1]
+    [1,0,1],0,1]
+    [1,0,1,0],1]
+    [1,[0,1,0,1]
+    [1,0,[1,0,1]
 
     Example 2:
     Input: nums = [0,0,0,0,0], goal = 0
@@ -140,70 +140,58 @@ public:
     // Approach1:
     //
 
-    // // Sub-optimal approach: Prefix sum
-    // // Time: O(N) ~ O(N^2) due to using map
-    // // Space: O(N)
-    // int numSubarraysWithSum(vector<int>& nums, int goal) {
+    // Sub-optimal approach: Prefix sum
+    // Time: O(N) ~ O(N^2) due to using map
+    // Space: O(N)
+    int numSubarraysWithSum(vector<int> &nums, int goal)
+    {
 
-    //     int N = nums.size();
-    //     int ans=0;
+        int N = nums.size();
+        int ans = 0;
 
-    //     unordered_map<int,int> mp; // O(N): <prefix sum, freq>
-    //     mp[0] = 1;  // For considering the sum of array from starting
+        unordered_map<int, int> mp; // O(N): <prefix sum, freq>
+        mp[0] = 1;                  // For considering the sum of array from starting
 
-    //     long long prefix_sum = 0;
+        long long prefix_sum = 0;
 
-    //     for(int i=0; i<N; i++){
-    //         prefix_sum += nums[i];
-    //         int req_pre_sum = prefix_sum - goal;
+        for (int i = 0; i < N; i++)
+        {
+            prefix_sum += nums[i];
+            int req_pre_sum = prefix_sum - goal;
 
-    //         ans += (mp[req_pre_sum]);
-    //         mp[prefix_sum]++;
-    //     }
+            ans += (mp[req_pre_sum]);
+            mp[prefix_sum]++;
+        }
 
-    //     return ans;
-    // }
+        return ans;
+    }
 
     // -------------------------------------
     // Approach2:
     //
 
     // O(2N)
-    int numSubarraysWith_lessEqual_Sum(vector<int> &nums, int goal)
+    int numSubarraysWith_lessEqual_Sum(vector<int> &nums, int k)
     {
 
-        if (goal < 0)
-            return 0;
         int N = nums.size();
+        int sum = 0;
+        int i = 0;
+        int j = 0;
         int ans = 0;
 
-        int l = 0;
-        int r = 0;
-        int sum = 0;
+        while (i < N)
+        {
+            sum += nums[i];
 
-        while (r < N)
-        { // O(N)
-            int cur = nums[r];
-            sum += cur;
-
-            if (sum <= goal)
-            { // less equal
-                int less_equal_count = r - l + 1;
-                ans += less_equal_count;
+            while (sum > k && j <= i)
+            {
+                sum -= nums[j];
+                j++;
             }
 
-            while (sum > goal && l <= r)
-            { // O(N)
-                sum -= nums[l];
-                l++;
-                if (sum <= goal)
-                { // less equal
-                    int less_equal_count = r - l + 1;
-                    ans += less_equal_count;
-                }
-            }
-
-            r++;
+            ans += (i - j + 1);
+            i++;
         }
 
         return ans;
@@ -234,41 +222,76 @@ class Solution
 {
 public:
     // O(2N)
+    // int numberOfSubarrays_less_equals(vector<int> &nums, int k)
+    // {
+
+    //     int N = nums.size();
+    //     int ans = 0;
+
+    //     int l = 0;
+    //     int r = 0;
+    //     int oddCount = 0;
+
+    //     while (r < N)
+    //     { // O(N)
+    //         if (nums[r] % 2)
+    //         {
+    //             oddCount++;
+    //         }
+    //         if (oddCount <= k)
+    //         {
+    //             ans += (r - l + 1);
+    //         }
+    //         while (oddCount > k)
+    //         { // O(N)
+    //             if (nums[l] % 2)
+    //             {
+    //                 oddCount--;
+    //             }
+    //             l++;
+
+    //             if (oddCount <= k)
+    //             {
+    //                 ans += (r - l + 1);
+    //             }
+    //         }
+
+    //         r++;
+    //     }
+
+    //     return ans;
+    // }
+
     int numberOfSubarrays_less_equals(vector<int> &nums, int k)
     {
 
         int N = nums.size();
+
+        int i = 0;
+        int j = 0;
+        int oddCount = 0;
         int ans = 0;
 
-        int l = 0;
-        int r = 0;
-        int oddCount = 0;
+        while (i < N)
+        {
 
-        while (r < N)
-        { // O(N)
-            if (nums[r] % 2)
+            if (nums[i] & 1)
             {
                 oddCount++;
             }
-            if (oddCount <= k)
+
+            while (oddCount > k && j <= i)
             {
-                ans += (r - l + 1);
-            }
-            while (oddCount > k)
-            { // O(N)
-                if (nums[l] % 2)
+                if (nums[j] & 1)
                 {
                     oddCount--;
                 }
-                l++;
-
-                if (oddCount <= k)
-                {
-                    ans += (r - l + 1);
-                }
+                j++;
             }
 
-            r++;
+            ans += (i - j + 1);
+
+            i++;
         }
 
         return ans;

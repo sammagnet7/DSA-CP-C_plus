@@ -101,48 +101,59 @@ bool knows(int i, int j)
 
 //
 
-// // Approach:1 : My approach
-// // Optimal approach: Using two pointers from same direction
-// // Time: O(2N)
-// // SPace: O(1)
-// int findCelebrity(int n) {
-//  	// Write your code here.
+// Approach:1 : My approach
+// Optimal approach: Using two pointers from same direction
+// Time: O(2N)
+// Space: O(1)
+int findCelebrity(int n)
+{
+    // Write your code here.
 
-// 	int i=0;
-// 	int j=1;
+    int i = 0;
+    int j = 1;
 
-// 	while(i<n && j<n){	// O(N)
+    while (i < n && j < n)
+    { // O(N)
 
-// 		// if(i==j){	// This is getting handled by 4th case
-// 		// 	j=i+1;
-// 		// }
-// 		// if(i>=n || j>= n) break;
+        // if(i==j){	// This is getting handled by 4th case
+        // 	j=i+1;
+        // }
+        // if(i>=n || j>= n) break;
 
-// 		if(knows(i,j) && knows(j,i)){	// 1st case: i knows j, j knows i
-// 			j++;
-// 			i=j;
-// 		}
-// 		else if(knows(i,j) && !knows(j,i)){	// 2nd case: i knows j, j NOTknows i
-// 			i=j;
-// 			j++;
-// 		}
-// 		else if(!knows(i,j) && knows(j,i)){	// 3rd case: i NOTknows j, j knows i
-// 			j++;
-// 		}
-// 		else if(!knows(i,j) && !knows(j,i)){	// 4th case: i NOTknows j, j NOTknows i
-// 			i=j; j++;
-// 		}
-// 	}
+        if (knows(i, j) && knows(j, i))
+        { // 1st case: i knows j, j knows i
+            j++;
+            i = j;
+        }
+        else if (knows(i, j) && !knows(j, i))
+        { // 2nd case: i knows j, j NOTknows i
+            i = j;
+            j++;
+        }
+        else if (!knows(i, j) && knows(j, i))
+        { // 3rd case: i NOTknows j, j knows i
+            j++;
+        }
+        else if (!knows(i, j) && !knows(j, i))
+        { // 4th case: i NOTknows j, j NOTknows i
+            i = j;
+            j++;
+        }
+    }
 
-// 	if(i>=n) return -1; // If `i` invalid return -1
+    if (i >= n)
+        return -1; // If `i` invalid return -1
 
-// 	for(int k=0; k<n; k++){	// O(N): double checking
-// 		if(i!=k && knows(i,k)) return -1;
-// 		if(i!=k && !knows(k,i)) return -1;
-// 	}
+    for (int k = 0; k < n; k++)
+    { // O(N): double checking
+        if (i != k && knows(i, k))
+            return -1;
+        if (i != k && !knows(k, i))
+            return -1;
+    }
 
-// 	return i;	// `i` is a celebrity
-// }
+    return i; // `i` is a celebrity
+}
 
 // Approach2 : Striver's approach
 // Optimal approach: Using two pointers from opposit direction
@@ -202,6 +213,59 @@ int findCelebrity(int N)
 
     // Return the index of celebrity
     return top;
+}
+
+// Another optimal approach: pointers same direction
+
+int findCelebrity(int n)
+{
+    // Write your code here.
+
+    if (n <= 1)
+        return -1;
+
+    vector<int> vis(n, -1);
+
+    int i = 0;
+    int j = 0;
+
+    while (j < n)
+    {
+
+        if (i == j)
+        {
+            j++;
+            continue;
+        }
+
+        bool know = knows(i, j);
+
+        if (know)
+        {
+            vis[i] = 0;
+            i = j;
+            j++;
+            continue;
+        }
+        else
+        {
+            vis[j] = 0;
+            j++;
+        }
+    }
+
+    for (int k = 0; k < n; k++)
+    {
+        if (k == i)
+        {
+            continue;
+        }
+        if (knows(i, k) || !knows(k, i))
+        {
+            return -1;
+        }
+    }
+    return i;
 }
 
 int main()

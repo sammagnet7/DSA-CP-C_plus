@@ -35,9 +35,11 @@ Examples :
     Input: s = "abab"
     Output: 2
     Explanation: The string "ab" is the longest prefix and suffix.
+
     Input: s = "aabcdaabc"
     Output: 4
     Explanation: The string "aabc" is the longest prefix and suffix.
+    
     Input: s = "aaaa"
     Output: 3
     Explanation: "aaa" is the longest prefix and suffix.

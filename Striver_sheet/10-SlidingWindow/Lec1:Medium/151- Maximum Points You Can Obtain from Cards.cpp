@@ -66,46 +66,49 @@ public:
     //
     //  Approach1:
 
-    // // Sub-optimal solution: Using prefix-sum
-    // //
-    // // Time: O(2N)
-    // // Space: O(1)
-    // int maxScore(vector<int>& cardPoints, int k) {
+    // Sub-optimal solution: Using prefix-sum
+    //
+    // Time: O(2N)
+    // Space: O(1)
+    int maxScore(vector<int> &cardPoints, int k)
+    {
+        int N = cardPoints.size();
+        int remSubArrSize = N - k;
+        long long total = 0;
 
-    //     int N = cardPoints.size();
-    //     int remSubArrSize = N-k;
-    //     long long total = 0;
+        for (int i : cardPoints)
+        { // O(N)
+            total += i;
+        }
 
-    //     for(int i:cardPoints){  // O(N)
-    //         total += i;
-    //     }
+        int l = 0;
+        int r = 0;
 
-    //     int l = 0;
-    //     int r = 0;
+        long long windowTot = 0;
 
-    //     long long windowTot = 0;
+        while (r <= (l + remSubArrSize - 1))
+        { // O(K)
+            windowTot += cardPoints[r];
+            r++;
+        }
 
-    //     while(r<=(l+remSubArrSize-1)){ //O(K)
-    //         windowTot += cardPoints[r];
-    //         r++;
-    //     }
+        long long score = total - windowTot;
+        long long maxScore = score;
 
-    //     long long score = total-windowTot;
-    //     long long maxScore = score;
+        while (r < N)
+        { // O(N-k)
+            windowTot -= cardPoints[l];
+            windowTot += cardPoints[r];
 
-    //     while(r<N){ // O(N-k)
-    //         windowTot -= cardPoints[l];
-    //         windowTot += cardPoints[r];
+            score = total - windowTot;
+            maxScore = max(maxScore, score);
 
-    //         score = total-windowTot;
-    //         maxScore = max(maxScore,score);
+            l++;
+            r++;
+        }
 
-    //         l++;
-    //         r++;
-    //     }
-
-    //     return maxScore;
-    // }
+        return maxScore;
+    }
 
     // ----------------------------------------
     // Approach2:

@@ -135,6 +135,46 @@ vector<int> asteroidCollision(vector<int> &asteroids)
     return st;
 }
 
+// approach: 2
+// Idea: Always push to queue EXCEPT: when stack is having +ve and input array is having -ve. 
+// That is in case only at left is +ve and at right is -ve -> collison can happen. Elsewhere simple plush
+vector<int> asteroidCollision(vector<int> &asteroids)
+{
+
+    int N = asteroids.size();
+    vector<int> st;
+    int i = 0;
+
+    while (i < N)
+    {
+        while (i < N && asteroids[i] < 0 && !st.empty() && st.back() > 0)
+        { // moves left
+            if (abs(st.back()) == abs(asteroids[i]))
+            {
+                st.pop_back();
+                i++;
+                continue;
+            }
+            else if (abs(st.back()) > abs(asteroids[i]))
+            {
+                i++;
+                continue;
+            }
+            else if (abs(st.back()) < abs(asteroids[i]))
+            {
+                st.pop_back();
+                continue;
+            }
+        }
+
+        // moves right
+        if (i < N)
+            st.push_back(asteroids[i++]);
+    }
+
+    return st;
+}
+
 int main()
 {
     return 0;

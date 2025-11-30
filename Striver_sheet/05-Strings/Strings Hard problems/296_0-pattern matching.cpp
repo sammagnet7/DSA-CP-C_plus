@@ -109,7 +109,7 @@ https://www.youtube.com/watch?v=yKhPWrdA6U8
 
 
 Problem statement:
-Given two strings, one is a text string txt and the other is a pattern string pat. The task is to print the indexes of all the occurrences of the pattern string in the text string. Use 0-based indexing while returning the indices.
+Given two strings, one is a text string `txt` and the other is a pattern string `pat`. The task is to print the indexes of all the occurrences of the pattern string in the text string. Use 0-based indexing while returning the indices.
 Note: Return an empty list in case of no occurrences of pattern.
 
 Examples :
@@ -501,10 +501,8 @@ public:
         int m = (int)pat.size(); // length of pattern
 
         // Edge cases: empty pattern or empty text
-        if (m == 0)
+        if (m == 0 || n == 0)
             return {}; // choose behavior: here return no matches
-        if (n == 0)
-            return {}; // empty text -> no matches
 
         // Build prefix-function for pattern (LPS for pattern)
         vector<int> LPS_pat = buildLPS(pat);

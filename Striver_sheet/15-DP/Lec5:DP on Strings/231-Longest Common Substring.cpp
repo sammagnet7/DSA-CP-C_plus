@@ -190,7 +190,7 @@ public:
      * -------------
      * We use dynamic programming to compare the strings character by character.
      * We build a table (dp) where each cell dp[i][j] tells us:
-     *   "How long is the longest common substring ending at str1[i-1] and str2[j-1]?"
+     *   "How long is the longest common substring ending at str1[i-1] and str2[j-1]"
      *
      * - If the characters match, we extend the previous substring length by 1.
      * - If the characters don't match, the length resets to 0
@@ -206,8 +206,8 @@ public:
      *
      * Complexity:
      * -----------
-     * Time:  O(N1 * N2) ? we check each character pair once.
-     * Space: O(N1 * N2) ? we store the results for all character pairs.
+     * Time:  O(N1 * N2) -> we check each character pair once.
+     * Space: O(N1 * N2) -> we store the results for all character pairs.
      */
     int LCSubStr(string str1, string str2)
     {

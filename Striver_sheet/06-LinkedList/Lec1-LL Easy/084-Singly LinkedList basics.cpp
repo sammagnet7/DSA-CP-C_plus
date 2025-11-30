@@ -29,6 +29,8 @@ Approach:
         node->val = temp_next->val;
         node->next = temp_next->next;
 
+        temp_next->next = nullptr;
+
         delete(temp_next);
     }
 

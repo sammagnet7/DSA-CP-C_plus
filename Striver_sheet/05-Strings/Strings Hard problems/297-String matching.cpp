@@ -456,6 +456,48 @@ public:
         // Step 6: If none matched, b cannot be contained by any repetition count of a
         return -1;
     }
+
+    // Another approach
+    int repeatedStringMatch(string a, string b)
+    {
+
+        int m = a.size();
+        int n = b.size();
+
+        int basic = ceil((double)n / m);
+
+        string tmp = "";
+
+        for (int i = 0; i < basic; i++)
+        {
+            tmp.append(a);
+        }
+
+        if (tmp.find(b) < tmp.size())
+        {
+            return basic;
+        }
+
+        string tmp1 = a + tmp;
+        if (tmp1.find(b) < tmp.size())
+        {
+            return basic + 1;
+        }
+
+        string tmp2 = tmp + a;
+        if (tmp2.find(b) < tmp.size())
+        {
+            return basic + 1;
+        }
+
+        string tmp3 = a + tmp + a;
+        if (tmp3.find(b) < tmp.size())
+        {
+            return basic + 2;
+        }
+
+        return -1;
+    }
 };
 
 int main()

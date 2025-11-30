@@ -91,15 +91,15 @@ public:
   // Sub-optimal approach: using sorting
   // Time: O(N Log N)
   // Space: O(1)
-  // int findKthLargest(vector<int> &nums, int k)
-  // {
+  int findKthLargest(vector<int> &nums, int k)
+  {
 
-  //   int N = nums.size();
+    int N = nums.size();
 
-  //   sort(nums.begin(), nums.end());
+    sort(nums.begin(), nums.end());
 
-  //   return nums[N - k];
-  // }
+    return nums[N - k];
+  }
 
   // ----------------------------
   // Approach2:
@@ -107,23 +107,23 @@ public:
   // Sub-optimal approach: using PQ as MAX heap
   // Time: O(N Log N + K log N)
   // Space: O(N)
-  // int findKthLargest(vector<int> &nums, int k)
-  // {
+  int findKthLargest(vector<int> &nums, int k)
+  {
 
-  //   priority_queue<int> pq; // O(N)
+    priority_queue<int> pq; // O(N)
 
-  //   for (int i = 0; i < nums.size(); i++)
-  //   { // O(N)
-  //     pq.push(nums[i]); // O(Log N)
-  //   }
+    for (int i = 0; i < nums.size(); i++)
+    {                   // O(N)
+      pq.push(nums[i]); // O(Log N)
+    }
 
-  //   for (int i = 0; i < k - 1; i++)
-  //   { // O(k)
-  //     pq.pop(); // O(Log N)
-  //   }
+    for (int i = 0; i < k - 1; i++)
+    {           // O(k)
+      pq.pop(); // O(Log N)
+    }
 
-  //   return pq.top();
-  // }
+    return pq.top();
+  }
 
   // ----------------------------
   // Approach3:
@@ -132,29 +132,29 @@ public:
   //
   // Time: O(K Log K + (N-K)*LogK ) ~ O(N Log K)
   // Space: O(K)
-  // int findKthLargest(vector<int> &nums, int k)
-  // {
+  int findKthLargest(vector<int> &nums, int k)
+  {
 
-  //   priority_queue<int, vector<int>, greater<int>> pq_min;
-  //   int N = nums.size();
+    priority_queue<int, vector<int>, greater<int>> pq_min;
+    int N = nums.size();
 
-  //   for (int i = 0; i < k; i++)
-  //   {                       // O(K)
-  //     pq_min.push(nums[i]); // O(Log K)
-  //   }
+    for (int i = 0; i < k; i++)
+    {                       // O(K)
+      pq_min.push(nums[i]); // O(Log K)
+    }
 
-  //   for (int i = k; i < N; i++)
-  //   { // O(N-K)
+    for (int i = k; i < N; i++)
+    { // O(N-K)
 
-  //     if (nums[i] > pq_min.top())
-  //     {
-  //       pq_min.pop(); // O(Log K)
-  //       pq_min.push(nums[i]);
-  //     }
-  //   }
+      if (nums[i] > pq_min.top())
+      {
+        pq_min.pop(); // O(Log K)
+        pq_min.push(nums[i]);
+      }
+    }
 
-  //   return pq_min.top();
-  // }
+    return pq_min.top();
+  }
 
   // ----------------------------
   // Approach4:

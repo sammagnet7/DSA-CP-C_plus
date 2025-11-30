@@ -29,17 +29,18 @@ A border of a string is a prefix that is also a suffix of the string but not the
 
 Example
     Input:
-    abcababcab Output:
+    abcababcab 
+    Output:
     2 5
 
-    Sample Input 0
+    Sample Input
     aaaaaaaaaa
-    Sample Output 0
+    Sample Output
     1 2 3 4 5 6 7 8 9
 
-    Sample Input 1
+    Sample Input
     ababababab
-    Sample Output 1
+    Sample Output
     2 4 6 8
 
 Input Format
@@ -117,7 +118,7 @@ OUTPUT::::::
 */
 void buildLPS(vector<int> &LPS, const string &pat)
 {
-    int n = (int)pat.size();
+    int n = pat.size();
     if (n == 0)
         return; // nothing to do for empty string
 
@@ -191,7 +192,7 @@ void buildLPS(vector<int> &LPS, const string &pat)
 */
 vector<int> findBorders(const string &s)
 {
-    int n = (int)s.size();
+    int n = s.size();
     if (n == 0)
         return {}; // no borders in empty string
 

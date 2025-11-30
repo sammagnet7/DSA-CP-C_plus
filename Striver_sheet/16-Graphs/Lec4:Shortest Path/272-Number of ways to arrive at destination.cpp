@@ -96,6 +96,9 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 //
 
+#define P pair<long long, int>
+
+
 class Solution
 {
 public:
@@ -155,7 +158,7 @@ public:
         vector<long long> ways(n, 0);
 
         // Priority queue: {distance, node}
-        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
+        priority_queue<P, vector<P>, greater<P>> pq;
 
         minDist[0] = 0;
         ways[0] = 1;

@@ -18,7 +18,7 @@ using namespace std;
 Clone Linked List with Random and Next Pointer:
 
 https://takeuforward.org/data-structure/clone-linked-list-with-random-and-next-pointer/
-https://leetcode.com/problems/copy-list-with-random-pointer/submissions/1663815606/
+https://leetcode.com/problems/copy-list-with-random-pointer/
 
 
 Problem statement:

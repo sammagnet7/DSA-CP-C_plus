@@ -18,7 +18,8 @@ using namespace std;
 Add 1 to a number represented by LL:
 
 https://www.youtube.com/watch?v=aXQWhbvT3w0&t=1s
-https://www.naukri.com/code360/problems/add-one-to-a-number-represented-as-linked-list_920557?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/add-one-to-a-number-represented-as-linked-list_920557?leftPanelTabValue=PROBLEM
+
 
 Problem statement:
 You're given a positive integer represented in the form of a singly linked-list of digits. The length of the number is 'n'.
@@ -56,7 +57,7 @@ OUTPUT::::::
 
 Add two numbers represented as Linked Lists:
 https://takeuforward.org/data-structure/add-two-numbers-represented-as-linked-lists/
-https://leetcode.com/problems/add-two-numbers/submissions/1661531904/
+https://leetcode.com/problems/add-two-numbers/
 
 */
 

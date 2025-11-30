@@ -25,7 +25,7 @@ Sample Input 1:
 4
 2 3 4 1
 Sample Output 1:
-3   
+3
 Explanation of sample output 1:
 If we right rotate the array {1, 2, 3, 4} by '3' times then we will get {2, 3, 4, 1}. Thus 'r' = 3.
 
@@ -42,9 +42,9 @@ INPUT::::::
 5
 2 3 4 1
 1 2 3
-35 43 45 1 2 9 12 13 19 20 26 28 29 32 
+35 43 45 1 2 9 12 13 19 20 26 28 29 32
 2
-6 7 10 1 4 
+6 7 10 1 4
 
 OUTPUT::::::
 3
@@ -59,7 +59,6 @@ class Solution
 public:
     // Alternate minimal approach would be to find the minimum element in this array.
     // That gives the starting element of rotated array
-
 
     // Optimal approach: Check which indexes are having elements lesser than start element of the array.
     // That is breaking the sorted order. And take the left most index from those.
@@ -92,6 +91,66 @@ public:
         }
         return k;
     }
+
+
+
+    // Another approach: exactly similar to find the minimum element in the array. i.e. the value of k
+    int findKRotation(vector<int> &arr)
+    {
+        // Write your code here.
+
+        int l = 0;
+        int r = arr.size() - 1;
+        int idx = 0;
+
+        while (l <= r)
+        {
+
+            if (arr[l] <= arr[r])
+            {
+                if (arr[l] < arr[idx])
+                {
+                    idx = l;
+                }
+                break;
+            }
+
+            int mid = l + (r - l) / 2;
+            // cout<< l<<" "<<mid<<" "<<r<<endl;
+
+            if (arr[l] == arr[r])
+            {
+                if (arr[l] < arr[idx])
+                {
+                    idx = l;
+                }
+                break;
+            }
+
+            if (arr[l] <= arr[mid])
+            {
+                // left half sorted
+                if (arr[l] < arr[idx])
+                {
+                    idx = l;
+                }
+                // go right
+                l = mid + 1;
+            }
+            else
+            {
+                // right half sorted
+                if (arr[mid] < arr[idx])
+                {
+                    idx = mid;
+                }
+                // go left
+                r = mid - 1;
+            }
+        }
+
+        return idx;
+    }
 };
 
 int main()
@@ -102,9 +161,9 @@ int main()
 
     while (t--)
     {
-        //int target;
-        //cin >> target;
-        //cin.ignore();
+        // int target;
+        // cin >> target;
+        // cin.ignore();
 
         string input;
         getline(cin, input);

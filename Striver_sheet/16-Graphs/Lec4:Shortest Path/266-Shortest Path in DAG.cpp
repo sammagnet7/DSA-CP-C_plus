@@ -106,60 +106,60 @@ public:
      * Space Complexity: O(V + E) for adjacency list + O(V) for queue + O(V) for distance array.
      *
      * **Why it's not efficient:**
-     * - Nodes are revisited multiple times since we don?t guarantee that we process nodes after all their dependencies.
+     * - Nodes are revisited multiple times since we don't guarantee that we process nodes after all their dependencies.
      * - This makes it similar to Bellman-Ford behavior in worst cases (though still better in DAG because no negative cycle).
      */
 
-    // vector<int> shortestPath(int V, int m, vector<vector<int>> &edges)
-    // {
-    //     // Build adjacency list where each entry stores {neighbor, weight}
-    //     vector<vector<pair<int, int>>> adjL(V);
-    //     for (auto e : edges)
-    //     {
-    //         adjL[e[0]].push_back({e[1], e[2]});
-    //     }
+    vector<int> shortestPath(int V, int m, vector<vector<int>> &edges)
+    {
+        // Build adjacency list where each entry stores {neighbor, weight}
+        vector<vector<pair<int, int>>> adjL(V);
+        for (auto e : edges)
+        {
+            adjL[e[0]].push_back({e[1], e[2]});
+        }
 
-    //     // Distance array initialized with large value (1e9 means unreachable)
-    //     vector<int> vist_dist(V, 1e9);
+        // Distance array initialized with large value (1e9 means unreachable)
+        vector<int> vist_dist(V, 1e9);
 
-    //     // Start BFS from source node 0
-    //     queue<int> q;
-    //     q.push(0);
-    //     vist_dist[0] = 0;
+        // Start BFS from source node 0
+        queue<int> q;
+        q.push(0);
+        vist_dist[0] = 0;
 
-    //     // BFS-like processing
-    //     while (!q.empty())
-    //     {
-    //         int cur = q.front();
-    //         int curDist = vist_dist[cur];
-    //         q.pop();
+        // BFS-like processing
+        while (!q.empty())
+        {
+            int cur = q.front();
+            int curDist = vist_dist[cur];
+            q.pop();
 
-    //         // Relax all adjacent nodes
-    //         for (auto adj : adjL[cur])
-    //         {
-    //             int adjN = adj.first;     // neighbor
-    //             int adjDist = adj.second; // edge weight
+            // Relax all adjacent nodes
+            for (auto adj : adjL[cur])
+            {
+                int adjN = adj.first;     // neighbor
+                int adjDist = adj.second; // edge weight
 
-    //             int newAdjDist = curDist + adjDist;
+                int newAdjDist = curDist + adjDist;
 
-    //             // If we find a shorter path, update and push neighbor to queue
-    //             if (newAdjDist < vist_dist[adjN])
-    //             {
-    //                 vist_dist[adjN] = newAdjDist;
-    //                 q.push(adjN);
-    //             }
-    //         }
-    //     }
+                // If we find a shorter path, update and push neighbor to queue
+                if (newAdjDist < vist_dist[adjN])
+                {
+                    vist_dist[adjN] = newAdjDist;
+                    q.push(adjN);
+                }
+            }
+        }
 
-    //     // Convert unreachable nodes to -1
-    //     vector<int> ans;
-    //     for (int i : vist_dist)
-    //     {
-    //         ans.push_back(i == 1e9 ? -1 : i);
-    //     }
+        // Convert unreachable nodes to -1
+        vector<int> ans;
+        for (int i : vist_dist)
+        {
+            ans.push_back(i == 1e9 ? -1 : i);
+        }
 
-    //     return ans;
-    // }
+        return ans;
+    }
 
     /**
      * @brief Compute the shortest path in a DAG using Topological Sort (Efficient approach).
@@ -171,7 +171,7 @@ public:
      *
      * Steps:
      * 1. Build adjacency list and indegree array.
-     * 2. Perform topological sort using Kahn?s algorithm.
+     * 2. Perform topological sort using Kahn's algorithm.
      * 3. Initialize dist array with infinity except source node = 0.
      * 4. Traverse nodes in topological order, and relax edges.
      * 5. Convert unreachable nodes (still 1e9) to -1.

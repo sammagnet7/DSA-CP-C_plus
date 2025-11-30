@@ -66,26 +66,29 @@ public:
   // // Sub-optimal approach
   // // time: O(N^2) ~ o(N^3)
   // // Space: O(2N) including `ans` space
-  // vector<int> replaceWithRank(vector<int> &arr, int n) {
+  vector<int> replaceWithRank(vector<int> &arr, int n)
+  {
 
-  //     int N = arr.size();
-  //     vector<int> ans(N); // space: O(N)
+    int N = arr.size();
+    vector<int> ans(N); // space: O(N)
 
-  //     for(int i=0; i<N; i++){ // O(N)
+    for (int i = 0; i < N; i++)
+    { // O(N)
 
-  //         unordered_set<int> lessEls; // space: O(N)
+      unordered_set<int> lessEls; // space: O(N)
 
-  //         for(int j=0; j<N; j++){ // O(N)
+      for (int j = 0; j < N; j++)
+      { // O(N)
 
-  //             if(arr[j] < arr[i])
-  //                 lessEls.insert(arr[j]);  // Avg(1) ~ O(N)
-  //         }
+        if (arr[j] < arr[i])
+          lessEls.insert(arr[j]); // Avg(1) ~ O(N)
+      }
 
-  //         ans[i] = lessEls.size()+1;
-  //     }
+      ans[i] = lessEls.size() + 1;
+    }
 
-  //     return ans;
-  // }
+    return ans;
+  }
 
   // -------------------------------
   // Approach2: Optimal
@@ -116,6 +119,37 @@ public:
     }
 
     return arr;
+  }
+
+
+
+  // Time: O(N Log N)
+  // Space: O(N)
+  vector<int> replaceWithRank(vector<int> &arr, int n)
+  {
+    // Write your code here.
+
+    map<int, vector<int>> mp;
+
+    for (int i = 0; i < n; i++)
+    {
+      mp[arr[i]].push_back(i);
+    }
+
+    vector<int> ans(n, -1);
+
+    int rank = 0;
+    for (auto e : mp)
+    {
+      rank++;
+
+      for (int idx : e.second)
+      {
+        ans[idx] = rank;
+      }
+    }
+
+    return ans;
   }
 };
 

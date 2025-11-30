@@ -178,8 +178,31 @@ public:
   }
 
   //-------------------------------------------------------------------------------
-  // 2. Title:
+  // 2. Title: Build BST from Post order
   //-------------------------------------------------------------------------------
+
+  TreeNode *buildFromPost(const vector<int> &post, int &idx, long long lowBound)
+  {
+    if (idx < 0)
+      return nullptr;
+    // If current value is < lowBound then it does not belong here
+    if (post[idx] < lowBound)
+      return nullptr;
+
+    TreeNode *node = new TreeNode(post[idx--]);
+
+    // IMPORTANT: process right subtree first (because we're going backwards)
+    node->right = buildFromPost(post, idx, node->val);
+    node->left = buildFromPost(post, idx, lowBound);
+
+    return node;
+  }
+
+  TreeNode *bstFromPostorder(const vector<int> &post)
+  {
+    int idx = (int)post.size() - 1;
+    return buildFromPost(post, idx, LLONG_MIN);
+  }
 };
 
 int main()

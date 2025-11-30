@@ -41,7 +41,7 @@ Examples:
 
 
 Constraints:
-0 <= s.length <= 5 * 104
+0 <= s.length <= 5 * 10^4
 s consists of lowercase English letters only.
 
 

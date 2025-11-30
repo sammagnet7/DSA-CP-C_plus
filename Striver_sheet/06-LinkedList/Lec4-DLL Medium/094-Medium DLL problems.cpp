@@ -16,13 +16,13 @@ using namespace std;
 
 /*
 Delete all occurrences of a given key in a doubly linked list:
-https://www.naukri.com/code360/problems/delete-all-occurrences-of-a-given-key-in-a-doubly-linked-list_8160461?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/delete-all-occurrences-of-a-given-key-in-a-doubly-linked-list_8160461?leftPanelTabValue=PROBLEM
 
 Find pairs with given sum in Sorted doubly linked list:
-https://www.naukri.com/code360/problems/find-pair-with-a-given-sum-in-a-doubly-linked-list_1164172?leftPanelTabValue=SUBMISSION
+https://www.naukri.com/code360/problems/find-pair-with-a-given-sum-in-a-doubly-linked-list_1164172?leftPanelTabValue=PROBLEM
 
 Remove duplicates from a sorted Doubly Linked List:
-https://www.naukri.com/code360/problems/remove-duplicates-from-a-sorted-doubly-linked-list_2420283?leftPanelTabValue=DISCUSS
+https://www.naukri.com/code360/problems/remove-duplicates-from-a-sorted-doubly-linked-list_2420283?leftPanelTabValue=PROBLEM
 
 */
 

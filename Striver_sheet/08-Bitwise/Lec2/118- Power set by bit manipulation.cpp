@@ -16,7 +16,7 @@ using namespace std;
 
 /*
 
-1. Title: Poer set using bit manipulation
+1. Title: Power set using bit manipulation
 
 Links:
 https://www.youtube.com/watch?v=LqKaUv1G3_I
@@ -52,38 +52,41 @@ public:
     // --------------------------------------------------------------------------------------------------
     // Recursive approach (Slower):
 
-    // // O(2^N)
-    // void recursePowerSet(vector<vector<int>> &ans, vector<int> &input, vector<int> &subset, int inputIdx){
+    // O(2^N)
+    void recursePowerSet(vector<vector<int>> &ans, vector<int> &input, vector<int> &subset, int inputIdx)
+    {
 
-    //     if(inputIdx == input.size()){
-    //         ans.push_back(subset);
-    //         return;
-    //     }
+        if (inputIdx == input.size())
+        {
+            ans.push_back(subset);
+            return;
+        }
 
-    //     recursePowerSet(ans, input, subset, (inputIdx+1));
+        recursePowerSet(ans, input, subset, (inputIdx + 1));
 
-    //     subset.push_back(input[inputIdx]);
-    //     recursePowerSet(ans, input, subset, (inputIdx+1));
-    //     subset.pop_back();
-    // }
+        subset.push_back(input[inputIdx]);
+        recursePowerSet(ans, input, subset, (inputIdx + 1));
+        subset.pop_back();
+    }
 
-    // // optimal approach: recursion/ backtracking
-    // // Here we are keeping an index of input vector
-    // // in each recursion step we are calling recursion 2 ways: One with the indexed element and other without
-    // // And then moving the index forward to the next element in the input vector
-    // // And finally saving the generated string when index is going outof bounds of the input vector
-    // // This way all the possible sets are getting generated
-    // // Time: O(2^N) because each element has two option: either present or not
-    // // Space: O(N) for recursion stack
-    // vector<vector<int>> subsets(vector<int>& nums) {
+    // optimal approach: recursion/ backtracking
+    // Here we are keeping an index of input vector
+    // in each recursion step we are calling recursion 2 ways: One with the indexed element and other without
+    // And then moving the index forward to the next element in the input vector
+    // And finally saving the generated string when index is going outof bounds of the input vector
+    // This way all the possible sets are getting generated
+    // Time: O(2^N) because each element has two option: either present or not
+    // Space: O(N) for recursion stack
+    vector<vector<int>> subsets(vector<int> &nums)
+    {
 
-    //     vector<vector<int>> ans;
-    //     vector<int> subset;
+        vector<vector<int>> ans;
+        vector<int> subset;
 
-    //     recursePowerSet(ans, nums, subset, 0);
+        recursePowerSet(ans, nums, subset, 0);
 
-    //     return ans;
-    // }
+        return ans;
+    }
 
     // --------------------------------------------------------------------------------------------------
     // Bit manipulation approach (Faster):

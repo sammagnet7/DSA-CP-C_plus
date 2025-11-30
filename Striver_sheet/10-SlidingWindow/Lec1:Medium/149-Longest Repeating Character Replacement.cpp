@@ -27,6 +27,7 @@ https://leetcode.com/problems/longest-repeating-character-replacement/descriptio
 
 Problem statement:
 You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
+
 Return the length of the longest substring containing the same letter you can get after performing the above operations.
 
 Examples:
@@ -64,7 +65,6 @@ You are given a string 'str' and an integer ‘K’. Your task is to find the le
 
 For example:
 You are given ‘str’ = ‘abbbbbbc’ and ‘K’ = 2, then the substrings that can be formed are [‘abbbbbb’, ‘bbbbbbc’]. Hence the answer is 7.
-Detailed explanation ( Input/output format, Notes, Images )
 
 The string str will contain only lowercase alphabets.
 
@@ -109,49 +109,49 @@ OUTPUT::::::
 // Approach1:
 //
 
-// // Sub-optimal approach: 2 pointer using frequency array
-// // Time: O(N + (N*26))
-// // Space: O(26)
-// int characterReplacement(string s, int k)
-// {
+// Sub-optimal approach: 2 pointer using frequency array
+// Time: O(N + (N*26))
+// Space: O(26)
+int characterReplacement(string s, int k)
+{
 
-//     int ans = 0;
-//     int N = s.size();
+    int ans = 0;
+    int N = s.size();
 
-//     int l = 0;
-//     int r = 0;
-//     vector<int> frq(26, 0); // O(26): stores frequency of each char
-//     int maxFrq = 0;
+    int l = 0;
+    int r = 0;
+    vector<int> frq(26, 0); // O(26): stores frequency of each char
+    int maxFrq = 0;
 
-//     while (r < N)
-//     { // O(N)
-//         int cur = s[r] - 'A';
-//         frq[cur]++;
-//         maxFrq = max(maxFrq, frq[cur]);
+    while (r < N)
+    { // O(N)
+        int cur = s[r] - 'A';
+        frq[cur]++;
+        maxFrq = max(maxFrq, frq[cur]);
 
-//         int alterCount = (r - l + 1) - maxFrq;
+        int alterCount = (r - l + 1) - maxFrq;
 
-//         while (alterCount > k)
-//         { // O(N)
-//             int curLeft = s[l] - 'A';
-//             frq[curLeft]--;
+        while (alterCount > k)
+        { // O(N)
+            int curLeft = s[l] - 'A';
+            frq[curLeft]--;
 
-//             maxFrq = 0;
-//             for (int f : frq)
-//             { // O(26)
-//                 maxFrq = max(maxFrq, f);
-//             }
+            maxFrq = 0;
+            for (int f : frq)
+            { // O(26)
+                maxFrq = max(maxFrq, f);
+            }
 
-//             l++;
-//             alterCount = (r - l + 1) - maxFrq;
-//         }
+            l++;
+            alterCount = (r - l + 1) - maxFrq;
+        }
 
-//         ans = max(ans, (r - l + 1));
-//         r++;
-//     }
+        ans = max(ans, (r - l + 1));
+        r++;
+    }
 
-//     return ans;
-// }
+    return ans;
+}
 
 // ---------------------------------
 // Approach2:
@@ -204,47 +204,47 @@ int characterReplacement(string s, int k)
 //----------------------------------------------------------------------------------
 // 2. Title: Longest Substring with At Most K Distinct Characters
 //----------------------------------------------------------------------------------
-// 
+//
 
 // Approach1:
 //
 
-// // Sub-optimal approach: 2 pointer approach: Double pass
-// // Time: O(2N)
-// // Space: O(26)
-// int kDistinctChars(int k, string &str)
-// {
-//     // Write your code here
-//     int N = str.size();
-//     int ans = 0;
-//     unordered_map<char, int> mp;
+// Sub-optimal approach: 2 pointer approach: Double pass
+// Time: O(2N)
+// Space: O(26)
+int kDistinctChars(int k, string &str)
+{
+    // Write your code here
+    int N = str.size();
+    int ans = 0;
+    unordered_map<char, int> mp;
 
-//     int l = 0;
-//     int r = 0;
+    int l = 0;
+    int r = 0;
 
-//     while (r < N)
-//     {
-//         mp[str[r]]++;
+    while (r < N)
+    {
+        mp[str[r]]++;
 
-//         while (mp.size() > k)
-//         {
-//             mp[str[l]]--;
+        while (mp.size() > k)
+        {
+            mp[str[l]]--;
 
-//             if (mp[str[l]] == 0)
-//             {
-//                 mp.erase(str[l]);
-//             }
-//             l++;
-//         }
+            if (mp[str[l]] == 0)
+            {
+                mp.erase(str[l]);
+            }
+            l++;
+        }
 
-//         int len = r - l + 1;
-//         ans = max(ans, len);
+        int len = r - l + 1;
+        ans = max(ans, len);
 
-//         r++;
-//     }
+        r++;
+    }
 
-//     return ans;
-// }
+    return ans;
+}
 
 // ---------------------------------
 // Approach2:

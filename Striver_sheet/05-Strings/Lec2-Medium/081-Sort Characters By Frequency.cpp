@@ -63,10 +63,9 @@ public:
     // Space: O(N)
     string frequencySort(string s)
     {
-
         int N = s.size();
 
-        vector<pair<int, int>> freq(256, make_pair(0, 0)); // < char, <freq,char> >
+        vector<pair<int, int>> freq(256, make_pair(0, 0)); // < <freq,char> >
 
         // O(N)
         for (int i = 0; i < N; i++)
@@ -79,6 +78,9 @@ public:
 
         // O(1) as freq arr is of size 256
         sort(freq.begin(), freq.end());
+
+        // #include<functional>
+        // sort(freq.begin(), freq.end(), greater<pair<int,int>>());
 
         string ans;
 

@@ -65,7 +65,7 @@ INPUT::::::
 OUTPUT::::::
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
-1. Title: Bottom view of BT
+2. Title: Bottom view of BT
 
 Links:
 https://takeuforward.org/data-structure/bottom-view-of-a-binary-tree/
@@ -208,7 +208,7 @@ public:
   }
 
   //-------------------------------------------------------------------------------
-  // 2. Title: Top View of BT
+  // 2. Title: Bottom View of BT
   //-------------------------------------------------------------------------------
 
   // Optmal approach: Using level order traversal (Exactly same as Top view excep one line)

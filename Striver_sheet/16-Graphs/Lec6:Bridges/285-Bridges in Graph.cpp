@@ -114,8 +114,7 @@ class Solution
     {
 
         vis[cur] = 1;
-        vis_time[cur] = min_adj_time[cur] = time; // initialize discovery & low
-        time++;
+        vis_time[cur] = min_adj_time[cur] = time++; // initialize discovery & low
 
         // Explore all neighbors
         for (int adjN : adjL[cur])
@@ -133,7 +132,7 @@ class Solution
                 min_adj_time[cur] = min(min_adj_time[cur], min_adj_time[adjN]);
 
                 // Bridge condition: If neighbor’s low > current’s discovery
-                if (min_adj_time[adjN] > vis_time[cur])
+                if (vis_time[cur] < min_adj_time[adjN])
                 {
                     bridges.push_back({cur, adjN});
                 }

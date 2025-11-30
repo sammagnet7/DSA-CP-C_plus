@@ -116,47 +116,47 @@ public:
     // - Space : O(N + E) → adjacency list + visited[].
     //----------------------------------------------------------------------------
 
-    // int makeConnected(int n, vector<vector<int>>& connections) {
-    //     int eCount = connections.size();
+    int makeConnected(int n, vector<vector<int>>& connections) {
+        int eCount = connections.size();
 
-    //     // Not enough cables
-    //     if (n - 1 > eCount)
-    //         return -1;
+        // Not enough cables
+        if (n - 1 > eCount)
+            return -1;
 
-    //     // Step 1: Build adjacency list
-    //     vector<vector<int>> adjL(n);
-    //     for (auto &e : connections) {
-    //         adjL[e[0]].push_back(e[1]);
-    //         adjL[e[1]].push_back(e[0]);
-    //     }
+        // Step 1: Build adjacency list
+        vector<vector<int>> adjL(n);
+        for (auto &e : connections) {
+            adjL[e[0]].push_back(e[1]);
+            adjL[e[1]].push_back(e[0]);
+        }
 
-    //     // Step 2: BFS to count components
-    //     vector<int> vis(n, 0);
-    //     int countDisCon = 0;
-    //     queue<int> q;
+        // Step 2: BFS to count components
+        vector<int> vis(n, 0);
+        int countDisCon = 0;
+        queue<int> q;
 
-    //     for (int i = 0; i < n; i++) {
-    //         if (vis[i] != 0) continue; // already visited in previous BFS
+        for (int i = 0; i < n; i++) {
+            if (vis[i] != 0) continue; // already visited in previous BFS
 
-    //         countDisCon++;  // new component found
-    //         q.push(i);
-    //         vis[i] = 1;
+            countDisCon++;  // new component found
+            q.push(i);
+            vis[i] = 1;
 
-    //         while (!q.empty()) {
-    //             int curN = q.front(); q.pop();
+            while (!q.empty()) {
+                int curN = q.front(); q.pop();
 
-    //             for (int &adjN : adjL[curN]) {
-    //                 if (vis[adjN] == 0) {
-    //                     vis[adjN] = 1;
-    //                     q.push(adjN);
-    //                 }
-    //             }
-    //         }
-    //     }
+                for (int &adjN : adjL[curN]) {
+                    if (vis[adjN] == 0) {
+                        vis[adjN] = 1;
+                        q.push(adjN);
+                    }
+                }
+            }
+        }
 
-    //     // Step 3: Need (components - 1) edges
-    //     return (countDisCon - 1);
-    // }
+        // Step 3: Need (components - 1) edges
+        return (countDisCon - 1);
+    }
 
     //----------------------------------------------------------------------------
     // Approach 2: Disjoint Set Union (DSU / Union-Find)

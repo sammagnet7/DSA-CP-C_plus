@@ -236,9 +236,6 @@
           - You're storing pointers in a data structure.
           - Polymorphism or dynamic lifetime needed.
 
-          💡 Your code is correct:
-          - Stack use is cleaner and safer.
-          - No need for `new` since object is used and returned locally.
    - Efficient way to merge a `string` and a `vector<string>` into `vector<vector<string>>`:
      - **Problem:**  
        Given a `string name` and a `vector<string> emails`, insert them together into a `vector<vector<string>> ans` in the form:  
@@ -315,7 +312,7 @@
      
 2.  If the string contains both uppercase and lowercase letters: We have 256 characters in total in this case. So, we will create a hash array of size **256**. Otherwise we can use hash[s[i]-’a’] OR hash[s[i]-’A’] and keep the hash array of 26 elements only.
 
-3.  In the map data structure, the data type of key can be anything like int, double, pair<int, int>, etc. But for unordered_map the data type is limited to integer, double, string, etc. We cannot have an unordered_map whose key is pair<int, int>. 
+3.  In the map data structure, the data type of **key** can be anything like int, double, pair<int, int>, etc. But for unordered_map the data type is limited to integer, double, string, etc. We cannot have an unordered_map whose key is pair<int, int>. 
 
 4.  How to traverse map from end to start?
      Ans: 
@@ -339,8 +336,8 @@
 9.  How to rotate an array or a string? (`O(N)`)
      - Use built-in function rotate(first,middle, last) where
        - first: fist iterator in the range of elements to rotate
-       - last: last iterator in the range of elements to rotate
        - middle: Iterator pointing to the element that should apprear at the begining of the rotated range
+       - last: last iterator in the range of elements to rotate
      - Example to left-rotate a string ("abcde") by 3 positions. Output: "deabc"
      ```cpp
           string s = "abcde";
@@ -477,8 +474,8 @@
      ```cpp
           for (auto it = s.begin(); it != s.end(); ) {
                int val = *it;
-               it++;                // Move iterator forward first
-               s.erase(val);        // Temporarily remove the element
+               //it++;                // Move iterator forward first
+               it = s.erase(val);        // Temporarily remove the element
 
                funcA(s);            // Do something with the modified set
 
@@ -488,38 +485,41 @@
 
 18. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
-1.   Below is a way to get the next valid index while traversing a 2-D matrix:
-     ```cpp
-               int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index
-               curFlatIndex++;                       // Move to next
-               int nextRowIdx = curFlatIndex / totalCols;
-               int nextColIdx = curFlatIndex % totalCols;
-     ```
-     OR
 
-     ```cpp
-          // Compute next cell's indices for 2D matrix
-          int nextRowIdx = (curColIdx == N - 1) ? (curRowIdx + 1) : curRowIdx;
-          int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
-     ```
+19.   Below is a way to get the next valid index while traversing a 2-D matrix:
+      
+```cpp
+          int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index
+          curFlatIndex++;                       // Move to next
+          int nextRowIdx = curFlatIndex / totalCols;
+          int nextColIdx = curFlatIndex % totalCols;
+```
+OR
 
-2.   A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
+```cpp
+     // Compute next cell's indices for 2D matrix
+     int nextRowIdx = (curColIdx == N - 1) ? (curRowIdx + 1) : curRowIdx;
+     int nextColIdx = (curColIdx == N - 1) ? 0 : (curColIdx + 1);
+```
 
-     ```cpp
-          for(int i=0; i<N; i++){
-               for(int j=0; j<N; j++){
-                    if(board[i][j] == '.'){
-                         goto endLoop;  // breaks to loops together
-                    }
+20.   A often big mistake is attempting tp *break* recursive loops with break, which is not possible. The way out is either *flag*, *goto* or *method* call. goto example:
+
+```cpp
+     for(int i=0; i<N; i++){
+          for(int j=0; j<N; j++){
+               if(board[i][j] == '.'){
+                    goto endLoop;  // breaks to loops together
                }
           }
-          endLoop:;
-     ```
-3.   Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
+     }
+     endLoop:;
+```
 
-    <img src="img/sudoku.png" alt="alt text" style="display: block; margin: auto; width: 250px;">
+21.   Way to iterate over a **m*m** sub-matrix inside a **N*N** matrix:
+<img src="img/sudoku.png" alt="alt text" style="display: block; margin: auto; width: 250px;">
+ 
 
-    ```cpp
+```cpp
           int matrixSize = N;
           int subMatrixSize = sqrt(matrixSize);
 
@@ -535,58 +535,60 @@ Whenever the problem is related to picking up elements from an array to form a c
                if (board[subMatrixRowIdx][subMatrixColIdx] == curCellChar)
                     return false;
           }
-    ```
-4.   How to push back and pop back a **string** to a **string**?
-     ```cpp
-          string cur = "test";
-          size_t oldSize = expression.size();
-          expression.append(cur);
-          expression.resize(oldSize);
-     ```
-5.   How to push back and pop back a **char** to a **string**?
-     ```cpp
-          char cur = 'x';
-          expression.push_back(cur);
-          expression.pop_back();
-     ```
-6.  Convert char/string to int and vice-versa: 
-     ```cpp 
-          int c =  'x' - 'a';
-     ```
-     Convert digit to char:
-     ```cpp 
-          char dig =  5 + '0';
-     ```
-     Convert number to string of digits:
-     ```cpp 
-          #include <string>
-          int num = 245;
-          string num =  to_string(num);
-     ```
-     Convert string of digits to num:
-     ```cpp
-          #include <string>
-          string str_num = "123";
-          int num = stoi(str_num);
-     ```
-7.  How to parse comma:
-    ```cpp
-          stringstream ss(data);
-          string s;
-          // here ',' seperator is used
-          while (getline(ss, s, ',')) {
-               cout << s << endl;
-          }
-     ```
-8.  Floor and Ceil:
+```
+
+22.   How to push back and pop back a **string** to a **string**?
+```cpp
+     string cur = "test";
+     size_t oldSize = expression.size();
+     expression.append(cur);
+     expression.resize(oldSize);
+```
+23.   How to push back and pop back a **char** to a **string**?
+```cpp
+     char cur = 'x';
+     expression.push_back(cur);
+     expression.pop_back();
+```
+24.  Convert char/string to int and vice-versa: 
+```cpp 
+     int c =  'x' - 'a';
+```
+Convert digit to char:
+```cpp 
+     char dig =  5 + '0';
+```
+Convert number to string of digits:
+```cpp 
+     #include <string>
+     int num = 245;
+     string num =  to_string(num);
+```
+Convert string of digits to num:
+```cpp
+     #include <string>
+     string str_num = "123";
+     int num = stoi(str_num);
+```
+25.  How to parse comma:
+```cpp
+     stringstream ss(data);
+     string s;
+     // here ',' seperator is used
+     while (getline(ss, s, ',')) {
+          cout << s << endl;
+     }
+```
+26.  Floor and Ceil:
   - Floor of a x is the greatest integer less than or equal to x.
   - Ceil of x is the least integer greater than or equal to x.
 
-9. Creating object:
+27. Creating object:
    * `MyClass obj;` → object lives on stack, auto destroyed, safer.
    * `MyClass *obj = new MyClass();` → object lives on heap, must `delete` manually (or use smart pointer).
   
-10. 
+28. Number of subarrays possible from an array of length `n` = `(n* (n+1)/2)` 
+29. In case of rotated sorted array always remember to handle the edge case when an element starts from middle , continues to the end and then again continues to the start of the array. e.g.: [1,0,1,1,1]. Sol: Do l++ and r-- -> shrink the array;
 
 ---
 <span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
@@ -617,7 +619,7 @@ Whenever the problem is related to picking up elements from an array to form a c
 <span style="color: violet; font-size: 18px;">**Miscs continues:**</span>
 
 
-1.  In c, once array is passed through method calling, then it is becomes a pointer and it's size can not be calculated with sizeof() op.
+1.  In c, once array is passed through method calling, then it becomes a pointer and it's size can not be calculated with sizeof() op.
     ```c
           void reverse(char arr[]){
           // int len = sizeof(arr)/sizeof(arr[0]); // Wrong because arr is a pointer here, and sizeof(arr) returns size of pointer i.e. 4 or 8 always. 
@@ -633,7 +635,7 @@ Whenever the problem is related to picking up elements from an array to form a c
                }
           }
      ```
-3.  Best waysto declare a 2D vector in C++:
+3.  Best ways to declare a 2D vector in C++:
     ```cpp
           vector<vector<int>> matrix(M, vector<int>(N, initial_value));
      ```
@@ -643,7 +645,7 @@ Whenever the problem is related to picking up elements from an array to form a c
 ---
 <span style="color: violet; font-size: 18px;">**Binary tree:**</span>
 
-39. Theory of BT:
+1.  Theory of BT:
     - Links:
       - [TUF theory blog](https://takeuforward.org/binary-tree/introduction-to-trees/)
       - [TUF+ theory blog](https://takeuforward.org/plus/dsa/binary-trees/theory-and-traversals/introduction-)
@@ -702,13 +704,14 @@ Whenever the problem is related to picking up elements from an array to form a c
      -  Database Indexing: quickly locate records based on keys.
      -  Symbol Tables: Used in compilers 
      -  Memory Management: Implementing data structures like heaps
-  -  `In-order` traversal of BST always gives elements in `sorted` order.
+  -  `In-order` traversal (left -> root [print] -> right) of BST always gives elements in **sorted** order.
+  -  `Reverse In-order` traversal (right -> root [print] -> left) of BST gives elements in **descending sorted** order.
   -  
 
 ---
 <span style="color: violet; font-size: 18px;">**Heap:**</span>
 
-
+z
 1.  In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
     ```cpp
           #include <queue>

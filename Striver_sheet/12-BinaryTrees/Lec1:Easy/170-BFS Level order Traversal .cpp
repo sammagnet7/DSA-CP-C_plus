@@ -85,58 +85,58 @@ public:
    *     - In the worst case, the last level of the tree may contain up to N/2 nodes (for a complete binary tree),
    *       which will all be stored in the queue. Additionally, output vector uses O(N) space.
    */
-  // vector<vector<int>> levelOrder(TreeNode *root)
-  // {
+  vector<vector<int>> levelOrder(TreeNode *root)
+  {
 
-  //   vector<vector<int>> ans;
+    vector<vector<int>> ans;
 
-  //   if (root == NULL)
-  //     return ans;
+    if (root == NULL)
+      return ans;
 
-  //   queue<TreeNode *> q1, q2;
+    queue<TreeNode *> q1, q2;
 
-  //   q1.push(root);
+    q1.push(root);
 
-  //   while (true)
-  //   {
-  //     if (q1.empty() && q2.empty())
-  //       break;
+    while (true)
+    {
+      if (q1.empty() && q2.empty())
+        break;
 
-  //     vector<int> tmp;
+      vector<int> tmp;
 
-  //     if (!q1.empty())
-  //     {
-  //       while (!q1.empty())
-  //       {
-  //         tmp.push_back(q1.front()->val);
+      if (!q1.empty())
+      {
+        while (!q1.empty())
+        {
+          tmp.push_back(q1.front()->val);
 
-  //         if (q1.front()->left != NULL)
-  //           q2.push(q1.front()->left);
-  //         if (q1.front()->right != NULL)
-  //           q2.push(q1.front()->right);
+          if (q1.front()->left != NULL)
+            q2.push(q1.front()->left);
+          if (q1.front()->right != NULL)
+            q2.push(q1.front()->right);
 
-  //         q1.pop();
-  //       }
-  //     }
-  //     else
-  //     {
-  //       while (!q2.empty())
-  //       {
-  //         tmp.push_back(q2.front()->val);
+          q1.pop();
+        }
+      }
+      else
+      {
+        while (!q2.empty())
+        {
+          tmp.push_back(q2.front()->val);
 
-  //         if (q2.front()->left != NULL)
-  //           q1.push(q2.front()->left);
-  //         if (q2.front()->right != NULL)
-  //           q1.push(q2.front()->right);
+          if (q2.front()->left != NULL)
+            q1.push(q2.front()->left);
+          if (q2.front()->right != NULL)
+            q1.push(q2.front()->right);
 
-  //         q2.pop();
-  //       }
-  //     }
+          q2.pop();
+        }
+      }
 
-  //     ans.push_back(tmp);
-  //   }
-  //   return ans;
-  // }
+      ans.push_back(tmp);
+    }
+    return ans;
+  }
 
   /**
    * Approach2: Level Order Traversal using a single queue.

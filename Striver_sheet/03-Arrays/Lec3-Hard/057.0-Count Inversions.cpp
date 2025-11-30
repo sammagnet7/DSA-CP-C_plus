@@ -106,10 +106,12 @@ public:
     {
         // Copy left and right halves into temp arrays
         vector<int> temp1(mid - start + 1), temp2(end - mid);
+
         for (int i = start; i <= mid; i++)
         {
             temp1[i - start] = arr[i];
         }
+        
         for (int i = mid + 1; i <= end; i++)
         {
             temp2[i - mid - 1] = arr[i];

@@ -234,7 +234,7 @@ public:
             dp[idx][0] = true;
         }
 
-        // Base case: first element alone can contribute to a sum if it's ? k
+        // Base case: first element alone can contribute to a sum if it's <= k
         if (arr[0] <= k)
             dp[0][arr[0]] = true;
 

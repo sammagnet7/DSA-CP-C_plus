@@ -32,7 +32,6 @@ Find the XOR of the elements in the range [L, R].
 Example:
     For 'L' = 1 and ‘R’ = 5.
     The answer is 1.
-    Detailed explanation ( Input/output format, Notes, Images )
 Sample Input 1:
     3 5
 Sample Output 1:
@@ -64,19 +63,19 @@ public:
     // O(1)
     int findXorOfRangeFromOne(int N)
     {
-
         int rem = N % 4;
 
         switch (rem)
         {
+        case 0:
+            return N;
         case 1:
             return 1;
         case 2:
             return (N + 1);
         case 3:
             return 0;
-        case 0:
-            return N;
+        
         default:
             return -1;
         }
@@ -87,7 +86,6 @@ public:
     // Space: O(1)
     int findXOR(int L, int R)
     {
-
         int preL = L - 1;
 
         int xorOneTopreL = findXorOfRangeFromOne(preL);

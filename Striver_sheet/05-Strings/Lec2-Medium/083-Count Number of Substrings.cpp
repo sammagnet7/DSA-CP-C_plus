@@ -16,9 +16,10 @@ using namespace std;
 Title: Number of Substrings Containing All Three Characters
 
 Links:
-https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/
 https://www.youtube.com/watch?v=xtqN4qlgr8s&list=PLgUwDviBIf0q7vrFA_HEWcqRqMpCXzYAL&index=9
 https://takeuforward.org/plus/dsa/problems/number-of-substrings-containing-all-three-characters?tab=editorial
+
+https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/
 https://www.naukri.com/code360/problems/count-substring-with-abc_8160465
 
 Problem statement:
@@ -32,7 +33,19 @@ Eaxamples:
     Input: s = "abcabc"
     Output: 10
     Explanation: The substrings containing at least one occurrence of the characters a, b and c are "abc", "abca", "abcab", "abcabc", "bca", "bcab", "bcabc", "cab", "cabc" and "abc" (again).
+class Solution {
+public:
+    //-----------------------------------------------------------------------
 
+    // Optimal approach: Recursive
+    // Time: O(N)
+    // Space: O(1)
+    int myAtoi(string s)
+    {
+
+…    //     return recursiveAtoI(s, 0, 1, 0, false);
+    // }
+};
     Example 2:
     Input: s = "aaacb"
     Output: 3
@@ -62,37 +75,37 @@ public:
     // Approach1:
     //
 
-    // // Optimal approach: Two pointer approach: 2 pass
-    // // Time: O(2N)
-    // // Space: O(3)
-    // int numberOfSubstrings(string s)
-    // {
+    // Optimal approach: Two pointer approach: 2 pass
+    // Time: O(2N)
+    // Space: O(3)
+    int numberOfSubstrings(string s)
+    {
 
-    //     int N = s.size();
-    //     int ans = 0;
+        int N = s.size();
+        int ans = 0;
 
-    //     int l = 0;
-    //     int r = 0;
+        int l = 0;
+        int r = 0;
 
-    //     vector<int> lastSeen(3, 0); // O(3)
+        vector<int> lastSeen(3, 0); // O(3)
 
-    //     while (r < N)
-    //     { // O(N)
+        while (r < N)
+        { // O(N)
 
-    //         lastSeen[s[r] - 'a']++;
+            lastSeen[s[r] - 'a']++;
 
-    //         while (lastSeen['a' - 'a'] >= 1 && lastSeen['b' - 'a'] >= 1 && lastSeen['c' - 'a'] >= 1)
-    //         { // O(N)
-    //             ans += (N - r);
-    //             lastSeen[s[l] - 'a']--;
-    //             l++;
-    //         }
+            while (lastSeen['a' - 'a'] >= 1 && lastSeen['b' - 'a'] >= 1 && lastSeen['c' - 'a'] >= 1)
+            { // O(N)
+                ans += (N - r);
+                lastSeen[s[l] - 'a']--;
+                l++;
+            }
 
-    //         r++;
-    //     }
+            r++;
+        }
 
-    //     return ans;
-    // }
+        return ans;
+    }
 
     // ------------------------------------------------------
     // Approach2:

@@ -18,7 +18,7 @@ https://www.naukri.com/code360/problems/zero-matrix_1171153?utm_source=youtube&u
 Problem Statement: Given a matrix if an element in the matrix is 0 then you will have to set its entire column and row to 0 and then return the matrix.
 
 Note:
--231 <= matrix[i][j] <= 231 - 1
+-231 <= matrix[i][j] <= 2^31 - 1
 You must do it in place.
 
 Examples:

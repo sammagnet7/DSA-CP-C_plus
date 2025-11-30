@@ -137,7 +137,7 @@ public:
     {
       return lowestCommonAncestor(root->right, p, q);
     }
-    // Current node is the split point where p and q diverge → this is the LCA
+    // Current node is the split point where p and q diverge → this is the LCA or either value matches
     else
     {
       return root;

@@ -58,7 +58,6 @@ private:
     // Space: O(1)
     int myBinarySearch(vector<int> &arr, int target, int l, int r)
     {
-
         if (l > r)
             return -1; // Base case
 
@@ -79,7 +78,6 @@ private:
     // Space: O(1)
     int myBinarySearch(vector<int> &arr, int target, int l, int r)
     {
-
         while (l <= r)
         {
             int mid = l + (r - l) / 2;

@@ -51,16 +51,20 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // long long XtoThePowerN(long long X, int N, int threshold){
-    //     long long mulV= 1;
-    //     while(N--){
-    //         mulV *= X;
-    //         if(mulV > threshold) return mulV;   // This is very imporatn step
-    //                                         // where we check the multiplication bound
-    //                                         // and return before overflow
-    //     }
-    //     return mulV;
-    // }
+    // brute force approach: O(N)
+    long long XtoThePowerN(long long X, int N, int threshold)
+    {
+        long long mulV = 1;
+        while (N--)
+        {
+            mulV *= X;
+            if (mulV > threshold)
+                return mulV; // This is very imporatn step
+                             // where we check the multiplication bound
+                             // and return before overflow
+        }
+        return mulV;
+    }
 
     // Optimal approach for getting power of N
     // Time: T(Log N)
@@ -81,7 +85,7 @@ public:
             else
             { // odd
                 N--;
-                mulV = baseV * mulV;
+                mulV = (mulV * baseV);
             }
 
             if (baseV > threshold || mulV > threshold) // This is very imporatn step
@@ -105,7 +109,7 @@ public:
 
         while (l <= r)
         {
-            int mid = l - (l - r) / 2;
+            int mid = l + (r - l) / 2;
 
             long long mulV = XtoThePowerN(mid, N, M);
 

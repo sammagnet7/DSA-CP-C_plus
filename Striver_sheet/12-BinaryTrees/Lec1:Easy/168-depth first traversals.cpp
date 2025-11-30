@@ -178,31 +178,61 @@ private:
   //----------
 
   // O(N)
+  // void preorderTraversal_iter(TreeNode *root, vector<int> &ans)
+  // {
+
+  //   stack<TreeNode *> st;
+
+  //   // Edge case: empty tree
+  //   if (root == nullptr)
+  //     return;
+
+  //   // Start with the root node
+  //   st.push(root);
+
+  //   while (!st.empty())
+  //   {
+  //     // Visit the current node (Node → Left → Right)
+  //     TreeNode *cur = st.top();
+  //     st.pop();
+
+  //     ans.push_back(cur->val); // Process current node
+
+  //     // Push right child first so that left is processed before right
+  //     if (cur->right != NULL)
+  //       st.push(cur->right);
+  //     if (cur->left != NULL)
+  //       st.push(cur->left);
+  //   }
+  // }
+
   void preorderTraversal_iter(TreeNode *root, vector<int> &ans)
   {
 
+    TreeNode *tmp = root;
     stack<TreeNode *> st;
 
-    // Edge case: empty tree
-    if (root == nullptr)
-      return;
-
-    // Start with the root node
-    st.push(root);
+    while (tmp)
+    {
+      ans.push_back(tmp->val);
+      st.push(tmp);
+      tmp = tmp->left;
+    }
 
     while (!st.empty())
     {
-      // Visit the current node (Node → Left → Right)
-      TreeNode *cur = st.top();
+
+      tmp = st.top();
       st.pop();
 
-      ans.push_back(cur->val); // Process current node
+      tmp = tmp->right;
 
-      // Push right child first so that left is processed before right
-      if (cur->right != NULL)
-        st.push(cur->right);
-      if (cur->left != NULL)
-        st.push(cur->left);
+      while (tmp)
+      {
+        ans.push_back(tmp->val);
+        st.push(tmp);
+        tmp = tmp->left;
+      }
     }
   }
 
@@ -211,36 +241,65 @@ private:
   //----------
 
   // O(N)
-  void inorderTraversal_iter(TreeNode *root, vector<int> &ans)
+  // void inorderTraversal_iter(TreeNode *root, vector<int> &ans)
+  // {
+
+  //   stack<TreeNode *> st; // Stack to simulate recursion
+  //   TreeNode *tmp = root; // Temporary pointer used for traversal
+
+  //   // Loop continues until we've processed all nodes
+  //   while (true)
+  //   {
+
+  //     if (tmp != NULL)
+  //     {
+  //       // Go as left as possible and push all nodes along the path
+  //       st.push(tmp);
+  //       tmp = tmp->left;
+  //     }
+  //     else
+  //     {
+  //       // If we've reached null, we backtrack using the stack
+  //       if (st.empty())
+  //         break; // If the stack is empty, we're done
+
+  //       // Process the top node (the leftmost unprocessed node)
+  //       TreeNode *prevN = st.top();
+  //       st.pop();
+
+  //       ans.push_back(prevN->val); // Visit the node (inorder: Left -> Node -> Right)
+
+  //       // Now, traverse the right subtree of the processed node
+  //       tmp = prevN->right;
+  //     }
+  //   }
+  // }
+
+  void inorderTraversal_iter(TreeNode *node, vector<int> &ans)
   {
 
-    stack<TreeNode *> st; // Stack to simulate recursion
-    TreeNode *tmp = root; // Temporary pointer used for traversal
+    TreeNode *tmp = node;
+    stack<TreeNode *> st;
 
-    // Loop continues until we've processed all nodes
-    while (true)
+    while (tmp)
     {
+      st.push(tmp);
+      tmp = tmp->left;
+    }
 
-      if (tmp != NULL)
+    while (!st.empty())
+    {
+      tmp = st.top();
+      st.pop();
+
+      ans.push_back(tmp->val);
+
+      tmp = tmp->right;
+
+      while (tmp)
       {
-        // Go as left as possible and push all nodes along the path
         st.push(tmp);
         tmp = tmp->left;
-      }
-      else
-      {
-        // If we've reached null, we backtrack using the stack
-        if (st.empty())
-          break; // If the stack is empty, we're done
-
-        // Process the top node (the leftmost unprocessed node)
-        TreeNode *prevN = st.top();
-        st.pop();
-
-        ans.push_back(prevN->val); // Visit the node (inorder: Left -> Node -> Right)
-
-        // Now, traverse the right subtree of the processed node
-        tmp = prevN->right;
       }
     }
   }
@@ -257,70 +316,110 @@ private:
   //
   // Time: O(2N)  for traversing all node + reversing ans
   // Space: O(h) for stack
-  void postorderTraversal_iter_rev(TreeNode *root, vector<int> &ans)
-  {
+  // void postorderTraversal_iter_rev(TreeNode *root, vector<int> &ans)
+  // {
 
-    stack<TreeNode *> st;
+  //   stack<TreeNode *> st;
 
-    // Edge case: empty tree
-    if (root == nullptr)
-      return;
+  //   // Edge case: empty tree
+  //   if (root == nullptr)
+  //     return;
 
-    // Start with the root node
-    st.push(root);
+  //   // Start with the root node
+  //   st.push(root);
 
-    while (!st.empty())
-    {
-      // Visit the current node (Node → Right → Left)
-      TreeNode *cur = st.top();
-      st.pop();
+  //   while (!st.empty())
+  //   {
+  //     // Visit the current node (Node → Right → Left)
+  //     TreeNode *cur = st.top();
+  //     st.pop();
 
-      ans.push_back(cur->val); // Process current node
+  //     ans.push_back(cur->val); // Process current node
 
-      // Push left child first so that right is processed before left
-      if (cur->left != NULL)
-        st.push(cur->left);
-      if (cur->right != NULL)
-        st.push(cur->right);
-    }
+  //     // Push left child first so that right is processed before left
+  //     if (cur->left != NULL)
+  //       st.push(cur->left);
+  //     if (cur->right != NULL)
+  //       st.push(cur->right);
+  //   }
 
-    // Finally reverse the ans to get post order traversal
-    reverse(ans.begin(), ans.end());
-  }
+  //   // Finally reverse the ans to get post order traversal
+  //   reverse(ans.begin(), ans.end());
+  // }
 
   // Same approach as reversing pre-order using extra stack
   // O(N)
   // O(2N)
-  void postorderTraversal_iter_2stack(TreeNode *root, vector<int> &ans)
+  // void postorderTraversal_iter_2stack(TreeNode *root, vector<int> &ans)
+  // {
+  //   stack<TreeNode *> st, st2;
+
+  //   // Edge case: empty tree
+  //   if (root == nullptr)
+  //     return;
+
+  //   // Start with the root node
+  //   st.push(root);
+
+  //   while (!st.empty())
+  //   {
+  //     // Visit the current node (Node → Right → Left)
+  //     TreeNode *cur = st.top();
+  //     st.pop();
+
+  //     st2.push(cur); // Process current node
+
+  //     // Push left child first so that right is processed before left
+  //     if (cur->left != NULL)
+  //       st.push(cur->left);
+  //     if (cur->right != NULL)
+  //       st.push(cur->right);
+  //   }
+
+  //   while (!st2.empty())
+  //   {
+  //     ans.push_back(st2.top()->val);
+  //     st2.pop();
+  //   }
+  // }
+
+  void postorderTraversal_iter(TreeNode *root, vector<int> &ans)
   {
-    stack<TreeNode *> st, st2;
 
-    // Edge case: empty tree
-    if (root == nullptr)
-      return;
+    stack<pair<TreeNode *, int>> st;
 
-    // Start with the root node
-    st.push(root);
+    TreeNode *tmp = root;
+
+    while (tmp)
+    {
+      st.push({tmp, 1});
+      tmp = tmp->left;
+    }
 
     while (!st.empty())
     {
-      // Visit the current node (Node → Right → Left)
-      TreeNode *cur = st.top();
+      auto entry = st.top();
       st.pop();
 
-      st2.push(cur); // Process current node
+      tmp = entry.first;
+      int order = entry.second;
 
-      // Push left child first so that right is processed before left
-      if (cur->left != NULL)
-        st.push(cur->left);
-      if (cur->right != NULL)
-        st.push(cur->right);
-    }
+      if (order == 2)
+      {
+        ans.push_back(tmp->val);
+        continue;
+      }
+      else
+      {
+        st.push({tmp, ++order});
 
-    while (!st2.empty())
-    {
-      ans.push_back(st2.top()->val);
-      st2.pop();
+        tmp = tmp->right;
+        while (tmp)
+        {
+          st.push({tmp, 1});
+          tmp = tmp->left;
+        }
+      }
     }
   }
 
@@ -363,8 +462,9 @@ public:
   vector<int> postorderTraversal(TreeNode *root)
   {
     vector<int> ans;
-    postorderTraversal_iter_rev(root, ans);
-    postorderTraversal_iter_2stack(root, ans);
+    // postorderTraversal_iter_rev(root, ans);
+    // postorderTraversal_iter_2stack(root, ans);
+    postorderTraversal_iter(root, ans);
     return ans;
   }
 };

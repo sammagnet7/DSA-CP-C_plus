@@ -295,8 +295,57 @@ public:
   }
 
   //-------------------------------------------------------------------------------
-  // 2. Title:
+  // 2. Title: Approach 2 : Using DFS [Easier]
   //-------------------------------------------------------------------------------
+
+  void dfsBuiltParentMap(TreeNode *node, TreeNode *p, map<TreeNode *, TreeNode *> &parentMap)
+  {
+
+    if (node == NULL)
+    {
+      return;
+    }
+
+    parentMap[node] = p;
+
+    dfsBuiltParentMap(node->left, node, parentMap);
+    dfsBuiltParentMap(node->right, node, parentMap);
+  }
+
+  void walkKLevels(int k, TreeNode *node, TreeNode *p, vector<int> &ans, map<TreeNode *, TreeNode *> &parentMap)
+  {
+    if (node == NULL)
+    {
+      return;
+    }
+
+    if (k == 0)
+    {
+      ans.push_back(node->val);
+      return;
+    }
+
+    if (parentMap[node] != p)
+      walkKLevels(k - 1, parentMap[node], node, ans, parentMap);
+    if (node->left != p)
+      walkKLevels(k - 1, node->left, node, ans, parentMap);
+    if (node->right != p)
+      walkKLevels(k - 1, node->right, node, ans, parentMap);
+  }
+
+  vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
+  {
+
+    map<TreeNode *, TreeNode *> parentMap;
+
+    dfsBuiltParentMap(root, NULL, parentMap);
+
+    vector<int> ans;
+
+    walkKLevels(k, target, NULL, ans, parentMap);
+
+    return ans;
+  }
 };
 
 int main()

@@ -118,7 +118,7 @@ public:
 
     // Try to divide the array into sets of size k with consecutive numbers
     while (!mp.empty())
-    {
+    { 
 
       // Start from the smallest available number
       int start = mp.begin()->first;

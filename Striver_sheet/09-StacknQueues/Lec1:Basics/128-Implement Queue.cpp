@@ -208,6 +208,7 @@ int Queue::pop()
         int ret = front->data;
         Node *tmp = front;
         front = front->next;
+        tmp->next = nullptr;
         delete (tmp);
         return ret;
     }

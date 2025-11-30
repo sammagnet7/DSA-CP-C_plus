@@ -56,6 +56,26 @@ OUTPUT::::::
 class Solution
 {
 public:
+    // Approach: Easiest
+    int maxProfit(vector<int> &prices)
+    {
+        int N = prices.size();
+
+        int leftMin = INT_MAX;
+        int maxProfit = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            int curProf = prices[i] - leftMin;
+
+            maxProfit = max(maxProfit, curProf);
+            leftMin = min(leftMin, prices[i]);
+        }
+
+        return maxProfit;
+    }
+
+    
     /**
      * Best Time to Buy and Sell Stock (LeetCode 121)
      * ----------------------------------------------

@@ -34,7 +34,25 @@ Output: true
 Explanation: [1,2,3] is the original sorted array.
 You can rotate the array by x = 0 positions (i.e. no rotation) to make nums.
 
+ms, return true if the array was originally sorted in non-decreasing order, then rotated some number of positions (including zero). Otherwise, return false.
+There may be duplicates in the original array.
 
+Note: An array A rotated by x positions results in an array B of the same length such that B[i] == A[(i+x) % A.length] for every valid index i.
+
+Example 1:
+Input: nums = [3,4,5,1,2]
+Output: true
+Explanation: [1,2,3,4,5] is the original sorted array.
+You can rotate the array by x = 3 positions to begin on the element of value 3: [3,4,5,1,2].
+
+Example 2:
+Input: nums = [2,1,3,4]
+Output: false
+Explanation: There is no sorted array once rotated that can make nums.
+
+Example 3:
+Input: nums = [1,2,3]
+Output: true
 INPUT::::::
 6
 3 4 5 1 2
@@ -70,7 +88,7 @@ public:
                 min_idx = i;
         }
 
-        // If minimum value spans from last element to the firs element we need to handle such case
+        // If minimum value spans from last element to the first element we need to handle such case
         // by taking the index from the tail side
         // example case: 6,10,6
         if (min_idx == 0 && nums[0] == nums[nums.size() - 1])
@@ -92,6 +110,75 @@ public:
                 return false;
             prev = nums[(min_idx + i) % nums.size()];
         }
+        return true;
+    }
+
+    // Another approach: Find the starting index as the first index which is breaking non-decreasing order
+    bool check(vector<int> &nums)
+    {
+        int N = nums.size();
+
+        int sIdx = -1;
+
+        for (int i = 0; i < N - 1; i++)
+        {
+            if (nums[i] > nums[i + 1])
+            {
+                sIdx = i + 1;
+                break;
+            }
+        }
+
+        if (sIdx == -1)
+        {
+            return true;
+        }
+
+        for (int i = sIdx; i + 1 != sIdx; i = (i + 1) % N)
+        {
+            int nxtIdx = (i + 1) % N;
+            if (nums[nxtIdx] < nums[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // -----------------------------------
+    // Another approach
+    // Time: O(N)
+    bool check(vector<int> &nums)
+    {
+
+        int N = nums.size();
+
+        int sIdx = -1;
+
+        for (int i = 0; i < N - 1; i++)
+        {
+            if (nums[i] > nums[i + 1])
+            {
+                sIdx = i + 1;
+                break;
+            }
+        }
+
+        if (sIdx == -1)
+        {
+            return true;
+        }
+
+        for (int i = sIdx; i + 1 != sIdx; i = (i + 1) % N)
+        {
+            int nxtIdx = (i + 1) % N;
+            if (nums[nxtIdx] < nums[i])
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 };

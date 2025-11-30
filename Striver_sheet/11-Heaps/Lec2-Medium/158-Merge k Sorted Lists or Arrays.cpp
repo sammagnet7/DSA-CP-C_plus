@@ -132,50 +132,50 @@ public:
   // //
   // // Time: O(K*N) where K is #lists and N is #total nodes in all the lists
   // // SPace: O(1)
-  // ListNode *mergeKLists(vector<ListNode *> &lists)
-  // {
+  ListNode *mergeKLists(vector<ListNode *> &lists)
+  {  
 
-  //   ListNode *ans;
-  //   ListNode *head = new ListNode();
-  //   ans = head;
+    ListNode *ans;
+    ListNode *head = new ListNode();
+    ans = head;
 
-  //   int k = lists.size();
+    int k = lists.size();
 
-  //   while (true)
-  //   { // O(N) where `N` is number of total nodes in all the lists
+    while (true)
+    { // O(N) where `N` is number of total nodes in all the lists
 
-  //     int smallestIdx = -1;
+      int smallestIdx = -1;
 
-  //     for (int i = 0; i < k; i++)
-  //     { // O(K)
+      for (int i = 0; i < k; i++)
+      { // O(K)
 
-  //       if (lists[i] == NULL)
-  //         continue;
+        if (lists[i] == NULL)
+          continue;
 
-  //       if (head->next == NULL)
-  //       { // for first non-null `i` this will happen
-  //         head->next = lists[i];
-  //         smallestIdx = i;
-  //       }
-  //       else
-  //       {
-  //         if (lists[i]->val < head->next->val)
-  //         {
-  //           head->next = lists[i];
-  //           smallestIdx = i;
-  //         }
-  //       }
-  //     }
+        if (head->next == NULL)
+        { // for first non-null `i` this will happen
+          head->next = lists[i];
+          smallestIdx = i;
+        }
+        else
+        {
+          if (lists[i]->val < head->next->val)
+          {
+            head->next = lists[i];
+            smallestIdx = i;
+          }
+        }
+      }
 
-  //     if (smallestIdx == -1)
-  //       break;
-  //     lists[smallestIdx] = lists[smallestIdx]->next;
-  //     head->next->next = NULL;
-  //     head = head->next;
-  //   }
+      if (smallestIdx == -1)
+        break;
+      lists[smallestIdx] = lists[smallestIdx]->next;
+      head->next->next = NULL;
+      head = head->next;
+    }
 
-  //   return ans->next;
-  // }
+    return ans->next;
+  }
 
   //-----------------------------------
   // Approach2: Optimal
@@ -302,7 +302,6 @@ public:
 
     return ans;
   }
-  
 };
 
 int main()

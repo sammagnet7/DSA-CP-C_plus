@@ -31,6 +31,11 @@ Problem statement:
 Given n, m denoting the row and column of the 2D matrix, and an array A of size k denoting the number of operations. Matrix elements are 0 if there is water or 1 if there is land. Originally, the 2D matrix is all 0 which means there is no land in the matrix. The array has k operator(s) and each operator has two integers A[i][0], A[i][1] means that you can change the cell matrix[A[i][0]][A[i][1]] from sea to island. Return how many islands are there in the matrix after each operation.
 The answer array will be of size k.
 
+You have a 2D grid of ‘N’ rows and ‘M’ columns which are initially filled with water. You are given ‘Q’ queries each consisting of two integers ‘X’ and ‘Y’ and in each query operation, you have to turn the water at position (‘X’, ‘Y’) into a land. You are supposed to find the number of islands in the grid after each query.
+
+An island is a group of lands surrounded by water horizontally, vertically.
+You may assume all four edges of the grid are all surrounded by water.
+
 Examples:
     Input: n = 4, m = 5, k = 4, A = [[1,1],[0,1],[3,3],[3,4]]
     Output: [1, 1, 2, 2]
@@ -42,7 +47,7 @@ Examples:
 
 Constraints:
       1 <= n, m <= 1000
-      1 <= k <= 104
+      1 <= k <= 10^4
       0 <= A[i][0] < n
       0 <= A[i][1] < m
 
@@ -188,7 +193,7 @@ public:
         int nodes = n * m;                                              // total possible cells
         DJS DS(nodes);                                                  // DSU for all cells
         vector<vector<int>> delta = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // 4 directions
-        vector<vector<int>> vis(n, vector<int>(m, 0));                  // visited grid
+        vector<vector<int>> land(n, vector<int>(m, 0));                  // visited grid
 
         vector<int> ans;
         int compCount = 0; // number of islands so far
@@ -198,15 +203,15 @@ public:
             int x = cord[0];
             int y = cord[1];
 
-            if (vis[x][y] == 1)
+            if (land[x][y] == 1)
             {
                 // Already land ? skip, just push current island count
                 ans.push_back(compCount);
                 continue;
             }
 
-            // Step 1: Convert (x, y) ? land
-            vis[x][y] = 1;
+            // Step 1: Convert (x, y) -> land
+            land[x][y] = 1;
             compCount++; // new island assumed
 
             // Step 2: Try merging with neighbors
@@ -215,7 +220,7 @@ public:
                 int x_k = x + delta[k][0];
                 int y_k = y + delta[k][1];
 
-                if (isIdxVal(x_k, y_k, n, m) && vis[x_k][y_k] == 1)
+                if (isIdxVal(x_k, y_k, n, m) && land[x_k][y_k] == 1)
                 {
                     int u = (x * m) + y;     // current cell's node ID
                     int v = (x_k * m) + y_k; // neighbor's node ID
@@ -223,7 +228,7 @@ public:
                     if (DS.fUP(u) != DS.fUP(v))
                     {
                         DS.UBS(u, v); // merge two islands
-                        compCount--;  // merged ? reduce island count
+                        compCount--;  // merged -> reduce island count
                     }
                 }
             }

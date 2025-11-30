@@ -209,7 +209,7 @@ public:
     {
       if (node->data == x)
         return x;
-      else if (node->data > x)
+      else if (x < node->data)
       {
         ceil = node->data;
         node = node->left;

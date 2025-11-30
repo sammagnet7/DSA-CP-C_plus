@@ -18,7 +18,7 @@ using namespace std;
 Rotate List:
 
 https://takeuforward.org/data-structure/reverse-linked-list-in-groups-of-size-k/
-https://leetcode.com/problems/reverse-nodes-in-k-group/submissions/1663052367/
+https://leetcode.com/problems/reverse-nodes-in-k-group/
 
 Problem statement:
 Given the head of a singly linked list of `n` nodes and an integer `k`, where k is less than or equal to `n`.
@@ -141,6 +141,86 @@ public:
         }
 
         return head;
+    }
+
+    ListNode *reverseKGroup(ListNode *head, int k)
+    {
+
+        // If k is 1, no reversal is needed.
+        if (k == 1 || head == nullptr)
+        {
+            return head;
+        }
+
+        // Dummy node simplifies handling the head of the list.
+        // The new head might be the k-th node.
+        ListNode *dummy = new ListNode(0);
+        dummy->next = head;
+
+        // groupPrev points to the last node of the *previous* group.
+        // Initially, it's the dummy node.
+        ListNode *groupPrev = dummy;
+
+        while (true)
+        {
+
+            // 1. Find the k-th node (the end of the current group)
+            ListNode *kthNode = groupPrev;
+            for (int i = 0; i < k; ++i)
+            {
+                kthNode = kthNode->next;
+                if (kthNode == nullptr)
+                {
+                    // Not enough nodes to form a group of k.
+                    // The rest of the list remains as is.
+                    // We delete the dummy node and return the real head.
+                    ListNode *newHead = dummy->next;
+                    delete dummy;
+                    return newHead;
+                }
+            }
+
+            // At this point, we have a valid group to reverse.
+            // groupPrev -> [groupStart -> ... -> kthNode] -> groupNext
+
+            // 2. Save pointers
+            ListNode *groupStart = groupPrev->next; // First node of the current group
+            ListNode *groupNext = kthNode->next;    // First node of the next group
+
+            // 3. Reverse the k-node group
+            // We reverse the list from groupStart up to (and including) kthNode.
+            // The new tail (groupStart) will point to groupNext.
+            ListNode *prev = groupNext;
+            ListNode *curr = groupStart;
+            ListNode *next = nullptr;
+
+            // This loop will run k times
+            while (curr != groupNext)
+            {
+                next = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = next;
+            }
+
+            // 4. Re-link the groups
+            // 'prev' is now the new head of the reversed group (the old kthNode)
+            // 'groupStart' is now the new tail of the reversed group
+
+            // Link the previous group's end to the new head
+            groupPrev->next = prev;
+
+            // 5. Setup for the next iteration
+            // The "previous" node for the *next* loop is the
+            // tail of the group we just reversed.
+            groupPrev = groupStart;
+        }
+
+        // Note: The loop will always exit via the 'return' inside.
+        // This is just to satisfy compiler, but dummy should be deleted.
+        // ListNode* finalHead = dummy->next;
+        // delete dummy;
+        // return finalHead;
     }
 };
 

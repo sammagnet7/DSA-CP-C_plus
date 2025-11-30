@@ -81,7 +81,7 @@ string removeKdigits(string num, int k)
     }
 
     while (k--)
-    { // edge case: If digits in given string is in Ascending order like 123456, then at the end pop last k digits from stack
+    { // edge case: If digits in given string is in Ascending order like 123456, then at the end pop last k digits from stack. Also supports if k <= num.size()
         st.pop_back();
     }
 

@@ -60,7 +60,7 @@ public:
 
         while (l <= r)
         {
-            long mid = l - (l - r) / 2;
+            long mid = l + (r - l) / 2;
 
             long mulV = mid * mid;
 

@@ -54,34 +54,34 @@ OUTPUT::::::
 // // sub-optimal approach: as using extra spaces
 // // Time: O(3N)
 // // Space: O(2N)
-// int trap(vector<int>& height) {
+int trap(vector<int>& height) {
 
-//     int ans = 0;
-//     int N = height.size();
+    int ans = 0;
+    int N = height.size();
 
-//     vector<int> maxPeakRight(N); // O(N)
-//     vector<int> maxPeakLeft(N); // O(N)
+    vector<int> maxPeakRight(N); // O(N)
+    vector<int> maxPeakLeft(N); // O(N)
 
-//     int m1 = INT_MIN;
-//     int m2 = INT_MIN;
+    int m1 = INT_MIN;
+    int m2 = INT_MIN;
 
-//     for(int i=0; i<N; i++){ // O(N)
+    for(int i=0; i<N; i++){ // O(N)
 
-//         m1 = max(m1,height[i]);
-//         maxPeakLeft[i] = m1;
+        m1 = max(m1,height[i]);
+        maxPeakLeft[i] = m1;
 
-//         int revIdx = (N-1-i);
-//         m2 = max(m2,height[revIdx]);
-//         maxPeakRight[revIdx] = m2;
-//     }
+        int revIdx = (N-1-i);
+        m2 = max(m2,height[revIdx]);
+        maxPeakRight[revIdx] = m2;
+    }
 
-//     for(int i=0; i<N; i++){ // O(N)
-//         int maxWaterLvl = min(maxPeakLeft[i], maxPeakRight[i]);
-//         ans += (maxWaterLvl-height[i]);
-//     }
+    for(int i=0; i<N; i++){ // O(N)
+        int maxWaterLvl = min(maxPeakLeft[i], maxPeakRight[i]);
+        ans += (maxWaterLvl-height[i]);
+    }
 
-//     return ans;
-// }
+    return ans;
+}
 
 // // Approach2:
 // //

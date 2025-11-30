@@ -101,7 +101,7 @@ public:
     //
     // Approach w/ duplicates:
     // Same approach + There can arise an edge case: arr[l]==arr[mid]==arr[r] != target
-    // For this edger case We will eliminate the eliments from both edges making the array smaller
+    // For this edge case We will eliminate the eliments from both edges making the array smaller
     // until getting out of this case.
     // Beacause anyway these elements are to be eliminated
     // Lines added with annotation [*Duplicate handle]
@@ -132,7 +132,7 @@ public:
 
             if (edgeCase)
             { //[*Duplicate handle]
-                // No BS
+              // No BS
             }
             else if (dirL)
             { //  make BS on the left sorted side
@@ -197,46 +197,57 @@ public:
 
     // Same approach with diff code style
     // Time: O(Log N)
-    int search(vector<int> &arr, int k)
+    int search(vector<int> &nums, int target)
     {
-        int n = arr.size();
-        int low = 0, high = n - 1;
-        while (low <= high)
+
+        int l = 0;
+        int r = nums.size() - 1;
+
+        while (l <= r)
         {
-            int mid = (low + high) / 2;
 
-            // if mid points the target
-            if (arr[mid] == k)
-                return mid;
+            int mid = l + (r - l) / 2;
 
-            // if left part is sorted:
-            if (arr[low] <= arr[mid])
+            if (nums[mid] == target)
             {
-                if (arr[low] <= k && k <= arr[mid])
+                return mid;
+            }
+
+            // Handling the edge case: when the same element continues from middle to last to first of the array.
+            // e.g: [1,0,1,1,1]
+            if (nums[l] == nums[mid] && nums[mid] == nums[r])
+            {
+                l = l + 1;
+                r = r - 1;
+                continue;
+            }
+
+            if (nums[l] <= nums[mid])
+            {
+                // left side sorted
+                if (nums[l] <= target && target <= nums[mid])
                 {
-                    // element exists:
-                    high = mid - 1;
+                    r = mid - 1;
                 }
                 else
                 {
-                    // element does not exist:
-                    low = mid + 1;
+                    l = mid + 1;
                 }
             }
             else
-            { // if right part is sorted:
-                if (arr[mid] <= k && k <= arr[high])
+            {
+                // right side sorted
+                if (nums[mid] <= target && target <= nums[r])
                 {
-                    // element exists:
-                    low = mid + 1;
+                    l = mid + 1;
                 }
                 else
                 {
-                    // element does not exist:
-                    high = mid - 1;
+                    r = mid - 1;
                 }
             }
         }
+
         return -1;
     }
 };
