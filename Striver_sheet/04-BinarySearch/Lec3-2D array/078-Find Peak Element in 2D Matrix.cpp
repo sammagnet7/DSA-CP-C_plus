@@ -60,20 +60,26 @@ class Solution
 {
 public:
     // ---------------------------------------------------------------------
-    // Optimal approach : BS
-    // Expand the idea of finding Peak element in 1D array to 2D array
-    // Here we apply BS on the column range from 0 to (N-1)
-    // In each iteration find the max of that column
-    // Then check that max element is peak or not
-    // If not then move the BS to right or left based on which direction gives greater element than the max element of this column
-    // So we can remove the other half of the columns in each iteration of Binary search
-    // Time: O(M * Log N)
-    // Space: O(1)
+    /*
+     * Approach Idea: Binary Search on Columns (Dimensionality Reduction)
+     * * 1. Strategy: Instead of traversing the whole 2D grid, we apply Binary Search on the COLUMNS (0 to n-1).
+     * * 2. The "Max in Column" Insight:
+     * - In the chosen 'mid' column, we find the maximum element (maxColVal).
+     * - Why? The largest element in a column is guaranteed to be greater than its top and bottom neighbors.
+     * - This effectively simplifies the 4-direction check to a 2-direction check (Left and Right only).
+     * * 3. Elimination Logic (Hill Climbing):
+     * - If maxColVal is greater than its Left and Right neighbors -> It is a Peak.
+     * - If the Left neighbor is greater -> There is a rising slope to the left, so a peak must exist in the left half. (Eliminate Right).
+     * - If the Right neighbor is greater -> There is a rising slope to the right. (Eliminate Left).
+     * * Time Complexity: O(rows * log(columns))
+     * Space Complexity: O(1)
+     */
     vector<int> findPeakGrid(vector<vector<int>> &mat)
     {
         int m = mat.size();    // #Rows
         int n = mat[0].size(); // #Columns
 
+        // BS on columns range
         int l = 0;
         int r = n - 1;
 
@@ -110,6 +116,30 @@ public:
 
         return {-1, -1};
     }
+
+    /*
+        Note:
+        
+        Qs: Instead of taking max of the middle coulmn can we take any local max (top and bottom is less)?
+
+        No, picking a "local" vertical peak is not safe. You must pick the Global Maximum of that column.
+
+        Here is the deep dive into why, using a "Wall vs. Fence" analogy.
+
+        1. The "Wall" Logic (Global Max)
+        The logic of this algorithm relies on creating a "separation barrier" (the mid column) that splits the matrix into two independent halves.
+
+        When we pick the Global Max (let's call it 100), we know that every other element in this column is smaller than 100.
+
+        If we move Left because the left neighbor is 101, we have crossed a "barrier".
+
+        The path of rising numbers can never come back to the Right side through this column, because to cross back, it would have to pass through this column again. But 101 is already taller than the entire mid column (since 100 was the max).
+
+        Therefore, the peak must be trapped in the Left half.
+
+        2. The "Fence" Leak (Local Peak)
+        If you only pick a Local Peak (an element greater than its top and bottom, but not the max of the column), you are building a "low fence" instead of a high wall. The path to the true peak can "jump" back over your column.
+    */
 };
 
 int main()

@@ -71,6 +71,8 @@ public:
     // Here in this approach, we have chosen the cell (0, m-1) to start with
     // If current element > target then col-- and if current element < target then row++
     // Time: O(m+n)
+    // In the worst case, the pointer starts at the top-right and moves all the way to the bottom-left. 
+    // It makes at most N moves down and M moves left.
     // Space: O(1)
     bool searchMatrix(vector<vector<int>> &mat, int target)
     {
@@ -92,6 +94,16 @@ public:
 
         return false;
     }
+
+    /*
+        Why not start at the top-left (0,0)? If you start at (0,0), moving right increases the value, and moving down also increases the value. If the current element is smaller than the target, you don't know whether to move right or down to find the target.
+
+        Where to start? You must start at a corner where moving in one direction increases the value, and moving in the other decreases it. There are two valid starting points:
+
+        Top-Right Corner: Moving Left decreases the value; moving Down increases the value.
+
+        Bottom-Left Corner: Moving Up decreases the value; moving Right increases the value.
+    */
 };
 
 int main()
