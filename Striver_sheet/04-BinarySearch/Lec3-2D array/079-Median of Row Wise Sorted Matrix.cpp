@@ -26,20 +26,20 @@ Examples:
 
 Sample Input 1 :
 5 5
-1 5 7 9 11 
-2 3 4 8 9 
-4 11 14 19 20 
-6 10 22 99 100 
-7 15 17 24 28 
+1 5 7 9 11
+2 3 4 8 9
+4 11 14 19 20
+6 10 22 99 100
+7 15 17 24 28
 
 Sample Output 1 :
 10
 
 Explanation For Sample Input 1:
 If we arrange the elements of the matrix in the sorted order in an array, they will be like this-
-1 2 3 4 4 5 6 7 7 8 9 9 10 11 11 14 15 17 19 20 22 24 28 99 100 
+1 2 3 4 4 5 6 7 7 8 9 9 10 11 11 14 15 17 19 20 22 24 28 99 100
 
-So the median is 10, which is at index 12, which is midway as the total elements are 25, so the 12th index is exactly midway. Therefore, the answer will be 10. 
+So the median is 10, which is at index 12, which is midway as the total elements are 25, so the 12th index is exactly midway. Therefore, the answer will be 10.
 
 
 Sample Input 2 :
@@ -62,11 +62,11 @@ INPUT::::::
 2
 
 5 5
-1 5 7 9 11 
-2 3 4 8 9 
-4 11 14 19 20 
-6 10 22 99 100 
-7 15 17 24 28 
+1 5 7 9 11
+2 3 4 8 9
+4 11 14 19 20
+6 10 22 99 100
+7 15 17 24 28
 
 3 5
 1 2 3 4 5
@@ -74,102 +74,86 @@ INPUT::::::
 21 23 25 27 29
 
 OUTPUT::::::
-10 
-11 
+10
+11
 
  */
 class Solution
 {
 public:
-    // Returns the upper-bound index
-    // Time: O(Log N)
-    // Space: O(1)
-    int findUpperBound(vector<int> &mat, int n, int target)
+    /**
+     * Function to find the median of a row-wise sorted matrix.
+     * * Time Complexity: O(32 * m * log(n))
+     * - 32: Binary search range (approx log2(10^9)).
+     * - m: Iterating through each row.
+     * - log(n): upper_bound (binary search) on each row.
+     * * Space Complexity: O(1)
+     */
+    int median(vector<vector<int>> &matrix, int m, int n)
     {
-        int l = 0;
-        int r = n - 1;
 
-        int ans = n;
-
-        while (l <= r)
-        {
-            int mid = l + (r - l) / 2;
-
-            if (mat[mid] > target)
-            {
-                ans = min(ans, mid);
-                r = mid - 1;
-            }
-            else if (mat[mid] <= target)
-            {
-                l = mid + 1;
-            }
-        }
-
-        return ans;
-    }
-
-    // Returns total number of elements in the whole matrix  (i.e. m vectors of each n size)
-    // which are less-than-or-equals-to the given target element
-    // Time: O(M * Log N)
-    // Space: O(1)
-    int countOfLessThanEquals(vector<vector<int>> &mat, int m, int n, int target)
-    {
-        int count = 0;
-
-        for (int i = 0; i < m; i++)
-        {
-            count += findUpperBound(mat[i], mat[i].size(), target);
-        }
-
-        return count;
-    }
-
-    // ---------------------------------------------------------------------
-    // Optimal approach: Using BS on the range of (min element to max element)
-    // Time: O(M) + O(Log(10^9) * M * LogN)
-    // Space: O(1)
-    // Note: Brute force approach [Time: O(M*N) + O(M*N Log(M*N))]; [Space: O(M*N)]
-    int median(vector<vector<int>> &mat, int m, int n)
-    {
-        // Write your code here.
-
+        // 1. Initialize Search Space
+        // Instead of searching from 1 to 10^9 (global constraints),
+        // we find the actual minimum and maximum elements currently in the matrix.
+        // Since rows are sorted, min is in the first column, max is in the last column.
         int minEl = INT_MAX;
         int maxEl = INT_MIN;
 
         for (int i = 0; i < m; i++)
-        { // O(M)
-            minEl = min(minEl, mat[i][0]);
-            maxEl = max(maxEl, mat[i][n - 1]);
+        {
+            minEl = min(minEl, matrix[i][0]);
+            maxEl = max(maxEl, matrix[i][n - 1]);
         }
 
-        int l = minEl;
-        int r = maxEl;
-        int ans = maxEl;
-        int leftToMedian = (m * n) / 2; // #expected elements left to the median
+        // 2. Define the Target Rank
+        // The median is the element in the middle of the sorted sequence.
+        // For a matrix of size 9 (3x3), median is the 5th smallest element.
+        // Formula: (Total Elements / 2) + 1
+        int desiredCount = (m * n) / 2 + 1;
 
+        int ans = -1;  // Variable to store the potential median
+        int l = minEl; // Low pointer of binary search
+        int r = maxEl; // High pointer of binary search
+
+        // 3. Binary Search on Answer
         while (l <= r)
-        { // O(Log (max-min)) where  int the worst case min=0, max=10^9 => O(Log (10^9))
-
+        {
+            // Pick a candidate value 'mid'
             int mid = l + (r - l) / 2;
 
-            int lessThanEqualsCount = countOfLessThanEquals(mat, m, n, mid);
+            int actualCount = 0; // Will store count of elements <= mid
 
-            if (lessThanEqualsCount > leftToMedian)
-            {   // To become the answer,
-                // #elements less than equals to median must be
-                //  greater than the #expected elements left to median
-                // becase of median element also need to be counted as +1
-                ans = min(ans, mid);
-                r = mid - 1;
+            // 4. Count elements <= mid
+            // Since rows are sorted, we don't need to iterate linearly.
+            // We use binary search (upper_bound) on each row.
+            for (int i = 0; i < m; i++)
+            {
+                // upper_bound returns iterator to the first element GREATER than mid.
+                // Subtracting .begin() gives the number of elements LESS THAN OR EQUAL to mid.
+                actualCount += upper_bound(matrix[i].begin(), matrix[i].end(), mid) - matrix[i].begin();
             }
-            else if (lessThanEqualsCount <= leftToMedian)
+
+            // 5. Decision Logic
+            // If actualCount >= desiredCount, it means 'mid' is large enough to cover the median rank.
+            // However, 'mid' might be larger than the true median (or not even exist in the matrix).
+            // So, we record 'mid' as a possible answer but try to find a SMALLER number
+            // that still satisfies the condition (squeeze to the left).
+            if (actualCount >= desiredCount)
+            {
+                ans = mid;   // Store potential answer
+                r = mid - 1; // Try smaller values
+            }
+            // If actualCount < desiredCount, 'mid' is too small.
+            // We need a larger number to reach the desired rank.
+            else
             {
                 l = mid + 1;
             }
         }
 
-        return ans; // If ans fails for any test cases then try with 'l'
+        // 6. Return final answer
+        // 'ans' will hold the smallest number X such that count(<= X) >= desiredCount.
+        return ans;
     }
 };
 
