@@ -75,42 +75,69 @@ public:
   // 1. Title: Candy
   //-------------------------------------------------------------------------------
 
+  //-------------------------------------------------------------------------------
   // Approach 1: Sub-optimal (Two-Pass with Two Arrays)
-  // Time Complexity: O(N)
-  // Space Complexity: O(N) + O(N) = O(N)
-  // Logic: Use two arrays to track candies from both left and right passes,
-  // then take the maximum at each index.
-  // int candy(vector<int> &ratings)
-  // {
-  //   int N = ratings.size();
+  //-------------------------------------------------------------------------------
 
-  //   vector<int> leftCandies(N);  // Tracks left-to-right constraints
-  //   vector<int> rightCandies(N); // Tracks right-to-left constraints
+  /*
+   * Method: candy
+   * -------------
+   * Calculates the minimum candies needed.
+   * * Strategy: Two-Pass Greedy
+   * 1. Initialize all children with 1 candy (Requirement 1).
+   * 2. Left-to-Right Pass: Ensure children with higher ratings than their
+   * LEFT neighbor get more candies.
+   * 3. Right-to-Left Pass: Ensure children with higher ratings than their
+   * RIGHT neighbor get more candies.
+   * * Complexity Analysis:
+   * Time Complexity: O(N)
+   * - We traverse the array exactly 3 times (L->R, R->L, Sum).
+   * Space Complexity: O(N)
+   * - To store the 'candies' array.
+   */
+  int candy(vector<int> &ratings)
+  {
+    int n = ratings.size();
 
-  //   leftCandies[0] = 1;
-  //   rightCandies[N - 1] = 1;
+    // Step 1: Give everyone 1 candy initially
+    // This satisfies the "Each child must have at least one candy" rule.
+    vector<int> candies(n, 1);
 
-  //   // Left to Right Pass: ensure increasing rating gets more candy
-  //   for (int i = 1; i < N; i++)
-  //   {
-  //     leftCandies[i] = (ratings[i] > ratings[i - 1]) ? leftCandies[i - 1] + 1 : 1;
+    // Step 2: Left-to-Right Pass
+    // Only look at the LEFT neighbor (i-1)
+    for (int i = 1; i < n; i++)
+    {
+      if (ratings[i] > ratings[i - 1])
+      {
+        // If I have a higher rating than my left neighbor,
+        // I must have 1 more candy than them.
+        candies[i] = candies[i - 1] + 1;
+      }
+    }
 
-  //     // Right to Left in same loop
-  //     int revIdx = N - 1 - i;
-  //     rightCandies[revIdx] = (ratings[revIdx] > ratings[revIdx + 1]) ? rightCandies[revIdx + 1] + 1 : 1;
-  //   }
+    // Step 3: Right-to-Left Pass
+    // Only look at the RIGHT neighbor (i+1)
+    for (int i = n - 2; i >= 0; i--)
+    {
+      if (ratings[i] > ratings[i + 1])
+      {
+        // If I have a higher rating than my right neighbor,
+        // I must have more candies than them.
+        // CRITICAL: We take max() to ensure we don't break the condition
+        // established in the Left-to-Right pass.
+        candies[i] = max(candies[i], candies[i + 1] + 1);
+      }
+    }
 
-  //   // Final candies = max(left pass, right pass) at each index
-  //   int ans = 0;
-  //   for (int i = 0; i < N; i++)
-  //   {
-  //     ans += max(leftCandies[i], rightCandies[i]);
-  //   }
+    // Step 4: Sum up the candies
+    // (accumulate is a standard library function to sum a vector)
+    return accumulate(candies.begin(), candies.end(), 0);
+  }
 
-  //   return ans;
-  // }
+  //-------------------------------------------------------------------------------
+  // Approach 2: Sub-optimal (Two-Pass but Space Optimized) [IGNORE]
+  //-------------------------------------------------------------------------------
 
-  // Approach 2: Sub-optimal (Two-Pass but Space Optimized)
   // Time Complexity: O(N)
   // Space Complexity: O(N) for leftCandies only
   // Logic: Store left pass in array, right pass inline using a variable.
@@ -142,20 +169,47 @@ public:
   //   return ans;
   // }
 
+  //-------------------------------------------------------------------------------
   // Approach 3: Optimal One-Pass (Greedy) [Note: Skipped]
-  // Time Complexity: O(N)
-  // Space Complexity: O(1)
-  // Logic: Traverse once while keeping track of increasing and decreasing trends.
-  // Use greedy logic to adjust candies when decreasing slope exceeds peak.
+  //-------------------------------------------------------------------------------
+
+  /*
+   * Method: candy
+   * -------------
+   * Calculates the minimum total candies required under the given constraints.
+   * * Approach: Slope (Peak & Valley) Strategy
+   * We treat the ratings array as a mountain range and calculate candies on the fly
+   * without using extra space.
+   * * 1. Initialization: The first child always starts with 1 candy.
+   * 2. Flat Surface (ratings[i] == ratings[i-1]):
+   * - The current child gets 1 candy (reset). The sequence restarts.
+   * 3. Increasing Slope (ratings[i] > ratings[i-1]):
+   * - We are climbing a mountain. Each subsequent child gets 1 more candy than the last.
+   * - We track the 'peak' height to compare with the valley later.
+   * 4. Decreasing Slope (ratings[i] < ratings[i-1]):
+   * - We are going down into a valley.
+   * - MATHEMATICAL TRICK: Instead of assigning candies like 3, 2, 1, we add them to the sum
+   * in reverse order (1, then 2, then 3...) as we descend.
+   * - 'down' tracks the length of the descent.
+   * - CONFLICT RESOLUTION: If the "Down" slope becomes longer than the "Up" slope (Peak),
+   * the peak wasn't high enough. We retroactively increase the peak's value by the difference, to avoid -ve values.
+   * * Complexity Analysis:
+   * - Time Complexity: O(N)
+   * We iterate through the array exactly once. The inner while loops just advance the main pointer 'i'.
+   * - Space Complexity: O(1)
+   * We only use a few variables (sum, i, up, down, peak) instead of an O(N) array.
+   */
   int candy(vector<int> &ratings)
   {
     int n = ratings.size();
-    int i = 1;   // Current index
-    int sum = 1; // Total candies (first child gets 1)
+    int i = 1;   // Pointer to traverse the array
+    int sum = 1; // Total candies accumulated (First child gets 1 initially)
 
     while (i < n)
     {
-      // Case 1: Equal ratings → give 1 candy
+      // Case 1: Flat Surface (Current rating equals previous)
+      // Rule: "Each child must have at least one candy."
+      // Since there is no slope requirement, we reset and give 1 candy.
       if (ratings[i] == ratings[i - 1])
       {
         sum += 1;
@@ -163,25 +217,40 @@ public:
         continue;
       }
 
-      // Case 2: Increasing slope
-      int peak = 1;
+      // Case 2: Increasing Slope (Current rating > previous)
+      // We are climbing up.
+      int up = 1;   // Tracks height of the climb relative to the start of this slope
+      int peak = 1; // Tracks the max height reached (used later for adjustment)
+
       while (i < n && ratings[i] > ratings[i - 1])
       {
-        peak += 1;
-        sum += peak;
+        up++;      // Increment candy count for the current child (2, 3, 4...)
+                   // Note: // here increasing 'up' before summing
+        peak = up; // Update the peak height
+        sum += up; // Add these candies to total sum
         i++;
       }
 
-      // Case 3: Decreasing slope
-      int down = 1;
+      // Case 3: Decreasing Slope (Current rating < previous)
+      // We are sliding down.
+      int down = 1; // Tracks length of the descent
       while (i < n && ratings[i] < ratings[i - 1])
       {
+        // LOGIC: When going down, the current child gets 1, the previous gets 2, etc.
+        // We simulate this by adding 'down' to sum.
+        // Step 1: Add 1 (for bottom-most child).
+        // Step 2: Add 2 (boost previous child to 2, bottom remains 1).
         sum += down;
-        down++;
+        down++; // Note: here increase 'down' after summing
         i++;
       }
 
-      // Adjustment: if down slope is longer than peak slope
+      // CRITICAL ADJUSTMENT: Peak Correction
+      // The 'peak' is shared by the Up slope and the Down slope.
+      // It must be high enough to satisfy BOTH sides.
+      // Example: Up slope height 2, Down slope length 3.
+      // The peak must be at least 4 (3+1) to support the descent.
+      // If down > peak, we add the difference to lift the peak retroactively.
       if (down > peak)
       {
         sum += (down - peak);
