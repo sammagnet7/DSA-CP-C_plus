@@ -137,6 +137,10 @@ public:
   // 1. Title: Minimum Number of Platforms
   //-------------------------------------------------------------------------------
 
+  //---------------------------
+  // Approach: 1
+  //---------------------------
+
   /*
     Approach: Event Timeline Sorting
 
@@ -153,40 +157,125 @@ public:
     Space Complexity: O(n) for storing the combined event list.
 */
 
-  // int calculateMinPatforms(int at[], int dt[], int n) {
-  //     vector<pair<int, char>> at_dt;
+  int calculateMinPatforms(int at[], int dt[], int n)
+  {
+    vector<pair<int, char>> at_dt;
 
-  //     // Push both arrival and departure events with markers
-  //     for (int i = 0; i < n; i++) {
-  //         at_dt.push_back({at[i], 'a'});
-  //         at_dt.push_back({dt[i], 'd'});
-  //     }
+    // Push both arrival and departure events with markers
+    for (int i = 0; i < n; i++)
+    {
+      at_dt.push_back({at[i], 'a'});
+      at_dt.push_back({dt[i], 'd'});
+    }
 
-  //     // Sort all events: time ascending, with 'a' before 'd' on ties
-  //     sort(at_dt.begin(), at_dt.end());
+    // Sort all events: time ascending, with 'a' before 'd' on ties
+    sort(at_dt.begin(), at_dt.end());
 
-  //     int aCount = 0;  // Number of trains currently at the station
-  //     int ans = 0;     // Max platforms needed at any time
+    int aCount = 0; // Number of trains currently at the station
+    int ans = 0;    // Max platforms needed at any time
 
-  //     // Traverse the sorted event list
-  //     for (auto el : at_dt) {
-  //         char type = el.second;
+    // Traverse the sorted event list
+    for (auto el : at_dt)
+    {
+      char type = el.second;
 
-  //         if (type == 'a') {
-  //             aCount++;  // One more train has arrived
-  //         } else {
-  //             aCount--;  // One train has departed
-  //         }
+      if (type == 'a')
+      {
+        aCount++; // One more train has arrived
+      }
+      else
+      {
+        aCount--; // One train has departed
+      }
 
-  //         ans = max(ans, aCount);  // Update max platforms required
-  //     }
+      ans = max(ans, aCount); // Update max platforms required
+    }
 
-  //     return ans;
-  // }
+    return ans;
+  }
 
-  //
-  // Approach 2
-  //
+  //---------------------------
+  // Approach: 2
+  //---------------------------
+
+  /*
+   * Function: calculateMinPlatforms
+   * -------------------------------
+   * Calculates the minimum number of platforms required.
+   * * Approach: Min-Heap (Priority Queue) Strategy
+   * 1. Combine Arrival and Departure times and sort them by Arrival Time.
+   * This simulates processing trains in the order they arrive at the station.
+   * 2. Use a Min-Heap (`freePlatforms`) to store the Departure Times of trains
+   * currently occupying platforms.
+   * - The top of the heap tells us the *earliest* time a platform will become free.
+   * 3. For every new train:
+   * - Check if its Arrival Time is > the Earliest Departure Time (heap.top()).
+   * - If YES: The previous train has left. We Pop (recycle the platform).
+   * - If NO: The platform is still busy. We need a new platform (increment count).
+   * - Always Push the new train's departure time (it now occupies a platform).
+   *
+   * Complexity Analysis:
+   * Time Complexity: O(N log N)
+   * - Sorting the vector takes O(N log N).
+   * - Heap operations (push/pop) take O(log N), done N times -> O(N log N).
+   * Space Complexity: O(N)
+   * - O(N) to store the pair vector.
+   * - O(N) for the priority queue in the worst case (all trains overlap).
+   */
+  int calculateMinPatforms(int at[], int dt[], int n)
+  {
+
+    // 1. Store trains as pairs {arrival, departure}
+    vector<pair<int, int>> timings;
+
+    for (int i = 0; i < n; i++)
+    {
+      timings.push_back({at[i], dt[i]});
+    }
+
+    // 2. Sort based on Arrival Time (process trains as they come)
+    sort(timings.begin(), timings.end());
+
+    // 3. Min-Heap: Stores departure times of active trains.
+    // minHeap.top() gives us the platform that will be free the soonest.
+    priority_queue<int, vector<int>, greater<int>> freePlatforms;
+
+    // Place the first train on a platform
+    freePlatforms.push(timings[0].second);
+
+    // We start with 1 platform occupied
+    int platforms = 1;
+
+    for (int i = 1; i < n; i++)
+    {
+
+      // Check availability:
+      // Current Train Arrival vs. Earliest Train Departure
+      // Condition: timings[i].first <= freePlatforms.top()
+      // If the new train arrives BEFORE or EXACTLY WHEN the earliest train leaves,
+      // we cannot reuse that platform yet (overlap).
+      if (timings[i].first <= freePlatforms.top())
+      {
+        platforms++; // Buy a new platform
+      }
+      else
+      {
+        // Case: The earliest train has departed.
+        // We can reuse its platform. Remove it from the busy list.
+        freePlatforms.pop();
+      }
+
+      // Regardless of whether we reused a platform or bought a new one,
+      // the current train is now occupying a slot. Add its departure time.
+      freePlatforms.push(timings[i].second);
+    }
+
+    return platforms;
+  }
+
+  //---------------------------
+  // Approach: 3
+  //---------------------------
 
   /*
       Approach: Two Pointer (Greedy)
@@ -202,8 +291,8 @@ public:
           - Else, train has departed, decrement platform count.
       - Keep track of max platforms required during traversal.
 
-      Time Complexity: O(n log n) ? sorting the arrival and departure arrays.
-      Space Complexity: O(1) ? constant space used, no extra structures.
+      Time Complexity: O(n log n)  sorting the arrival and departure arrays.
+      Space Complexity: O(1)  constant space used, no extra structures.
   */
 
   int calculateMinPatforms(int at[], int dt[], int n)

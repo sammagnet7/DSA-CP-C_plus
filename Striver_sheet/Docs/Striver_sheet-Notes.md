@@ -852,4 +852,4 @@ It can be of two types:
 8. [Find element in rth row and cth col in Pascal's triangle](https://www.geeksforgeeks.org/dsa/find-the-nth-row-in-pascals-triangle/)
 9. [3sum](https://leetcode.com/problems/3sum/description/)
 10. [find Repeating-missing number](https://www.naukri.com/code360/problems/missing-and-repeating-numbers_6828164?utm_source=striver&utm_medium=website&utm_campaign=codestudio_a_zcourse)
-11. 
+11. [Maximum Profit in Job Scheduling [with Fixed Start & End Times]](https://leetcode.com/problems/maximum-profit-in-job-scheduling/)
