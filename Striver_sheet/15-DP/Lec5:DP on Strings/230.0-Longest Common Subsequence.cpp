@@ -91,6 +91,8 @@ Similar quetion:
                 - then insert (len(word2) - LCS) chars from word2 to word1
                 - Total Required operations: (len(word1) - LCS) + (len(word2) - LCS)
 
+4) From Leetcoe daily: https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/description/?envType=daily-question&envId=2026-01-10
+
 
 ----------------------------------------------------------------------------------------------------
 

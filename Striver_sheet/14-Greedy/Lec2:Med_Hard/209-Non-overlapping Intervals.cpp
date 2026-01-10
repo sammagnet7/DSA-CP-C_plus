@@ -24,7 +24,7 @@ https://www.youtube.com/watch?v=HDHQ8lAWakY
 https://takeuforward.org/plus/dsa/problems/non-overlapping-intervals?tab=editorial
 https://leetcode.com/problems/non-overlapping-intervals/description/
 
-Note: this is exact opposit problem of : [208-N meetings in one room]
+Note: This problem is the exact inverse of the Activity Selection Problem (or "Maximum Non-Overlapping Intervals"):  [208-N meetings in one room]
 
 
 Problem statement:
@@ -86,6 +86,7 @@ public:
    *
    * Approach:
    *   1. Sort the intervals based on their end times (greedy strategy).
+   *      Why? Finishing early leaves the maximum possible "free space" for the next interval to fit in.
    *   2. Initialize a counter to track the maximum number of non-overlapping intervals.
    *   3. Traverse through intervals, selecting only those that do not overlap
    *      with the last selected interval.

@@ -62,53 +62,67 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Insert Interval
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Insert Interval
-  //-------------------------------------------------------------------------------
-
-  /**
-   * Inserts a new interval into a list of non-overlapping, sorted intervals and merges if necessary.
-   *
-   * @param intervals A list of sorted non-overlapping intervals.
-   * @param newInterval The interval to insert and potentially merge.
-   * @return A new list of merged intervals after inserting newInterval.
-   *
-   * Time Complexity: O(n), where n is the number of intervals.
-   * Space Complexity: O(n), for storing the result in the output vector.
+  /*
+   * Method: insert
+   * --------------
+   * Inserts a new interval into a sorted list of non-overlapping intervals, merging if necessary.
+   * * Approach: Linear Scan (Three Phases)
+   * 1. Add all intervals that come strictly BEFORE the new interval.
+   * 2. Merge all intervals that OVERLAP with the new interval.
+   * 3. Add the merged interval, followed by all remaining intervals.
+   * * Complexity Analysis:
+   * - Time Complexity: O(N)
+   * We iterate through the 'intervals' vector exactly once.
+   * - Space Complexity: O(N)
+   * We create a new vector 'result' to store the output.
+   * (O(1) auxiliary space if we ignore the return container).
    */
   vector<vector<int>> insert(vector<vector<int>> &intervals, vector<int> &newInterval)
   {
-    vector<vector<int>> ans;
+
+    vector<vector<int>> result;
     int i = 0;
     int n = intervals.size();
 
-    // Step 1: Add all intervals that end before newInterval starts (no overlap)
+    // Phase 1: Add intervals that end before the new interval starts.
+    // Condition: current_end < new_start
+    // These are strictly to the left and unaffected.
     while (i < n && intervals[i][1] < newInterval[0])
     {
-      ans.push_back(intervals[i]);
+      result.push_back(intervals[i]);
       i++;
     }
 
-    // Step 2: Merge all overlapping intervals with newInterval
+    // Phase 2: Merge overlapping intervals.
+    // Condition: current_start <= new_end
+    // (Since Phase 1 handled everything ending before, any interval reaching here
+    //  that starts <= new_end MUST overlap).
     while (i < n && intervals[i][0] <= newInterval[1])
     {
-      newInterval[0] = min(newInterval[0], intervals[i][0]); // Expand start
-      newInterval[1] = max(newInterval[1], intervals[i][1]); // Expand end
+      // Expand the newInterval to encompass the current overlapping interval
+      newInterval[0] = min(newInterval[0], intervals[i][0]); // Min Start
+      newInterval[1] = max(newInterval[1], intervals[i][1]); // Max End
       i++;
     }
-    ans.push_back(newInterval); // Add the merged interval
 
-    // Step 3: Add the remaining intervals that start after newInterval ends
+    // Push the fully merged 'newInterval' into the result
+    result.push_back(newInterval);
+
+    // Phase 3: Add remaining intervals.
+    // These start after the new interval ends, so they are strictly to the right.
     while (i < n)
     {
-      ans.push_back(intervals[i]);
+      result.push_back(intervals[i]);
       i++;
     }
 
-    return ans;
+    return result;
   }
 };
 
