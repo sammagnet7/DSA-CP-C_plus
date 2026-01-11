@@ -25,7 +25,7 @@ https://takeuforward.org/plus/dsa/problems/sum-of-subarray-minimums?tab=editoria
 https://leetcode.com/problems/sum-of-subarray-minimums/description/
 
 Problem statement:
-Given an array of integers arr, find the sum of min(b), where b ranges over every (contiguous) subarray of arr. Since the answer may be large, return the answer modulo 109 + 7.
+Given an array of integers arr, find the sum of min(b), where b ranges over every (contiguous) subarray of arr. Since the answer may be large, return the answer modulo 10^9 + 7.
 
 Example 1:
     Input: arr = [3,1,2,4]

@@ -18,7 +18,7 @@ using namespace std;
 /*
 
 1. Title: Maximal Rectangle
-        Maximum Rectangle Area with all 1's | DP on Rectangles: DP 55
+            Maximum Rectangle Area with all 1's | DP on Rectangles: DP 55
 
 Links:
 https://youtu.be/ttVu6G7Ayik?si=VBosejklFJNgK3FH
@@ -55,158 +55,340 @@ OUTPUT::::::
 
 */
 
+//=======================================================================
+// 1. Title: Maximum Rectangle Area with all 1's
+//=======================================================================
+
 //------------------------------------------------------------------------
-// 1. Title: Maximal Rectangle
-//           Maximum Rectangle Area with all 1's
+// Approach 1: DP + Monotonic Stack  [3 pass for finding pse+nse+maxArea]
 //------------------------------------------------------------------------
 
-/*
-        Function: largestRectangleArea
-        --------------------------------------
-        Problem:
-        Given an array `heights` representing the heights of bars in a histogram,
-        return the area of the largest rectangle that can be formed within the histogram.
-
-        Approach:
-        - Use a **monotonic increasing stack** to store indices of bars.
-        - For each bar:
-            1. While the current bar is smaller than the bar at the stack's top:
-                - Pop from the stack (this means we found the **next smaller element** for that bar).
-                - Calculate the width using the current index as NSE (next smaller element)
-                and the new stack top as PSE (previous smaller element).
-                - Compute area = height of popped bar * width, update max.
-            2. Push the current index into the stack.
-        - After iterating through all bars, clear the stack by assuming NSE = N (array end).
-
-        Time Complexity:
-        - O(2N) → Each element is pushed and popped at most once.
-        - First pass: O(N)
-        - Second pass (clearing stack): O(N)
-
-        Space Complexity:
-        - O(N) for stack.
-
-        Why O(2N) and not O(N²)?
-        - Each index is processed twice at most (push + pop), so total operations = 2N.
-
-    */
-
-// Time: O(2N): stack loop + input array loop
-// Space: O(N): stack
-int largestRectangleArea(vector<int> &heights)
+class Solution
 {
+public:
+    /*
+     * METHOD: largestRectangleArea
+     * ----------------------------
+     * IDEA:
+     * This helper function solves the "Largest Rectangle in Histogram" problem.
+     * For a given row of heights, the largest rectangle is determined by the "limiting"
+     * bar height. For any specific bar 'h', the widest rectangle using 'h' as the full
+     * height extends to the left until it hits a smaller bar (Previous Smaller Element)
+     * and to the right until it hits a smaller bar (Next Smaller Element).
+     * * APPROACH:
+     * 1. Monotonic Stack (2 Passes):
+     * - Pass 1: Find Previous Smaller Element (PSE) index for every bar.
+     * - Pass 2: Find Next Smaller (or Equal) Element (NSE) index for every bar.
+     * 2. Calculate Area:
+     * - Width = (Right Boundary - Left Boundary - 1)
+     * - Area = Width * Height
+     * * COMPLEXITY:
+     * Time: O(N) - We traverse the histogram 3 times (PSE loop, NSE loop, Calculation loop).
+     * Stack operations are amortized O(1).
+     * Space: O(N) - Used for PSE array, NSE array, and Stack.
+     */
+    int largestRectangleArea(vector<int> &histogram)
+    {
 
-    int N = heights.size();
-    int maxi = INT_MIN;
+        int N = histogram.size();
 
-    // vector<int> pse(N); // O(N): stores pse's indexes // not needed as computing on-d-fly
-    stack<int> st; // O(N): stores indexes of prev elements
+        // PSIdx[i]: Index of the first element to the LEFT smaller than histogram[i]
+        vector<int> PSIdx(N, -1); // Init to -1 (imaginary boundary before index 0)
 
-    for (int i = 0; i < N; i++)
-    { // O(N)
+        // NSEqIdx[i]: Index of the first element to the RIGHT smaller than histogram[i]
+        vector<int> NSEqIdx(N, N); // Init to N (imaginary boundary after last index)
 
-        while (!st.empty() && heights[st.top()] > heights[i])
-        { // O(N): Amortized for N loops
+        stack<int> st; // Stores indices of the histogram bars
 
-            int pge_id = st.top(); // prev-greater element's index
-            st.pop();
-
-            int pge_nse = i; // pge's next-smaller-element is current element
-            // int pge_pse = pse[pge_id];  // pge's prev-smaller-element
-            int pge_pse = st.empty() ? -1 : st.top(); // the next in stack is  pge's prev-smaller-element
-
-            int range = pge_nse - pge_pse - 1;
-            int contri = heights[pge_id] * range;
-
-            maxi = max(maxi, contri);
-        }
-
-        // pse[i] = st.empty() ? -1 : st.top(); // not needed as computing on-d-fly
-        st.push(i);
-    }
-
-    while (!st.empty())
-    { // Added as part of prev stack traverse in O(N). N extra time
-
-        int pge_id = st.top(); // prev-greater-equal element's index
-        st.pop();
-
-        int pge_nse = N; // prev-greater-equal element's next-smaller-index
-        // int pge_pse = pse[pge_id];  // prev-greater-equal element's prev-smaller-index
-        int pge_pse = st.empty() ? -1 : st.top();
-
-        int range = pge_nse - pge_pse - 1;
-        int contri = heights[pge_id] * range;
-
-        maxi = max(maxi, contri);
-    }
-
-    return maxi;
-}
-
-/*
-        Function: maximalRectangle
-        --------------------------------------
-        Problem:
-        Given a binary matrix (M x N), find the area of the largest rectangle containing only 1's.
-
-        Approach:
-        - Convert the matrix into a histogram for each row:
-            - For each cell (i, j), if matrix[i][j] = 1:
-                hist[i][j] = hist[i-1][j] + 1 (stacking the height from the previous row).
-            else:
-                hist[i][j] = 0.
-        - For each row's histogram, compute the largest rectangle using
-        the `largestRectangleArea()` function (same as Histogram problem).
-        - Take the maximum area across all rows.
-
-        Time Complexity:
-        - O(M * N) for building histograms
-        - O(M * 2N) for computing largest rectangle for each row
-        - Total = O(M * (N + 2N)) = O(M * N)
-
-        Space Complexity:
-        - O(M * N) for histogram matrix
-        - O(N) for stack used in largestRectangleArea()
-    */
-// Optimal approach: Uses the method of finding largest area of histograms
-//
-// Time: O(M*N + M*2N)  where M is #Rows and N is #Cols
-// Space: (M*N + N)
-int maximalRectangle(vector<vector<char>> &matrix)
-{
-
-    int maxArea = INT_MIN;
-    int M = matrix.size();    // m rows
-    int N = matrix[0].size(); // n cols
-
-    vector<vector<int>> histograms(M, vector<int>(N));
-
-    for (int i = 0; i < M; i++)
-    { // O(M*N)
-        for (int j = 0; j < N; j++)
+        // ---------------------------------------------------------
+        // Step 1: Create the Previous Smaller Elements (PSE) array
+        // ---------------------------------------------------------
+        for (int i = 0; i < N; i++)
         {
 
-            int cur = (matrix[i][j] - '0');
+            int cur = histogram[i];
 
-            if (i == 0)
+            // Monotonic Stack Logic:
+            // Remove elements from stack that are greater or equal to current('>=').
+            // We want to find the first one strictly smaller to the left.
+            while (!st.empty() && histogram[st.top()] >= cur)
             {
-                histograms[i][j] = cur;
+                st.pop();
             }
-            else
+
+            if (!st.empty())
             {
-                histograms[i][j] = cur == 0 ? 0 : (histograms[i - 1][j] + cur);
+                PSIdx[i] = st.top(); // Found the boundary on the left
             }
+            // Else, PSIdx[i] remains -1 (default)
+
+            st.push(i);
         }
+
+        // Clear stack for reuse in next step
+        while (!st.empty())
+        {
+            st.pop();
+        }
+
+        // ---------------------------------------------------------
+        // Step 2: Create the Next Smaller Elements (NSE) array
+        // ---------------------------------------------------------
+        // We traverse from Right to Left to find the right boundary
+        for (int j = N - 1; j >= 0; j--)
+        {
+
+            int cur = histogram[j];
+
+            // Remove elements that are strictly greater('>').
+            // Note: Handling duplicates carefully ensures we don't double count,
+            // though exact strictness varies by implementation.
+            while (!st.empty() && histogram[st.top()] > cur)
+            {
+                st.pop();
+            }
+
+            if (!st.empty())
+            {
+                NSEqIdx[j] = st.top(); // Found the boundary on the right
+            }
+            // Else, NSEqIdx[j] remains N (default)
+
+            st.push(j);
+        }
+
+        int largestArea = 0;
+
+        // ---------------------------------------------------------
+        // Step 3: Calculate area for every bar to find the maximum
+        // ---------------------------------------------------------
+        for (int k = 0; k < N; k++)
+        {
+
+            // Optimization: If height is 0, it cannot form a rectangle
+            if (histogram[k] == 0)
+            {
+                continue;
+            }
+
+            // Formula: Width = Right Boundary - Left Boundary - 1
+            // Example: Limits are indices 1 and 5. Width is range [2,3,4], size 3.
+            // Calculation: 5 - 1 - 1 = 3.
+            int curLength = NSEqIdx[k] - PSIdx[k] - 1;
+            int curHeight = histogram[k];
+
+            int curArea = curLength * curHeight;
+
+            largestArea = max(largestArea, curArea);
+        }
+
+        return largestArea;
     }
 
-    for (auto histRow : histograms)
-    {                                                          // O(M)
-        maxArea = max(maxArea, largestRectangleArea(histRow)); // O(2N)
+    /*
+     * METHOD: maximalRectangle
+     * ------------------------
+     * IDEA:
+     * We convert the 2D binary matrix into a series of 1D histograms.
+     * We iterate through the matrix row by row. For each row, we treat it as
+     * the "ground" and calculate the height of consecutive 1s above it.
+     * Then we solve the "Largest Rectangle in Histogram" problem for that row.
+     * * COMPLEXITY:
+     * Time: O(Rows * Cols)
+     * - We iterate every cell once to build histograms: O(Rows * Cols)
+     * - We call largestRectangleArea (O(Cols)) for each Row: O(Rows * Cols)
+     * Space: O(Cols)
+     * - We only need one 1D array of size Cols to store the running heights.
+     */
+    int maximalRectangle(vector<vector<char>> &matrix)
+    {
+
+        if (matrix.empty())
+            return 0;
+
+        int M = matrix.size();
+        int N = matrix[0].size();
+
+        // Stores the height of consecutive 1s for the current row
+        vector<int> histogram(N, 0);
+        int maxRectangle = 0;
+
+        // Traverse every row
+        for (int i = 0; i < M; i++)
+        {
+            // Update the histogram for the current row
+            for (int j = 0; j < N; j++)
+            {
+
+                if (matrix[i][j] == '0')
+                {
+                    // If current cell is 0, the continuous vertical strip breaks.
+                    // Height becomes 0.
+                    histogram[j] = 0;
+                }
+                else
+                {
+                    // If current cell is 1, we extend the height from the previous row.
+                    histogram[j] = histogram[j] + 1;
+                }
+            }
+
+            // For this updated histogram (representing the matrix up to row i),
+            // find the largest rectangle.
+            maxRectangle = max(maxRectangle, largestRectangleArea(histogram));
+        }
+
+        return maxRectangle;
+    }
+};
+
+//------------------------------------------------------------------------
+// Approach 2: DP + Monotonic Stack  [1 pass for finding pse+nse+maxArea]
+//------------------------------------------------------------------------
+
+class Solution
+{
+public:
+    /*
+     * METHOD: largestRectangleArea
+     * ----------------------------
+     * IDEA:
+     * This method uses a SINGLE-PASS Monotonic Stack approach (optimized from the 2-pass version).
+     * Instead of pre-calculating PSE (Previous Smaller) and NSE (Next Smaller) arrays separately,
+     * we calculate the area *during* the traversal.
+     * * * LOGIC:
+     * 1. We maintain a stack of indices with increasing heights.
+     * 2. When we encounter a bar (cur) smaller than the bar at stack.top(), it means we have found
+     * the "Next Smaller Element" (Right Boundary) for the bar at stack.top().
+     * 3. At that moment, we pop the top element. This popped element is the 'height'.
+     * 4. The 'width' is determined by:
+     * - Right Boundary: The current index 'i' (which triggered the pop).
+     * - Left Boundary: The *new* stack.top() after popping (Previous Smaller Element).
+     * * * COMPLEXITY:
+     * Time: O(N) - Each element is pushed and popped exactly once.
+     * Space: O(N) - For the stack in the worst case (ascending order input).
+     */
+    int largestRectangleArea(vector<int> &histogram)
+    {
+
+        int N = histogram.size();
+        stack<int> st; // Stores indices of the histogram bars (strictly increasing order of height)
+        int largestArea = 0;
+
+        for (int i = 0; i <= N; i++)
+        {
+            // We iterate up to N.
+            // The (i == n) case acts as a dummy '0' height bar
+            // Forces the stack to empty at the end.
+            // To avoid extra code block to empty the stack (commented out next)
+            int cur = (i == N) ? 0 : histogram[i];
+
+            // If current bar is smaller than stack top, the stack top's right boundary is found.
+            // We must resolve (calculate area for) all bars in stack that are taller than 'cur'.
+            while (!st.empty() && histogram[st.top()] >= cur)
+            {
+
+                int el = histogram[st.top()]; // The height of the bar we are processing
+                st.pop();                     // Remove it to find its left boundary
+
+                // Right Boundary (NSE): The current index 'i' triggered the pop
+                int NSEqIdx = i;
+
+                // Left Boundary (PSE): The element remaining below it in the stack.
+                // If stack is empty, it means 'el' was the smallest so far, extending to index -1.
+                int PSIdx = !st.empty() ? st.top() : -1;
+
+                // Calculate Area for the popped bar
+                int curLength = NSEqIdx - PSIdx - 1;
+                int curHeight = el;
+                int curArea = curLength * curHeight;
+
+                largestArea = max(largestArea, curArea);
+            }
+
+            st.push(i); // Push current index to stack
+        }
+
+        // Commented out block to empty the stack
+        /*
+            // Processing remaining elements in the stack
+            // These elements never found a "Next Smaller Element" on the right.
+            // Therefore, their Right Boundary extends to the end of the array (Index N).
+            while (!st.empty())
+            {
+                int el = histogram[st.top()];
+                st.pop();
+
+                int NSEqIdx = N;                         // Right boundary is the end of the array
+                int PSIdx = !st.empty() ? st.top() : -1; // Left boundary is the element below
+
+                int curLength = NSEqIdx - PSIdx - 1;
+                int curHeight = el;
+                int curArea = curLength * curHeight;
+
+                largestArea = max(largestArea, curArea);
+            }
+        */
+
+        return largestArea;
     }
 
-    return maxArea;
-}
+    /*
+     * METHOD: maximalRectangle
+     * ------------------------
+     * IDEA:
+     * We convert the 2D binary matrix into a series of 1D histograms.
+     * We iterate through the matrix row by row. For each row, we treat it as
+     * the "ground" and calculate the height of consecutive 1s above it.
+     * Then we solve the "Largest Rectangle in Histogram" problem for that row.
+     * * COMPLEXITY:
+     * Time: O(Rows * Cols)
+     * - We iterate every cell once to build histograms: O(Rows * Cols)
+     * - We call largestRectangleArea (O(Cols)) for each Row: O(Rows * Cols)
+     * Space: O(Cols)
+     * - We only need one 1D array of size Cols to store the running heights.
+     */
+    int maximalRectangle(vector<vector<char>> &matrix)
+    {
+
+        if (matrix.empty())
+            return 0;
+
+        int M = matrix.size();
+        int N = matrix[0].size();
+
+        // Stores the height of consecutive 1s for the current row
+        vector<int> histogram(N, 0);
+        int maxRectangle = 0;
+
+        // Traverse every row
+        for (int i = 0; i < M; i++)
+        {
+            // Update the histogram for the current row
+            for (int j = 0; j < N; j++)
+            {
+
+                if (matrix[i][j] == '0')
+                {
+                    // If current cell is 0, the continuous vertical strip breaks.
+                    // Height becomes 0.
+                    histogram[j] = 0;
+                }
+                else
+                {
+                    // If current cell is 1, we extend the height from the previous row.
+                    histogram[j] = histogram[j] + 1;
+                }
+            }
+
+            // For this updated histogram (representing the matrix up to row i),
+            // find the largest rectangle.
+            maxRectangle = max(maxRectangle, largestRectangleArea(histogram));
+        }
+
+        return maxRectangle;
+    }
+};
 
 int main()
 {
