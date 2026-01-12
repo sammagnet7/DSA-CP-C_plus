@@ -193,6 +193,101 @@ public:
   // 1. Title: House Robber II
   //-------------------------------------------------------------------------------
 
+  //---------------------------------
+  // Approach 2: SUB-OPTIMAL [Space]
+  //---------------------------------
+
+  /*
+   * Method: rob
+   * -----------
+   * Solves the Circular House Robber problem.
+   * * * Approach: Decomposition into Linear Cases
+   * Since the first and last houses are neighbors, we cannot rob both.
+   * This breaks the problem into two mutually exclusive scenarios:
+   * 1. Case A (DP1): Ignore the First House (Index 0). Rob from range [1 to N-1].
+   * 2. Case B (DP2): Ignore the Last House (Index N-1). Rob from range [0 to N-2].
+   * * The answer is simply max(Case A, Case B).
+   * * * Complexity Analysis:
+   * - Time Complexity: O(N)
+   * We iterate through the array twice (once for each scenario).
+   * - Space Complexity: O(N)
+   * We use two DP arrays of size N.
+   * (Note: This could be optimized to O(1) space by using variables instead of arrays).
+   */
+  int rob(vector<int> &nums)
+  {
+
+    int N = nums.size();
+
+    // Edge Case: Only 1 house. The "circular" constraint doesn't exist yet.
+    if (N == 1)
+    {
+      return nums[0];
+    }
+    // Edge Case: 2 houses. They are neighbors, so pick the max.
+    if (N == 2)
+    {
+      return max(nums[0], nums[1]);
+    }
+
+    // DP Arrays for the two scenarios
+    vector<int> DP1(N, 0); // Scenario 1: Range [1...N-1] (Include Last, Exclude First)
+    vector<int> DP2(N, 0); // Scenario 2: Range [0...N-2] (Include First, Exclude Last)
+
+    // -------------------------------------------------------
+    // Scenario 1: Solve for Range [1 to N-1]
+    // We implicitly skip nums[0] by initializing DP1[0] to 0
+    // and treating index 1 as the effective start.
+    // -------------------------------------------------------
+
+    // Base case relative to this sub-problem:
+    DP1[0] = 0;       // Dummy value (Skipping index 0)
+    DP1[1] = nums[1]; // First house of this range
+
+    // Standard House Robber logic for the rest
+    for (int i = 2; i <= N - 1; i++)
+    {
+      // Option 1: Rob current 'i' + loot from 'i-2'
+      // Note: DP1[i-2] is valid because we initialized DP1[0]=0
+      int take = nums[i] + DP1[i - 2];
+
+      // Option 2: Skip current 'i', take loot from 'i-1'
+      int notTake = DP1[i - 1];
+
+      DP1[i] = max(take, notTake);
+    }
+
+    // -------------------------------------------------------
+    // Scenario 2: Solve for Range [0 to N-2]
+    // We proceed normally but STOP before the last element (N-1).
+    // -------------------------------------------------------
+
+    // Base cases for standard House Robber starting at 0:
+    DP2[0] = nums[0];
+    DP2[1] = max(nums[0], nums[1]); // Standard logic: max of first two
+
+    // Loop stops at N-2 (strictly excluding the last house)
+    for (int i = 2; i <= N - 2; i++)
+    {
+
+      int take = nums[i] + DP2[i - 2];
+      int notTake = DP2[i - 1];
+
+      DP2[i] = max(take, notTake);
+    }
+
+    // -------------------------------------------------------
+    // Final Result
+    // Compare the best result from Scenario 1 (ending at N-1)
+    // and Scenario 2 (ending at N-2).
+    // -------------------------------------------------------
+    return max(DP1[N - 1], DP2[N - 2]);
+  }
+
+  //-----------------------------
+  // Approach 2: OPTIMAL [Space]
+  //-----------------------------
+
   /**
    * Function: rob
    * Problem: Leetcode 213 - House Robber II
