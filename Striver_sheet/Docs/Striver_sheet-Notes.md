@@ -643,6 +643,30 @@ Convert string of digits to num:
 
 5. To get length of a number `n` use function: `log10(n)+1`.
 ---
+<span style="color: violet; font-size: 18px;">**Binary search:**</span>
+
+### Binary Search Best Practices: Float vs. Integer
+
+**1. Floating-Point Binary Search (Continuous Range)**
+
+* **Context:** Geometry problems, finding roots, answers like `1.16667`.
+* **Best Practice:** Use a **fixed `for` loop** (e.g., `for(int i=0; i<100; i++)`).
+* **Why:**
+* **Precision:** 100 iterations reduce the search space by a factor of  (), far exceeding standard `double` precision.
+* **Safety:** Avoids infinite loops caused by "epsilon" pitfalls (where `r - l` never becomes smaller than machine precision).
+* **Predictability:** Guarantees consistent runtime regardless of input values.
+
+
+
+**2. Integer Binary Search (Discrete Range)**
+
+* **Context:** Array indexing, finding counts, specific integer values.
+* **Best Practice:** Use the standard **`while (l <= r)` loop**.
+* **Why:**
+* **Exactness:** You need to land on a specific integer index. Fixed loops may stop "near" the answer but not *on* it.
+* **Efficiency:** For small ranges, a fixed loop (e.g., 100) is wasteful. A `while` loop terminates immediately when the target is found or boundaries cross.
+
+---
 <span style="color: violet; font-size: 18px;">**Binary tree:**</span>
 
 1.  Theory of BT:
@@ -711,7 +735,7 @@ Convert string of digits to num:
 ---
 <span style="color: violet; font-size: 18px;">**Heap:**</span>
 
-z
+
 1.  In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
     ```cpp
           #include <queue>
