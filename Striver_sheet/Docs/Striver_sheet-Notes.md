@@ -862,6 +862,8 @@ It can be of two types:
 19. [Graph Leetcode TLE](https://leetcode.com/problems/word-ladder-ii/submissions/1747769329/) : 258-Word ladder.cpp TUF+ approach:2
 20. To do: [leetcode](https://leetcode.com/problems/course-schedule-ii/)
 21. String Subsequence DP hard problem: [leet](https://leetcode.com/problems/count-palindromic-subsequences/)
+22. [18-Segment Tree/Extras/Separate Squares I I.cpp](https://leetcode.com/problems/separate-squares-ii/description/?envType=daily-question&envId=2026-01-14)
+23. 
 
 ---
 
