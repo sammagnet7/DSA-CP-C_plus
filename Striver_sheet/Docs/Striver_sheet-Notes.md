@@ -642,6 +642,40 @@ Convert string of digits to num:
 4.  Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
 
 5. To get length of a number `n` use function: `log10(n)+1`.
+6. `std::max` vs `std::max_element`
+   * `std::max` compares values directly. It can take two values or an `initializer_list`, but it **cannot** take a container like `std::vector`.
+
+   ```cpp
+   #include <algorithm>
+   #include <iostream>
+
+   int a = 5, b = 10;
+   std::cout << std::max(a, b);         // Output: 10
+   std::cout << std::max({3, 7, 2, 9}); // Output: 9
+
+   // std::vector<int> v = {1, 4, 6};
+   // std::max(v);   // ❌ Error: std::max does not accept containers
+   ```
+
+   * `std::max_element` works on a **range (iterators)**, so it is used to find the maximum inside containers like `std::vector`.
+
+   ```cpp
+   #include <algorithm>
+   #include <iostream>
+   #include <vector>
+
+   std::vector<int> v = {1, 4, 6};
+   auto it = std::max_element(v.begin(), v.end());
+   std::cout << *it;   // Output: 6
+   ```
+
+   **Summary:**
+
+   * `std::max` → for values or initializer lists
+   * `std::max_element` → for containers (vector, array, etc.)
+
+7. 
+
 ---
 <span style="color: violet; font-size: 18px;">**Binary search:**</span>
 

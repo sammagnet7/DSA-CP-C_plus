@@ -90,6 +90,10 @@ public:
   // 1. Title: Minimum path sum in Grid
   //-------------------------------------------------------------------------------
 
+  //------------------------
+  // Approach 1: Recursive
+  //------------------------
+
   /*
    * Function: minPath
    * -----------------
@@ -167,10 +171,52 @@ public:
     return minPath(grid, dp, M - 1, N - 1);
   }
 
+  //------------------------
+  // Approach 2: Iterative
+  //------------------------
+
+  int minPathSum(vector<vector<int>> &grid)
+  {
+
+    int M = grid.size();
+    int N = grid[0].size();
+
+    vector<vector<int>> DP(M, vector<int>(N, 0));
+
+    DP[0][0] = grid[0][0]; // init cell 0
+
+    // init col 0
+    for (int i = 1; i < M; i++)
+    {
+      DP[i][0] = grid[i][0] + DP[i - 1][0];
+    }
+
+    // init Row 0
+    for (int j = 1; j < N; j++)
+    {
+      DP[0][j] = grid[0][j] + DP[0][j - 1];
+    }
+
+    // Build DP table bottom up
+    for (int i = 1; i < M; i++)
+    {
+      for (int j = 1; j < N; j++)
+      {
+
+        DP[i][j] = grid[i][j] + min(DP[i - 1][j], DP[i][j - 1]);
+      }
+    }
+
+    return DP[M - 1][N - 1];
+  }
+
   //-------------------------------------------------------------------------------
   // 2. Title: Minimum path sum in Triangular Grid
   //-------------------------------------------------------------------------------
 
+  //----------------------------------------------------
+  // Approach 1: Recursive [N*N DP table] [SUB-OPTIMAL]
+  //----------------------------------------------------
   /*
    * Function: minPath
    * -----------------
@@ -220,46 +266,100 @@ public:
     return minPath(triangle, dp, N, 0, 0); // Start from top
   }
 
+  //----------------------------------------------------
+  // Approach 2: Iterative [N*N DP table] [SUB-OPTIMAL]
+  //----------------------------------------------------
+  int minimumTotal(vector<vector<int>> &triangle)
+  {
+
+    int M = triangle.size();
+    int N = M;
+
+    vector<vector<int>> DP(M, vector<int>(N, 1e9)); // init with large number so that invalid cells gets ignored from MIN path sum calculation
+
+    DP[0][0] = triangle[0][0]; // init top layer
+
+    // init Col 0
+    for (int i = 1; i < M; i++)
+    {
+      DP[i][0] = triangle[i][0] + DP[i - 1][0];
+    }
+
+    // Build DP table bottom-up
+    for (int i = 1; i < M; i++)
+    {
+      for (int j = 1; j < (i + 1); j++)
+      {
+
+        DP[i][j] = triangle[i][j] + min(DP[i - 1][j], DP[i - 1][j - 1]);
+      }
+    }
+
+    return *min_element(DP[M - 1].begin(), DP[M - 1].end());
+  }
+
+  //----------------------------------------------------
+  // Approach 3: Iterative [N-length vector] [OPTIMAL]
+  //----------------------------------------------------
   /*
-   *   [OPTIMAL]
-   * Function: minimumTotal
-   * ----------------------
-   * A bottom-up tabulation approach with space optimization.
-   * Computes the minimum path sum from top to bottom, level by level.
-   *
-   * Time Complexity: O(N^2)
-   * Space Complexity: O(N) - Using only one 1D vector to store DP state.
-   *
-   * At each level, compute the minimum cost to reach each position
-   * by checking valid positions from the previous level.
+   * Method: minimumTotal
+   * --------------------
+   * Finds the minimum path sum from top to bottom of a triangle.
+   * * * Approach: Top-Down Dynamic Programming with Space Optimization
+   * Instead of a full 2D DP matrix, we use two 1D arrays:
+   * - 'prev': Stores path sums for the row directly above.
+   * - 'cur':  Stores path sums we are currently calculating.
+   * * * Logic:
+   * For every element at triangle[i][j], the path comes from the minimum
+   * of the two parents directly above it: (i-1, j) and (i-1, j-1).
+   * Recurrence: cur[j] = triangle[i][j] + min(prev[j], prev[j-1])
+   * * * Complexity:
+   * - Time: O(N^2) (Total elements in triangle)
+   * - Space: O(N) (Two rows of size N)
    */
   int minimumTotal(vector<vector<int>> &triangle)
   {
-    int N = triangle.size();
 
-    // Initialize DP for level 0
-    vector<int> lvDP(1);
-    lvDP[0] = triangle[0][0];
+    int M = triangle.size();
+    int N = M; // The last row has M elements, so max width is M.
 
-    // Build DP level by level
-    for (int lv = 1; lv < N; lv++)
+    // Initialize with a large value (1e9) to represent Infinity.
+    // This acts as a boundary guard for edges where a parent doesn't exist.
+    vector<int> prev(N, 1e9);
+    vector<int> cur(N, 1e9);
+
+    // Base Case: The top of the triangle has only one path.
+    prev[0] = triangle[0][0];
+
+    // Iterate from the 2nd row (index 1) down to the bottom
+    for (int i = 1; i < M; i++)
     {
-      int lvSize = triangle[lv].size();
 
-      vector<int> tmp(lvSize, -1); // temp storage for current level
+      // 1. Handle Left Edge (j=0) separately
+      // The first element of a row can ONLY come from the first element
+      // of the previous row (directly above). No 'j-1' exists.
+      cur[0] = triangle[i][0] + prev[0];
 
-      for (int j = 0; j < lvSize; j++)
+      // 2. Handle the rest of the row
+      // Loop goes up to 'i' (inclusive), as row 'i' has 'i+1' elements.
+      for (int j = 1; j < (i + 1); j++)
       {
-        int opt1 = (j == lvSize - 1) ? INT_MAX : lvDP[j]; // from above
-        int opt2 = (j - 1 < 0) ? INT_MAX : lvDP[j - 1];   // from left-diagonal
 
-        tmp[j] = triangle[lv][j] + min(opt1, opt2);
+        // Find the cheaper path from the two parents:
+        // - prev[j]:   Directly above (conceptually up-right)
+        // - prev[j-1]: Up-left
+        // Note: For the Right Edge (j=i), prev[j] will be 1e9 (infinity)
+        // because the parent row was shorter. This forces the logic to
+        // correctly pick prev[j-1] (the only valid parent).
+        cur[j] = triangle[i][j] + min(prev[j], prev[j - 1]);
       }
 
-      lvDP = tmp; // update for next level
+      // Move current row to previous for the next iteration
+      prev = cur;
     }
 
-    return *min_element(lvDP.begin(), lvDP.end()); // find minimum path to bottom
+    // The answer is the minimum value found in the last computed row
+    return *min_element(prev.begin(), prev.end());
   }
 };
 

@@ -106,7 +106,7 @@ class Solution
 {
 public:
   //-------------------------------------------------------------------------------
-  // 1. Title: Ninja’s Training
+  // Approach 1: To-Down [Recursive]
   //-------------------------------------------------------------------------------
 
   /*
@@ -128,26 +128,30 @@ public:
    * Time Complexity: O(n * 3) = O(n), where n is the number of days (because we memoize each subproblem).
    * Space Complexity: O(n * 3) for the memoization table.
    */
-  int maxPoints(vector<vector<int>> &points, vector<vector<int>> &dp, int day, int lastact) {
-      if (day < 0) {
-          return 0; // No days left, no points to earn
-      }
+  int maxPoints(vector<vector<int>> &points, vector<vector<int>> &dp, int day, int lastact)
+  {
+    if (day < 0)
+    {
+      return 0; // No days left, no points to earn
+    }
 
-      if (dp[day][lastact] != -1)
-          return dp[day][lastact]; // Return memoized result
+    if (dp[day][lastact] != -1)
+      return dp[day][lastact]; // Return memoized result
 
-      int maxP = INT_MIN;
+    int maxP = INT_MIN;
 
-      // Try all activities except the one done last time
-      for (int i = 0; i < 3; i++) {
-          if (lastact == i) continue; // Skip same activity as previous day
+    // Try all activities except the one done last time
+    for (int i = 0; i < 3; i++)
+    {
+      if (lastact == i)
+        continue; // Skip same activity as previous day
 
-          // Choose activity i and add its points
-          maxP = max(maxP, points[day][i] + maxPoints(points, dp, day - 1, i));
-      }
+      // Choose activity i and add its points
+      maxP = max(maxP, points[day][i] + maxPoints(points, dp, day - 1, i));
+    }
 
-      dp[day][lastact] = maxP; // Memoize and return result
-      return maxP;
+    dp[day][lastact] = maxP; // Memoize and return result
+    return maxP;
   }
 
   /*
@@ -186,8 +190,49 @@ public:
   }
 
   //-------------------------------------------------------------------------------
-  // 1. Title:
+  // Approach 2: Bottom-UP [Iterative]
   //-------------------------------------------------------------------------------
+
+  int ninjaTraining(int n, vector<vector<int>> &points)
+  {
+    // dp[i][j] stores the max points on Day 'i' performing Task 'j' (0, 1, 2)
+    vector<vector<int>> dp(n, vector<int>(3, 0));
+
+    // 1. Base Case: Day 0
+    // On the first day, the max points are just the points of the tasks themselves.
+    dp[0][0] = points[0][0];
+    dp[0][1] = points[0][1];
+    dp[0][2] = points[0][2];
+
+    // 2. Iterate through Day 1 to Day N-1
+    for (int day = 1; day < n; day++)
+    {
+
+      // For the current day, calculate max points for each task (0, 1, 2)
+      for (int currentTask = 0; currentTask < 3; currentTask++)
+      {
+
+        // Look at the previous day to find the best previous task
+        int maxPrev = 0;
+        for (int prevTask = 0; prevTask < 3; prevTask++)
+        {
+
+          // Rule: Cannot perform the same task on consecutive days
+          if (prevTask != currentTask)
+          {
+            maxPrev = max(maxPrev, dp[day - 1][prevTask]);
+          }
+        }
+
+        // Current Max = Points for this task + Best valid result from previous day
+        dp[day][currentTask] = points[day][currentTask] + maxPrev;
+      }
+    }
+
+    // 3. Final Answer
+    // The result is the maximum value found in the last day's row
+    return max({dp[n - 1][0], dp[n - 1][1], dp[n - 1][2]});
+  }
 };
 
 int main()

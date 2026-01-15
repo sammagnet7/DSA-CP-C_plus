@@ -95,6 +95,10 @@ public:
   // 1. Title: Unique Paths
   //-------------------------------------------------------------------------------
 
+  //------------------------
+  // Approach 1: Recursive
+  //------------------------
+
   /*
    * Function: totalPaths
    * --------------------
@@ -150,6 +154,10 @@ public:
     return totalPaths(dp, m, n, 0, 0); // Start from top-left cell
   }
 
+  //------------------------
+  // Approach 2: Iterative
+  //------------------------
+
   /*
    * Function: uniquePaths (Tabulation)
    * ----------------------------------
@@ -195,6 +203,10 @@ public:
   // 1. Title: Unique Paths II
   //-------------------------------------------------------------------------------
 
+  //------------------------
+  // Approach 1: Iterative
+  //------------------------
+
   /*
    * Function: uniquePathsWithObstacles
    * ----------------------------------
@@ -226,7 +238,10 @@ public:
     for (int i = 0; i < m; i++)
     {
       if (obstacleGrid[i][0] == 1)
-        break;      // All cells below this are unreachable
+        break;      // ** NOTE **
+                    //
+                    // All cells below this are unreachable
+                    //
       dp[i][0] = 1; // Only one way to reach (i,0): all down moves
     }
 
@@ -234,7 +249,10 @@ public:
     for (int j = 0; j < n; j++)
     {
       if (obstacleGrid[0][j] == 1)
-        break;      // All cells to the right are unreachable
+        break;      // ** NOTE **
+                    //
+                    // All cells below this are unreachable
+                    //
       dp[0][j] = 1; // Only one way to reach (0,j): all right moves
     }
 
