@@ -38,12 +38,12 @@ Since the blue square overlaps with the red square, it will not be counted again
 
 
 Constraints:
-1 <= squares.length <= 5 * 104
+1 <= squares.length <= 5 * 10^4
 squares[i] = [xi, yi, li]
 squares[i].length == 3
-0 <= xi, yi <= 109
-1 <= li <= 109
-The total area of all the squares will not exceed 1015.
+0 <= xi, yi <= 10^9
+1 <= li <= 10^9
+The total area of all the squares will not exceed 10^15.
 
  */
 

@@ -75,6 +75,10 @@ public:
   // 1. Title: Chocolate Pickup
   //-------------------------------------------------------------------------------
 
+  //-----------------------------------------------
+  // Approach 1: Recursive (Top-Down)
+  //-----------------------------------------------
+
   /**
    * Function to calculate the maximum chocolates that two players (Alice and Bob)
    * can collect while traversing a grid from the top row to the bottom.
@@ -159,9 +163,100 @@ public:
     return maxChoco(grid, dp, r, c, 0, 0, c - 1);
   }
 
-  //-------------------------------------------------------------------------------
-  // 2. Title:
-  //-------------------------------------------------------------------------------
+  //-----------------------------------------------
+  // Approach 2: Iterative (Bottom-Up) [OPTIMAL]
+  //-----------------------------------------------
+
+  // Global DP array
+  // Size is [50][52][52].
+  // We use 52 columns to provide a "padding" of 1 on each side (index 0 and index 51).
+  int DP[50][52][52];
+
+  int maximumChocolates(int r, int c, vector<vector<int>> &grid)
+  {
+    // -------------------------------------------------------------------------
+    // 1. Initialization
+    // -------------------------------------------------------------------------
+
+    // Correct Fix: Using std::fill for non-byte integer values (-1e9).
+    // Pointer Arithmetic:
+    // Start: &DP[0][0][0]
+    // End:   Start + Total Elements (50 * 52 * 52)
+    // Value: -1e9 (Represents negative infinity/unreachable)
+    fill(&DP[0][0][0], &DP[0][0][0] + (50 * 52 * 52), -1e9);
+
+    // -------------------------------------------------------------------------
+    // 2. Base Case (Row 0)
+    // -------------------------------------------------------------------------
+    // Alice starts at (0, 0), Bob starts at (0, c-1).
+    // Mapping: We shift all column indices by +1 to fit into our padded DP table.
+    // grid[0] -> DP[1] ... grid[c-1] -> DP[c]
+    DP[0][0 + 1][c - 1 + 1] = grid[0][0] + grid[0][c - 1];
+
+    // -------------------------------------------------------------------------
+    // 3. DP Transitions
+    // -------------------------------------------------------------------------
+    for (int i = 1; i < r; i++)
+    {
+      for (int A = 0; A < c; A++)
+      {
+        for (int B = c - 1; B >= 0; B--)
+        {
+
+          // A. Calculate chocolates collected at current step (i, A, B)
+          int curLvlColl = 0;
+          if (A == B)
+          {
+            // Collision: Both land on same cell, collect once.
+            curLvlColl = grid[i][A];
+          }
+          else
+          {
+            // Distinct cells: Collect from both.
+            curLvlColl = grid[i][A] + grid[i][B];
+          }
+
+          // B. Look back at previous row (i-1) to find max path
+          // We check all 9 combinations of moves:
+          // Alice's prev move (kA): -1, 0, 1
+          // Bob's prev move (kB):   -1, 0, 1
+          for (int kA = -1; kA <= 1; kA++)
+          {
+            for (int kB = -1; kB <= 1; kB++)
+            {
+
+              // Accessing Previous State:
+              // Current padded index is (A+1). Previous was (A+1 + kA).
+              // thanks to padding, if (A+1+kA) is 0 or c+1 (out of grid bounds),
+              // DP returns -1e9 (initialized value), which is safely handled by max().
+              int prevLvlColl = DP[i - 1][A + 1 + kA][B + 1 + kB];
+
+              // State Update
+              // If prevLvlColl is -1e9, the sum remains very negative (invalid path).
+              // If it's valid, we extend the path.
+              DP[i][A + 1][B + 1] = max(DP[i][A + 1][B + 1], (curLvlColl + prevLvlColl));
+            }
+          }
+        }
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. Final Result
+    // -------------------------------------------------------------------------
+    int ans = 0; // Initialize to 0 (or -1e9 depending on problem constraints)
+
+    // Check all possible finishing positions for Alice and Bob in the last row
+    for (int A = 0; A < c; A++)
+    {
+      for (int B = 0; B < c; B++)
+      {
+        ans = max(ans, DP[r - 1][A + 1][B + 1]);
+      }
+    }
+
+    return ans;
+  }
 };
 
 int main()

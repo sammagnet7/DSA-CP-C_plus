@@ -674,8 +674,38 @@ Convert string of digits to num:
    * `std::max` → for values or initializer lists
    * `std::max_element` → for containers (vector, array, etc.)
 
-7. 
+7. `memset` vs `std::fill`
+     
+     `memset` (Byte-wise)
 
+     * **Mechanism:** Sets memory **byte-by-byte**. It takes the value, converts it to a single `unsigned char`, and repeats that byte across the entire memory block.
+     * **Safe Values:**
+       * `0` (All bits 0)
+       * `-1` (All bits 1)
+
+     * **DANGER:** DO NOT use for arbitrary values like `1`, `50`, or `-1e9`.
+     * *Example:* `memset(arr, 1, ...)` results in integer `16843009` (byte pattern `01 01 01 01`), **not** `1`.
+
+       * **Syntax:**
+       ```cpp
+       memset(arr, 0, sizeof(arr)); // Sets all to 0
+
+       ```
+
+     #### **2. `std::fill` (Type-safe)**
+
+     * **Mechanism:** Template-based. assigns the **full value** according to the data type (`int`, `long long`, etc.).
+     * **Safe Values:** **ANYTHING**. Use this for `-1e9`, `-1e18`, `1`, etc.
+     * **Range Rule:** Works on `[start, end)`, meaning the **end pointer is excluded**.
+     * **Syntax for Multi-Dimensional Arrays (Contiguous Memory):**
+          ```cpp
+          // Correct way to set a 3D array to -1e9
+          // End pointer must be: Start + Total_Elements
+          fill(&DP[0][0][0], &DP[0][0][0] + (R * C * H), -1e9); 
+
+          ```
+
+8. 
 ---
 <span style="color: violet; font-size: 18px;">**Binary search:**</span>
 
