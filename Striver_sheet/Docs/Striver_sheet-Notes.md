@@ -590,43 +590,14 @@ Convert string of digits to num:
 28. Number of subarrays possible from an array of length `n` = `(n* (n+1)/2)` 
 29. In case of rotated sorted array always remember to handle the edge case when an element starts from middle , continues to the end and then again continues to the start of the array. e.g.: [1,0,1,1,1]. Sol: Do l++ and r-- -> shrink the array;
 
----
-<span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
-
-1.  -ve numbers are stored as 2's complement format.
-2.  Not(~) operator: 
-     ```cpp
-          int x = 6; // originally stored as 32 bits: 0000 .. 0000 0110 
-          cout<< ~(x)<< endl; // After negetaion:   [1]111 .. 1111 1001
-                              // becomes -ve
-                              // So interpreted as 2's completed
-                              // [1]111 .. 1111 1001->[1]000 .. 0000 0110
-                              //                                     +1
-                              //                      -------------------
-                              //                   -> [1]000 .. 0000 0111->-7
-
-
-
-          int y = -6; // originally stored as 32 bits: 1111 .. 1111 1010
-                    // After negetaion:              0000 .. 0000 0101->+5
-
-          cout<< ~(y) << endl;
-     ```
-34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
-     <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
-
----
-<span style="color: violet; font-size: 18px;">**Miscs continues:**</span>
-
-
-1.  In c, once array is passed through method calling, then it becomes a pointer and it's size can not be calculated with sizeof() op.
+30. In c, once array is passed through method calling, then it becomes a pointer and it's size can not be calculated with sizeof() op.
     ```c
           void reverse(char arr[]){
           // int len = sizeof(arr)/sizeof(arr[0]); // Wrong because arr is a pointer here, and sizeof(arr) returns size of pointer i.e. 4 or 8 always. 
           int len = strlen(arr); // correct
           }
     ```
-2.  Convert char to string in-line:
+31. Convert char to string in-line:
      ```cpp  
           stack<string> st; // stack of string
           for (char c : postfix) {
@@ -635,14 +606,14 @@ Convert string of digits to num:
                }
           }
      ```
-3.  Best ways to declare a 2D vector in C++:
+32. Best ways to declare a 2D vector in C++:
     ```cpp
           vector<vector<int>> matrix(M, vector<int>(N, initial_value));
      ```
-4.  Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
+33. Whenever we need `greatest` or `smallest` elements in linear time complexity, think of using `Monotonic stack`.
 
-5. To get length of a number `n` use function: `log10(n)+1`.
-6. `std::max` vs `std::max_element`
+34. To get length of a number `n` use function: `log10(n)+1`.
+35. `std::max` vs `std::max_element`
    * `std::max` compares values directly. It can take two values or an `initializer_list`, but it **cannot** take a container like `std::vector`.
 
    ```cpp
@@ -674,7 +645,7 @@ Convert string of digits to num:
    * `std::max` → for values or initializer lists
    * `std::max_element` → for containers (vector, array, etc.)
 
-7. `memset` vs `std::fill`
+36. `memset` vs `std::fill`
      
      `memset` (Byte-wise)
 
@@ -692,7 +663,7 @@ Convert string of digits to num:
 
        ```
 
-     #### **2. `std::fill` (Type-safe)**
+     ####  `std::fill` (Type-safe)
 
      * **Mechanism:** Template-based. assigns the **full value** according to the data type (`int`, `long long`, etc.).
      * **Safe Values:** **ANYTHING**. Use this for `-1e9`, `-1e18`, `1`, etc.
@@ -705,7 +676,126 @@ Convert string of digits to num:
 
           ```
 
-8. 
+37. ### **Searching in a Sorted Vector (C++)**
+
+     All functions below require the vector to be **sorted**. They are found in the `<algorithm>` header.
+
+     ####  Check Existence: `binary_search`
+
+     Returns `true` if the element exists, `false` otherwise. It **does not** return the index or iterator.
+
+     ```cpp
+     vector<int> v = {10, 20, 30, 40, 50};
+
+     // Syntax: binary_search(start_iter, end_iter, value)
+     bool found = binary_search(v.begin(), v.end(), 30); // true
+     bool exists = binary_search(v.begin(), v.end(), 25); // false
+
+     ```
+
+
+
+     #### Find Position: `lower_bound` (First Occurrence / Insertion Point)
+
+     Returns an iterator to the **first element that is greater than or equal to (`>=`)** the value.
+
+     * If the element exists: Points to its **first** occurrence.
+     * If it doesn't exist: Points to the position where it *should* be inserted to maintain order.
+     * If value > all elements: Returns `v.end()`.
+
+     ```cpp
+     vector<int> v = {10, 20, 30, 30, 30, 40, 50};
+
+     auto it = lower_bound(v.begin(), v.end(), 30);
+
+     // Check if element was actually found
+     if (it != v.end() && *it == 30) {
+     int index = distance(v.begin(), it); // Index is 2
+     // Found at index 2
+     } else {
+     // Not found (it points to where 30 would go)
+     }
+
+     ```
+
+     ####  Find Boundary: `upper_bound` (Strictly Greater)
+
+     Returns an iterator to the **first element that is strictly greater than (`>`)** the value.
+
+     * Useful for finding the end of a range of duplicates or counting occurrences.
+
+     ```cpp
+     vector<int> v = {10, 20, 30, 30, 30, 40, 50};
+
+     auto it = upper_bound(v.begin(), v.end(), 30);
+     // 'it' points to 40 (index 5)
+
+     ```
+
+     **Common Trick: Count Occurrences**
+
+     ```cpp
+     auto start = lower_bound(v.begin(), v.end(), 30);
+     auto end   = upper_bound(v.begin(), v.end(), 30);
+     int count = end - start; // Returns 3
+
+     ```
+
+     #### **Summary Table**
+
+     | Function | Condition | Returns | Use Case |
+     | --- | --- | --- | --- |
+     | `binary_search` | `==` | `bool` | Just checking existence. |
+     | `lower_bound` | `>=` | `iterator` | Finding index, first match, or insertion point. |
+     | `upper_bound` | `>` | `iterator` | Finding range end or counting duplicates. |
+
+38. Prefix sum for Rectangles:
+     ```cpp
+          // 1. Build 2D Prefix Sum (Note: size M+1, N+1 to avoid "if i==0" checks)
+          vector<vector<int>> P(M + 1, vector<int>(N + 1, 0));
+          for (int i = 1; i <= M; i++) {
+               for (int j = 1; j <= N; j++) {
+                    P[i][j] = mat[i-1][j-1] + P[i-1][j] + P[i][j-1] - P[i-1][j-1];
+               }
+          }
+
+          // Square defined by Top-Left (i1, j1) and Bottom-Right (i2, j2)
+          // In 1-based P array, coords shift by +1.
+          int r1 = i1, c1 = j1;    // i1, j1 should not be incllusive
+          int r2 = i2 + 1, c2 = j2 + 1;
+
+          int rectangleSum = P[r2][c2] - P[r1][c2] - P[r2][c1] + P[r1][c1];
+
+     ```
+
+
+39. 
+
+
+---
+<span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
+
+1.  -ve numbers are stored as 2's complement format.
+2.  Not(~) operator: 
+     ```cpp
+          int x = 6; // originally stored as 32 bits: 0000 .. 0000 0110 
+          cout<< ~(x)<< endl; // After negetaion:   [1]111 .. 1111 1001
+                              // becomes -ve
+                              // So interpreted as 2's completed
+                              // [1]111 .. 1111 1001->[1]000 .. 0000 0110
+                              //                                     +1
+                              //                      -------------------
+                              //                   -> [1]000 .. 0000 0111->-7
+
+
+
+          int y = -6; // originally stored as 32 bits: 1111 .. 1111 1010
+                    // After negetaion:              0000 .. 0000 0101->+5
+
+          cout<< ~(y) << endl;
+     ```
+34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
+     <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
 ---
 <span style="color: violet; font-size: 18px;">**Binary search:**</span>
 

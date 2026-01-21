@@ -97,7 +97,10 @@ public:
     // 1. Title: Subset Sum Equal To K
     //-------------------------------------------------------------------------------
 
+    //-----------------------------------------------
     // Approach1: Recursive
+    //-----------------------------------------------
+
     /**
      * @brief Recursive helper to determine if a subset with the given target sum exists.
      *
@@ -116,11 +119,11 @@ public:
      *      - -1 if state not yet computed.
      *
      * Time Complexity:
-     * - O(n * k), where n = size of array, k = target sum.
+     * - O(n * target), where n = size of array, target = target sum.
      *   Each (index, target) pair is computed at most once.
      *
      * Space Complexity:
-     * - O(n * k) for memoization table.
+     * - O(n * target) for memoization table.
      * - O(n) recursion stack in worst case (when all elements are considered).
      */
     bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
@@ -166,10 +169,10 @@ public:
     }
 
     /**
-     * @brief Checks if a subset with sum equal to k exists in the array.
+     * @brief Checks if a subset with sum equal to target exists in the array.
      *
      * @param n   Size of array
-     * @param k   Target sum
+     * @param target   Target sum
      * @param arr Input array
      *
      * @return true if such subset exists, false otherwise.
@@ -179,134 +182,210 @@ public:
      *   - State: dp[i][target] = whether it is possible to form "target" using
      *     elements from arr[0..i].
      *   - Transition: include arr[i] or exclude arr[i].
-     *   - Recursion depth O(n), total states O(n * k).
+     *   - Recursion depth O(n), total states O(n * target).
      *
      * Complexity:
-     *   - Time Complexity: O(n * k) (each state solved once).
-     *   - Space Complexity: O(n * k) for the DP table + O(n) recursion stack.
+     *   - Time Complexity: O(n * target) (each state solved once).
+     *   - Space Complexity: O(n * target) for the DP table + O(n) recursion stack.
      *
      * Practical limits (important):
-     *   - Memory use ≈ n * (k+1) integers.
-     *     * With 4-byte ints: ~4 * n * k bytes.
-     *   - For n ~ 100 and k ~ 10^5 → ~40 MB (borderline but feasible).
-     *   - For n ~ 1000 and k ~ 10^4 → ~40 MB (feasible).
-     *   - For k ~ 10^6 and n ~ 100 → ~400 MB (too large).
-     *   - For very large k (like 10^9, as in "Meet in the Middle" problem),
+     *   - Memory use ≈ n * (target+1) integers.
+     *     * With 4-byte ints: ~4 * n * target bytes.
+     *   - For n ~ 100 and target ~ 10^5 → ~40 MB (borderline but feasible).
+     *   - For n ~ 1000 and target ~ 10^4 → ~40 MB (feasible).
+     *   - For target ~ 10^6 and n ~ 100 → ~400 MB (too large).
+     *   - For very large target (like 10^9, as in "Meet in the Middle" problem),
      *     this DP is **impossible** due to memory/time blowup.
      *
      * Rule of thumb:
-     *   - Suitable if n * k ≤ ~10^7 (time) and memory ≤ a few hundred MB.
-     *   - If k is very large (≥10^7–10^8), switch to:
-     *       • Bitset optimization (O(n*k/word_size)) for feasibility,
+     *   - Suitable if n * target ≤ ~10^7 (time) and memory ≤ a few hundred MB.
+     *   - If target is very large (≥10^7–10^8), switch to:
+     *       • Bitset optimization (O(n*target/word_size)) for feasibility,
      *       • Or alternative strategies like "Meet in the Middle" if n ≤ 40.
      */
-    bool subsetSumToK(int n, int k, vector<int> &arr)
+    bool subsetSumToK(int n, int target, vector<int> &arr)
     {
         // Memoization table initialized to -1 (unvisited states)
-        vector<vector<int>> dp(n, vector<int>(k + 1, -1));
+        vector<vector<int>> dp(n, vector<int>(target + 1, -1));
 
-        // Start recursion from last index with target k
-        return recFind(arr, dp, k, n - 1);
+        // Start recursion from last index with target target
+        return recFind(arr, dp, target, n - 1);
     }
 
-    //-------------------------------------------------------------------------------
+    //-----------------------------------------------
     // Approach2: Iterative
-    /**
+    //-----------------------------------------------
+
+    /*
      * Function: subsetSumToK
      * ----------------------
-     * Determines if there exists a subset in `arr` of size `n` whose sum equals `k`.
-     * This approach uses bottom-up dynamic programming with a 2D DP table.
+     * Determines if there exists a subset of 'arr' that sums up to 'target'.
      *
-     * Time Complexity: O(n * k)
-     *   - Outer loop runs for each element (n)
-     *   - Inner loop runs for each target sum from 1 to k
+     * Approach: Bottom-Up Dynamic Programming (Tabulation)
      *
-     * Space Complexity: O(n * k)
-     *   - DP table stores boolean states: dp[i][j] = true if a subset of the first i+1 elements can sum to j
+     * State Definition:
+     * DP[i][sum] = true if it is possible to achieve 'sum' using a subset of
+     * elements from index 0 to i. Otherwise false.
+     *
+     * Complexity:
+     * Time: O(N * Target)
+     * Space: O(N * Target)
      */
-    bool subsetSumToK(int n, int k, vector<int> &arr)
+    bool subsetSumToK(int n, int target, vector<int> &arr)
     {
-        vector<vector<bool>> dp(n, vector<bool>(k + 1, false)); // [index][target sum]
 
-        // Base case: sum 0 is always achievable with empty subset
-        for (int idx = 0; idx < n; idx++)
+        // DP Table Initialization
+        // Rows (n): Elements of the array considered so far.
+        // Cols (target+1): All possible target sums from 0 to 'target'.
+        // Initialized to 'false' assuming no sum is possible initially.
+        vector<vector<bool>> DP(n, vector<bool>(target + 1, false));
+
+        // ---------------------------------------------------------
+        // 1. Base Case: Sum = 0
+        // ---------------------------------------------------------
+        // It is ALWAYS possible to achieve a target sum of 0 (by choosing an empty subset).
+        // This is true for any index, but we specifically set it for the 0th row
+        // to kickstart the iteration. (Later loops will propagate this 'true' down).
+        DP[0][0] = true;
+
+        // ---------------------------------------------------------
+        // 2. Base Case: First Element (Index 0)
+        // ---------------------------------------------------------
+        // If we only have the first element arr[0], we can only achieve a sum equal to arr[0].
+        // IMPORTANT NOTE: We must check if arr[0] <= target to avoid accessing
+        // an index outside the DP table bounds.
+        if (arr[0] <= target)
         {
-            dp[idx][0] = true;
+            DP[0][arr[0]] = true;
         }
 
-        // Base case: first element alone can contribute to a sum if it's <= k
-        if (arr[0] <= k)
-            dp[0][arr[0]] = true;
-
-        // Fill the DP table
-        for (int idx = 1; idx < n; idx++)
+        // ---------------------------------------------------------
+        // 3. Iterate Tabulation
+        // ---------------------------------------------------------
+        for (int i = 1; i < n; i++)
         {
-            for (int target = 1; target <= k; target++)
+
+            // Check for every possible sum from 0 to target
+            for (int sum = 0; sum <= target; sum++)
             {
-                bool take = false, notTake = false;
 
-                // Include current element if it does not exceed target
-                if (target >= arr[idx])
-                    take = dp[idx - 1][target - arr[idx]];
+                bool take = false;
+                bool notTake = false;
 
-                // Exclude current element
-                notTake = dp[idx - 1][target];
+                // Option 1: Take the current element arr[i]
+                // We can only take it if the current required 'sum' is greater than or equal to arr[i].
+                // If we take it, we check if the remaining sum (sum - arr[i]) was possible
+                // using the previous elements (row i-1).
+                if (sum - arr[i] >= 0)
+                {
+                    take = DP[i - 1][sum - arr[i]];
+                }
 
-                dp[idx][target] = take || notTake;
+                // Option 2: Do not take the current element
+                // If we don't take arr[i], the possibility depends entirely on whether
+                // the current 'sum' was already achievable using previous elements (row i-1).
+                notTake = DP[i - 1][sum];
+
+                // Final Logic:
+                // If EITHER taking the element OR not taking it leads to a valid solution,
+                // then the current state is valid (true).
+                DP[i][sum] = take || notTake;
             }
         }
 
-        // Final answer: is target k achievable using all n elements?
-        return dp[n - 1][k];
+        // Return the result for the full array (index n-1) and the desired target.
+        return DP[n - 1][target];
     }
 
-    //-------------------------------------------------------------------------------
+    //-----------------------------------------------
     // Approach3: Iterative 2 1D arrays[OPTIMAL]
-    /**
+    //-----------------------------------------------
+
+    /*
      * Function: subsetSumToK
      * ----------------------
-     * Optimized version of the 2D DP approach by using 1D space.
-     * At each index, we maintain only the current and previous rows of DP.
-     *
-     * Time Complexity: O(n * k)
-     * Space Complexity: O(k)
-     *   - Reduces space from O(n * k) to O(k) using rolling array technique
+     * Space Optimized Bottom-Up Dynamic Programming.
+     * * Instead of a full 2D table DP[N][Target], we only need the previous row
+     * to calculate the current row.
+     * * Complexity:
+     * Time: O(N * Target)
+     * Space: O(Target)  <-- Significantly reduced from O(N*Target)
      */
-    bool subsetSumToK(int n, int k, vector<int> &arr)
+    bool subsetSumToK(int n, int target, vector<int> &arr)
     {
-        vector<bool> prev(k + 1, false);
 
-        // Base cases
-        prev[0] = true; // Always possible to make sum 0
-        if (arr[0] <= k)
-            prev[arr[0]] = true;
+        // 1. Initialize 'prev' array (Represents row i-1)
+        // Size is target+1 to cover sums from 0 to target.
+        vector<bool> prev(target + 1, false);
 
-        for (int idx = 1; idx < n; idx++)
+        // We can also define 'cur' here, or inside the loop.
+        // 'cur' represents the current row i.
+        vector<bool> cur(target + 1, false);
+
+        // ---------------------------------------------------------
+        // 2. Base Case Initialization (Equivalent to Row 0)
+        // ---------------------------------------------------------
+
+        // Base Case 1: Target Sum = 0
+        // It is always possible to make sum 0 (empty subset).
+        prev[0] = true;
+
+        // Base Case 2: First Element arr[0]
+        // If we are at index 0, we can achieve sum == arr[0] by taking it.
+        // Check bounds to prevent crash.
+        if (arr[0] <= target)
         {
-            vector<bool> cur(k + 1, false);
-
-            for (int target = 1; target <= k; target++)
-            {
-                bool take = false, notTake = false;
-
-                // Include current element if it fits
-                if (target >= arr[idx])
-                    take = prev[target - arr[idx]];
-
-                // Exclude current element
-                notTake = prev[target];
-
-                cur[target] = take || notTake;
-            }
-
-            // Move to next state
-            prev = cur;
-            prev[0] = true; // sum 0 always possible
+            prev[arr[0]] = true;
         }
 
-        return prev[k];
-    }
+        // ---------------------------------------------------------
+        // 3. Iterate (From Index 1 to N-1)
+        // ---------------------------------------------------------
+        for (int i = 1; i < n; i++)
+        {
 
+            // Calculate 'cur' state based on 'prev' state
+            // Important: We must also handle sum=0 for the 'cur' row effectively.
+            // Since prev[0] is true, notTake (prev[sum]) handles it automatically.
+            for (int sum = 0; sum <= target; sum++)
+            {
+
+                bool take = false;
+                bool notTake = false;
+
+                // Option 1: Not Take
+                // If we don't take arr[i], can we achieve 'sum' using previous elements?
+                // Look at the same column in the previous row.
+                notTake = prev[sum];
+
+                // Option 2: Take
+                // Check if valid index, then look at the shifted index in previous row.
+                if (sum - arr[i] >= 0)
+                {
+                    take = prev[sum - arr[i]];
+                }
+
+                // Update Current State
+                cur[sum] = take || notTake;
+            }
+
+            // ---------------------------------------------------------
+            // 4. Shift States
+            // ---------------------------------------------------------
+            // The current row ('cur') becomes the previous row ('prev')
+            // for the next iteration.
+            prev = cur;
+        }
+
+        // ---------------------------------------------------------
+        // 5. Return Result
+        // ---------------------------------------------------------
+        // CRITICAL FIX: Return 'prev[target]', NOT 'cur[target]'.
+        // Reason: If n=1, the loop above never runs. 'cur' remains all false.
+        // The correct answer for n=1 is stored in 'prev' during initialization.
+        // For n>1, 'prev' is updated to 'cur' at the end of the loop, so it is valid there too.
+        return prev[target];
+    }
     //-------------------------------------------------------------------------------
     // 2. Title:
     //-------------------------------------------------------------------------------
