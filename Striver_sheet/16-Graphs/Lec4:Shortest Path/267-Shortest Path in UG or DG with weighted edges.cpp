@@ -32,6 +32,7 @@ https://www.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-mat
 
 Similar problem:
     743. Network Delay Time: https://leetcode.com/problems/network-delay-time/description/ [with directed edges]
+    https://leetcode.com/problems/minimum-cost-path-with-edge-reversals/description/?envType=daily-question&envId=2026-01-27    [with directed edges]
 
 
 
