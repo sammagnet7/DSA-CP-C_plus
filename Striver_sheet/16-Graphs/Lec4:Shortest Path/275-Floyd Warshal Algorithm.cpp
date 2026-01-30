@@ -32,6 +32,7 @@ Similar problems:
     https://www.youtube.com/watch?v=PwMVNSJ5SLI&t=1s
     https://takeuforward.org/plus/dsa/problems/find-the-city-with-the-smallest-number-of-neighbors?tab=editorial
     https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/description/
+    https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envType=daily-question&envId=2026-01-29
 
 
 

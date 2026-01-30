@@ -56,7 +56,7 @@ Example 1:
 Constraints:
     1 <= word.length, prefix.length <= 2000
     word and prefix consist only of lowercase English letters.
-    At most 3 * 104 calls in total will be made to insert, search, and startsWith.
+    At most 3 * 10^4 calls in total will be made to insert, search, and startsWith.
 
 
 INPUT::::::
@@ -101,7 +101,7 @@ OUTPUT::::::
 //   - endStatus: marks if the node represents the end of a valid word
 // -----------------------------------------------------------------------------
 class Node
-{
+{ 
 private:
     vector<Node *> arr; // children links: size 26 (for lowercase English letters)
     bool endStatus;     // true if node represents the end of a word

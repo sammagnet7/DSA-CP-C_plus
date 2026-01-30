@@ -7,7 +7,9 @@ This repository I will use to store the hands-on from Striver's sheets.
 3. Alt + Z  -> "Word Wrap" feature
 
 ---
-## Team tracker sheet: [DSA practice track](https://docs.google.com/spreadsheets/d/1qcgnbkRomHnKWfCxcDuYUtUKmuKpfvtoaNNXfzqiURA/edit?gid=1460427080#gid=1460427080)
+## Team tracker sheet: [DSA practice track](https://docs.google.com/spreadsheets/d/1tLx_rGo83kXSwrnnpvL069_YSzAwYFy1xaz9xnnFE68/edit?gid=1460427080#gid=1460427080)
+
+
 
 ---
 ## Journal
@@ -261,4 +263,62 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 25/09/25: <span style="color: orange;"> #1 [67/455]</span>
 - 26/09/25: <span style="color: green;"> #3 [70/455]</span>
 - 27/09/25: <span style="color: green;"> #8 [78/455]</span>
-- 
+
+
+---
+### Some tricky problems to revise:
+
+1. 074-Minimize Max Distance to Gas Station
+2. 075-Median of 2 sorted arrays
+3. 078-Find Peak Element in 2D Matrix
+4. 079-Median of Row Wise Sorted Matrix
+5. Is there any optimized version possible instead of O(N^2 * 26): https://leetcode.com/problems/sum-of-beauty-of-all-substrings/submissions/1653682726/
+6. **DP** not used till now. Do later: 
+   - https://leetcode.com/problems/longest-palindromic-substring/
+   - 109-Word Searches: 
+   - 
+7. 110=N-Queens: Formula for upper and lower diagonal check in 2D matrix: https://takeuforward.org/data-structure/n-queen-problem-return-all-distinct-solutions-to-the-n-queens-puzzle/
+8. 114-Expression Add Operators: **Hard**: [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/) <- *could not complete.* getting **TLE**. Need to calculate the result on the go, instead of calculating it at the end. Follow Editorial.
+9. 115-basic bit manipulation: Hard: [Title: Count the set bits](https://www.naukri.com/code360/problems/count-set-bits_1112627?leftPanelTabValue=PROBLEM) <- *could not complete.* getting **TLE**. Check later.
+10. 119- Single number in array: Single number II: could n't grasp the 4th optimal solution mentioned in the video: [youtube](https://www.youtube.com/watch?v=5Bb2nqA40JY&t=77s).
+11. Sliding window: Hard: Minimum Window Subsequence -> need DP to solve. Check after DP. [Problem link](https://www.naukri.com/code360/problems/minimum-window-subsequence_2181133) [Editorial](https://takeuforward.org/plus/dsa/problems/minimum-window-subsequence?tab=editorial)
+12. 155-Check for heap: Need to try for linkedlist tree also. Check after tree: [Unsolved problem](https://www.geeksforgeeks.org/problems/is-binary-tree-heap/1)
+13. 168-DFS traversal for Binary tree: [L12. Iterative Postorder Traversal using 1 Stack](https://www.youtube.com/watch?v=NzIGLLwZBS8&list=PLkjdNRgDmcc0Pom5erUBU4ZayeU9AyRRu&index=12) -> Logic is complex though alternate easy approach is available. Check later.
+14. Binary tree question try later: [GFG](https://www.geeksforgeeks.org/problems/postorder-traversal-from-given-inorder-and-preorder-traversals/1)
+15. In BST try this later: [ninja](https://www.naukri.com/code360/problems/maximum-node-in-between_920450)
+16. Solve later: Merge 2 BST's: [leetcode](https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/) [youtube](https://www.youtube.com/watch?v=AiKZjCuy2k4&t=4s&ab_channel=ShradhaKhapra)
+17. Do after DP: Jump Game II: [leetcode](https://leetcode.com/problems/jump-game-ii/description/) [youtube](https://www.youtube.com/watch?v=7SBVnw7GSTk&t=1s)
+18. [Meet in the middle approach](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/description/) Complete: 225-Partition Set Into 2 Subsets With Min Absolute Sum Diff.cpp
+19. [Graph Leetcode TLE](https://leetcode.com/problems/word-ladder-ii/submissions/1747769329/) : 258-Word ladder.cpp TUF+ approach:2
+20. To do: [leetcode](https://leetcode.com/problems/course-schedule-ii/)
+21. String Subsequence DP hard problem: [leet](https://leetcode.com/problems/count-palindromic-subsequences/)
+22. [18-Segment Tree/Extras/Separate Squares I I.cpp](https://leetcode.com/problems/separate-squares-ii/description/?envType=daily-question&envId=2026-01-14)
+23. 
+
+---
+
+### revisit:
+1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
+2. [check if rotated-array sorted](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
+3. [next permutation](https://leetcode.com/problems/next-permutation/description/)
+4. [longest consecutive sequence](https://leetcode.com/problems/longest-consecutive-sequence/description/)
+5. [set matrix with zeros](https://leetcode.com/problems/set-matrix-zeroes/description/)
+6. [Roatate matrix by 1](https://www.naukri.com/code360/problems/981260?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website&leftPanelTabValue=PROBLEM)
+7. [Print Spiral matrix](https://leetcode.com/problems/spiral-matrix/description/)
+8. [Find element in rth row and cth col in Pascal's triangle](https://www.geeksforgeeks.org/dsa/find-the-nth-row-in-pascals-triangle/)
+9. [3sum](https://leetcode.com/problems/3sum/description/)
+10. [find Repeating-missing number](https://www.naukri.com/code360/problems/missing-and-repeating-numbers_6828164?utm_source=striver&utm_medium=website&utm_campaign=codestudio_a_zcourse)
+11. [Maximum Profit in Job Scheduling [with Fixed Start & End Times]](https://leetcode.com/problems/maximum-profit-in-job-scheduling/)
+12. [Minimum Cost Path with Teleportations](https://leetcode.com/problems/minimum-cost-path-with-teleportations/description/)
+13. 
+
+
+
+---
+
+### Skipped from Leetcode Daily:
+
+1. [Minimum Pair Removal to Sort Array II](https://leetcode.com/problems/minimum-pair-removal-to-sort-array-ii/description/)
+2. [Separate Squares II](https://leetcode.com/problems/separate-squares-ii/description/)
+3. [Minimum Cost to Convert String II](https://leetcode.com/problems/minimum-cost-to-convert-string-ii/description/?envType=daily-question&envId=2026-01-30)
+4. 

@@ -305,6 +305,223 @@
    - y
 
 ---
+
+<span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
+
+1.  -ve numbers are stored as 2's complement format.
+2.  Not(~) operator: 
+     ```cpp
+          int x = 6; // originally stored as 32 bits: 0000 .. 0000 0110 
+          cout<< ~(x)<< endl; // After negetaion:   [1]111 .. 1111 1001
+                              // becomes -ve
+                              // So interpreted as 2's completed
+                              // [1]111 .. 1111 1001->[1]000 .. 0000 0110
+                              //                                     +1
+                              //                      -------------------
+                              //                   -> [1]000 .. 0000 0111->-7
+
+
+
+          int y = -6; // originally stored as 32 bits: 1111 .. 1111 1010
+                    // After negetaion:              0000 .. 0000 0101->+5
+
+          cout<< ~(y) << endl;
+     ```
+34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
+     <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
+---
+<span style="color: violet; font-size: 18px;">**Binary search:**</span>
+
+### Binary Search Best Practices: Float vs. Integer
+
+**1. Floating-Point Binary Search (Continuous Range)**
+
+* **Context:** Geometry problems, finding roots, answers like `1.16667`.
+* **Best Practice:** Use a **fixed `for` loop** (e.g., `for(int i=0; i<100; i++)`).
+* **Why:**
+* **Precision:** 100 iterations reduce the search space by a factor of  (), far exceeding standard `double` precision.
+* **Safety:** Avoids infinite loops caused by "epsilon" pitfalls (where `r - l` never becomes smaller than machine precision).
+* **Predictability:** Guarantees consistent runtime regardless of input values.
+
+
+
+**2. Integer Binary Search (Discrete Range)**
+
+* **Context:** Array indexing, finding counts, specific integer values.
+* **Best Practice:** Use the standard **`while (l <= r)` loop**.
+* **Why:**
+* **Exactness:** You need to land on a specific integer index. Fixed loops may stop "near" the answer but not *on* it.
+* **Efficiency:** For small ranges, a fixed loop (e.g., 100) is wasteful. A `while` loop terminates immediately when the target is found or boundaries cross.
+
+---
+<span style="color: violet; font-size: 18px;">**Binary tree:**</span>
+
+1.  Theory of BT:
+    - Links:
+      - [TUF theory blog](https://takeuforward.org/binary-tree/introduction-to-trees/)
+      - [TUF+ theory blog](https://takeuforward.org/plus/dsa/binary-trees/theory-and-traversals/introduction-)
+      - [Binary Tree Representation in C++](https://takeuforward.org/binary-tree/binary-tree-representation-in-c/)
+      - [Tree traversals](https://takeuforward.org/binary-tree/binary-tree-traversal-inorder-preorder-postorder/)
+    - *Full/Strict Binary Tree*: 
+      - every node has either 0 or 2 children — no node has only one child, no matter how the tree is growing. 
+      - contributes significantly to the tree’s balance, making traversal, searching, and insertion options more predictable and efficient.
+    - *Complete binary tree*: 
+       -  All levels are completely filled, all internal nodes having 2 children except possibly the last.
+       -  The last level is filled from left to right, with no gaps.
+       -  aids in achieving balanced structures, making it easier to implement algorithms and ensuring reasonably consistent performance.
+       -  useful for storing data in structures like heaps
+       -  at level h, #nodes = 2^h
+    - *Almost complete binary tree*: 
+        - The term "Almost Complete" is not strictly standardized
+        - A tree that's very close to being complete, but may have small deviations.
+    - *Perfect binary tree*: 
+       -  Every level is completely filled.
+       -  Every internal node (non-leaf node) has exactly two children
+       -  all leaf nodes are at the same level.
+       -  0-indexed Height = h, number of nodes = 2^(h+1) - 1  
+    - *Balanced Binary Tree*: 
+       -  height difference between the left and right subtrees of every node is at most 1.
+       -  `abs(height(left subtree) - height(right subtree)) <= 1`
+       - O(log n) max height
+       -  Efficient operations like search, insert, delete in AVL/Red-Black/BSTs.
+    - *Degenerate Tree*:
+       -  each parent node has only one child.
+       -  This makes the tree essentially behave like a linked list.
+       -  tree is called skewed
+       -  max height O(n)
+    - Diameter of tree: Length of the longest path (every node can be traversed only once) between any two nodes in the tree. It may or may not pass through the root.
+    - LCA: Lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).
+    - 
+
+---
+
+<span style="color: violet; font-size: 18px;">**Binary search tree:**</span>
+
+1. Link: 
+   - [TUF+ theory](https://takeuforward.org/plus/dsa/problems/introduction-to-bst)
+   - [TUF theory](https://takeuforward.org/binary-search-tree/introduction-to-binary-search-trees/) 
+2. Whst is BST?
+  -  Each node in a BST follows the binary tree property: having at most two children.
+  -  The left child of a node holds values less than the node’s value, while the right child holds values greater than the node’s value. 
+  -  (Left Child < Node < Right Child)
+  -  Each subtree of a BST is also a BST. This means that every node in the left subtree is less than the root node, and every node in the right subtree is greater.
+  -  Typically Binary Search Trees, duplicate node values are not permitted. If allowed then 
+     -  either frequency is maintained per node
+     -  or (Left Child <= Node < Right Child)
+  -  Balanced Variants of BST
+     -  AVL Tree: : A self-balancing BST where the height difference between left and right subtrees (balance factor) of any node is at most 1.
+     -  Red-Black Tree:: A self-balancing BST where each node has an extra bit for color (red or black).
+  -  Practical Applications
+     -  Database Indexing: quickly locate records based on keys.
+     -  Symbol Tables: Used in compilers 
+     -  Memory Management: Implementing data structures like heaps
+  -  `In-order` traversal (left -> root [print] -> right) of BST always gives elements in **sorted** order.
+  -  `Reverse In-order` traversal (right -> root [print] -> left) of BST gives elements in **descending sorted** order.
+  -  
+
+---
+<span style="color: violet; font-size: 18px;">**Heap:**</span>
+
+
+1.  In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
+    ```cpp
+          #include <queue>
+
+          priority_queue<int> max_heap; // Default: max heap
+          max_heap.push(10);
+          max_heap.push(5);
+          max_heap.push(20);
+          cout << "Max heap top: " << max_heap.top() << endl; // Output: 20
+    ```
+    ```cpp
+          #include <queue>
+          #include <functional> // For std::greater
+
+          // Min heap: specify std::greater<int> as the comparator
+          priority_queue<int, vector<int>, greater<int>> min_heap; 
+          min_heap.push(10);
+          min_heap.push(5);
+          min_heap.push(20);
+          cout << "Min heap top: " << min_heap.top() << endl; // Output: 5
+    ```
+2.  Heap Theory:
+    1.  Priority queue is basically *almost complete binary tree* where all operations take time **O(Log N)**
+    2.  Heap is stored in form of *Array*.
+    3.  For 0-based indexing for element `i`
+        -   left child is at: `2*i +1`
+        -   right child is at: `2*i +2`
+        -   Parent is at: `ceil( (float)i /2) - 1`; Correct version: `(i-1)/2`
+        -   #total nodes = #internal nodes + #leaf nodes
+        -   For Complete Binary tree: 
+            -   #leaf nodes = #internal nodes + 1;
+        -   For Almost complete Binary tree:
+            -   Leaf nodes lie from `(N/2)` to `(N-1)`
+            -   Internal nodes lie from `0` to `(N/2 - 1)`
+    4.  
+
+---
+<span style="color: violet; font-size: 18px;">**DP:**</span>
+
+1. In case of problems related to `subsequence`, when characters from both string matches, just consider it into answer, and move pointers for both the strings. 
+Basically, in case of subsequence if characters from both strings are matching at any index, on that index no need to apply other options like `take` `noTake`. 
+
+---
+<span style="color: violet; font-size: 18px;">**Graph:**</span>
+
+1.  A `path` in a graph is a sequence of vertices where each adjacent pair of vertices is connected by an edge. A path always contain unique nodes, i.e., a node cannot appear twice in a path.
+It can be of two types:
+    - Simple Path: A path where no vertex is repeated.
+    - Closed Path (Cycle): A path that **starts and ends at the same vertex**, with no other repetitions of vertices and edges.
+
+2. For un-directed graphs, 
+   - `degree of a node = #edges connected to it`.
+3. For directed graphs,
+   - `in-degree of a node = #edges in-coming to the node`.
+   - `out-degree of a node = #edges out-going from the node`.
+4. `total degree of a graph = 2 * total #edges` (because every edge is associated/connected to two nodes.)
+5. Space needed for representing Graphs 
+   - As Adjacency matris : O(V^2). Declared as: 
+     ```cpp 
+          int adjM[v+1][v+1]; 
+     ```
+   - As Adjacency list: O(E). Declared as: 
+     ```cpp 
+          vector<int> adjL[v+1]; 
+     ```
+   - As Adjacency list with weighted edges: 
+     ```cpp 
+          vector< pair<int,int> > adjWL[v+1]; 
+     ```
+6. Bipartite graph: 
+   - two adjascent nodes can not have same color. Graph will be 2 colored.
+   - Can have cycle of even length.
+   - Can not have cycle of odd length.
+7. Find shortest path from source node:
+   - For DAG -> always do topo sort -> then BFS/DFS -> calculates predecssor nodes before a node -> in turn saves time
+   - For undirected graph with unit weights -> Use plain BFS
+   - For undirected graph with weighted edge - use Dijkstra -> Queue [Slow]-> Priority_queue -> Set [OPTIMAL]
+   - The original Dijkstra algo works for undirected graphs only having non-ngetives edges.
+   - We have modified `Dijkstra` incorporating priority_queue, so it can now handle negetive edges or non-negetive weight cycles only if graph is having directed edges. (Because undirected graph with a single negetive weight creates a negetive weight cycle.)
+   - `Bellman-ford` algo can detect negetive weight cycles(a cycle where sum of all weights is negative). 
+   - `Floyd warshall` can be used for for Directed and undirected graphs. 
+   - If you need **all-pairs shortest paths**, running `Dijkstra` from every node is usually faster on **sparse graphs with non-negative weights** (≈ O(V·E log V)), while `Floyd–Warshall` is better for **dense graphs** (≈ O(V³)) or when there are **negative weights** (but no negative cycles). In short: use **Dijkstra-all-nodes** for large sparse graphs, and **Floyd–Warshall** for dense or negative-weighted graphs.
+   - A `spanning tree` is a subset of a weighted graph in which there are N nodes(i.e. all the nodes present in the original graph) and N-1 edges and all nodes are reachable from each other. 
+   - Any edge in a component of a graph is called a `bridge` when the component is divided into 2 or more components if that particular edge is removed. 
+   - An `articulation point` or `cut-vertex` is a vertex whose removal, along with all its connected edges, increases the number of connected components in the graph.
+   - A `back edge` is an edge in a graph that connects a vertex to one of its ancestors in a Depth-First Search (DFS) tree.
+   - A component is called a `Strongly Connected Component(SCC)` only if for every possible pair of vertices (u, v) inside that component, u is reachable from v and vice-versa. Note: Strongly connected components(SCC) are only valid for **directed graphs**.
+   - `Trie` is an advanced information retrieval data structure. Ability to quickly find all strings that start with a given prefix makes Tries particularly useful for applications like autocomplete and predictive text. 
+  
+---
+<span style="color: violet; font-size: 18px;">**Hashing:**</span>
+
+   - [hashing1](https://takeuforward.org/hashing/hashing-maps-time-complexity-collisions-division-rule-of-hashing-strivers-a2z-dsa-course/) 
+   - [hashing2](https://takeuforward.org/hashing/what-is-hashing/)
+   - [hashing3](https://takeuforward.org/hashing/hashing-applications/)
+
+
+---
+
 <span style="color: violet; font-size: 18px;">**Miscs:**</span>
 
 1. Array size limitations: 
@@ -769,267 +986,13 @@ Convert string of digits to num:
      ```
 
 
-39. 
-
-
----
-<span style="color: violet; font-size: 18px;">**Bit manipulation:**</span>
-
-1.  -ve numbers are stored as 2's complement format.
-2.  Not(~) operator: 
-     ```cpp
-          int x = 6; // originally stored as 32 bits: 0000 .. 0000 0110 
-          cout<< ~(x)<< endl; // After negetaion:   [1]111 .. 1111 1001
-                              // becomes -ve
-                              // So interpreted as 2's completed
-                              // [1]111 .. 1111 1001->[1]000 .. 0000 0110
-                              //                                     +1
-                              //                      -------------------
-                              //                   -> [1]000 .. 0000 0111->-7
-
-
-
-          int y = -6; // originally stored as 32 bits: 1111 .. 1111 1010
-                    // After negetaion:              0000 .. 0000 0101->+5
-
-          cout<< ~(y) << endl;
-     ```
-34. Xor of consecutive numbers starting from 1 shows cyclic behaviour:
-     <img src="img/xor-in-given-range.png" alt="xor-in-given-range" style="display: block; margin: auto; width: 250px;">
----
-<span style="color: violet; font-size: 18px;">**Binary search:**</span>
-
-### Binary Search Best Practices: Float vs. Integer
-
-**1. Floating-Point Binary Search (Continuous Range)**
-
-* **Context:** Geometry problems, finding roots, answers like `1.16667`.
-* **Best Practice:** Use a **fixed `for` loop** (e.g., `for(int i=0; i<100; i++)`).
-* **Why:**
-* **Precision:** 100 iterations reduce the search space by a factor of  (), far exceeding standard `double` precision.
-* **Safety:** Avoids infinite loops caused by "epsilon" pitfalls (where `r - l` never becomes smaller than machine precision).
-* **Predictability:** Guarantees consistent runtime regardless of input values.
-
-
-
-**2. Integer Binary Search (Discrete Range)**
-
-* **Context:** Array indexing, finding counts, specific integer values.
-* **Best Practice:** Use the standard **`while (l <= r)` loop**.
-* **Why:**
-* **Exactness:** You need to land on a specific integer index. Fixed loops may stop "near" the answer but not *on* it.
-* **Efficiency:** For small ranges, a fixed loop (e.g., 100) is wasteful. A `while` loop terminates immediately when the target is found or boundaries cross.
-
----
-<span style="color: violet; font-size: 18px;">**Binary tree:**</span>
-
-1.  Theory of BT:
-    - Links:
-      - [TUF theory blog](https://takeuforward.org/binary-tree/introduction-to-trees/)
-      - [TUF+ theory blog](https://takeuforward.org/plus/dsa/binary-trees/theory-and-traversals/introduction-)
-      - [Binary Tree Representation in C++](https://takeuforward.org/binary-tree/binary-tree-representation-in-c/)
-      - [Tree traversals](https://takeuforward.org/binary-tree/binary-tree-traversal-inorder-preorder-postorder/)
-    - *Full/Strict Binary Tree*: 
-      - every node has either 0 or 2 children — no node has only one child, no matter how the tree is growing. 
-      - contributes significantly to the tree’s balance, making traversal, searching, and insertion options more predictable and efficient.
-    - *Complete binary tree*: 
-       -  All levels are completely filled, all internal nodes having 2 children except possibly the last.
-       -  The last level is filled from left to right, with no gaps.
-       -  aids in achieving balanced structures, making it easier to implement algorithms and ensuring reasonably consistent performance.
-       -  useful for storing data in structures like heaps
-       -  at level h, #nodes = 2^h
-    - *Almost complete binary tree*: 
-        - The term "Almost Complete" is not strictly standardized
-        - A tree that's very close to being complete, but may have small deviations.
-    - *Perfect binary tree*: 
-       -  Every level is completely filled.
-       -  Every internal node (non-leaf node) has exactly two children
-       -  all leaf nodes are at the same level.
-       -  0-indexed Height = h, number of nodes = 2^(h+1) - 1  
-    - *Balanced Binary Tree*: 
-       -  height difference between the left and right subtrees of every node is at most 1.
-       -  `abs(height(left subtree) - height(right subtree)) <= 1`
-       - O(log n) max height
-       -  Efficient operations like search, insert, delete in AVL/Red-Black/BSTs.
-    - *Degenerate Tree*:
-       -  each parent node has only one child.
-       -  This makes the tree essentially behave like a linked list.
-       -  tree is called skewed
-       -  max height O(n)
-    - Diameter of tree: Length of the longest path (every node can be traversed only once) between any two nodes in the tree. It may or may not pass through the root.
-    - LCA: Lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).
-    - 
-
----
-
-<span style="color: violet; font-size: 18px;">**Binary search tree:**</span>
-
-1. Link: 
-   - [TUF+ theory](https://takeuforward.org/plus/dsa/problems/introduction-to-bst)
-   - [TUF theory](https://takeuforward.org/binary-search-tree/introduction-to-binary-search-trees/) 
-2. Whst is BST?
-  -  Each node in a BST follows the binary tree property: having at most two children.
-  -  The left child of a node holds values less than the node’s value, while the right child holds values greater than the node’s value. 
-  -  (Left Child < Node < Right Child)
-  -  Each subtree of a BST is also a BST. This means that every node in the left subtree is less than the root node, and every node in the right subtree is greater.
-  -  Typically Binary Search Trees, duplicate node values are not permitted. If allowed then 
-     -  either frequency is maintained per node
-     -  or (Left Child <= Node < Right Child)
-  -  Balanced Variants of BST
-     -  AVL Tree: : A self-balancing BST where the height difference between left and right subtrees (balance factor) of any node is at most 1.
-     -  Red-Black Tree:: A self-balancing BST where each node has an extra bit for color (red or black).
-  -  Practical Applications
-     -  Database Indexing: quickly locate records based on keys.
-     -  Symbol Tables: Used in compilers 
-     -  Memory Management: Implementing data structures like heaps
-  -  `In-order` traversal (left -> root [print] -> right) of BST always gives elements in **sorted** order.
-  -  `Reverse In-order` traversal (right -> root [print] -> left) of BST gives elements in **descending sorted** order.
-  -  
-
----
-<span style="color: violet; font-size: 18px;">**Heap:**</span>
-
-
-1.  In c++ **priority queue** is the implementation of **heap**. By default it creates *max* heap. Example:
+39. Why Comparing string.size() with INT_MIN yields incorrect results?
+    1.  because string.size() returns an unsigned integer type (size_t or std::string::size_type), while INT_MIN is a signed negative integer. C++ converts the negative INT_MIN to a massive unsigned positive value, making the comparison inaccurate (e.g., 5 > -2147483648 becomes 5 > 2147483648+), which is false. 
+    2.  Solution: Always cast the string.size() to a signed type for comparison or compare against 0 instead.
     ```cpp
-          #include <queue>
-
-          priority_queue<int> max_heap; // Default: max heap
-          max_heap.push(10);
-          max_heap.push(5);
-          max_heap.push(20);
-          cout << "Max heap top: " << max_heap.top() << endl; // Output: 20
+     // Corrected comparison
+     if (static_cast<int>(s.size()) < static_cast<int>(INT_MIN)) { ... }
     ```
-    ```cpp
-          #include <queue>
-          #include <functional> // For std::greater
-
-          // Min heap: specify std::greater<int> as the comparator
-          priority_queue<int, vector<int>, greater<int>> min_heap; 
-          min_heap.push(10);
-          min_heap.push(5);
-          min_heap.push(20);
-          cout << "Min heap top: " << min_heap.top() << endl; // Output: 5
-    ```
-2.  Heap Theory:
-    1.  Priority queue is basically *almost complete binary tree* where all operations take time **O(Log N)**
-    2.  Heap is stored in form of *Array*.
-    3.  For 0-based indexing for element `i`
-        -   left child is at: `2*i +1`
-        -   right child is at: `2*i +2`
-        -   Parent is at: `ceil( (float)i /2) - 1`; Correct version: `(i-1)/2`
-        -   #total nodes = #internal nodes + #leaf nodes
-        -   For Complete Binary tree: 
-            -   #leaf nodes = #internal nodes + 1;
-        -   For Almost complete Binary tree:
-            -   Leaf nodes lie from `(N/2)` to `(N-1)`
-            -   Internal nodes lie from `0` to `(N/2 - 1)`
-    4.  
-
----
-<span style="color: violet; font-size: 18px;">**DP:**</span>
-
-1. In case of problems related to `subsequence`, when characters from both string matches, just consider it into answer, and move pointers for both the strings. 
-Basically, in case of subsequence if characters from both strings are matching at any index, on that index no need to apply other options like `take` `noTake`. 
-
----
-<span style="color: violet; font-size: 18px;">**Graph:**</span>
-
-1.  A `path` in a graph is a sequence of vertices where each adjacent pair of vertices is connected by an edge. A path always contain unique nodes, i.e., a node cannot appear twice in a path.
-It can be of two types:
-    - Simple Path: A path where no vertex is repeated.
-    - Closed Path (Cycle): A path that **starts and ends at the same vertex**, with no other repetitions of vertices and edges.
-
-2. For un-directed graphs, 
-   - `degree of a node = #edges connected to it`.
-3. For directed graphs,
-   - `in-degree of a node = #edges in-coming to the node`.
-   - `out-degree of a node = #edges out-going from the node`.
-4. `total degree of a graph = 2 * total #edges` (because every edge is associated/connected to two nodes.)
-5. Space needed for representing Graphs 
-   - As Adjacency matris : O(V^2). Declared as: 
-     ```cpp 
-          int adjM[v+1][v+1]; 
-     ```
-   - As Adjacency list: O(E). Declared as: 
-     ```cpp 
-          vector<int> adjL[v+1]; 
-     ```
-   - As Adjacency list with weighted edges: 
-     ```cpp 
-          vector< pair<int,int> > adjWL[v+1]; 
-     ```
-6. Bipartite graph: 
-   - two adjascent nodes can not have same color. Graph will be 2 colored.
-   - Can have cycle of even length.
-   - Can not have cycle of odd length.
-7. Find shortest path from source node:
-   - For DAG -> always do topo sort -> then BFS/DFS -> calculates predecssor nodes before a node -> in turn saves time
-   - For undirected graph with unit weights -> Use plain BFS
-   - For undirected graph with weighted edge - use Dijkstra -> Queue [Slow]-> Priority_queue -> Set [OPTIMAL]
-   - The original Dijkstra algo works for undirected graphs only having non-ngetives edges.
-   - We have modified `Dijkstra` incorporating priority_queue, so it can now handle negetive edges or non-negetive weight cycles only if graph is having directed edges. (Because undirected graph with a single negetive weight creates a negetive weight cycle.)
-   - `Bellman-ford` algo can detect negetive weight cycles(a cycle where sum of all weights is negative). 
-   - `Floyd warshall` can be used for for Directed and undirected graphs. 
-   - If you need **all-pairs shortest paths**, running `Dijkstra` from every node is usually faster on **sparse graphs with non-negative weights** (≈ O(V·E log V)), while `Floyd–Warshall` is better for **dense graphs** (≈ O(V³)) or when there are **negative weights** (but no negative cycles). In short: use **Dijkstra-all-nodes** for large sparse graphs, and **Floyd–Warshall** for dense or negative-weighted graphs.
-   - A `spanning tree` is a subset of a weighted graph in which there are N nodes(i.e. all the nodes present in the original graph) and N-1 edges and all nodes are reachable from each other. 
-   - Any edge in a component of a graph is called a `bridge` when the component is divided into 2 or more components if that particular edge is removed. 
-   - An `articulation point` or `cut-vertex` is a vertex whose removal, along with all its connected edges, increases the number of connected components in the graph.
-   - A `back edge` is an edge in a graph that connects a vertex to one of its ancestors in a Depth-First Search (DFS) tree.
-   - A component is called a `Strongly Connected Component(SCC)` only if for every possible pair of vertices (u, v) inside that component, u is reachable from v and vice-versa. Note: Strongly connected components(SCC) are only valid for **directed graphs**.
-   - `Trie` is an advanced information retrieval data structure. Ability to quickly find all strings that start with a given prefix makes Tries particularly useful for applications like autocomplete and predictive text. 
-  
----
-<span style="color: violet; font-size: 18px;">**Hashing:**</span>
-
-   - [hashing1](https://takeuforward.org/hashing/hashing-maps-time-complexity-collisions-division-rule-of-hashing-strivers-a2z-dsa-course/) 
-   - [hashing2](https://takeuforward.org/hashing/what-is-hashing/)
-   - [hashing3](https://takeuforward.org/hashing/hashing-applications/)
-   - 
-
 
 
 ---
-### Some tricky problems to revise:
-
-1. 074-Minimize Max Distance to Gas Station
-2. 075-Median of 2 sorted arrays
-3. 078-Find Peak Element in 2D Matrix
-4. 079-Median of Row Wise Sorted Matrix
-5. Is there any optimized version possible instead of O(N^2 * 26): https://leetcode.com/problems/sum-of-beauty-of-all-substrings/submissions/1653682726/
-6. **DP** not used till now. Do later: 
-   - https://leetcode.com/problems/longest-palindromic-substring/
-   - 109-Word Searches: 
-   - 
-7. 110=N-Queens: Formula for upper and lower diagonal check in 2D matrix: https://takeuforward.org/data-structure/n-queen-problem-return-all-distinct-solutions-to-the-n-queens-puzzle/
-8. 114-Expression Add Operators: **Hard**: [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/) <- *could not complete.* getting **TLE**. Need to calculate the result on the go, instead of calculating it at the end. Follow Editorial.
-9. 115-basic bit manipulation: Hard: [Title: Count the set bits](https://www.naukri.com/code360/problems/count-set-bits_1112627?leftPanelTabValue=PROBLEM) <- *could not complete.* getting **TLE**. Check later.
-10. 119- Single number in array: Single number II: could n't grasp the 4th optimal solution mentioned in the video: [youtube](https://www.youtube.com/watch?v=5Bb2nqA40JY&t=77s).
-11. Sliding window: Hard: Minimum Window Subsequence -> need DP to solve. Check after DP. [Problem link](https://www.naukri.com/code360/problems/minimum-window-subsequence_2181133) [Editorial](https://takeuforward.org/plus/dsa/problems/minimum-window-subsequence?tab=editorial)
-12. 155-Check for heap: Need to try for linkedlist tree also. Check after tree: [Unsolved problem](https://www.geeksforgeeks.org/problems/is-binary-tree-heap/1)
-13. 168-DFS traversal for Binary tree: [L12. Iterative Postorder Traversal using 1 Stack](https://www.youtube.com/watch?v=NzIGLLwZBS8&list=PLkjdNRgDmcc0Pom5erUBU4ZayeU9AyRRu&index=12) -> Logic is complex though alternate easy approach is available. Check later.
-14. Binary tree question try later: [GFG](https://www.geeksforgeeks.org/problems/postorder-traversal-from-given-inorder-and-preorder-traversals/1)
-15. In BST try this later: [ninja](https://www.naukri.com/code360/problems/maximum-node-in-between_920450)
-16. Solve later: Merge 2 BST's: [leetcode](https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/) [youtube](https://www.youtube.com/watch?v=AiKZjCuy2k4&t=4s&ab_channel=ShradhaKhapra)
-17. Do after DP: Jump Game II: [leetcode](https://leetcode.com/problems/jump-game-ii/description/) [youtube](https://www.youtube.com/watch?v=7SBVnw7GSTk&t=1s)
-18. [Meet in the middle approach](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/description/) Complete: 225-Partition Set Into 2 Subsets With Min Absolute Sum Diff.cpp
-19. [Graph Leetcode TLE](https://leetcode.com/problems/word-ladder-ii/submissions/1747769329/) : 258-Word ladder.cpp TUF+ approach:2
-20. To do: [leetcode](https://leetcode.com/problems/course-schedule-ii/)
-21. String Subsequence DP hard problem: [leet](https://leetcode.com/problems/count-palindromic-subsequences/)
-22. [18-Segment Tree/Extras/Separate Squares I I.cpp](https://leetcode.com/problems/separate-squares-ii/description/?envType=daily-question&envId=2026-01-14)
-23. 
-
----
-
-### revisit:
-1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
-2. [check if rotated-array sorted](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
-3. [next permutation](https://leetcode.com/problems/next-permutation/description/)
-4. [longest consecutive sequence](https://leetcode.com/problems/longest-consecutive-sequence/description/)
-5. [set matrix with zeros](https://leetcode.com/problems/set-matrix-zeroes/description/)
-6. [Roatate matrix by 1](https://www.naukri.com/code360/problems/981260?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website&leftPanelTabValue=PROBLEM)
-7. [Print Spiral matrix](https://leetcode.com/problems/spiral-matrix/description/)
-8. [Find element in rth row and cth col in Pascal's triangle](https://www.geeksforgeeks.org/dsa/find-the-nth-row-in-pascals-triangle/)
-9. [3sum](https://leetcode.com/problems/3sum/description/)
-10. [find Repeating-missing number](https://www.naukri.com/code360/problems/missing-and-repeating-numbers_6828164?utm_source=striver&utm_medium=website&utm_campaign=codestudio_a_zcourse)
-11. [Maximum Profit in Job Scheduling [with Fixed Start & End Times]](https://leetcode.com/problems/maximum-profit-in-job-scheduling/)

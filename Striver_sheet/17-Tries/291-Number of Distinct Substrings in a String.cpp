@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Number of Distinct Substrings in a String Using Trie
+1. Title: Number of Distinct Substrings in a String
 
 Links:
 https://takeuforward.org/data-structure/number-of-distinct-substrings-in-a-string-using-trie/
@@ -33,7 +33,7 @@ Note :
 A string ‘B’ is a substring of a string ‘A’ if ‘B’ that can be obtained by deletion of, several characters(possibly none) from the start of ‘A’ and several characters(possibly none) from the end of ‘A’.
 
 Two strings ‘X’ and ‘Y’ are considered different if there is at least one index ‘i’  such that the character of ‘X’ at index ‘i’ is different from the character of ‘Y’ at index ‘i’(X[i]!=Y[i]).
-Detailed explanation ( Input/output format, Notes, Images )
+
 
 Constraints :
 1 <= T <= 5
@@ -115,31 +115,34 @@ OUTPUT::::::
 //   The size of the set = number of distinct substrings.
 //
 // Complexity:
-//   - Time: O(n^3) (O(n^2) substrings ? O(n) copy per substring).
+//   - Time: O(n^3) (O(n^2) substrings * O(n) copy per substring).
 //   - Space: O(n^2) for storing substrings.
 //   Works only for very small strings. Efficient methods use SAM or Suffix Array.
 // -----------------------------------------------------------------------------
 
-// int countDistinctSubstrings(string &s)
-// {
-//     int n = s.size();
-//     unordered_set<string> subStrs;
-//     subStrs.insert(""); // include the empty substring
+int countDistinctSubstrings(string &s)
+{
+    int n = s.size();
+    unordered_set<string> subStrs;
+    subStrs.insert(""); // include the empty substring
 
-//     for (int i = 0; i < n; i++) {
-//         for (int j = n - 1; j >= i; j--) {
-//             subStrs.insert(s.substr(i, (j - i + 1)));
-//         }
-//     }
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = n - 1; j >= i; j--)
+        {
+            subStrs.insert(s.substr(i, (j - i + 1)));
+        }
+    }
 
-//     return subStrs.size();
-// }
+    return subStrs.size();
+}
 
 // -----------------------------------------------------------------------------
-// Approach2: Trie-based solution (Optimal Approach)
+// Approach2: Trie-based solution [Optimal Approach]
 // -----------------------------------------------------------------------------
 /*
   Trie-based solution to count distinct substrings (non-empty).
+  The key insight is: Every substring of a string S is a prefix of some suffix of S.
   Idea:
     - Insert all suffixes of the string into a Trie.
     - Each time we create a new Trie node it corresponds to a distinct substring
@@ -151,7 +154,7 @@ OUTPUT::::::
   Complexity:
     - Time:  O(N^2) worst-case. For each of N starting positions we may walk up
       to O(N) characters inserting nodes or following existing links.
-    - Space: O(N^2) worst-case (there can be ?(N^2) distinct substrings -> nodes).
+    - Space: O(N^2) worst-case (there can be (N^2) (more accurately N*(N+1)/2 e.g. "abcde") distinct substrings -> nodes).
 */
 
 class Node
@@ -161,7 +164,7 @@ class Node
 public:
     // Constructor: initialize all child pointers to nullptr
     Node()
-    {   
+    {
         // Need to initialize.
         for (int i = 0; i < 26; i++)
         {

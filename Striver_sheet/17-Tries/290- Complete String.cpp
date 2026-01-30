@@ -158,7 +158,6 @@ Complexity:
 // -----------------------------------------------------------------------------
 // Node: a single Trie node
 // - arr[26]: children pointers for letters 'a'..'z'
-// - prefixMatchCount: number of words that pass through this node (prefix frequency)
 // - endsWithCount   : number of words that end exactly at this node
 // -----------------------------------------------------------------------------
 class Node
@@ -166,8 +165,6 @@ class Node
 private:
     // children links: index 0 -> 'a', 1 -> 'b', ..., 25 -> 'z'
     std::vector<Node *> arr;
-    // how many words include the prefix represented by the path to this node
-    int prefixMatchCount = 0;
     // how many words end exactly at this node
     int endsWithCount = 0;
 
@@ -175,7 +172,6 @@ public:
     // Constructor: initialize children to nullptr and counters to 0
     Node() : arr(std::vector<Node *>(26, nullptr))
     {
-        prefixMatchCount = 0;
         endsWithCount = 0;
     }
 
@@ -204,7 +200,6 @@ public:
     {
         Node *newN = new Node();
         this->arr[chID] = newN;
-        newN->increasePrefixMatchCount();
         return newN;
     }
 
@@ -212,18 +207,6 @@ public:
     Node *getNextNode(int chID)
     {
         return this->arr[chID];
-    }
-
-    // Increase the number of words passing through this node (prefix count)
-    void increasePrefixMatchCount()
-    {
-        this->prefixMatchCount++;
-    }
-
-    // Decrease the prefix count (used when erasing a word)
-    void decreasePrefixMatchCount()
-    {
-        this->prefixMatchCount--;
     }
 
     // Increase count of words that end exactly at this node
@@ -242,12 +225,6 @@ public:
     int getEndsWithCount()
     {
         return this->endsWithCount;
-    }
-
-    // How many words share the prefix up to this node?
-    int getPrefixMatchCount()
-    {
-        return this->prefixMatchCount;
     }
 };
 
@@ -299,7 +276,6 @@ public:
             {
                 // Move to existing child and update its prefix count
                 tmp = tmp->getNextNode(chID);
-                tmp->increasePrefixMatchCount();
             }
             else
             {
@@ -310,87 +286,6 @@ public:
 
         // Mark that one more word ends at this node
         tmp->insreaseEndsWithCount();
-    }
-
-    // -------------------------------------------------------------------------
-    // countWordsEqualTo(word)
-    // - Follow the path for 'word'; if any required child is missing -> return 0.
-    // - Otherwise return the endsWith count at the terminal node.
-    // Time: O(L)
-    // -------------------------------------------------------------------------
-    int countWordsEqualTo(std::string &word)
-    {
-        Node *tmp = root;
-
-        for (int i = 0; i < (int)word.size(); i++)
-        {
-            int chID = word[i] - 'a';
-
-            if (!tmp->charExists(chID))
-            {
-                // word not present
-                return 0;
-            }
-            else
-            {
-                tmp = tmp->getNextNode(chID);
-            }
-        }
-
-        return tmp->getEndsWithCount();
-    }
-
-    // -------------------------------------------------------------------------
-    // countWordsStartingWith(prefix)
-    // - Traverse characters of prefix; if missing -> return 0.
-    // - Otherwise return prefixMatchCount at the final node of the prefix.
-    // Time: O(L)
-    // -------------------------------------------------------------------------
-    int countWordsStartingWith(std::string &word)
-    {
-        Node *tmp = root;
-
-        for (int i = 0; i < (int)word.size(); i++)
-        {
-            int chID = word[i] - 'a';
-
-            if (!tmp->charExists(chID))
-            {
-                // No words have this prefix
-                return 0;
-            }
-            else
-            {
-                tmp = tmp->getNextNode(chID);
-            }
-        }
-
-        // Number of words sharing this prefix
-        return tmp->getPrefixMatchCount();
-    }
-
-    // -------------------------------------------------------------------------
-    // erase(word)
-    // - Walk down the path of 'word' and decrement prefix counters.
-    // - At the terminal node, decrement endsWith count.
-    // - This version updates counts but does not free nodes even if counts drop to zero.
-    // Time: O(L)
-    // -------------------------------------------------------------------------
-    void erase(std::string &word)
-    {
-        Node *tmp = root;
-
-        for (int i = 0; i < (int)word.size(); i++)
-        {
-            int chID = word[i] - 'a';
-            // Move to next node (assumes word exists at least once)
-            tmp = tmp->getNextNode(chID);
-            // Decrease prefix match count as this occurrence is being erased
-            tmp->decreasePrefixMatchCount();
-        }
-
-        // Decrease terminal ends-with count
-        tmp->decreaseEndsWithCount();
     }
 
     // -------------------------------------------------------------------------
