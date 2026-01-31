@@ -571,9 +571,9 @@ It can be of two types:
           cout<<s<<endl;
      ```
 
-10. string substr (size_t pos = 0, size_t len = npos) const;
-     - pos: Position of the first character to be copied as a substring.
-     - len: Number of characters to include in the substring
+10. string "xyz".substr(size_t pos = 0, size_t len = npos) const;
+     - `pos`: The starting index.
+     - `len`: The length of the substring.
      - Example: 
      ```cpp
           // left rotate by i places each at a time
@@ -927,10 +927,10 @@ Convert string of digits to num:
 
      // Check if element was actually found
      if (it != v.end() && *it == 30) {
-     int index = distance(v.begin(), it); // Index is 2
-     // Found at index 2
+          int index = distance(v.begin(), it); // Index is 2
+          // Found at index 2
      } else {
-     // Not found (it points to where 30 would go)
+          // Not found (it points to where 30 would go)
      }
 
      ```
