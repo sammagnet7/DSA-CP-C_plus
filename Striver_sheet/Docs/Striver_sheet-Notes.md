@@ -994,5 +994,39 @@ Convert string of digits to num:
      if (static_cast<int>(s.size()) < static_cast<int>(INT_MIN)) { ... }
     ```
 
+40. Difference between `!` and `~`.
+
+     `!` (Logical NOT)
+
+     * **Type:** Boolean Operator.
+     * **Function:** Inverts **Truth value**.
+     * **Logic:** If the operand is non-zero (True), result is `0` (False). If operand is `0`, result is `1`.
+     * **Use case:** `if (!isValid)` conditions.
+
+     `~` (Bitwise NOT)
+
+     * **Type:** Bitwise Operator.
+     * **Function:** Inverts **Every Bit**.
+     * **Logic:** Flips every `0` bit to `1` and every `1` bit to `0` (One's Complement).
+     * **Use case:** Low-level bit manipulation, masking.
+
+     Example Code
+
+     ```cpp
+     int x = 5;  // Binary: 0000...0101
+
+     // 1. Logical NOT (!)
+     // 5 is non-zero (True), so !5 becomes False (0)
+     int res1 = !x;  // Result: 0
+
+     // 2. Bitwise NOT (~)
+     // Flips all bits: 0000...0101 -> 1111...1010
+     // In signed 2's complement, 111...1010 is -6
+     int res2 = ~x;  // Result: -6
+
+     ```
+
+41. 
+
 
 ---

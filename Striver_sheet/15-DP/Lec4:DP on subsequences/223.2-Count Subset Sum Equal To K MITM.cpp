@@ -23,6 +23,8 @@ using namespace std;
 Links:
 https://www.hackerrank.com/contests/mock-test-2-1758395674/challenges/meet-in-the-middle-3-1
 
+https://leetcode.com/problems/closest-subsequence-sum/description/
+
 
 Problem statement:
 You are given an array of n numbers. In how many ways can you choose a subset of the numbers with sum x?
@@ -119,7 +121,7 @@ Space Complexity:
   - O(n) recursion stack depth (since idx decreases down to -1).
 
 Limitations:
-  - `sum` can be as large as 1e9 in some problems (e.g., "Meet in the Middle" subset-sum variant).
+  - `sum` can be as large as 10^9 in some problems (e.g., "Meet in the Middle" subset-sum variant).
     → This approach becomes infeasible for large sums because:
         * DP table size = n * (sum+1) → memory blowup.
         * Time also scales linearly with `sum`.
@@ -131,34 +133,34 @@ Limitations:
 int countSubsetSum(int idx, int sum, vector<int> &nums, vector<vector<int>> &dp)
 {
 
-    // Base case: no elements left and target achieved
-    if (idx < 0 && sum == 0)
-        return 1;
+  // Base case: no elements left and target achieved
+  if (idx < 0 && sum == 0)
+    return 1;
 
-    // Base case: no elements left but target not achieved
-    else if (idx < 0 && sum != 0)
-        return 0;
+  // Base case: no elements left but target not achieved
+  else if (idx < 0 && sum != 0)
+    return 0;
 
-    // Base case: overshoot target sum (invalid path)
-    else if (sum < 0)
-    {
-        return 0;
-    }
+  // Base case: overshoot target sum (invalid path)
+  else if (sum < 0)
+  {
+    return 0;
+  }
 
-    // Optimization: if target already zero, any remaining elements excluded
-    if (idx >= 0 && sum == 0)
-        return dp[idx][sum] = 1;
+  // Optimization: if target already zero, any remaining elements excluded
+  if (idx >= 0 && sum == 0)
+    return dp[idx][sum] = 1;
 
-    // Return cached result if available
-    if (dp[idx][sum] != -1)
-    {
-        return dp[idx][sum];
-    }
+  // Return cached result if available
+  if (dp[idx][sum] != -1)
+  {
+    return dp[idx][sum];
+  }
 
-    // Recurrence: include or exclude nums[idx]
-    return dp[idx][sum] =
-               countSubsetSum(idx - 1, sum - nums[idx], nums, dp) + // include current
-               countSubsetSum(idx - 1, sum, nums, dp);              // exclude current
+  // Recurrence: include or exclude nums[idx]
+  return dp[idx][sum] =
+             countSubsetSum(idx - 1, sum - nums[idx], nums, dp) + // include current
+             countSubsetSum(idx - 1, sum, nums, dp);              // exclude current
 }
 
 /*
@@ -174,10 +176,10 @@ int countSubsetSum(int idx, int sum, vector<int> &nums, vector<vector<int>> &dp)
 */
 int countSubsetSumWrapper(int n, int sum, vector<int> &nums)
 {
-    vector<vector<int>> dp(n, vector<int>(sum + 1, -1));
-    countSubsetSum(n - 1, sum, nums, dp);
+  vector<vector<int>> dp(n, vector<int>(sum + 1, -1));
+  countSubsetSum(n - 1, sum, nums, dp);
 
-    return dp[n - 1][sum];
+  return dp[n - 1][sum];
 }
 
 //-------------------------------------------------------------------------------
@@ -235,41 +237,41 @@ int countSubsetSumWrapper(int n, int sum, vector<int> &nums)
 int countSubsetSumWrapper(int n, int totSum, vector<int> &nums)
 {
 
-    // DP table: rows = elements, columns = sums
-    vector<vector<int>> dp(n, vector<int>(totSum + 1, 0));
+  // DP table: rows = elements, columns = sums
+  vector<vector<int>> dp(n, vector<int>(totSum + 1, 0));
 
-    // Base Case 1: sum = 0 is always achievable (empty subset)
-    for (int i = 0; i < n; i++)
+  // Base Case 1: sum = 0 is always achievable (empty subset)
+  for (int i = 0; i < n; i++)
+  {
+    dp[i][0] = 1;
+  }
+
+  // Base Case 2: with only the first element, we can form sum = nums[0]
+  if (nums[0] <= totSum)
+  {
+    dp[0][nums[0]] = 1;
+  }
+
+  // Fill DP table bottom-up
+  for (int idx = 1; idx < n; idx++)
+  {
+    for (int sum = 1; sum <= totSum; sum++)
     {
-        dp[i][0] = 1;
+      if (sum - nums[idx] >= 0)
+      {
+        // Option 1: include nums[idx], Option 2: exclude it
+        dp[idx][sum] = dp[idx - 1][sum - nums[idx]] + dp[idx - 1][sum];
+      }
+      else
+      {
+        // Can't include nums[idx], only option: exclude it
+        dp[idx][sum] = dp[idx - 1][sum];
+      }
     }
+  }
 
-    // Base Case 2: with only the first element, we can form sum = nums[0]
-    if (nums[0] <= totSum)
-    {
-        dp[0][nums[0]] = 1;
-    }
-
-    // Fill DP table bottom-up
-    for (int idx = 1; idx < n; idx++)
-    {
-        for (int sum = 1; sum <= totSum; sum++)
-        {
-            if (sum - nums[idx] >= 0)
-            {
-                // Option 1: include nums[idx], Option 2: exclude it
-                dp[idx][sum] = dp[idx - 1][sum - nums[idx]] + dp[idx - 1][sum];
-            }
-            else
-            {
-                // Can't include nums[idx], only option: exclude it
-                dp[idx][sum] = dp[idx - 1][sum];
-            }
-        }
-    }
-
-    // Final answer
-    return dp[n - 1][totSum];
+  // Final answer
+  return dp[n - 1][totSum];
 }
 
 //-------------------------------------------
@@ -306,28 +308,27 @@ int countSubsetSumWrapper(int n, int totSum, vector<int> &nums)
     - For large m this becomes expensive quickly (exponential blow-up).
 */
 
-// void generateAllSubsetsums(int startIdx, int initSum, int endIdx, vector<int> &nums, vector<int> &allSubsetsums)
-// {
+void generateAllSubsetsumsBitMask(int startIdx, int initSum, int endIdx, vector<int> &nums, vector<int> &allSubsetsums)
+{
+  int m = endIdx - startIdx + 1;
+  int subset_size = (1 << m);
 
-//     int array_size = endIdx - startIdx + 1; // number of elements in this subarray (m)
-//     int subset_size = (1 << array_size);    // total number of masks = 2^m
+  for (int bitmask = 0; bitmask < subset_size; bitmask++)
+  { // for each 2^m possibilities a bitmask to be used
 
-//     for (int bitmask = 0; bitmask < subset_size; bitmask++)
-//     { // for each 2^array_size possibilities a bitmask to be used
+    int curSum = 0;
 
-//         int curSum = 0;
+    for (int i = 0; i < m; i++)
+    {
+      if ((bitmask & (1 << i)))
+      {
+        curSum += nums[startIdx + i];
+      }
+    }
 
-//         for (int i = startIdx; i <= endIdx; i++)
-//         {
-//             if ((bitmask & 1 << (i - startIdx)))
-//             {
-//                 curSum += nums[i];
-//             }
-//         }
-
-//         allSubsetsums.push_back(curSum); // record the sum for this particular subset (mask)
-//     }
-// }
+    allSubsetsums.push_back(curSum);
+  }
+}
 
 /*
   generateAllSubsetsums (recursive version)
@@ -354,20 +355,20 @@ int countSubsetSumWrapper(int n, int totSum, vector<int> &nums)
     - Recursive approach is clearer for many readers, but has a small recursion overhead.
     - Use this when m is small (<= ~25). For very large m recursion may risk stack overflow.
 */
-void generateAllSubsetsums(int curIdx, int curSum, int endIdx, vector<int> &nums, vector<int> &allSubsetsums)
+void generateAllSubsetsumsRec(int curIdx, int curSum, int endIdx, vector<int> &nums, vector<int> &allSubsetsums)
 {
 
-    // base case: whenever traversing the array completes, saves the current sum
-    if (curIdx == endIdx + 1)
-    {
-        allSubsetsums.push_back(curSum);
-        return;
-    }
+  // base case: whenever traversing the array completes, saves the current sum
+  if (curIdx > endIdx)
+  {
+    allSubsetsums.push_back(curSum);
+    return;
+  }
 
-    // Include current element and recurse
-    generateAllSubsetsums(curIdx + 1, curSum + nums[curIdx], endIdx, nums, allSubsetsums);
-    // Exclude current element and recurse
-    generateAllSubsetsums(curIdx + 1, curSum, endIdx, nums, allSubsetsums);
+  // Include current element and recurse
+  generateAllSubsetsumsRec(curIdx + 1, curSum + nums[curIdx], endIdx, nums, allSubsetsums);
+  // Exclude current element and recurse
+  generateAllSubsetsumsRec(curIdx + 1, curSum, endIdx, nums, allSubsetsums);
 }
 
 /*
@@ -425,59 +426,65 @@ void generateAllSubsetsums(int curIdx, int curSum, int endIdx, vector<int> &nums
 int countSubsetSumWrapper(int n, int targetSum, vector<int> &nums)
 {
 
-    int mid = n / 2;
-    int leftSize = mid;
-    int rightSize = n - mid;
+  int mid = n / 2;
+  int leftSize = mid;
+  int rightSize = n - mid;
 
-    vector<int> leftSubsetsums;
-    leftSubsetsums.reserve(1 << leftSize); // 2^leftSize
+  vector<int> leftSubsetsums;
+  leftSubsetsums.reserve(1 << leftSize); // 2^leftSize
 
-    vector<int> rightSubsetsums;
-    rightSubsetsums.reserve(1 << rightSize); // 2^rightSize
+  vector<int> rightSubsetsums;
+  rightSubsetsums.reserve(1 << rightSize); // 2^rightSize
 
-    // generate subset sums for left half [0 .. leftSize-1]
-    generateAllSubsetsums(0, 0, leftSize - 1, nums, leftSubsetsums);
-    // generate subset sums for right half [leftSize .. leftSize+rightSize-1] i.e. [leftSize .. n-1]
-    generateAllSubsetsums(leftSize + 0, 0, leftSize + rightSize - 1, nums, rightSubsetsums);
+  // generate subset sums for left half [0 .. leftSize-1]
+  generateAllSubsetsumsBitMask(0, 0, leftSize - 1, nums, leftSubsetsums);
+  // generate subset sums for right half [leftSize .. leftSize+rightSize-1] i.e. [leftSize .. n-1]
+  generateAllSubsetsumsBitMask(leftSize + 0, 0, leftSize + rightSize - 1, nums, rightSubsetsums);
 
-    // sort right sums for binary-search counting of complements
-    sort(rightSubsetsums.begin(), rightSubsetsums.end());
+  // Or
+  // // generate subset sums for left half [0 .. leftSize-1]
+  // generateAllSubsetsumsRec(0, 0, leftSize - 1, nums, leftSubsetsums);
+  // // generate subset sums for right half [leftSize .. leftSize+rightSize-1] i.e. [leftSize .. n-1]
+  // generateAllSubsetsumsRec(leftSize + 0, 0, leftSize + rightSize - 1, nums, rightSubsetsums);
 
-    int ans = 0;
+  // sort right sums for binary-search counting of complements
+  sort(rightSubsetsums.begin(), rightSubsetsums.end());
 
-    // iterate every left subset sum and count complementary right sums
-    for (int i = 0; i < (1 << leftSize); i++)
-    {
-        int leftSum = leftSubsetsums[i];
-        int restTargetSum = targetSum - leftSum;
+  int ans = 0;
 
-        auto matchRange = equal_range(rightSubsetsums.begin(), rightSubsetsums.end(), restTargetSum);
+  // iterate every left subset sum and count complementary right sums
+  for (int i = 0; i < (1 << leftSize); i++)
+  {
+    int leftSum = leftSubsetsums[i];
+    int restTargetSum = targetSum - leftSum;
 
-        ans += distance(matchRange.first, matchRange.second);
-    }
+    auto matchRange = equal_range(rightSubsetsums.begin(), rightSubsetsums.end(), restTargetSum);
 
-    return ans;
+    ans += distance(matchRange.first, matchRange.second);
+  }
+
+  return ans;
 }
 
 int main()
 {
-    /* Enter your code here. Read input from STDIN. Print output to STDOUT */
-    int n, sum;
+  /* Enter your code here. Read input from STDIN. Print output to STDOUT */
+  int n, sum;
 
-    cin >> n;
-    cin >> sum;
+  cin >> n;
+  cin >> sum;
 
-    vector<int> nums;
+  vector<int> nums;
 
-    int count = n;
-    while (count--)
-    {
-        int temp;
-        cin >> temp;
-        nums.push_back(temp);
-    }
+  int count = n;
+  while (count--)
+  {
+    int temp;
+    cin >> temp;
+    nums.push_back(temp);
+  }
 
-    cout << countSubsetSumWrapper(n, sum, nums);
+  cout << countSubsetSumWrapper(n, sum, nums);
 
-    return 0;
+  return 0;
 }
