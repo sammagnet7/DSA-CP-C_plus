@@ -1026,7 +1026,9 @@ Convert string of digits to num:
 
      ```
 
-41. 
+41. Avoid .count() on Multiset in Performance-Critical Code 
+`multiset::count(val)` runs in $O(\log N + K)$ time (scanning all $K$ duplicates), which degrades to $O(N)$ linear time in worst-case scenarios, whereas `multiset::find(val)` is strictly $O(\log N)$.
 
+42. 
 
 ---

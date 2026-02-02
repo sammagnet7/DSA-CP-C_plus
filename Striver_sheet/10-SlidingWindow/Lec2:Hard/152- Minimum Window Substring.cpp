@@ -25,6 +25,10 @@ https://www.youtube.com/watch?v=WJaij9ffOIY&list=PLgUwDviBIf0q7vrFA_HEWcqRqMpCXz
 https://takeuforward.org/plus/dsa/problems/minimum-window-substring-?tab=editorial
 https://leetcode.com/problems/minimum-window-substring/description/
 
+Check below as well from Leetcode daily: 
+https://leetcode.com/problems/divide-an-array-into-subarrays-with-minimum-cost-ii/description/
+
+
 Problem statement:
 Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. If there is no such substring, return the empty string "".
 
