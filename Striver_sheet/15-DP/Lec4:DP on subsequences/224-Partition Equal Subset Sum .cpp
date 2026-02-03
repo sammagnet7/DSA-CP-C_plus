@@ -43,7 +43,7 @@ Examples:
 
 
 
-INPUT::::::
+INPUT:::::
 
 
 OUTPUT::::::
@@ -75,6 +75,9 @@ public:
     // 1. Title: Partition Equal Subset Sum
     //-------------------------------------------------------------------------------
 
+    //----------------------------
+    // Approach 1: Recursive
+    //----------------------------
     /**
      * @brief Recursive helper to determine if a subset with the given target sum exists.
      *
@@ -183,6 +186,93 @@ public:
 
         // Step 4: Try to find a subset with sum = targetSum
         return recFind(nums, dp, targetSum, nums.size() - 1);
+    }
+
+    //----------------------------
+    // Approach 2: Iterative
+    //----------------------------
+    /*
+     * Function: canPartition
+     * ----------------------
+     * Determines if the array can be partitioned into two subsets with equal sums.
+     * * Approach: Dynamic Programming (Subset Sum Problem)
+     * - This is a variation of the 0/1 Knapsack problem.
+     * - If the total sum is S, we need to find if there exists a subset with sum S/2.
+     * * Complexity:
+     * - Time: O(N * Target), where Target is TotalSum/2.
+     * - Space: O(N * Target) for the 2D DP table.
+     */
+    bool canPartition(vector<int> &nums)
+    {
+
+        int N = nums.size();
+
+        // 1. Calculate Total Sum
+        long long totalSum = accumulate(nums.begin(), nums.end(), (long long)0);
+
+        // 2. Odd Sum Check (Critical Optimization)
+        // If the total sum is odd, we cannot split it into two equal integer halves.
+        // Example: Sum = 11. Half is 5.5 (not possible with integers).
+        if (totalSum % 2 != 0)
+        {
+            return false;
+        }
+
+        // The goal is to find a subset that sums up to exactly half of the total.
+        long long target = totalSum / 2;
+
+        // 3. Initialize DP Table
+        // DP[i][sum] = true if sum 'sum' can be achieved using a subset of elements
+        // from index 0 to i.
+        vector<vector<bool>> DP(N, vector<bool>(target + 1, false));
+
+        // 4. Base Case: Sum = 0
+        // It is always possible to form a sum of 0 (by choosing the empty set).
+        // This holds true for any prefix of the array.
+        for (int i = 0; i < N; i++)
+        {
+            DP[i][0] = true;
+        }
+
+        // 5. Base Case: First Element
+        // If we only consider the first element (index 0), we can only form a sum
+        // equal to its value. (Check bounds to avoid crash if nums[0] > target).
+        if (nums[0] <= target)
+        {
+            DP[0][nums[0]] = true;
+        }
+
+        // 6. Fill the DP Table
+        // Iterate through the remaining elements (1 to N-1)
+        for (int i = 1; i < N; ++i)
+        {
+
+            // Iterate through all possible target sums (0 to target)
+            for (int j = 0; j <= target; ++j)
+            {
+
+                // Option A: Take the current element (nums[i])
+                // We check if the remaining sum (j - nums[i]) was possible
+                // using the previous elements (i-1).
+                bool take = false;
+                if (j - nums[i] >= 0)
+                {
+                    take = DP[i - 1][j - nums[i]];
+                }
+
+                // Option B: Do Not Take the current element
+                // The possibility depends entirely on whether sum 'j' was already
+                // achievable using previous elements (i-1).
+                bool notTake = DP[i - 1][j];
+
+                // If either option works, the state is valid.
+                DP[i][j] = take || notTake;
+            }
+        }
+
+        // The answer lies in considering all elements (index N-1)
+        // to form the specific 'target' sum.
+        return DP[N - 1][target];
     }
 
     //-------------------------------------------------------------------------------
