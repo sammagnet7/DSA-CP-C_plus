@@ -310,7 +310,7 @@ This repository I will use to store the hands-on from Striver's sheets.
 10. [find Repeating-missing number](https://www.naukri.com/code360/problems/missing-and-repeating-numbers_6828164?utm_source=striver&utm_medium=website&utm_campaign=codestudio_a_zcourse)
 11. [Maximum Profit in Job Scheduling [with Fixed Start & End Times]](https://leetcode.com/problems/maximum-profit-in-job-scheduling/)
 12. [Minimum Cost Path with Teleportations](https://leetcode.com/problems/minimum-cost-path-with-teleportations/description/)
-13. 
+13. [Trionic Array II](https://leetcode.com/problems/trionic-array-ii/description/?envType=daily-question&envId=2026-02-04)
 
 
 

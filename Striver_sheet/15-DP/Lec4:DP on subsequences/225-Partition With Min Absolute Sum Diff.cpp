@@ -326,124 +326,234 @@ public:
 // Approach 3
 // ----------------------
 
-/**
- * @brief Recursive helper to determine if a subset with the given target sum exists.
- *
- * Approach:
- * - Uses top-down recursion with memoization.
- * - At each step, we can either:
- *      1. Exclude the current element and check the remaining elements.
- *      2. Include the current element and reduce the target accordingly.
- * - The function terminates early if:
- *      - target becomes negative (no valid subset possible).
- *      - target becomes zero (subset found).
- *      - index goes out of bounds without reaching target.
- * - Memoization table `dp[index][target]` stores:
- *      - 1 if subset sum possible for current state.
- *      - 0 if not possible.
- *      - -1 if state not yet computed.
- *
- * Time Complexity:
- * - O(n * k), where n = size of array, k = target sum.
- *   Each (index, target) pair is computed at most once.
- *
- * Space Complexity:
- * - O(n * k) for memoization table.
- * - O(n) recursion stack in worst case (when all elements are considered).
- */
-bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
+class Solution
 {
-
-    // Base case: Target becomes negative ? invalid path
-    if (target < 0)
-        return 0;
-
-    // Base case: Target achieved
-    else if (target == 0)
+public:
+    /**
+     * @brief Recursive helper to determine if a subset with the given target sum exists.
+     *
+     * Approach:
+     * - Uses top-down recursion with memoization.
+     * - At each step, we can either:
+     *      1. Exclude the current element and check the remaining elements.
+     *      2. Include the current element and reduce the target accordingly.
+     * - The function terminates early if:
+     *      - target becomes negative (no valid subset possible).
+     *      - target becomes zero (subset found).
+     *      - index goes out of bounds without reaching target.
+     * - Memoization table `dp[index][target]` stores:
+     *      - 1 if subset sum possible for current state.
+     *      - 0 if not possible.
+     *      - -1 if state not yet computed.
+     *
+     * Time Complexity:
+     * - O(n * k), where n = size of array, k = target sum.
+     *   Each (index, target) pair is computed at most once.
+     *
+     * Space Complexity:
+     * - O(n * k) for memoization table.
+     * - O(n) recursion stack in worst case (when all elements are considered).
+     */
+    bool recFind(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
     {
-        if (index >= 0)
-            return dp[index][target] = 1; // store result if within bounds
-        else
-            return 1; // no need to store if index < 0
-    }
 
-    // Base case: No elements left to consider
-    else if (index < 0)
-        return false;
+        // Base case: Target becomes negative ? invalid path
+        if (target < 0)
+            return 0;
 
-    // Memoization check
-    if (dp[index][target] != -1)
-        return dp[index][target];
-
-    // Choice 1: Skip current element
-    bool ret = recFind(arr, dp, target, index - 1);
-    if (ret)
-    {
-        return dp[index][target] = 1; // store & return true
-    }
-
-    // Choice 2: Include current element
-    ret = recFind(arr, dp, target - arr[index], index - 1);
-    if (ret)
-    {
-        return dp[index][target] = 1; // store & return true
-    }
-
-    // If both choices fail, store and return false
-    return dp[index][target] = 0;
-}
-
-/**
- * @brief Computes the minimum difference between the sums of two subsets of the given array.
- *
- * Approach:
- * - Let `total` be the sum of all elements.
- * - The problem reduces to finding a subset with sum as close as possible to `total / 2`.
- * - Uses `recFind()` to fill a boolean dp table marking achievable subset sums.
- * - The minimum difference is then computed by:
- *      min(|total - 2 * subset_sum|) over all achievable subset sums.
- *      Because (s1+s2=tot;) and (s1-s2 = d;) =>(d=tot-2*s2)
- *
- * Time Complexity:
- * - O(N * total), where `total` = sum of array.
- *   Because each (index, sum) state is computed once.
- *
- * Space Complexity:
- * - O(N * total) for dp table.
- * - O(N) recursion stack space.
- */
-int minSubsetSumDifference(vector<int> &nums, int N)
-{
-    int total = 0;
-    for (int el : nums)
-        total += el; // Compute total sum
-
-    // dp[i][sum] = 1 if a subset using first i+1 elements can form 'sum'
-    vector<vector<int>> dp(N, vector<int>(total + 1, -1));
-
-    // Fill dp table for all possible sums
-    for (int sum = total; sum >= 0; sum--)
-        recFind(nums, dp, sum, N - 1);
-
-    int minDiff = INT_MAX;
-
-    // Check achievable sums and track minimum difference
-    for (int sum = total; sum >= 0; sum--)
-    {
-        if (dp[N - 1][sum])
+        // Base case: Target achieved
+        else if (target == 0)
         {
-            int diff = abs(2 * sum - total);
-            minDiff = min(minDiff, diff);
+            if (index >= 0)
+                return dp[index][target] = 1; // store result if within bounds
+            else
+                return 1; // no need to store if index < 0
         }
+
+        // Base case: No elements left to consider
+        else if (index < 0)
+            return false;
+
+        // Memoization check
+        if (dp[index][target] != -1)
+            return dp[index][target];
+
+        // Choice 1: Skip current element
+        bool ret = recFind(arr, dp, target, index - 1);
+        if (ret)
+        {
+            return dp[index][target] = 1; // store & return true
+        }
+
+        // Choice 2: Include current element
+        ret = recFind(arr, dp, target - arr[index], index - 1);
+        if (ret)
+        {
+            return dp[index][target] = 1; // store & return true
+        }
+
+        // If both choices fail, store and return false
+        return dp[index][target] = 0;
     }
 
-    return minDiff;
-}
+    /**
+     * @brief Computes the minimum difference between the sums of two subsets of the given array.
+     *
+     * Approach:
+     * - Let `total` be the sum of all elements.
+     * - The problem reduces to finding a subset with sum as close as possible to `total / 2`.
+     * - Uses `recFind()` to fill a boolean dp table marking achievable subset sums.
+     * - The minimum difference is then computed by:
+     *      min(|total - 2 * subset_sum|) over all achievable subset sums.
+     *      Because (s1+s2=tot;) and (s1-s2 = d;) =>(d=tot-2*s2)
+     *
+     * Time Complexity:
+     * - O(N * total), where `total` = sum of array.
+     *   Because each (index, sum) state is computed once.
+     *
+     * Space Complexity:
+     * - O(N * total) for dp table.
+     * - O(N) recursion stack space.
+     */
+    int minSubsetSumDifference(vector<int> &nums, int N)
+    {
+        int total = 0;
+        for (int el : nums)
+            total += el; // Compute total sum
+
+        // dp[i][sum] = 1 if a subset using first i+1 elements can form 'sum'
+        vector<vector<int>> dp(N, vector<int>(total + 1, -1));
+
+        // Fill dp table for all possible sums
+        for (int sum = total; sum >= 0; sum--)
+            recFind(nums, dp, sum, N - 1);
+
+        int minDiff = INT_MAX;
+
+        // Check achievable sums and track minimum difference
+        for (int sum = total; sum >= 0; sum--)
+        {
+            if (dp[N - 1][sum])
+            {
+                int diff = abs(2 * sum - total);
+                minDiff = min(minDiff, diff);
+            }
+        }
+
+        return minDiff;
+    }
+};
 
 //-------------------------------------------------------------------------------
 // 2. Title: Partition Array Into Two Arrays to Minimize Sum Difference with
 //      [Array having negetives and partitions  are of same size]
 //-------------------------------------------------------------------------------
+
+// -------------------------
+// Approach 1 : 3-D DP [TLE]
+// -------------------------
+class Solution
+{
+public:
+    /* * Helper Function: traverseMinDiff
+     * --------------------------------
+     * Recursively explores all possible ways to pick 'targetLength' elements from the array
+     * to form a subset, using Memoization (Top-Down DP) to avoid re-calculating states.
+     *
+     * @param idx          Current index in 'nums' we are considering.
+     * @param curSum       Current sum of elements picked so far (shifted by offset).
+     * @param targetLength Number of elements we still need to pick to reach N.
+     * @param nums         Input array.
+     * @param dp           3D Memoization table [idx][sum][count] acting as a 'visited' set.
+     * @param minDiff      Reference to global minimum difference found.
+     * @param total        Total sum of the original array (used to calculate complement sum).
+     * @param offset       Value added to sums to handle negative numbers (makes indices non-negative).
+     *
+     * Logic:
+     * 1. Base Case: If targetLength == 0, we found a valid subset of size N.
+     * Calculate difference vs the complement subset and update minDiff.
+     * 2. Pruning: If we run out of elements (idx == size) or have visited this state, return.
+     * 3. Transitions: Either SKIP nums[idx] or PICK nums[idx].
+     */
+    void traverseMinDiff(int idx, long long curSum, int targetLength, vector<int> &nums,
+                         vector<vector<vector<bool>>> &dp, int &minDiff, long long total, int offset)
+    {
+
+        if (targetLength == 0)
+        {
+            int a = (curSum - offset); // Remove offset to get actual sum
+            int b = total - a;         // The rest of the elements form subset B
+            int absDiff = abs(b - a);
+            minDiff = min(minDiff, absDiff);
+            return;
+        }
+
+        // Check bounds and Memoization (Pruning)
+        if (idx == nums.size() || dp[idx][curSum][targetLength])
+            return;
+
+        // Option 1: Skip current element
+        traverseMinDiff(idx + 1, curSum, targetLength, nums, dp, minDiff, total, offset);
+
+        // Option 2: Pick current element
+        traverseMinDiff(idx + 1, curSum + nums[idx], targetLength - 1, nums, dp, minDiff, total, offset);
+
+        // Mark state as visited
+        dp[idx][curSum][targetLength] = true;
+    }
+
+    /*
+     * Main Function: minimumDifference
+     * --------------------------------
+     * Orchestrates the setup for the DP approach.
+     * * @param nums  Input array of size 2*N.
+     * @return      The minimum absolute difference between sums of two subsets of size N.
+     *
+     * IMPORTANT CONSTRAINT NOTE:
+     * This method uses a 3D DP table where one dimension is the 'Sum Range'.
+     * - WORKS FOR: Small element values (e.g., sum up to ~10,000).
+     * - FAILS FOR: Large element values (e.g., 10^7 like in LeetCode 2035).
+     * Large values create a massive DP table (e.g., 135GB RAM) causing Memory Limit Exceeded (MLE).
+     * For large values, a "Meet-in-the-Middle" approach is required instead.
+     */
+    int minimumDifference(vector<int> &nums)
+    {
+
+        int N = nums.size() / 2; // We need to partition into two arrays of size N
+
+        long long total = 0;
+        long long minSum = 0, maxSum = 0;
+
+        // Calculate range required for DP table to handle negative numbers
+        for (int el : nums)
+        {
+            total += el;
+            maxSum += max(0, el);
+            minSum += min(el, 0);
+        }
+
+        // 'offset' shifts all possible sums to be positive integers starting from 0
+        int offset = abs(minSum);
+        long long range = offset + maxSum;
+
+        // Initialize 3D DP Table: [Index][Sum][Count]
+        // Note: Check 'range' size here. If range > 100,000, this line causes MLE.
+        vector<vector<vector<bool>>> dp(nums.size() + 1,
+                                        vector<vector<bool>>(range + 1,
+                                                             vector<bool>(N + 1, false)));
+
+        int minDiff = INT_MAX;
+
+        // Start Recursion
+        traverseMinDiff(0, offset, N, nums, dp, minDiff, total, offset);
+
+        return minDiff;
+    }
+};
+
+// ----------------------------
+// Approach 2 : MITM [Optimal]
+// ----------------------------
 
 int main()
 {
