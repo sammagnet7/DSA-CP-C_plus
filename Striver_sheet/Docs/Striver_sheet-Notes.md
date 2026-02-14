@@ -1029,6 +1029,25 @@ Convert string of digits to num:
 41. Avoid .count() on Multiset in Performance-Critical Code 
 `multiset::count(val)` runs in $O(\log N + K)$ time (scanning all $K$ duplicates), which degrades to $O(N)$ linear time in worst-case scenarios, whereas `multiset::find(val)` is strictly $O(\log N)$.
 
-42. 
+42. Reset vector with default values:
 
+     ```cpp
+     next.assign(query_row + 2, 0.0);
+     ```
+     or
+
+     ```cpp
+     next.clear(); // Size becomes 0 (capacity remains)
+     next.resize(query_row + 2, 0.0); // Size becomes N, new slots filled with 0.0
+     ```
+     or
+     ```cpp
+     next = vector<double>(query_row + 2, 0.0);
+     ```
+     or
+     ```cpp
+     // Best balance of readability and performance:
+     fill(next.begin(), next.end(), 0.0);
+     ```
+43. 
 ---
