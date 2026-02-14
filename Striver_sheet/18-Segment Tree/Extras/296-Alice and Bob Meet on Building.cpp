@@ -303,7 +303,7 @@ public:
 //
 // APPROACH 2 : Segment Tree [Q * Log N] [OPTIMAL]
 //
-//-------------------------------------------------
+//--------------------------------------------------
 
 /*
  * Problem: 2940. Find Building Where Alice and Bob Can Meet
