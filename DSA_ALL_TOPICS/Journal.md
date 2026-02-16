@@ -1,18 +1,17 @@
-# Striver sheet
-This repository I will use to store the hands-on from Striver's sheets.
+## Journal
 
-- Vscode shortcuts I use in this workspace:
+#### Vscode shortcuts I use in this workspace:
 1. cntrl+shift+r -> Run task -> select Task with label "COMPILE and RUN with IO" as mentioned in the tasks.json
 2. ALT -> for enabling and disabling top menu bar.
 3. Alt + Z  -> "Word Wrap" feature
 
----
-## Team tracker sheet: [DSA practice track](https://docs.google.com/spreadsheets/d/1tLx_rGo83kXSwrnnpvL069_YSzAwYFy1xaz9xnnFE68/edit?gid=1460427080#gid=1460427080)
 
 
+### Daily Tracker: 
+  
+[Team tracker link](https://docs.google.com/spreadsheets/d/1tLx_rGo83kXSwrnnpvL069_YSzAwYFy1xaz9xnnFE68/edit?gid=1460427080#gid=1460427080)
 
----
-## Journal
+#### Personal tracker:
 
 - 11/01/25: Set up workspace
 - 12/01/25: Step 1:: Lec 1: Things to Know in C++.. [9/455] <span style="color: green;">[2 hours]</span>
@@ -248,9 +247,8 @@ This repository I will use to store the hands-on from Striver's sheets.
 - 08/09/25: Step15:: SHEET 1 PASS COMPLETED[455/455] <span style="color: Green;"> [ Easy : 00 ] [ Medium : 02 ] [ Hard : 03 ]</span>
 
 ---
-## Revisions:
+### Revisions:
 
----
 - 16/09/25: <span style="color: green;"> #31 [31/455]</span>
 - 17/09/25: <span style="color: green;"> #21 [52/455]</span>
 - 18/09/25: <span style="color: red;">[0 hour]</span>
@@ -266,7 +264,7 @@ This repository I will use to store the hands-on from Striver's sheets.
 
 
 ---
-### Some tricky problems to revise:
+### Problems to revise:
 
 1. 074-Minimize Max Distance to Gas Station
 2. 075-Median of 2 sorted arrays
@@ -293,11 +291,14 @@ This repository I will use to store the hands-on from Striver's sheets.
 20. To do: [leetcode](https://leetcode.com/problems/course-schedule-ii/)
 21. String Subsequence DP hard problem: [leet](https://leetcode.com/problems/count-palindromic-subsequences/)
 22. [18-Segment Tree/Extras/Separate Squares I I.cpp](https://leetcode.com/problems/separate-squares-ii/description/?envType=daily-question&envId=2026-01-14)
-23. 
+23. [Pr1](https://www.geeksforgeeks.org/problems/search-query-auto-complete/0)
+24. [Pr31](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
+25. [Pr49: Traffic: Maximum Consecutive Ones](https://www.naukri.com/code360/problems/traffic_6682625)
+26. [Pr50: Find the number that appears once, and other numbers twice](https://www.naukri.com/code360/problems/find-the-single-element_6680465)
 
 ---
 
-### revisit:
+### Revisit:
 1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
 2. [check if rotated-array sorted](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
 3. [next permutation](https://leetcode.com/problems/next-permutation/description/)

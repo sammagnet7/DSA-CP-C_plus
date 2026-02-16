@@ -1,0 +1,10 @@
+TestFloor index: 2 Ceil index: 1
+Floor index: 3 Ceil index: 3
+Floor index: 3 Ceil index: -1
+Floor index: 2 Ceil index: 2
+Floor index: 4 Ceil index: 4
+Floor index: 2 Ceil index: 1
+Floor index: 1 Ceil index: 2
+Floor index: 4 Ceil index: 5
+Floor index: -1 Ceil index: 0
+Floor index: 4 Ceil index: 3
