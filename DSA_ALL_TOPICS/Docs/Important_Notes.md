@@ -1049,5 +1049,35 @@ Convert string of digits to num:
      // Best balance of readability and performance:
      fill(next.begin(), next.end(), 0.0);
      ```
-43. 
+43. Bit Counting Methods in C++
+     ```cpp
+          // C++20
+          int count = std::popcount((unsigned int)n);
+
+          // Compiler Intrinsic (Fastest / CP Friendly)
+          // For int
+          int count = __builtin_popcount(n); 
+          // For long long
+          int count = __builtin_popcountll(n);
+
+          // STL Bitset (Readable)
+          int count = std::bitset<32>(n).count();
+
+          // naive : Iterates through all 32 bits.
+          int count = 0;
+          while (n > 0) {
+               if (n & 1) count++;
+               n >>= 1;
+          }
+
+          // Brian Kernighan’s Algorithm: Iterates 'number of set bits' times.
+          int count = 0; 
+          while (n > 0) {
+               n = n & (n - 1); // Clears the lowest set bit
+               count++;
+          }
+
+     ```
+
+44. 
 ---
