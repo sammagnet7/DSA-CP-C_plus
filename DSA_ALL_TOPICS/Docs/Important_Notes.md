@@ -1018,7 +1018,7 @@ Convert string of digits to num:
      // 1. Logical NOT (!)
      // 5 is non-zero (True), so !5 becomes False (0)
      int res1 = !x;  // Result: 0
-
+bool wrong = static_cast<bool>('0'); // Result: true
      // 2. Bitwise NOT (~)
      // Flips all bits: 0000...0101 -> 1111...1010
      // In signed 2's complement, 111...1010 is -6
@@ -1049,7 +1049,7 @@ Convert string of digits to num:
      // Best balance of readability and performance:
      fill(next.begin(), next.end(), 0.0);
      ```
-43. Bit Counting Methods in C++
+43. Set bits Counting Methods in C++
      ```cpp
           // C++20
           int count = std::popcount((unsigned int)n);
@@ -1077,7 +1077,24 @@ Convert string of digits to num:
                count++;
           }
 
+          // Using bitset container of c++
+          bitset<32> bits(n); // 
+          int count = 0;
+          for(int i=0; i<=log(2, n); i++){   // 
+               if(bits[i]==1){          // 
+                    count++;
+               }
+          } 
      ```
 
-44. 
+44. `static_cast<bool>`
+    1.  static_cast<bool>('0') evaluates to true because the character '0' has an ASCII value of 48 (a non-zero value).
+    ```cpp
+          bool wrong = static_cast<bool>('0'); // Result: true
+    ```
+    2.  To interpret the character as the actual integer 0 (which evaluates to false), subtract the character '0'.
+    ```cpp
+          bool correct = (s[i] - '0'); // Result: false
+    ```
+45. 
 ---
