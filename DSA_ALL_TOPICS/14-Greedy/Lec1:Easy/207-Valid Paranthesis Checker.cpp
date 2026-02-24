@@ -19,7 +19,7 @@ using namespace std;
 
 /*
 
-1. Title: Valid Paranthesis Checker
+1. Title: Valid Parenthesis String
 
 Links:
 https://takeuforward.org/plus/dsa/problems/valid-paranthesis-checker?tab=editorial
@@ -450,6 +450,70 @@ public:
 
     // If min open is 0 → all opened are closed
     return openCmin == 0;
+  }
+
+  //-------------------------------------------------------------------------------
+  // Approach: 5 [2 pass]
+  //-------------------------------------------------------------------------------
+
+  /**
+   * Approach:
+   *
+   *
+   * Time Complexity: O(2N) — one pass over the string
+   * Space Complexity: O(1) — constant space
+   */
+
+  bool checkValidString(string s)
+  {
+    int N = s.length();
+
+    // PASS 1: Left to Right
+    // Checks if every ')' has a preceding '(' or '*' to match it.
+    int openCount = 0;
+    int wildCount = 0;
+
+    for (int i = 0; i < N; i++)
+    {
+      if (s[i] == '*')
+        ++wildCount;
+      else if (s[i] == '(')
+        ++openCount;
+      else if (s[i] == ')')
+      {
+        if (openCount > 0)
+          --openCount;
+        else if (wildCount > 0)
+          --wildCount;
+        else
+          return false; // Found ')' but no '(' or '*' before it
+      }
+    }
+
+    // PASS 2: Right to Left
+    // Checks if every '(' has a following ')' or '*' to match it.
+    int closeCount = 0;
+    wildCount = 0; // Reset wildcard count for reverse pass
+
+    for (int i = N - 1; i >= 0; i--)
+    {
+      if (s[i] == '*')
+        ++wildCount;
+      else if (s[i] == ')')
+        ++closeCount;
+      else if (s[i] == '(')
+      {
+        if (closeCount > 0)
+          --closeCount;
+        else if (wildCount > 0)
+          --wildCount;
+        else
+          return false; // Found '(' but no ')' or '*' after it
+      }
+    }
+
+    // If both directional passes succeed, the string is valid!
+    return true;
   }
 };
 
