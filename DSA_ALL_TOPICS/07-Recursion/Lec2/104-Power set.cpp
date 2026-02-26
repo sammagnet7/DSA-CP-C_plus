@@ -103,7 +103,8 @@ class Solution
 {
 public:
     // ---------------------------------------------
-    // Generate Power Set:
+    // 1. Generate Power Set:
+    // ---------------------------------------------
 
     // O(2^N)
     void recursePowerSet(vector<vector<int>> &ans, vector<int> &input, vector<int> &subset, int inputIdx)
@@ -142,42 +143,164 @@ public:
     }
 
     //--------------------------------------------------------------------------
-    // Generate all possible UNIQUE subsets:
+    // 2. Generate all possible UNIQUE subsets:
+    //--------------------------------------------------------------------------
 
-    // O(2^N * N)
-    void recurseUniquePowerSet(vector<vector<int>> &ans, vector<int> &inp, vector<int> &subset, int idx)
+    // ===================================================================================
+    // Approach 1: Brute Force Backtracking with std::set for Deduplication [sub-optimal]
+    // ===================================================================================
+    /*
+     * IDEA:
+     * This method relies on the data structure (`std::set`) to do the heavy
+     * lifting. We sort the array to guarantee that identical subsets are generated
+     * in the exact same order (e.g., always `[1, 2, 2]`, never `[2, 1, 2]`).
+     * Then, we generate EVERY possible subset blindly and insert them into a set.
+     * The set automatically discards the duplicates.
+     *
+     * STEP-BY-STEP APPROACH:
+     * 1. Sort the input array `nums`.
+     * 2. Start recursion at index 0.
+     * 3. Base Case: If `idx` reaches the end, insert `subset` into the `set` `ans`.
+     * 4. Branch 1 (Do Not Pick): Recurse to `idx + 1` without adding to `subset`.
+     * 5. Branch 2 (Pick): Add `nums[idx]`, recurse to `idx + 1`, and backtrack.
+     * 6. In the main function, construct the final `vector<vector<int>>` using
+     * the iterators from the `set`.
+     *
+     * TIME COMPLEXITY:
+     * O(N * 2^N * log(2^N)), which simplifies to O(N^2 * 2^N).
+     * We blindly generate exactly $2^N$ subsets. For each subset, inserting it
+     * into the set takes logarithmic time relative to the set's size, and comparing
+     * subsets during insertion takes $O(N)$ time.
+     *
+     * SPACE COMPLEXITY:
+     * O(N * 2^N) to store the subsets in the `std::set`. A set in C++ is
+     * typically implemented as a Red-Black Tree, meaning every subset is wrapped
+     * in a node with extra pointers (left, right, parent) and a color flag,
+     * causing significant memory overhead compared to a flat vector.
+     *
+     * COMPARISON TO METHOD 1 (Optimized Method):
+     * + PROS: The recursive logic is incredibly simple and standard. You don't
+     * have to think about duplicate-skipping logic at all; the `set` acts as
+     * a safety net.
+     * - CONS: Much slower execution time and significantly higher memory footprint.
+     * Generating identical branches just to throw them away later is highly
+     * inefficient, especially as the input size grows.
+     */
+
+    void rec(int idx, vector<int> &nums, vector<int> &subset, set<vector<int>> &ans)
     {
 
-        ans.push_back(subset);
-
-        for (int i = idx; i < inp.size(); i++)
+        if (idx == nums.size())
         {
-            if (i != idx and inp[i] == inp[i - 1])
-                continue;
-
-            subset.push_back(inp[i]);
-            recurseUniquePowerSet(ans, inp, subset, (i + 1));
-            subset.pop_back();
+            ans.insert(subset);
+            return;
         }
+
+        // Branch 1: DO NOT PICK
+        rec(idx + 1, nums, subset, ans);
+
+        // Branch 2: PICK
+        subset.push_back(nums[idx]);
+        rec(idx + 1, nums, subset, ans);
+        subset.pop_back(); // backtrack
     }
 
-    // Optimal approach: Recursion + Iteration
-    // Time:  O(2^N * N) Beacuse 2^Nelements in power set and N is the max length of subset
-    // Space: O(2^N * N) for `ans` vector + Auxiliary space is O(n)  if n is the depth of the recursion tree
     vector<vector<int>> subsetsWithDup(vector<int> &nums)
     {
-        sort(nums.begin(), nums.end());
 
+        set<vector<int>> ans;
+        vector<int> subset;
+
+        // Sorting guarantees subsets are generated with elements in identical order
+        sort(nums.begin(), nums.end());
+        rec(0, nums, subset, ans);
+
+        // Convert the set back to the required vector format
+        return vector<vector<int>>(ans.begin(), ans.end());
+    }
+
+    // ============================================================================
+    // Approach 2: Optimized Backtracking with Duplicate Pruning [OPTIMAL]
+    // ============================================================================
+    /*
+     * IDEA:
+     * This method uses standard backtracking (Pick / Do Not Pick) but actively
+     * prunes the recursion tree to avoid generating duplicate subsets in the
+     * first place. By sorting the array first, all duplicates become adjacent.
+     * If we choose NOT to pick an element, we must also skip all identical
+     * elements immediately following it to prevent generating identical subsets.
+     *
+     * STEP-BY-STEP APPROACH:
+     * 1. Sort the input array `nums` so duplicates are adjacent.
+     * 2. Start the recursion at index 0 with an empty `subset`.
+     * 3. Base Case: If `idx` reaches the end of `nums`, add `subset` to `ans`.
+     * 4. Branch 1 (Pick): Add `nums[idx]` to `subset`, recurse for `idx + 1`,
+     * and then backtrack by popping the element.
+     * 5. Branch 2 (Do Not Pick): Since we decided NOT to include the current
+     * element at this specific position, we use a while loop to skip any
+     * subsequent identical elements.
+     * 6. Recurse for the next unique element's index.
+     *
+     * TIME COMPLEXITY:
+     * O(N * 2^N) in the worst case (where all elements are unique).
+     * We generate at most 2^N subsets, and copying each subset to the result
+     * takes O(N) time. However, if there are many duplicates, the actual
+     * time is much faster because we prune large portions of the recursion tree.
+     * * SPACE COMPLEXITY:
+     * O(N) auxiliary space for the recursion stack and the `subset` vector.
+     * (Excluding the space required for the output array `ans`).
+     *
+     * COMPARISON TO METHOD 2 (Set Method):
+     * + PROS: Much faster and more memory-efficient. It avoids generating
+     * dead-end branches in the recursion tree entirely. It also avoids the
+     * heavy structural memory overhead and O(log M) insertion time of a
+     * `std::set` (Red-Black tree).
+     * - CONS: The logic is slightly more complex. You have to be careful
+     * about exactly where and how you skip duplicates.
+     */
+
+    void rec(int idx, vector<int> &nums, vector<int> &subset, vector<vector<int>> &ans)
+    {
+        // Base case: we've considered all elements
+        if (idx == nums.size())
+        {
+            ans.push_back(subset);
+            return;
+        }
+
+        // Branch 1: PICK the current element
+        subset.push_back(nums[idx]);
+        rec(idx + 1, nums, subset, ans);
+        subset.pop_back(); // backtrack
+
+        // Branch 2: DO NOT PICK the current element
+        // Since we are not picking nums[idx], we must skip all future duplicates of it.
+        // Otherwise, picking the duplicate later would create a subset we already generated.
+        while (idx + 1 < nums.size() && nums[idx] == nums[idx + 1])
+        {
+            idx++;
+        }
+
+        // Move to the next unique element
+        rec(idx + 1, nums, subset, ans);
+    }
+
+    vector<vector<int>> subsetsWithDup(vector<int> &nums)
+    {
         vector<vector<int>> ans;
         vector<int> subset;
 
-        recurseUniquePowerSet(ans, nums, subset, 0);
+        // Sorting is strictly required so duplicates are adjacent
+        sort(nums.begin(), nums.end());
+
+        rec(0, nums, subset, ans);
 
         return ans;
     }
 
     // ---------------------------------------------
-    // Sum of all Subsets:
+    // 3. Sum of all Subsets:
+    // ---------------------------------------------
 
     // O(2^N * 2^N Log (2^N))
     void recurseSubsetSum(vector<int> &ans, vector<int> &input, int idx, int sum)

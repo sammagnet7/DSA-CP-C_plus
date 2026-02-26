@@ -25,7 +25,6 @@ Links:
 https://takeuforward.org/data-structure/partition-set-into-2-subsets-with-min-absolute-sum-diff-dp-16/
 https://www.youtube.com/watch?v=GS_OqZb2CWc
 https://takeuforward.org/plus/dsa/problems/partition-a-set-into-two-subsets-with-minimum-absolute-sum-difference?tab=editorial
-https://www.naukri.com/code360/problems/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum_842494
 
 Problem statement:
 You are given an array 'arr' containing 'n' non-negative integers.
@@ -35,7 +34,7 @@ You just need to find the minimum absolute difference considering any valid divi
 Note:
 1. Each array element should belong to exactly one of the subsets.
 2. Subsets need not always be contiguous.
-3. Here each subset size need to be same
+3. Here each subset size no need to be same
 4. No negetive elements are present in given array
 
 For example, for the array : [1, 2, 3], some of the possible divisions are
@@ -86,7 +85,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Partition Array Into Two Arrays to Minimize Sum Difference with
+2. Title: Partition Array Into Two Arrays to Minimize Sum Difference
             [Array having negetives and partitions  are of same size]
 
 Links:

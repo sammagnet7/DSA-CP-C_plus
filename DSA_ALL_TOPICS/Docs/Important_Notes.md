@@ -1108,5 +1108,8 @@ bool wrong = static_cast<bool>('0'); // Result: true
      | **`[&]`** (Capture by Reference) | Yes | Yes | **Minimal** (Stores memory addresses/pointers under the hood) |
      | **`[=]`** (Capture by Value) | Yes | No (Read-only copies) | **Variable/High** (Creates copies of every captured variable) |
 
-47. 
+47. How to compare nCr with terms with power of 2?
+    - Ans: `n chose n/2`, this complexity rougly equivalent to `4^(n/2) = 2^n`. 
+    - [source](https://en.wikipedia.org/wiki/Central_binomial_coefficient)
+48. 
 ---

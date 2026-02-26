@@ -386,9 +386,7 @@ public:
         // For n>1, 'prev' is updated to 'cur' at the end of the loop, so it is valid there too.
         return prev[target];
     }
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
+
 };
 
 int main()

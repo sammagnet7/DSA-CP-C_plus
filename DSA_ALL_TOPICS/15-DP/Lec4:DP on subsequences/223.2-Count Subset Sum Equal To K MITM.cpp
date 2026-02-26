@@ -31,31 +31,27 @@ You are given an array of n numbers. In how many ways can you choose a subset of
 
 Example
     Input:
+    4
     4 5 1 2 3 2
     Output:
     3
-
-Input Format
-The first input line has two numbers n and x: the array size and the required sum. The second line has n integers t1,t2,...,tn: the numbers in the array.
 
 Constraints
     1<=n<=40
     1<=x<=10^9
     1<=ti<=10^9
 
-Output Format
-    Print the number of ways you can create the sum x.
 
-Sample Input 0
-    10 17
+    Sample Input
+    17
     5 8 5 6 9 1 2 5 8 6
-    Sample Output 0
+    Sample Output
     22
 
-    Sample Input 1
-    40 1
+    Sample Input
+    1
     1 2 2 1 1 1 2 2 2 2 1 1 2 1 1 2 2 1 1 2 2 1 2 2 2 2 2 2 1 2 1 2 1 2 1 2 2 1 2 1
-    Sample Output 1
+    Sample Output
     17
 
 
@@ -468,7 +464,6 @@ int countSubsetSumWrapper(int n, int targetSum, vector<int> &nums)
 
 int main()
 {
-  /* Enter your code here. Read input from STDIN. Print output to STDOUT */
   int n, sum;
 
   cin >> n;
