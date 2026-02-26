@@ -786,6 +786,8 @@ Convert string of digits to num:
      #include <string>
      string str_num = "123";
      int num = stoi(str_num);
+     long long num = stoll(str_num);
+     unsigned long num = stoull(str_num);
 ```
 25.  How to parse comma:
 ```cpp
@@ -1096,5 +1098,15 @@ bool wrong = static_cast<bool>('0'); // Result: true
     ```cpp
           bool correct = (s[i] - '0'); // Result: false
     ```
-45. 
+45. `std::__builtin_popcount` is a hardware supported `O(1)` operation.
+46. **Lambda Capture Clauses**:
+     - In C++, the brackets at the beginning of a lambda function are called the Capture Clause (or capture list). They tell the compiler which variables from the surrounding scope (the function where you wrote the lambda) the lambda is allowed to "see" and use.
+
+    | Capture Clause | Read External Variables? | Modify External Variables? | Memory / Performance Cost |
+     | :--- | :--- | :--- | :--- |
+     | **`[]`** (Capture Nothing) | No | No | **None** (Safest and most lightweight) |
+     | **`[&]`** (Capture by Reference) | Yes | Yes | **Minimal** (Stores memory addresses/pointers under the hood) |
+     | **`[=]`** (Capture by Value) | Yes | No (Read-only copies) | **Variable/High** (Creates copies of every captured variable) |
+
+47. 
 ---
