@@ -26,18 +26,18 @@ https://www.hackerrank.com/challenges/the-power-sum/problem
 
 
 Problem statement:
-Given two integers, X and N, determine the number of ways that X can be expressed as the sum of the N-th powers of unique, natural numbers.
+Given two integers, target and N, determine the number of ways that target can be expressed as the sum of the N-th powers of unique, natural numbers.
 
 Formally, you need to count the number of distinct sets {a1, a2, …, ak} such that:
 
-    X = a1^N + a2^N + … + ak^N
+    target = a1^N + a2^N + … + ak^N
 
 where each ai is a positive integer, and all ai are distinct.
 
 Example
 -------
 Input:
-X = 10
+target = 10
 N = 2
 
 Possible combinations:
@@ -52,17 +52,17 @@ Function Description
 --------------------
 Complete the function powerSum in the editor below.
 
-    int powerSum(int X, int N);
+    int powerSum(int target, int N);
 
-- X: the integer to be expressed as a sum.
+- target: the integer to be expressed as a sum.
 - N: the exponent value.
 
 Returns:
-- An integer representing the number of ways X can be expressed as the sum of unique natural numbers raised to the power N.
+- An integer representing the number of ways target can be expressed as the sum of unique natural numbers raised to the power N.
 
 Constraints
 -----------
-1 <= X <= 1000
+1 <= target <= 1000
 1 <= N <= 10
 
 
@@ -104,9 +104,9 @@ public:
     // Approach:
     // We are solving the "Power Sum" problem using recursion + DP.
     //
-    // Step 1: Generate all possible powers a^N such that a^N <= X.
+    // Step 1: Generate all possible powers a^N such that a^N <= target.
     // Step 2: Use recursion with memoization (top-down DP) to count
-    //         the number of ways to form X using these powers.
+    //         the number of ways to form target using these powers.
     //         Each power can be used at most once (subset style).
     //
     // DP State: dp[idx][rem]
@@ -122,11 +122,11 @@ public:
     //    - rem == 0 → 1 way (found a valid combination)
     //    - rem < 0 or idx < 0 → 0 ways (invalid path)
     //
-    // Time Complexity: O(n * X)
-    //    where n ≈ X^(1/N) (number of valid powers).
+    // Time Complexity: O(n * target)
+    //    where n ≈ target^(1/N) (number of valid powers).
     //    Because each state (idx, rem) is computed once.
     //
-    // Space Complexity: O(n * X)
+    // Space Complexity: O(n * target)
     //    for the memoization table dp.
     // ------------------------------------------------------------
 
@@ -154,21 +154,21 @@ public:
         return dp[idx][rem] = without + withIt;
     }
 
-    int powerSum(int X, int N)
+    int powerSum(int target, int N)
     {
         vector<int> powers;
 
-        // generate all a^N <= X
+        // generate all a^N <= target
         for (int a = 1;; ++a)
         {
             long long p = 1;
             for (int i = 0; i < N; ++i)
             {
                 p *= a;
-                if (p > X)
-                    break; // stop if power exceeds X
+                if (p > target)
+                    break; // stop if power exceeds target
             }
-            if (p > X)
+            if (p > target)
                 break; // further a will only make bigger powers
             powers.push_back((int)p);
         }
@@ -176,13 +176,13 @@ public:
         int n = powers.size();
 
         // initialize DP table with -1 (uncomputed states)
-        vector<vector<int>> dp(n, vector<int>(X + 1, -1));
+        vector<vector<int>> dp(n, vector<int>(target + 1, -1));
 
-        // start recursion from last index (largest power) and full target X
-        dfs(powers, n - 1, X, dp);
+        // start recursion from last index (largest power) and full target target
+        dfs(powers, n - 1, target, dp);
 
-        // answer is number of ways to form X using all powers
-        return dp[n - 1][X];
+        // answer is number of ways to form target using all powers
+        return dp[n - 1][target];
     }
 
     //------------------------------
@@ -192,21 +192,21 @@ public:
     /*
      * Function: powerSum
      * ------------------
-     * Calculates the number of ways to express X as the sum of N-th powers
+     * Calculates the number of ways to express target as the sum of N-th powers
      * of unique, natural numbers.
      *
      * Approach: 0/1 Knapsack Pattern (Dynamic Programming)
      * - We have a set of "items": {1^N, 2^N, 3^N, ...}
-     * - We want to find how many subsets of these items sum up exactly to X.
+     * - We want to find how many subsets of these items sum up exactly to target.
      * - Since each number must be unique, we can use each item at most once.
      */
-    int powerSum(int X, int N)
+    int powerSum(int target, int N)
     {
-        int target = X;
+        int target = target;
 
         // 1. Determine the range of numbers to consider.
-        // We only need bases 'b' where b^N <= X.
-        // Example: X=10, N=2 -> 1^2=1, 2^2=4, 3^2=9. 4^2=16 (too big). Limit is 3.
+        // We only need bases 'b' where b^N <= target.
+        // Example: target=10, N=2 -> 1^2=1, 2^2=4, 3^2=9. 4^2=16 (too big). Limit is 3.
         int baseLimit = 1;
         while (pow(baseLimit + 1, N) <= target)
         {
@@ -215,7 +215,7 @@ public:
 
         // 2. Initialize DP Table
         // Rows (b): Considering numbers from 0 up to 'b'.
-        // Cols (t): Target sum from 0 to X.
+        // Cols (t): Target sum from 0 to target.
         // DP[b][t] = Number of ways to get sum 't' using a subset of {1^N ... b^N}
         vector<vector<int>> DP(baseLimit + 1, vector<int>(target + 1, 0));
 
@@ -260,7 +260,7 @@ public:
         }
 
         // The answer is in the bottom-right cell:
-        // Using all available numbers up to baseLimit to form the full target X.
+        // Using all available numbers up to baseLimit to form the full target target.
         return DP[baseLimit][target];
     }
 
@@ -271,7 +271,7 @@ public:
     /*
      * Function: powerSum
      * ------------------
-     * Calculates the number of ways to represent 'X' as the sum of unique
+     * Calculates the number of ways to represent 'target' as the sum of unique
      * natural numbers raised to the power 'N'.
      *
      * Approach: Dynamic Programming (Space Optimized - Two Rows)
@@ -279,23 +279,23 @@ public:
      *
      * Complexity Analysis:
      * --------------------
-     * Time Complexity: O(X * X^(1/N))
-     * - We iterate through 'baseLimit' numbers. baseLimit is approx X^(1/N).
-     * - For each number, we iterate up to 'target' (X).
-     * - Total operations ≈ X * X^(1/N).
-     * - Example (X=1000, N=2): ~31 * 1000 = 31,000 operations (Very Fast).
+     * Time Complexity: O(target * target^(1/N))
+     * - We iterate through 'baseLimit' numbers. baseLimit is approx target^(1/N).
+     * - For each number, we iterate up to 'target' (target).
+     * - Total operations ≈ target * target^(1/N).
+     * - Example (target=1000, N=2): ~31 * 1000 = 31,000 operations (Very Fast).
      *
-     * Space Complexity: O(X)
-     * - We use two vectors 'prev' and 'cur' of size X.
-     * - Standard 2D DP would be O(baseLimit * X). This is a significant reduction.
+     * Space Complexity: O(target)
+     * - We use two vectors 'prev' and 'cur' of size target.
+     * - Standard 2D DP would be O(baseLimit * target). This is a significant reduction.
      */
-    int powerSum(int X, int N)
+    int powerSum(int target, int N)
     {
-        int target = X;
+        int target = target;
 
         // 1. Calculate the Upper Limit
-        // We only need to consider base numbers 'b' such that b^N <= X.
-        // E.g., if X=10, N=2, we check 1, 2, 3 (since 3^2=9 <= 10, but 4^2=16 > 10).
+        // We only need to consider base numbers 'b' such that b^N <= target.
+        // E.g., if target=10, N=2, we check 1, 2, 3 (since 3^2=9 <= 10, but 4^2=16 > 10).
         int baseLimit = 1;
         while (pow(baseLimit + 1, N) <= target)
         {
