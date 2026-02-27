@@ -554,6 +554,151 @@ public:
 // Approach 2 : MITM [Optimal]
 // ----------------------------
 
+#include <vector>
+#include <numeric>
+#include <algorithm>
+#include <cmath>
+#include <climits>
+
+class Solution
+{
+private:
+    /*
+     * Helper Method: generateAllSubsetSums
+     * ------------------------------------
+     * Generates all possible subset sums for a given array and groups them by
+     * the number of elements used to form that sum.
+     * * Logic: Uses bitmasking. A mask like 1011 means we pick the 0th, 1st, and 3rd elements.
+     */
+    void generateAllSubsetSums(vector<int> &arr, vector<vector<int>> &subsetSums)
+    {
+        int n = arr.size();
+        int totalStates = (1 << n); // 2^n combinations
+
+        for (int mask = 0; mask < totalStates; ++mask)
+        {
+            int setBitCount = 0;
+            int curSum = 0;
+
+            for (int bit = 0; bit < n; ++bit)
+            {
+                if ((mask >> bit) & 1)
+                {
+                    ++setBitCount;
+                    curSum += arr[bit];
+                }
+            }
+            // Store the sum in the bucket corresponding to how many elements were picked
+            subsetSums[setBitCount].push_back(curSum);
+        }
+    }
+
+public:
+    /*
+     * Method: minimumDifference
+     * -------------------------
+     * Approach: Meet-in-the-Middle + Binary Search
+     * * Why this approach?
+     * The array has 2*N elements (up to 30). Checking all combinations is O(2^30) -> TLE.
+     * By splitting the array in half (N=15 elements each), we only check O(2^15) combinations
+     * per half, which is just 32,768. We then efficiently stitch the two halves together.
+     * * Step-by-Step Idea:
+     * 1. Split the 2*N array into two halves: Part1 and Part2 (size N each).
+     * 2. Generate all subset sums for Part1 and Part2. Group them by the number of elements picked.
+     * 3. Sort the subset sums of Part2 to allow Binary Search.
+     * 4. To form a valid partition of size N: if we pick 'k' elements from Part1,
+     * we MUST pick exactly 'N - k' elements from Part2.
+     * 5. Our goal is to make the partition sum as close to (TotalSum / 2) as possible.
+     * 6. Iterate through every sum in Part1. Calculate what we NEED from Part2 (the 'delta').
+     * Use lower_bound to find the closest available sum in Part2.
+     * * Time Complexity: O(n * 2^n) where n = Total_Elements / 2
+     * - Subset generation: 2 * O(n * 2^n)
+     * - Sorting Part2 sums: O(2^n * log(2^n)) = O(n * 2^n)
+     * - Binary Search: For each of the 2^n sums in Part1, we do an O(log(2^n)) = O(n) search.
+     * Total search time = O(n * 2^n).
+     * * Space Complexity: O(2^n)
+     * - We store all 2^n subset combinations for Part1 and Part2.
+     * - Since max n is 15, 2^15 = 32,768 integers, which easily fits in memory.
+     */
+    int minimumDifference(vector<int> &nums)
+    {
+
+        int N = nums.size();
+        int n = N / 2; // Size of one half
+
+        int totalSum = accumulate(nums.begin(), nums.end(), 0);
+        int targetSum = totalSum / 2; // The "Perfect Balance" point
+
+        // Step 1: Split the array physically into two halves
+        vector<int> part1(nums.begin(), nums.begin() + n);
+        vector<int> part2(nums.begin() + n, nums.end());
+
+        // part1Sums[k] will store all sums made by picking exactly 'k' elements from Part1
+        vector<vector<int>> part1Sums(n + 1);
+        vector<vector<int>> part2Sums(n + 1);
+
+        // Step 2: Generate all subsets for both halves
+        generateAllSubsetSums(part1, part1Sums);
+        generateAllSubsetSums(part2, part2Sums);
+
+        // Step 3: Sort Part2 subsets to enable binary search (lower_bound) later
+        for (auto &v : part2Sums)
+        {
+            sort(v.begin(), v.end());
+        }
+
+        int minDiff = INT_MAX;
+
+        // Step 4: Stitch the two halves together
+        // elCountP1 is the number of elements we are currently picking from Part1
+        for (int elCountP1 = 0; elCountP1 <= n; ++elCountP1)
+        {
+
+            // If we pick 'elCountP1' from Part1, we MUST pick 'elCountP2' from Part2
+            // so that the total elements in our partition equals exactly 'n'.
+            int elCountP2 = n - elCountP1;
+
+            vector<int> &p1v = part1Sums[elCountP1];
+            vector<int> &p2v = part2Sums[elCountP2];
+
+            // Iterate through every possible sum we generated from Part1 using 'elCountP1' elements
+            for (int p1Sum : p1v)
+            {
+
+                // What sum do we desperately need from Part2 to reach the Perfect Balance?
+                int delta = targetSum - p1Sum;
+
+                // Find the first sum in Part2 that is >= delta
+                auto it = lower_bound(p2v.begin(), p2v.end(), delta);
+
+                // Case A: Element found is >= delta
+                // This might be the exact delta (a perfect match), or slightly over it.
+                if (it != p2v.end())
+                {
+                    int p2Sum = *it;
+                    int sum1 = p1Sum + p2Sum;   // Sum of Partition A
+                    int sum2 = totalSum - sum1; // Sum of Partition B
+                    minDiff = min(minDiff, abs(sum1 - sum2));
+                }
+
+                // Case B: Element strictly < delta
+                // What if the element slightly UNDER delta was actually a closer match
+                // than the one slightly OVER delta? We must check the previous element.
+                if (it != p2v.begin())
+                {
+                    auto prevIt = prev(it); // Look one step back
+                    int p2Sum = *prevIt;
+                    int sum1 = p1Sum + p2Sum;   // Sum of Partition A
+                    int sum2 = totalSum - sum1; // Sum of Partition B
+                    minDiff = min(minDiff, abs(sum1 - sum2));
+                }
+            }
+        }
+
+        return minDiff;
+    }
+};
+
 int main()
 {
     return 0;

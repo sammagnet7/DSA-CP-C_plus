@@ -322,4 +322,4 @@
 1. [Minimum Pair Removal to Sort Array II](https://leetcode.com/problems/minimum-pair-removal-to-sort-array-ii/description/)
 2. [Separate Squares II](https://leetcode.com/problems/separate-squares-ii/description/)
 3. [Minimum Cost to Convert String II](https://leetcode.com/problems/minimum-cost-to-convert-string-ii/description/?envType=daily-question&envId=2026-01-30)
-4. 
+4. [Minimum Operations to Equalize Binary String](https://leetcode.com/problems/minimum-operations-to-equalize-binary-string/description/)
