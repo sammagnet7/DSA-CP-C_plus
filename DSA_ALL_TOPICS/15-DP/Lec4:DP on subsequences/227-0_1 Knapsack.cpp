@@ -22,8 +22,8 @@ using namespace std;
 
 Links:
 https://takeuforward.org/data-structure/0-1-knapsack-dp-19/
-https://www.youtube.com/watch?v=GqOmJHQZivw&list=PLgUwDviBIf0qUlt5H_kiKYaNSqJ81PMMY&index=22
-https://www.naukri.com/code360/problems/0-1-knapsack_920542?leftPanelTabValue=PROBLEM
+https://www.youtube.com/watchv=GqOmJHQZivw&list=PLgUwDviBIf0qUlt5H_kiKYaNSqJ81PMMY&index=22
+https://www.naukri.com/code360/problems/0-1-knapsack_920542leftPanelTabValue=PROBLEM
 
 
 Problem statement:
@@ -78,8 +78,8 @@ public:
         1. Recursive definition:
            - We consider items from index `idx` down to 0.
            - For each item, we have two choices:
-                a) Exclude it ? move to the next item (idx-1) without reducing capacity.
-                b) Include it ? add its value and reduce capacity by its weight.
+                a) Exclude it  move to the next item (idx-1) without reducing capacity.
+                b) Include it  add its value and reduce capacity by its weight.
            - Take the maximum of these two choices.
 
         2. Memoization:
@@ -168,13 +168,13 @@ public:
            - Start by filling the first row (i = 0) for all capacities >= weight[0].
              For these capacities, the best value is simply value[0].
            - For each subsequent item:
-                a) Exclude it ? value remains dp[i-1][w].
-                b) Include it ? value is value[i] + dp[i-1][w - weight[i]].
+                a) Exclude it  value remains dp[i-1][w].
+                b) Include it  value is value[i] + dp[i-1][w - weight[i]].
              Take the maximum of these two choices.
 
         2. Iterative filling:
-           - Outer loop ? items (index from 1 to n-1).
-           - Inner loop ? capacities (1 to maxWeight).
+           - Outer loop  items (index from 1 to n-1).
+           - Inner loop  capacities (1 to maxWeight).
            - This ensures subproblems are solved before being used.
 
         Time Complexity:
@@ -184,7 +184,7 @@ public:
 
         Space Complexity:
         -----------------
-        O(n * maxWeight) ? DP table storing all subproblem results.
+        O(n * maxWeight)  DP table storing all subproblem results.
 
     ===============================================================================
     */
@@ -246,8 +246,8 @@ public:
         ---------
         1. Bottom-Up Dynamic Programming (Space Optimized):
            - Instead of storing all n rows in a DP table, we only keep two 1D arrays:
-                prev[w] ? results for previous item index
-                cur[w]  ? results for current item index
+                prev[w] results for previous item index
+                cur[w]  results for current item index
            - This works because dp[i][w] only depends on dp[i-1][*] (the previous row).
 
         2. Initialization:
@@ -255,8 +255,8 @@ public:
 
         3. Iterative filling:
            - For each item index `idx` from 1 to N-1:
-                a) Choice 1: Exclude current item ? max value is prev[w].
-                b) Choice 2: Include current item (if it fits) ? value[idx] + prev[w - weight[idx]].
+                a) Choice 1: Exclude current item  max value is prev[w].
+                b) Choice 2: Include current item (if it fits)  value[idx] + prev[w - weight[idx]].
                 c) Store the best in cur[w].
            - After processing current item, set prev = cur for the next iteration.
 
@@ -267,7 +267,7 @@ public:
 
         Space Complexity:
         -----------------
-        O(maxWeight) ? Only two arrays of size maxWeight+1 are used.
+        O(maxWeight) Only two arrays of size maxWeight+1 are used.
 
     ===============================================================================
     */
@@ -285,8 +285,8 @@ public:
     {
         int N = weight.size();
 
-        // prev ? results for previous item
-        // cur  ? results for current item
+        // prev results for previous item
+        // cur  results for current item
         vector<int> prev(maxWeight + 1, 0), cur(maxWeight + 1, 0);
 
         // Base case: first item
@@ -344,8 +344,8 @@ public:
         3. Iterative filling:
            - For each subsequent item index `idx`:
                 a) Iterate sackSize from maxWeight down to 1.
-                b) Choice 1: Exclude current item ? value remains prev[w].
-                c) Choice 2: Include current item (if it fits) ? value[idx] + prev[w - weight[idx]].
+                b) Choice 1: Exclude current item  value remains prev[w].
+                c) Choice 2: Include current item (if it fits)  value[idx] + prev[w - weight[idx]].
                 d) Take the maximum and store back in prev[w].
 
         Time Complexity:
@@ -355,7 +355,7 @@ public:
 
         Space Complexity:
         -----------------
-        O(maxWeight) ? Single array of size maxWeight+1.
+        O(maxWeight)  Single array of size maxWeight+1.
 
     ===============================================================================
     */

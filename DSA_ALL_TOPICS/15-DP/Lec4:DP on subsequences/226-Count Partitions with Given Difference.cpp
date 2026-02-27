@@ -26,12 +26,6 @@ https://www.youtube.com/watch?v=zoilQD1kYSg
 https://takeuforward.org/plus/dsa/problems/count-partitions-with-given-difference?tab=editorial
 https://www.naukri.com/code360/problems/partitions-with-given-difference_3751628?leftPanelTabValue=PROBLEM
 
-Similar question:
-Target Sum (DP - 21) : follow exact similar approach
-    https://takeuforward.org/data-structure/target-sum-dp-21/
-    https://takeuforward.org/plus/dsa/problems/target-sum?tab=editorial
-    https://leetcode.com/problems/target-sum/description/
-
 
 Problem statement:
 Given an array ‘ARR’, partition it into two subsets (possibly empty) such that their union is the original array. Let the sum of the elements of these two subsets be ‘S1’ and ‘S2’.
@@ -60,13 +54,45 @@ INPUT::::::
 OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
-
-2. Title:
+Similar question:
+2. Title: Target Sum
 
 Links:
+    https://takeuforward.org/data-structure/target-sum-dp-21/
+    https://takeuforward.org/plus/dsa/problems/target-sum?tab=editorial
+    https://leetcode.com/problems/target-sum/description/
 
 
 Problem statement:
+You are given an integer array nums and an integer target.
+
+You want to build an expression out of nums by adding one of the symbols '+' and '-' before each integer in nums and then concatenate all the integers.
+
+For example, if nums = [2, 1], you can add a '+' before 2 and a '-' before 1 and concatenate them to build the expression "+2-1".
+Return the number of different expressions that you can build, which evaluates to target.
+
+
+
+Example 1:
+    Input: nums = [1,1,1,1,1], target = 3
+    Output: 5
+    Explanation: There are 5 ways to assign symbols to make the sum of nums be target 3.
+    -1 + 1 + 1 + 1 + 1 = 3
+    +1 - 1 + 1 + 1 + 1 = 3
+    +1 + 1 - 1 + 1 + 1 = 3
+    +1 + 1 + 1 - 1 + 1 = 3
+    +1 + 1 + 1 + 1 - 1 = 3
+
+Example 2:
+    Input: nums = [1], target = 1
+    Output: 1
+
+
+Constraints:
+1 <= nums.length <= 20
+0 <= nums[i] <= 1000
+0 <= sum(nums[i]) <= 1000
+-1000 <= target <= 1000
 
 
 INPUT::::::
@@ -77,250 +103,221 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Count Partitions with Given Difference
+//-------------------------------------------------------------------------------
+
+/**
+ * Problem: Count Partitions with Given Difference
+ * -----------------------------------------------
+ * Approach: Math + 0/1 Knapsack (Top-Down DP / Memoization)
+ *
+ * Mathematical Derivation:
+ * Let the array be divided into two subsets: S1 and S2.
+ * We are given:
+ * 1. S1 - S2 = d      (The difference between subsets is d)
+ * 2. S1 + S2 = tot    (The sum of both subsets equals the total array sum)
+ * * Subtracting equation 1 from equation 2:
+ * (S1 + S2) - (S1 - S2) = tot - d
+ * 2 * S2 = tot - d
+ * S2 = (tot - d) / 2
+ *
+ * Conclusion:
+ * The problem reduces to finding how many subsets in the array sum up to exactly S2.
+ *
+ * Complexity Analysis:
+ * --------------------
+ * Time Complexity: O(N * target)
+ * Space Complexity: O(N * target) for DP table + O(N) for recursion stack.
+ */
+
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
 class Solution
 {
-public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Count Partitions with Given Difference
-    //-------------------------------------------------------------------------------
+private:
     int modulo = 1e9 + 7;
 
-    // ----------
-    // Approach1
-    // ----------
-
-    /*
-    Function: recCount
-    ------------------
-    A recursive + memoization function to count the number of ways to partition an array
-    into two subsets such that the difference between their sums is exactly `d`.
-
-    Parameters:
-        arr     - The input array of integers.
-        dp      - 2D memoization table where dp[idx][curSum] stores the computed result for
-                  state (idx, curSum).
-        d       - Desired difference between subset sums.
-        tot     - Total sum of the array elements.
-        idx     - Current index being considered in the recursion.
-        prevSum - Sum of the chosen elements so far in the recursion path.
-
-    Returns:
-        Number of valid partitions from index `idx` onwards that meet the given difference `d`.
-
-    Time Complexity:
-        O(n * tot)
-        - n = arr.size()
-        - tot = total sum of array
-        For each index, we compute results for possible `curSum` values up to `tot`.
-
-    Space Complexity:
-        O(n * tot) for the `dp` table, plus O(n) recursion stack depth.
-*/
-    int recDiffCount(vector<int> &arr, vector<vector<int>> &dp, int d, int tot, int idx, long long prevSum)
-    {
-        /* Base case: If we have processed all elements, no further partitions possible */
-        if (idx == arr.size())
-            return 0;
-
-        /* Calculate current sum by including arr[idx] in the chosen subset */
-        int curSum = prevSum + arr[idx];
-
-        /* If already computed for this state, return stored value */
-        if (dp[idx][curSum] != -1)
-            return dp[idx][curSum];
-
-        int ret = 0;
-
-        /* If the current partition satisfies (sum(S1) - sum(S2) = d), count this as a valid way */
-        if ((2 * curSum - tot) == d)
-        {
-            ret = 1;
-        }
-
-        /* Choice 1: Skip current element */
-        ret += recDiffCount(arr, dp, d, tot, idx + 1, prevSum);
-
-        /* Choice 2: Include current element */
-        ret += recDiffCount(arr, dp, d, tot, idx + 1, prevSum + arr[idx]);
-
-        /* Store and return result modulo `modulo` constant */
-        return dp[idx][curSum] = ret % modulo;
-    }
-
-    /*
-        Function: countPartitions
-        -------------------------
-        Computes the total number of partitions of the array into two subsets
-        whose difference in sum equals `d`.
-
-        Parameters:
-            n   - Number of elements in the array.
-            d   - Desired difference between subset sums.
-            arr - The input array.
-
-        Returns:
-            Number of valid partitions.
-
-        Time Complexity:
-            O(n * tot) — where `tot` is total sum of elements.
-
-        Space Complexity:
-            O(n * tot) — for memoization table.
-    */
-    int countPartitions(int n, int d, vector<int> &arr)
-    {
-        long long tot = 0;
-
-        /* Compute total sum of array elements */
-        for (int el : arr)
-        {
-            tot += el;
-        }
-
-        /* Initialize memoization table with -1 (uncomputed states) */
-        vector<vector<int>> dp(arr.size(), vector<int>(tot + 1, -1));
-
-        /* Start recursion from index 0 with initial sum 0 */
-        return recDiffCount(arr, dp, d, tot, 0, 0);
-    }
-
-    // ----------
-    // Approach2
-    // ----------
-
-    /*
-        Function: recCount
-        ------------------
-        A recursive + memoization approach to count the number of subsets
-        from the given array that sum up to the target value.
-
-        Special handling is done for index == 0 to correctly count subsets
-        when the first element is zero (because zero can be included or excluded
-        without changing the sum, giving multiple ways).
-
-        Approach:
-            - If index == 0: handle as base case (taking care of zeros explicitly).
-            - If target < 0: no valid subset possible.
-            - Otherwise, recursively explore two choices:
-                1. Skip the current element (noTake)
-                2. Include the current element (take)
-            - Use memoization table dp[index][target] to store computed results
-              to avoid recomputation.
-            - Apply modulo to prevent integer overflow.
-
-        Time Complexity:
-            O(n * target)
-            - n: number of elements
-            - target: desired subset sum
-            Each state (index, target) is computed at most once.
-
-        Space Complexity:
-            O(n * target) for dp table + O(n) recursion stack space.
-
-        Parameters:
-            arr    : input array of integers
-            dp     : memoization table initialized with -1
-            target : required sum to achieve
-            index  : current index in the array
-
-        Returns:
-            Number of subsets (modulo 'modulo') that sum up to 'target'.
-    */
+    /**
+     * Method: recCount
+     * ----------------
+     * Recursive helper function to count subsets that sum to 'target'.
+     *
+     * WHY WE GO DOWN TO (index < 0):
+     * You might wonder: "If target == 0, why not just return 1 immediately?"
+     * If all elements were strictly > 0, we absolutely could! However, this array
+     * can contain 0s.
+     * * If we reach target == 0 but still have a '0' left at index 0, there are actually
+     * TWO valid subsets: one where we pick the '0', and one where we skip it. If we
+     * stopped early, we would only count it as one subset. By forcing the recursion
+     * to evaluate every element until the array is fully exhausted (index < 0), we
+     * ensure all permutations involving zeros are perfectly counted.
+     */
     int recCount(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
     {
-        /* Base case: if we are at the first element (index == 0) */
-        if (index == 0)
+        /* Base Case 1: Array fully exhausted */
+        if (index < 0)
         {
-            /* Case 1: If target == 0 and arr[0] == 0, two valid subsets: {} and {0} */
-            if (target == 0 && arr[0] == 0)
-                return dp[index][target] = 2;
-            /* Case 2: If target == 0 (arr[0] != 0), only {} works */
             if (target == 0)
-                return dp[index][target] = 1;
-            /* Case 3: If target equals arr[0], only {arr[0]} works */
-            if (target == arr[0])
-                return dp[index][target] = 1;
-            /* Otherwise: no valid subset */
-            else
-                return 0;
+            {
+                return 1; // Valid subset found
+            }
+            return 0; // Invalid subset
         }
 
-        /* If target becomes negative -> invalid path */
+        /* Base Case 2: Overshot the target */
         if (target < 0)
+        {
             return 0;
+        }
 
-        /* Check if result already computed */
+        /* Memoization Check: Return cached result if already computed */
         if (dp[index][target] != -1)
+        {
             return dp[index][target];
+        }
 
-        /* Choice 1: Skip current element */
+        /* Choice 1: Skip current element (target remains unchanged) */
         int noTake = recCount(arr, dp, target, index - 1);
 
-        /* Choice 2: Include current element */
+        /* Choice 2: Include current element (subtract its value from target) */
         int take = recCount(arr, dp, target - arr[index], index - 1);
 
-        /* Store and return result (modulo applied) */
+        /* Store the result in DP table and apply modulo to prevent overflow */
         return dp[index][target] = (take + noTake) % modulo;
     }
 
-    /*
-        Function: countPartitions
-        -------------------------
-        Given an array and a difference 'd', counts the number of ways to split
-        the array into two subsets such that the absolute difference of their sums
-        equals 'd'.
-
-        Approach:
-            - Let total sum = sum(arr)
-            - Partition problem can be transformed to finding number of subsets
-              with sum = (total - d) / 2
-            - If (total - d) is odd, no valid partitions exist
-            - Use recCount() to count the number of subsets of sum = (total - d)/2
-
-        Time Complexity:
-            O(n * subsetSum) where subsetSum = (total - d)/2
-
-        Space Complexity:
-            O(n * subsetSum) for dp table + recursion stack space O(n)
-
-        Parameters:
-            n   : number of elements
-            d   : required difference
-            arr : input array
-
-        Returns:
-            Number of valid partitions.
-    */
+public:
+    /**
+     * Method: countPartitions
+     * -----------------------
+     * Prepares the math formulas, validates constraints, and sets up
+     * the DP table for the recursive subset-sum function.
+     */
     int countPartitions(int n, int d, vector<int> &arr)
     {
-
         long long tot = 0;
 
-        /* Compute total sum of array */
+        /* Step 1: Compute total sum of the array */
         for (int el : arr)
         {
             tot += el;
         }
 
-        /* Step 2: Check if (tot - d) is valid for subset sum formulation
-        - If negative: impossible since d is too large in magnitude.
-        - If odd: impossible because sum difference must be even. */
+        /* Step 2: Validate if a partition is mathematically possible
+           - Condition A: (tot - d) < 0 -> Impossible to have a difference larger than total sum.
+           - Condition B: (tot - d) % 2 != 0 -> Difference must allow for an integer subset sum. */
         if ((tot - d) < 0 || (tot - d) % 2 != 0)
+        {
             return 0;
+        }
 
-        /* Target subset sum for one partition */
+        /* Step 3: Calculate the target subset sum for one of the partitions */
         int subsetSum = abs(tot - d) / 2;
 
-        /* Initialize dp table with -1 */
+        /* Step 4: Initialize DP table with -1 (uncomputed states) */
         vector<vector<int>> dp(n, vector<int>(subsetSum + 1, -1));
 
-        /* Count number of subsets with sum = subsetSum */
+        /* Step 5: Start recursion from the last index looking for 'subsetSum' */
         return recCount(arr, dp, subsetSum, n - 1);
     }
+};
 
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Target sum
+//-------------------------------------------------------------------------------
+
+/**
+ * Problem: 494. Target Sum
+ * ------------------------
+ * Approach: Math Reduction + Iterative DP (Bottom-Up Tabulation)
+ * * Mathematical Derivation:
+ * Let S1 be the subset of numbers assigned '+' and S2 be the subset assigned '-'.
+ * 1. S1 - S2 = target
+ * 2. S1 + S2 = totalSum
+ * Adding them: 2 * S1 = totalSum + target  =>  S1 = (totalSum + target) / 2
+ * * We just need to find the number of subsets (S1) that sum to 'targetSum'.
+ * * Key Takeaways & Edge Cases Handled:
+ * 1. Negative Targets: The constraints say target can be down to -1000.
+ * This doesn't break our array indexing because the validation check uses `abs(target)`.
+ * Since `totalSum >= abs(target)`, the numerator `(totalSum + target)` is mathematically
+ * guaranteed to be >= 0. Thus, `targetSum` will NEVER be negative.
+ * 2. Zero Elements: If the array contains 0s, picking or not picking a 0 both yield
+ * the same sum but represent TWO distinct valid choices. Starting loops at sum=0
+ * and using `+=` during initialization ensures these are counted perfectly.
+ * * Complexity:
+ * Time: O(N * targetSum)
+ * Space: O(N * targetSum) for the 2D DP matrix.
+ */
+class Solution
+{
+public:
+    int findTargetSumWays(vector<int> &nums, int target)
+    {
+
+        int N = nums.size();
+
+        // Step 1: Compute total sum
+        int totalSum = accumulate(nums.begin(), nums.end(), 0);
+
+        // Step 2: Validate if partition is possible
+        // Note: totalSum < abs(target) guarantees our calculated targetSum won't be negative!
+        if (totalSum < abs(target) || (totalSum + target) % 2 != 0)
+        {
+            return 0;
+        }
+
+        // The exact subset sum we need to find
+        int targetSum = (totalSum + target) / 2;
+
+        // Step 3: Initialize DP table
+        // dp[i][j] = number of ways to make sum 'j' using elements from index 0 to 'i'
+        vector<vector<int>> dp(N, vector<int>(targetSum + 1, 0));
+
+        // Step 4: Base Case Initialization (0th row)
+        dp[0][0] = 1; // Note: 1 way to make sum 0 (by picking nothing)
+
+        if (nums[0] <= targetSum)
+        {
+            // Note: We use += 1 instead of = 1 here. Don't assign blindly!
+            // If nums[0] is 0, dp[0][0] becomes 1 + 1 = 2.
+            // This elegantly handles the case where the first element is a 0
+            // (1 way to not take it, 1 way to take it).
+            dp[0][nums[0]] += 1;
+        }
+
+        // Step 5: Fill the DP table
+        for (int idx = 1; idx < N; ++idx)
+        {
+
+            // Note: MUST start with sum == 0, not sum == 1.
+            // If nums[idx] == 0, we need the 0th column to update correctly
+            // so the number of ways doubles (take the 0 vs don't take the 0).
+            for (int sum = 0; sum <= targetSum; ++sum)
+            {
+
+                int take = 0;
+
+                // Choice 1: Do not include the current number
+                int notTake = dp[idx - 1][sum];
+
+                // Choice 2: Include the current number (if it fits)
+                if (nums[idx] <= sum)
+                {
+                    take = dp[idx - 1][sum - nums[idx]];
+                }
+
+                // Total ways is the sum of both choices
+                dp[idx][sum] = take + notTake;
+            }
+        }
+
+        // Return the bottom-right corner of the DP matrix
+        return dp[N - 1][targetSum];
+    }
 };
 
 int main()

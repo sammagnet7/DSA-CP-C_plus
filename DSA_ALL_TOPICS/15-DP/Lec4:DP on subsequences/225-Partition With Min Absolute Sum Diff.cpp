@@ -623,25 +623,42 @@ public:
     int minimumDifference(vector<int> &nums)
     {
 
+        // ==========================================
+        // STEP 1: Initialization & Array Splitting
+        // ==========================================
+        // TC: O(N) where N is the total number of elements.
+        // SC: O(N) to store part1 and part2.
+
         int N = nums.size();
-        int n = N / 2; // Size of one half
+        int n = N / 2; // 'n' is exactly half of the array (max 15)
 
+        // accumulate requires <numeric>. It sums all elements in O(N) time.
         int totalSum = accumulate(nums.begin(), nums.end(), 0);
-        int targetSum = totalSum / 2; // The "Perfect Balance" point
+        int targetSum = totalSum / 2; // We want each partition to be as close to this as possible
 
-        // Step 1: Split the array physically into two halves
+        // Physically split the array into two halves
         vector<int> part1(nums.begin(), nums.begin() + n);
         vector<int> part2(nums.begin() + n, nums.end());
 
-        // part1Sums[k] will store all sums made by picking exactly 'k' elements from Part1
+        // ==========================================
+        // STEP 2: Subset Sum Generation
+        // ==========================================
+        // TC: O(n * 2^n) because we check 'n' bits for 2^n states, twice.
+        // SC: O(2^n) to store all possible sum combinations.
+
         vector<vector<int>> part1Sums(n + 1);
         vector<vector<int>> part2Sums(n + 1);
 
-        // Step 2: Generate all subsets for both halves
         generateAllSubsetSums(part1, part1Sums);
         generateAllSubsetSums(part2, part2Sums);
 
-        // Step 3: Sort Part2 subsets to enable binary search (lower_bound) later
+        // ==========================================
+        // STEP 3: Sort Right Half (Part 2) Sums
+        // ==========================================
+        // TC: O(n * 2^n) overall. The max size of a single bucket is nCr(n, n/2).
+        // Sorting takes O(K log K) where K is bucket size. Summing this up is bounded by O(n * 2^n).
+        // SC: O(1) auxiliary space for in-place sorting.
+
         for (auto &v : part2Sums)
         {
             sort(v.begin(), v.end());
@@ -649,47 +666,55 @@ public:
 
         int minDiff = INT_MAX;
 
-        // Step 4: Stitch the two halves together
-        // elCountP1 is the number of elements we are currently picking from Part1
+        // ==========================================
+        // STEP 4: Meet-in-the-Middle (Binary Search)
+        // ==========================================
+        // TC: O(n * 2^n). There are exactly 2^n elements in part1Sums across all buckets.
+        // For each element, we do a binary search (lower_bound) taking O(log K) <= O(n) time.
+        // SC: O(1) auxiliary space (just integer variables).
+
+        // Loop over the number of elements picked from Part 1
         for (int elCountP1 = 0; elCountP1 <= n; ++elCountP1)
         {
 
-            // If we pick 'elCountP1' from Part1, we MUST pick 'elCountP2' from Part2
-            // so that the total elements in our partition equals exactly 'n'.
+            // If we pick 'elCountP1' elements from Part 1,
+            // we MUST pick exactly 'elCountP2' from Part 2 to make a total of 'n' elements.
             int elCountP2 = n - elCountP1;
 
             vector<int> &p1v = part1Sums[elCountP1];
             vector<int> &p2v = part2Sums[elCountP2];
 
-            // Iterate through every possible sum we generated from Part1 using 'elCountP1' elements
+            // Try every generated sum from Part 1
             for (int p1Sum : p1v)
             {
 
-                // What sum do we desperately need from Part2 to reach the Perfect Balance?
+                // Delta is the exact value we need from Part 2 to reach the optimal 'targetSum'
                 int delta = targetSum - p1Sum;
 
-                // Find the first sum in Part2 that is >= delta
+                // Binary Search: Find the first element in Part 2 that is >= delta
                 auto it = lower_bound(p2v.begin(), p2v.end(), delta);
 
-                // Case A: Element found is >= delta
-                // This might be the exact delta (a perfect match), or slightly over it.
+                // Case A: We found an element >= delta
                 if (it != p2v.end())
                 {
                     int p2Sum = *it;
                     int sum1 = p1Sum + p2Sum;   // Sum of Partition A
                     int sum2 = totalSum - sum1; // Sum of Partition B
+
+                    // Update global minimum difference
                     minDiff = min(minDiff, abs(sum1 - sum2));
                 }
 
-                // Case B: Element strictly < delta
-                // What if the element slightly UNDER delta was actually a closer match
-                // than the one slightly OVER delta? We must check the previous element.
+                // Case B: Check the element strictly < delta
+                // The element right before our iterator might actually be closer to the target!
                 if (it != p2v.begin())
                 {
-                    auto prevIt = prev(it); // Look one step back
+                    auto prevIt = prev(it); // Look one position back
                     int p2Sum = *prevIt;
                     int sum1 = p1Sum + p2Sum;   // Sum of Partition A
                     int sum2 = totalSum - sum1; // Sum of Partition B
+
+                    // Update global minimum difference
                     minDiff = min(minDiff, abs(sum1 - sum2));
                 }
             }

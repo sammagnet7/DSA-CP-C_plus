@@ -106,43 +106,48 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Minimum Coins
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Minimum Coins
-    //-------------------------------------------------------------------------------
-
     // Approach 1: Greedy [FAILS]
     // This approach is FAILING for test case #52
-    // beacuse alway substracting with the hishest possible substractor may not be perfect always
+    // beacuse alway substracting with the highest possible substractor may not be perfect always
     // some unexpected smaller numbers we can be left with
-    // int coinChange(vector<int>& coins, int amount) {
-    //     sort(coins.begin(), coins.end());
+    int coinChange(vector<int> &coins, int amount)
+    {
+        sort(coins.begin(), coins.end());
 
-    //     int i=coins.size()-1;
-    //     int count=0;
+        int i = coins.size() - 1;
+        int count = 0;
 
-    //     while(amount>0 && i>=0){
-    //         if(coins[i] > amount){
-    //             i--;
-    //             continue;
-    //         }
-    //         if(amount%coins[i]==0){
-    //             int q = amount/coins[i];
-    //             amount = amount - (q*coins[i]);
-    //             count += q;
-    //         }
-    //         else{
-    //             count++;
-    //             amount -= coins[i];
-    //         }
-    //     }
+        while (amount > 0 && i >= 0)
+        {
+            if (coins[i] > amount)
+            {
+                i--;
+                continue;
+            }
+            if (amount % coins[i] == 0)
+            {
+                int q = amount / coins[i];
+                amount = amount - (q * coins[i]);
+                count += q;
+            }
+            else
+            {
+                count++;
+                amount -= coins[i];
+            }
+        }
 
-    //     if(amount==0)
-    //         return count;
-    //     else return -1;
-    // }
+        if (amount == 0)
+            return count;
+        else
+            return -1;
+    }
 
     /*
     ===============================================================================
@@ -308,7 +313,7 @@ public:
         {
             if (amount % coins[0] == 0)
             {
-                dp[0][amount] = amount / coins[0]; // exact multiple possible
+                dp[0][amount] = amount / coins[0]; // exact multiple possible ** Note here **
             }
         }
 
@@ -336,103 +341,91 @@ public:
         // If no solution, return -1
         return dp[N - 1][totAmount] == 1e9 ? -1 : dp[N - 1][totAmount];
     }
+};
 
-    //-------------------------------------------------------------------------------
-    // 2. Title: Coin Change 2 (DP - 22)
-    //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Coin Change 2 (DP - 22)
+//-------------------------------------------------------------------------------
 
-    /*
-    Method: recCount
-    ----------------
-    Recursively counts the number of ways to form a given target sum
-    using coins (or array elements) with unlimited supply (unbounded knapsack).
-
-    Parameters:
-        arr    - reference to array of coin values
-        dp     - memoization table where dp[i][t] stores the number of ways
-                 to make sum 't' using coins[0..i]
-        target - remaining sum to achieve
-        index  - current index in arr
-
-    Returns:
-        int - number of ways to make 'target' sum from arr[0..index]
-
-    Time Complexity:
-        O(N * target) — Each state (index, target) is computed once due to memoization.
-
-    Space Complexity:
-        O(N * target) for dp table +
-        O(N) recursion call stack in worst case.
-*/
+class Solution
+{
+public:
+    /**
+     * Recursive helper function using Top-Down Dynamic Programming (Memoization).
+     * This models an "Unbounded Knapsack" problem where each item (coin)
+     * can be selected an infinite number of times.
+     *
+     * @param arr    Reference to the array of available coins.
+     * @param dp     2D memoization table to cache computed subproblem results.
+     * @param target The remaining amount we need to form.
+     * @param index  The current coin denomination we are considering.
+     * @return       The total number of valid combinations for this state.
+     */
     int recCount(vector<int> &arr, vector<vector<int>> &dp, int target, int index)
     {
-        /* Base case: only one type of coin available (index == 0) */
-        if (index == 0)
+        // --- BASE CASES ---
+
+        // 1. Target Achieved: We successfully reduced the amount to exactly 0.
+        // This represents 1 valid combination of coins.
+        if (target == 0)
         {
-            // Case 1: If target is 0 and coin value is also 0 → two possibilities:
-            //         include it or exclude it
-            if (target == 0 && arr[0] == 0)
-                return dp[index][target] = 2;
+            return 1;
+        }
 
-            // Case 2: If target is 0 → only one possibility: take nothing
-            if (target == 0)
-                return dp[index][target] = 1;
-
-            // Case 3: If target is divisible by coin value → can take multiple coins of same value
-            if (target % arr[0] == 0)
-                return dp[index][target] = 1;
-
-            // Case 4: Otherwise no way to make target
+        // 2. Overshot Target: The last coin picked was too large.
+        // This is an invalid combination, so we return 0 ways.
+        if (target < 0)
+        {
             return 0;
         }
 
-        /* If target becomes negative → invalid path */
-        if (target < 0)
+        // 3. Exhausted Coins: We ran out of coin denominations to try,
+        // but the target is still greater than 0.
+        if (index < 0)
+        {
             return 0;
+        }
 
-        /* If already computed → return stored value */
+        // --- MEMOIZATION CHECK ---
+
+        // If this specific state (current coin index + remaining target)
+        // has been calculated in a previous recursive branch, return it immediately.
         if (dp[index][target] != -1)
+        {
             return dp[index][target];
+        }
 
-        /* Choice 1: Do not take current coin (move to smaller index) */
+        // --- STATE TRANSITIONS (The Core Logic) ---
+
+        // CHOICE 1: "No Take" (Skip the current coin)
+        // We decide to not use the coin at 'index' at all.
+        // The target stays the same, and we move to the next coin (index - 1).
         int noTake = recCount(arr, dp, target, index - 1);
 
-        /* Choice 2: Take current coin (stay at same index, target decreases) */
-        int take = recCount(arr, dp, target - arr[index], index);
+        // CHOICE 2: "Take" (Use the current coin)
+        // We subtract the coin's value from the target.
+        // CRITICAL: We pass 'index' (not index - 1) down the recursion tree.
+        // Because we have infinite coins, we stay on the same coin to potentially use it again.
+        int take = 0;
+        if (target >= arr[index])
+        { // Minor optimization: only branch if the coin actually fits
+            take = recCount(arr, dp, target - arr[index], index);
+        }
 
-        /* Store and return total ways */
+        // Store the sum of both decision branches into the DP table and return it.
         return dp[index][target] = (take + noTake);
     }
 
-    /*
-        Method: change
-        --------------
-        Solves the Coin Change II problem: count the number of combinations
-        to make a given 'amount' using unlimited supply of given coins.
-
-        Parameters:
-            amount - target amount to make
-            coins  - vector of coin denominations
-
-        Returns:
-            int - number of distinct combinations
-
-        Time Complexity:
-            O(N * amount) — where N is number of coins.
-
-        Space Complexity:
-            O(N * amount) for dp table +
-            O(N) recursion stack space due to calls to recCount.
-    */
     int change(int amount, vector<int> &coins)
     {
-
         int N = coins.size();
 
-        // dp[i][t] → number of ways to make sum 't' using coins[0..i]
+        // Initialize the 2D DP memoization table.
+        // dp[i][t] maps to: ways to make sum 't' using coins from index 0 up to 'i'.
+        // We fill it with -1 to differentiate between "0 ways" and "uncomputed".
         vector<vector<int>> dp(N, vector<int>(amount + 1, -1));
 
-        // Call recursive helper to count combinations
+        // Start the recursion tree from the last coin index, looking for the full amount.
         return recCount(coins, dp, amount, N - 1);
     }
 };
