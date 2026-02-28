@@ -1128,5 +1128,6 @@ bool wrong = static_cast<bool>('0'); // Result: true
 49. How to compare nCr with terms with power of 2?
     - Ans: `n chose n/2`, this complexity rougly equivalent to `4^(n/2) = 2^n`. 
     - [source](https://en.wikipedia.org/wiki/Central_binomial_coefficient)
-50. 
+50. In **recursion** or **DP** while doing substraction remember to add the `MOD` value before `%MOD`, to get rid of wrong `-ve` value cause by modular arithmatic.
+51. 
 ---

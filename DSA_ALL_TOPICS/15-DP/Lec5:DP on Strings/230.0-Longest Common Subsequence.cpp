@@ -86,12 +86,12 @@ Similar quetion:
 
         Sol: If we know the LCS length, then:
             - The characters not in LCS must be deleted from both strings to match word1 and word2.
-            - or we can say to make word1 same as word2 
+            - or we can say to make word1 same as word2
                 - first remove (len(word1) - LCS) chars from word1
                 - then insert (len(word2) - LCS) chars from word2 to word1
                 - Total Required operations: (len(word1) - LCS) + (len(word2) - LCS)
 
-4) From Leetcoe daily: https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/description/?envType=daily-question&envId=2026-01-10
+4) From Leetcoe daily: https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/description
 
 
 ----------------------------------------------------------------------------------------------------
@@ -124,25 +124,21 @@ Sample Input 1:
 ababa
 cbbcad
 
-
 Expected Answer:
 "bba"
-
 Output on console:
 1
-
 Explanation of sample output 1:
 “bba” is only possible longest subsequence present in both s1 = “ababa” and s2 = “cbbcad”. '1' is printed if the returned string is equal to "bba".
+
 Sample Input 2:
 3 3
 xyz
 abc
-
 Expected Answer:
 ""
 Output on console:
 1
-
 Explanation of sample output 2:
 There’s no subsequence of ‘s1’ that is also present in ‘s2’. Thus an empty string is returned and '1' is printed.
 
@@ -166,9 +162,9 @@ public:
     // 1. Title: Longest Common Subsequence
     //-------------------------------------------------------------------------------
 
-    // -----------------
-    // Approach 1
-    // ----------------
+    // ---------------------------
+    // Approach 1: Recursive
+    // --------------------------
 
     /*
         Method: recCountSubseq
@@ -218,7 +214,7 @@ public:
             int takeBoth = 1 + recCountSubseq(idx1 - 1, idx2 - 1, text1, text2, dp);
             maxCount = takeBoth;
         }
-        else
+        else // Note: if current match found no need to check the others
         {
             // Characters don't match → try both possibilities and take the maximum
             int skipText1 = recCountSubseq(idx1 - 1, idx2, text1, text2, dp);
@@ -263,9 +259,9 @@ public:
         return recCountSubseq(N1 - 1, N2 - 1, text1, text2, dp);
     }
 
-    // -----------------
-    // Approach 2
-    // ----------------
+    // -------------------------
+    // Approach 2: Iterative
+    // ------------------------
 
     /*
         Method: longestCommonSubsequence
@@ -331,7 +327,7 @@ public:
                     // Characters match → extend the LCS from dp[i-1][j-1]
                     dp[i][j] = dp[i - 1][j - 1] + 1;
                 }
-                else
+                else // Note: if current match found no need to check the others
                 {
                     // Characters don't match → skip from either text1 or text2
                     dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
@@ -347,10 +343,9 @@ public:
     // 2. Title: Print Longest Common Subsequence | (DP - 26)
     //-------------------------------------------------------------------------------
 
-    // -----------------
-    // Approach 1
-    // ----------------
-
+    // -----------------------
+    // Approach 1 : Recursive
+    // ----------------------
 
     /*
         Helper Method: recCountSubseq
@@ -483,9 +478,9 @@ public:
         return matchCS;
     }
 
-    // -----------------
-    // Approach 2
-    // ----------------
+    // -----------------------
+    // Approach 2 : Iterative
+    // ----------------------
 
     /*
      Method: findLCS

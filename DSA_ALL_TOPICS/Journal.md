@@ -299,7 +299,7 @@
 ---
 
 ### Revisit:
-1. [text](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
+1. [frequency-of-the-most-frequent-element](https://leetcode.com/problems/frequency-of-the-most-frequent-element/description/)
 2. [check if rotated-array sorted](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/)
 3. [next permutation](https://leetcode.com/problems/next-permutation/description/)
 4. [longest consecutive sequence](https://leetcode.com/problems/longest-consecutive-sequence/description/)
@@ -312,6 +312,8 @@
 11. [Maximum Profit in Job Scheduling [with Fixed Start & End Times]](https://leetcode.com/problems/maximum-profit-in-job-scheduling/)
 12. [Minimum Cost Path with Teleportations](https://leetcode.com/problems/minimum-cost-path-with-teleportations/description/)
 13. [Trionic Array II](https://leetcode.com/problems/trionic-array-ii/description/?envType=daily-question&envId=2026-02-04)
+14. [Count Palindromic Subsequences : 28/02/26](https://www.geeksforgeeks.org/problems/count-palindromic-subsequences/1)
+15. [Count Palindromic Subsequences of size 5 : skipped on 28/02/26](https://leetcode.com/problems/count-palindromic-subsequences/description/)
 
 
 
