@@ -1089,7 +1089,13 @@ bool wrong = static_cast<bool>('0'); // Result: true
           } 
      ```
 
-44. `static_cast<bool>`
+44. `%MOD`, `<<` and `overflow`:
+    
+    - Overflow is just a hidden Modulo: When bits fall off the left edge of a 64-bit integer, the computer isn't just deleting them; mathematically, it is silently applying `% 2^64` to your number.
+
+     - It only works if your MOD is a Power of 2: If your target `MOD` (like `10^9 + 7`) does not perfectly divide `2^64`, losing those bits permanently corrupts your final remainder. You must apply `% MOD` at every step to keep the number small and prevent the computer's "hidden modulo" from ruining your math.
+
+45. `static_cast<bool>`
     1.  static_cast<bool>('0') evaluates to true because the character '0' has an ASCII value of 48 (a non-zero value).
     ```cpp
           bool wrong = static_cast<bool>('0'); // Result: true
@@ -1098,8 +1104,19 @@ bool wrong = static_cast<bool>('0'); // Result: true
     ```cpp
           bool correct = (s[i] - '0'); // Result: false
     ```
-45. `std::__builtin_popcount` is a hardware supported `O(1)` operation.
-46. **Lambda Capture Clauses**:
+46. `std::__builtin_popcount` is a hardware supported `O(1)` operation.
+47. To calculate number of bits needed to represent a number:
+    1. Use `log` func:
+    ```cpp
+          #include<cmath>
+          int usefulBits = ( log2(cur) + 1 );     // O(1)
+    ```
+    2. c++ built-in compiler intrinsic method to calculate `Count Leading Zeros` can be use to get `useful bit from LSB` in a single hardware clock cycle:
+    ```cpp
+          int usefulBits = 32 - ( __builtin_clz(cur) );     // O(1)
+    ```
+    
+48. **Lambda Capture Clauses**:
      - In C++, the brackets at the beginning of a lambda function are called the Capture Clause (or capture list). They tell the compiler which variables from the surrounding scope (the function where you wrote the lambda) the lambda is allowed to "see" and use.
 
     | Capture Clause | Read External Variables? | Modify External Variables? | Memory / Performance Cost |
@@ -1108,8 +1125,8 @@ bool wrong = static_cast<bool>('0'); // Result: true
      | **`[&]`** (Capture by Reference) | Yes | Yes | **Minimal** (Stores memory addresses/pointers under the hood) |
      | **`[=]`** (Capture by Value) | Yes | No (Read-only copies) | **Variable/High** (Creates copies of every captured variable) |
 
-47. How to compare nCr with terms with power of 2?
+49. How to compare nCr with terms with power of 2?
     - Ans: `n chose n/2`, this complexity rougly equivalent to `4^(n/2) = 2^n`. 
     - [source](https://en.wikipedia.org/wiki/Central_binomial_coefficient)
-48. 
+50. 
 ---
