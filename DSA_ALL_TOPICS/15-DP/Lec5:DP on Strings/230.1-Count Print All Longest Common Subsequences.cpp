@@ -27,7 +27,7 @@ Links:
 Problem statement:
 Given two strings s1 and s2, find the length of their Longest Common Subsequence (LCS) and determine the total number of distinct subsequences (by index) that achieve this maximum length.
 
-Since the total number of longest common subsequences can be incredibly large, return the count modulo $10^9 + 7$.
+Since the total number of longest common subsequences can be incredibly large, return the count modulo 10^9 + 7.
 
 Note: A subsequence is a sequence that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
 

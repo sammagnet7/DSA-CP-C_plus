@@ -63,22 +63,9 @@ INPUT::::::
 OUTPUT::::::
 
 
-Similar quetion:
-1) Longest Palindromic Subsequence | (DP-28) :
-        https://takeuforward.org/data-structure/longest-palindromic-subsequence-dp-28/
-        https://takeuforward.org/plus/dsa/problems/longest-palindromic-subsequence?tab=editorial
-        https://leetcode.com/problems/longest-palindromic-subsequence/description/
+Similar question:
 
-        Sol: Ans is the LCS between the original string and its reversed version.
-
-2) Minimum insertions to make string palindrome | DP-29
-        https://takeuforward.org/data-structure/minimum-insertions-to-make-string-palindrome-dp-29/
-        https://takeuforward.org/plus/dsa/problems/minimum-insertions-to-make-string-palindrome?tab=editorial
-        https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/
-
-        Sol: Ans is the number of characters NOT in the Longest Palindromic Subsequence from the original string.
-
-3) Minimum Insertions/Deletions to Convert String | (DP- 30)
+1) Minimum Insertions/Deletions to Convert String | (DP- 30)
         https://takeuforward.org/data-structure/minimum-insertions-deletions-to-convert-string-dp-30/
         https://www.youtube.com/watch?v=yMnH0jrir0Q
         https://takeuforward.org/plus/dsa/problems/minimum-insertions-or-deletions-to-convert-string-a-to-b?tab=editorial
@@ -91,7 +78,7 @@ Similar quetion:
                 - then insert (len(word2) - LCS) chars from word2 to word1
                 - Total Required operations: (len(word1) - LCS) + (len(word2) - LCS)
 
-4) From Leetcoe daily: https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/description
+2) From Leetcoe daily: https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/description
 
 
 ----------------------------------------------------------------------------------------------------
@@ -162,9 +149,9 @@ public:
     // 1. Title: Longest Common Subsequence
     //-------------------------------------------------------------------------------
 
-    // ---------------------------
-    // Approach 1: Recursive
-    // --------------------------
+    // -----------------------------------------
+    // Approach 1: Recursive [Knapsack approach]
+    // -----------------------------------------
 
     /*
         Method: recCountSubseq
