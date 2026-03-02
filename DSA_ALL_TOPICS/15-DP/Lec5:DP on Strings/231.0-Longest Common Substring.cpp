@@ -59,16 +59,16 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Longest Common Substring
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Longest Common Substring
-    //-------------------------------------------------------------------------------
-
-    // -----------------
-    // Approach 1
-    // ----------------
+    // ----------------------
+    // Approach 1: 3D (TLE)
+    // ---------------------
 
     /*
     Method: recCountSubstr
@@ -139,7 +139,7 @@ public:
         //  - skipping from text1
         //  - skipping from text2
         return dp[idx1][idx2][matchedLen] =
-                   max(currentCount, max(skipText1, skipText2));
+                   max({currentCount, skipText1, skipText2});
     }
 
     /*
@@ -176,9 +176,9 @@ public:
         return recCountSubstr(N1 - 1, N2 - 1, 0, str1, str2, dp);
     }
 
-    // -----------------
-    // Approach 2
-    // ----------------
+    // ---------------------------------------------------------
+    // Approach 2 : Iterative (Optimal) [RECOMMENDED]
+    // --------------------------------------------------------
 
     /**
      * Finds the length of the Longest Common Substring between two strings.
@@ -190,12 +190,15 @@ public:
      * -------------
      * We use dynamic programming to compare the strings character by character.
      * We build a table (dp) where each cell dp[i][j] tells us:
-     *   "How long is the longest common substring ending at str1[i-1] and str2[j-1]"
+     *
+     * dp[i][j] represents the length of the longest common substring
+     *  that ends EXACTLY at s1[i-1] and s2[j-1].
+     *  Remember: (dp index i, j is equivalent to str index (i-1), (j-1))
      *
      * - If the characters match, we extend the previous substring length by 1.
      * - If the characters don't match, the length resets to 0
      *   because substrings must be continuous.
-     * - While filling this table, we keep track of the largest number we see ?
+     * - While filling this table, we keep track of the largest number we see
      *   that's our answer.
      *
      * Why it works:
@@ -236,10 +239,91 @@ public:
         return maxLen;
     }
 
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
+    // --------------------------------
+    // Approach 3 : recursive (Optimal)
+    // --------------------------------
+    /**
+     * Problem: Longest Common Substring (Recursive / Top-Down)
+     * --------------------------------------------------------
+     * 1. What rec(i, j) signifies:
+     * It returns the length of the longest common substring ending EXACTLY
+     * at s1[i-1] and s2[j-1].
+     * * 2. The "Side Effect" Traversal:
+     * Because the actual maximum streak could be hiding anywhere, we use a
+     * reference variable `maxLength` to trap the highest value. We also MUST
+     * call `rec(i-1, j)` and `rec(i, j-1)` just to guarantee we explore
+     * every single (i, j) pair in the grid.
+     * * 3. Time and Space Complexity:
+     * - Time: O(N * M) because memoization ensures we calculate each state once.
+     * - Space: O(N * M) for the DP table, plus O(N + M) for the recursion stack.
+     */
+
+    int rec(int i, int j, string &s1, string &s2, int &maxLength, vector<vector<int>> &dp)
+    {
+
+        // Base case: If either string is empty, the streak is 0.
+        if (i == 0 || j == 0)
+        {
+            return 0;
+        }
+
+        // Memoization check
+        if (dp[i][j] != -1)
+        {
+            return dp[i][j];
+        }
+
+        // --- THE SIDE QUEST (Matrix Traversal) ---
+        // We MUST trigger these recursive calls to ensure we explore the
+        // combinations where we skip a character in s1 or s2.
+        // We don't use their return values here; their only purpose is
+        // to eventually trigger the matching logic below at different indices!
+        rec(i - 1, j, s1, s2, maxLength, dp);
+        rec(i, j - 1, s1, s2, maxLength, dp);
+
+        // --- THE ACTUAL MATCHING LOGIC ---
+        int currentStreak = 0;
+
+        // If the characters match, we extend the diagonal streak
+        if (s1[i - 1] == s2[j - 1])
+        {
+            currentStreak = 1 + rec(i - 1, j - 1, s1, s2, maxLength, dp);
+
+            // Spy on the streak and trap the maximum value globally!
+            maxLength = max(maxLength, currentStreak);
+        }
+        // If they don't match, currentStreak safely remains 0 (the streak is broken).
+
+        // Cache and return the exact streak for this specific (i, j)
+        return dp[i][j] = currentStreak;
+    }
+
+    int longestCommonSubstring(string s1, string s2)
+    {
+        int n = s1.length();
+        int m = s2.length();
+
+        // Global tracker for the highest streak we find
+        int maxLength = 0;
+
+        // DP table initialized to -1
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, -1));
+
+        // Start recursion from the very end of both strings
+        rec(n, m, s1, s2, maxLength, dp);
+
+        return maxLength;
+    }
 };
+
+/*
+    Note: How reconstruct the longest common substring?
+    Ans: Store end_index, then extract the substring using str1[(end_index - max_length) : end_index ].
+*/
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
