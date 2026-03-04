@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Wildcard Matching | (DP-34)
+1. Title: Wildcard Matching
 
 Links:
 https://takeuforward.org/data-structure/wildcard-matching-dp-34/
@@ -79,12 +79,95 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Wildcard MatchingS
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Wildcard Matching | (DP-34)
-    //-------------------------------------------------------------------------------
+    // ------------------------------------------------
+    // Approach 2 [Iterative][Optimal][Recommended]
+    // ------------------------------------------------
+    /**
+     * @brief Computes if the entire string 's' matches the wildcard pattern 'p'.
+     * * --- APPROACH ---
+     * We use a 2D Dynamic Programming approach where `dp[i][j]` represents a boolean
+     * answer to the question: "Does the prefix s[0...i-1] match the prefix p[0...j-1]?"
+     * * 1. If characters match or we see a '?', we consume one character from both strings
+     * and inherit the status from the diagonal (i-1, j-1).
+     * 2. If we see a '*', we branch into possibilities: the '*' can act as an empty sequence
+     * (looking Left) or consume a character and keep going (looking Top / Diagonal).
+     * * --- COMPLEXITY ---
+     * Time Complexity: O(N * M), where N is the length of 's' and M is the length of 'p'.
+     * We evaluate every combination of prefixes exactly once.
+     * Space Complexity: O(N * M) to store the 2D DP matrix.
+     */
+    bool isMatch(string s, string p)
+    {
+
+        int n = s.length();
+        int m = p.length();
+
+        // dp[i][j] will be true if s[0...i-1] perfectly matches p[0...j-1].
+        // Initialized to false by default.
+        vector<vector<bool>> dp(n + 1, vector<bool>(m + 1, false));
+
+        // --- BASE CASES ---
+
+        // 1. An empty string perfectly matches an empty pattern.
+        dp[0][0] = true;
+
+        // 2. An empty string 's' can ONLY match a pattern 'p' if the pattern
+        //    is composed entirely of '*' characters.
+        //    We loop through 'p' safely using the boundary check `k < m`.
+        int k = 0;
+        while (k < m && p[k] == '*')
+        {
+            dp[0][k + 1] = true;
+            k++;
+        }
+
+        // --- DP TRANSITIONS ---
+
+        for (int i = 1; i <= n; ++i)
+        {
+            for (int j = 1; j <= m; ++j)
+            {
+
+                // CASE A: Exact Match or Single Wildcard ('?')
+                // If the current characters are identical, OR the pattern has a '?',
+                // it successfully matches exactly one character.
+                // We inherit the truth value from before these characters were added (Diagonal).
+                if (s[i - 1] == p[j - 1] || p[j - 1] == '?')
+                {
+                    dp[i][j] = dp[i - 1][j - 1];
+                }
+
+                // CASE B: The Multi-Wildcard ('*')
+                // A '*' can match any sequence of characters. We have three logical choices:
+                // 1. dp[i][j-1]   -> '*' matches 0 characters (Empty sequence). We ignore the '*'.
+                // 2. dp[i-1][j-1] -> '*' matches exactly 1 character.
+                // 3. dp[i-1][j]   -> '*' matches multiple characters. We consume s[i-1] and let the
+                //                    '*' stay active for the next row.
+                // If ANY of these historical paths were valid (true), our current state is valid.
+                else if (p[j - 1] == '*')
+                {
+                    dp[i][j] = dp[i - 1][j] || dp[i][j - 1] || dp[i - 1][j - 1];
+                }
+
+                // Note: We don't need an `else { dp[i][j] = false; }` block here
+                // because the entire grid was initialized to `false` from the start!
+            }
+        }
+
+        // The final cell holds the answer for whether the full string matches the full pattern.
+        return dp[n][m];
+    }
+
+    // ---------------------------------
+    // Approach 2 [Recursive] [Optimal]
+    // ---------------------------------
     /*
         Problem:
         --------
@@ -179,11 +262,11 @@ public:
         // Start recursion from the last characters
         return recMatcher(n1 - 1, n2 - 1, s, p, dp);
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Edit Distance | (DP-33)
+1. Title: Edit Distance
 
 Links:
 https://takeuforward.org/data-structure/edit-distance-dp-33/
@@ -84,16 +84,16 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Edit Distance
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Edit Distance | (DP-33)
-    //-------------------------------------------------------------------------------
-
-    // ---------------------------------
-    // Approach 1 (Inefficient, TLE on large cases)
-    // ---------------------------------
+    // ---------------------------------------------
+    // Approach 1 [3D dp: TLE]
+    // ---------------------------------------------
     //
     // Idea:
     //  - Carry an "opCount" parameter down the recursion to accumulate operations.
@@ -150,9 +150,104 @@ public:
         return recOpCount(n1 - 1, n2 - 1, 0, word1, word2, dp);
     }
 
-    // -----------------------
-    // Approach 2 (Optimal, Accepted)
-    // -----------------------
+    // ---------------------------------
+    // Approach 2 [Optimal] [Iterative]
+    // ---------------------------------
+
+    /**
+     * @brief Computes the minimum number of operations to convert word1 to word2.
+     *
+     * * --- THE LCS BACKTRACKING PITFALL ---
+     * [Where it works]: Finding the Longest Common Subsequence (LCS) and backtracking
+     * works perfectly for problems that ONLY allow Insertions and Deletions (e.g.,
+     * LeetCode 583: Delete Operation for Two Strings (DP 230.0)). In those cases, the minimum
+     * edits are strictly derived from the formula: len(word1) + len(word2) - 2 * LCS.
+     *
+     * * [Why it fails here]: The moment the "Replace" operation is introduced, the
+     * *distribution* of the un-matched characters (the gaps) matters. A single Replace
+     * operation fixes one character from BOTH strings simultaneously. Because there can
+     * be multiple valid LCS paths, a standard LCS backtracker will blindly pick the
+     * first one it finds. This might force alignments that create terrible "gaps",
+     * requiring more edits than an alternative LCS path would have needed.
+     *
+     * * --- THE CORRECT IDEA (Current Approach) ---
+     * Instead of relying on a rigid LCS anchor, we use Dynamic Programming to evaluate
+     * the cost of all 3 operations simultaneously at every single prefix combination.
+     * * We define dp[i][j] as the minimum operations to convert the prefix word1[0...i-1]
+     * to the prefix word2[0...j-1].
+     * * If the current characters mismatch, we simulate all 3 allowed operations by
+     * looking at previously computed states, and take the minimum:
+     * 1. Insert:  We virtually inserted word2[j-1]. Cost = 1 + dp[i][j-1] (Left cell)
+     * 2. Delete:  We virtually deleted word1[i-1]. Cost = 1 + dp[i-1][j] (Top cell)
+     * 3. Replace: We virtually swapped them. Cost = 1 + dp[i-1][j-1] (Diagonal cell)
+     *
+     * * --- COMPLEXITY ---
+     * Time Complexity:  O(N * M), where N and M are the lengths of the two strings.
+     * We compute every cell in the 2D grid exactly once.
+     * Space Complexity: O(N * M) to store the 2D DP matrix.
+     */
+    int minDistance(string word1, string word2)
+    {
+
+        int n = word1.length();
+        int m = word2.length();
+
+        // dp[i][j] will store the minimum edit distance between the
+        // first 'i' characters of word1 and the first 'j' characters of word2.
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+
+        // --- BASE CASES ---
+
+        // If word2 is empty (j = 0), the only way to match it is to
+        // DELETE all 'i' characters from word1.
+        for (int i = 0; i <= n; ++i)
+        {
+            dp[i][0] = i;
+        }
+
+        // If word1 is empty (i = 0), the only way to match word2 is to
+        // INSERT all 'j' characters of word2 into word1.
+        for (int j = 0; j <= m; ++j)
+        {
+            dp[0][j] = j;
+        }
+
+        // --- DP TRANSITIONS ---
+
+        for (int i = 1; i <= n; ++i)
+        {
+            for (int j = 1; j <= m; ++j)
+            {
+
+                // CASE A: Characters Match
+                // No new operation is needed. The edit distance is exactly the same
+                // as it was for the prefixes before these two characters.
+                if (word1[i - 1] == word2[j - 1])
+                {
+                    dp[i][j] = dp[i - 1][j - 1];
+                }
+                // CASE B: Characters Do NOT Match
+                // We must perform exactly 1 operation. We look at the 3 possible
+                // moves, find the one that previously cost the least, and add 1.
+                else
+                {
+                    int doInsert = dp[i][j - 1];      // Cost if we inserted word2's character
+                    int doDelete = dp[i - 1][j];      // Cost if we deleted word1's character
+                    int doReplace = dp[i - 1][j - 1]; // Cost if we replaced word1's char with word2's
+
+                    // Take the best (minimum) of the 3 simulated choices, plus 1 for the operation
+                    dp[i][j] = 1 + min({doInsert, doDelete, doReplace});
+                }
+            }
+        }
+
+        // The final cell contains the minimum operations for the full lengths of both strings
+        return dp[n][m];
+    }
+
+    // ---------------------------------
+    // Approach 3 [Optimal] [Recursive]
+    // ---------------------------------
     //
     // Idea:
     //  - State defined only by indices (id1,id2).
@@ -207,11 +302,11 @@ public:
         vector<vector<int>> dp(n1, vector<int>(n2, -1));
         return recOpCount(n1 - 1, n2 - 1, word1, word2, dp);
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

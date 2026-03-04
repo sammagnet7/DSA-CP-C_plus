@@ -65,7 +65,7 @@ OUTPUT::::::
 
 Similar question:
 
-1) Minimum Insertions/Deletions to Convert String | (DP- 30)
+1) Minimum Insertions/Deletions to Convert String
         https://takeuforward.org/data-structure/minimum-insertions-deletions-to-convert-string-dp-30/
         https://www.youtube.com/watch?v=yMnH0jrir0Q
         https://takeuforward.org/plus/dsa/problems/minimum-insertions-or-deletions-to-convert-string-a-to-b?tab=editorial
@@ -83,7 +83,7 @@ Similar question:
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Print Longest Common Subsequence | (DP - 26)
+2. Title: Print Longest Common Subsequence
 
 Links:
 https://takeuforward.org/data-structure/print-longest-common-subsequence-dp-26/
@@ -327,197 +327,40 @@ public:
     }
 
     //-------------------------------------------------------------------------------
-    // 2. Title: Print Longest Common Subsequence | (DP - 26)
+    // 2. Title: Print Longest Common Subsequence
     //-------------------------------------------------------------------------------
 
-    // -----------------------
-    // Approach 1 : Recursive
-    // ----------------------
-
-    /*
-        Helper Method: recCountSubseq
-        -----------------------------
-        Recursively computes the length of the Longest Common Subsequence (LCS)
-        between s1[0..idx1] and s2[0..idx2] using memoization.
-
-        Parameters:
-            idx1 - current index in s1 (0-based)
-            idx2 - current index in s2 (0-based)
-            text1 - first string
-            text2 - second string
-            dp - memoization table where dp[i][j] stores the LCS length
-                 for text1[0..i] and text2[0..j]
-
-        Returns:
-            int - length of the LCS for the given (idx1, idx2) pair
-
-        Time Complexity:
-            O(N1 * N2)  (each pair computed once)
-        Space Complexity:
-            O(N1 * N2) for dp + O(N1 + N2) recursion stack
-    */
-    int recCountSubseq(int idx1, int idx2, string &text1, string &text2, vector<vector<int>> &dp)
-    {
-        // Base case: if either string is fully traversed, no subsequence remains
-        if (idx1 < 0 || idx2 < 0)
-        {
-            return 0;
-        }
-
-        // Return memoized result if already computed
-        if (dp[idx1][idx2] != -1)
-            return dp[idx1][idx2];
-
-        int maxCount = 0;
-
-        if (text1[idx1] == text2[idx2])
-        {
-            // Characters match → include this character in LCS
-            int takeBoth = 1 + recCountSubseq(idx1 - 1, idx2 - 1, text1, text2, dp);
-            maxCount = takeBoth;
-        }
-        else
-        {
-            // Characters don't match → try both possibilities and take the maximum
-            int skipText1 = recCountSubseq(idx1 - 1, idx2, text1, text2, dp);
-            int skipText2 = recCountSubseq(idx1, idx2 - 1, text1, text2, dp);
-            maxCount = max(skipText1, skipText2);
-        }
-
-        // Store and return the result
-        return dp[idx1][idx2] = maxCount;
-    }
-
-    /*
-        Method: findLCS
-        ---------------
-        Finds and returns the Longest Common Subsequence (LCS) between two strings s1 and s2.
-
-        Parameters:
-            n  - length of s1
-            m  - length of s2
-            s1 - first input string
-            s2 - second input string
-
-        Returns:
-            string - the LCS between s1 and s2
-
-        Steps:
-            1. Use `recCountSubseq` to compute the LCS length and fill the dp table.
-            2. Reconstruct the actual LCS string by tracing back through dp.
-               - If characters match, include them in the LCS.
-               - Otherwise, move in the direction of the larger dp value.
-
-        Time Complexity:
-            O(N1 * N2) to fill dp + O(N1 + N2) to reconstruct string
-        Space Complexity:
-            O(N1 * N2) for dp
-    */
-    string findLCS(int n, int m, string &s1, string &s2)
-    {
-        int N1 = n;
-        int N2 = m;
-
-        // Initialize dp table with -1 (uncomputed states)
-        vector<vector<int>> dp(N1, vector<int>(N2, -1));
-
-        // Step 1: Get maximum LCS length
-        int maxLen = recCountSubseq(N1 - 1, N2 - 1, s1, s2, dp);
-
-        // Prepare LCS string (filled with placeholders)
-        string matchCS(maxLen, 'X');
-
-        // Start from the end of both strings
-        int matchIdx = maxLen - 1;
-        int idx1 = N1 - 1;
-        int idx2 = N2 - 1;
-
-        // Step 2: Trace back to reconstruct the LCS
-        while (idx1 >= 0 && idx2 >= 0 && matchIdx >= 0)
-        {
-
-            if (s1[idx1] == s2[idx2])
-            {
-                // Characters match → add to LCS and move diagonally up-left
-                matchCS[matchIdx] = s1[idx1];
-                matchIdx--;
-                idx1--;
-                idx2--;
-            }
-            else
-            {
-                // Characters don't match → move towards the direction with larger LCS length
-                if (idx1 - 1 < 0)
-                    idx2--;
-                else if (idx2 - 1 < 0)
-                    idx1--;
-                else if (dp[idx1 - 1][idx2] >= dp[idx1][idx2 - 1])
-                {
-                    idx1--;
-                }
-                else
-                {
-                    idx2--;
-                }
-            }
-        }
-
-        return matchCS;
-    }
-
-    // -----------------------
-    // Approach 2 : Iterative
-    // ----------------------
-
-    /*
-     Method: findLCS
-     ----------------
-     Finds the **Longest Common Subsequence (LCS)** string between two input strings.
-
-     What is LCS?
-     ------------
-     - LCS is the longest sequence of characters that appear in the same order
-       in both strings (not necessarily contiguous).
-     - Example:
-         word1 = "abcde"
-         word2 = "ace"
-         LCS   = "ace"
-
-     Approach:
-     ---------
-     1. Build a DP table (n1+1 x n2+1):
-        - dp[i][j] = length of LCS between word1[0..i-1] and word2[0..j-1].
-        - If characters match → dp[i][j] = 1 + dp[i-1][j-1].
-        - Otherwise → dp[i][j] = max(dp[i-1][j], dp[i][j-1]).
-
-     2. After filling the table:
-        - dp[n1][n2] contains the length of the LCS.
-
-     3. Reconstruct the LCS string:
-        - Start from bottom-right of the table (dp[n1][n2]).
-        - If characters match → include it in result and move diagonally up-left.
-        - If they do not match → move in the direction of the larger dp value (up or left).
-        - Continue until reaching the top/left boundary.
-
-     4. Return the reconstructed LCS string.
-
-     Complexity:
-     -----------
-     - Time:  O(n1 * n2) for filling DP + O(n1 + n2) for reconstruction
-              → overall O(n1 * n2)
-     - Space: O(n1 * n2) for DP table
- */
+    /**
+     * Finds the Longest Common Subsequence (LCS) of two strings.
+     * * Idea and Approach:
+     * This uses a bottom-up Dynamic Programming (iterative) approach.
+     * 1. We build a 2D table `dp` of dimensions (n+1) x (m+1).
+     * 2. `dp[i][j]` stores the length of the LCS for the prefixes word1[0..i-1]
+     * and word2[0..j-1].
+     * 3. We iterate through both strings. If word1[i-1] == word2[j-1], we add 1
+     * to the result of the remaining strings (`dp[i-1][j-1]`). Otherwise, we
+     * take the maximum of excluding the current character from either word1
+     * (`dp[i-1][j]`) or word2 (`dp[i][j-1]`).
+     * 4. We reconstruct the actual LCS string by backtracking from the bottom
+     * right corner at `dp[n][m]`. If characters matched, we append them to our
+     * result string and move diagonally up-left. If not, we move in the
+     * direction of the larger DP value.
+     * 5. Because backtracking builds the string from end to start, we reverse
+     * the final string before returning it.
+     *
+     * Time Complexity: O(n * m), where n and m are the lengths of word1 and word2.
+     * Filling the table requires visiting every cell once, taking O(n * m).
+     * The backtracking step takes O(n + m) time, and reversing the string takes O(L)
+     * where L is the length of the LCS. Overall time is bounded by O(n * m).
+     * * Space Complexity: O(n * m) required to store the 2D DP table.
+     */
     string findLCS(int n, int m, string &word1, string &word2)
     {
-        int n1 = word1.size();
-        int n2 = word2.size();
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
 
-        // Step 1: Build DP table for LCS length
-        vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
-
-        for (int i = 1; i <= n1; i++)
+        for (int i = 1; i <= n; i++)
         {
-            for (int j = 1; j <= n2; j++)
+            for (int j = 1; j <= m; j++)
             {
                 if (word1[i - 1] == word2[j - 1])
                 {
@@ -530,41 +373,31 @@ public:
             }
         }
 
-        int lcsqLen = dp[n1][n2];
+        string lcs = "";
+        // Optional: lcs.reserve(dp[n][m]); to prevent reallocations
 
-        // Step 2: Prepare result string with placeholder size
-        string matchCS(lcsqLen, 'X');
-
-        // Step 3: Trace back to reconstruct the LCS
-        int matchIdx = lcsqLen - 1;
-        int idx1 = n1;
-        int idx2 = n2;
-
-        while (idx1 > 0 && idx2 > 0)
+        int i = n, j = m;
+        while (i > 0 && j > 0)
         {
-            if (word1[idx1 - 1] == word2[idx2 - 1])
+            if (word1[i - 1] == word2[j - 1])
             {
-                // Characters match → add to LCS and move diagonally
-                matchCS[matchIdx] = word1[idx1 - 1];
-                matchIdx--;
-                idx1--;
-                idx2--;
+                lcs += word1[i - 1];
+                i--;
+                j--;
+            }
+            else if (dp[i - 1][j] > dp[i][j - 1])
+            {
+                i--;
             }
             else
             {
-                // Move towards the direction of greater LCS length
-                if (dp[idx1 - 1][idx2] >= dp[idx1][idx2 - 1])
-                {
-                    idx1--;
-                }
-                else
-                {
-                    idx2--;
-                }
+                j--;
             }
         }
 
-        return matchCS;
+        reverse(lcs.begin(), lcs.end());
+
+        return lcs;
     }
 };
 
