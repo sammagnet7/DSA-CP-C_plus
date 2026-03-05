@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Buy and Sell Stock - II|(DP-36)
+1. Title: Buy and Sell Stock - II
 
 Links:
 https://takeuforward.org/data-structure/buy-and-sell-stock-ii-dp-36/
@@ -29,7 +29,9 @@ https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/description/
 
 Problem statement:
 You are given an integer array prices where prices[i] is the price of a given stock on the ith day.
-On each day, you may decide to buy and/or sell the stock. You can only hold at most one share of the stock at any time. However, you can buy it then immediately sell it on the same day.
+
+On each day, you may decide to buy and/or sell the stock. You can only hold at most one share of the stock at any time. However, you can sell and buy the stock multiple times on the same day, ensuring you never hold more than one share of the stock.
+
 Find and return the maximum profit you can achieve.
 
 Examples:
@@ -53,8 +55,8 @@ Examples:
 
 
 Constraints:
-1 <= prices.length <= 3 * 104
-0 <= prices[i] <= 104
+1 <= prices.length <= 3 * 10^4
+0 <= prices[i] <= 10^4
 
 
 
@@ -65,21 +67,18 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Buy and Sell Stocks With Transaction Fees | (DP - 40)
+2. Title: Buy and Sell Stocks With Transaction Fees
 
 Links:
 https://takeuforward.org/data-structure/buy-and-sell-stocks-with-transaction-fees-dp-40/
 https://www.youtube.com/watch?v=k4eK-vEmnKg
-https://takeuforward.org/plus/dsa/problems/best-time-to-buy-and-sell-stock-with-cooldown-and-transaction-fees?tab=editorial
+https://takeuforward.org/plus/dsa/problems/best-time-to-buy-and-sell-stock-with-cooldown-and-transaction-fees
 
 
 Problem statement:
-You are given an array prices where prices[i] is the price of a given stock on the ith day, and an integer fee representing a transaction fee.
-Find the maximum profit you can achieve. You may complete as many transactions as you like, but you need to pay the transaction fee for each transaction.
+Given an array arr where arr[i] represents the price of a given stock on the ith day. Additionally, you are given an integer fee representing a transaction fee for each trade. The task is to determine the maximum profit you can achieve such that you need to pay a transaction fee for each buy and sell transaction. The Transaction Fee is applied when you sell a stock.
 
-Note:
-You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
-The transaction fee is only charged once for each stock purchase and sale.
+You may complete as many transactions. You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before buying again).
 
 Examples:
     Example 1:
@@ -114,11 +113,11 @@ class Solution
 {
 public:
     //-------------------------------------------------------------------------------
-    // 1. Title: Buy and Sell Stock - II|(DP-36)
+    // 1. Title: Buy and Sell Stock - II
     //-------------------------------------------------------------------------------
-    // ------------
-    // Approach: 1
-    //-------------
+    // ---------------------
+    // Approach 1: Recursive
+    //----------------------
 
     /*
         Problem:
@@ -203,9 +202,9 @@ public:
         return recmaxProf(0, 0, prices, n, dp);
     }
 
-    // ------------
-    // Approach: 2
-    //-------------
+    // ---------------------
+    // Approach 2: Iterative
+    //----------------------
 
     /*
         Problem:
@@ -289,9 +288,9 @@ public:
         return dp[0][0];
     }
 
-    // ------------
-    // Approach: 3
-    //-------------
+    // -------------------------------------
+    // Approach 3: Space optimized [Optimal]
+    //--------------------------------------
 
     /*
         Problem:
@@ -382,46 +381,53 @@ public:
         // Final answer: profit starting at day 0 with no stock
         return cur[0];
     }
+};
 
-    //-------------------------------------------------------------------------------
-    // 2. Title: Buy and Sell Stocks With Transaction Fees | (DP - 40)
-    //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Buy and Sell Stocks With Transaction Fees
+//-------------------------------------------------------------------------------
 
+class Solution
+{
+public:
+    // ---------------------
+    // Approach 1: Recursive
+    //----------------------
     /*
-    Function: recmaxProf
-    ---------------------
-    Recursive + Memoization approach for
-    "Best Time to Buy and Sell Stock with Transaction Fee" (LeetCode 714).
+        Function: recmaxProf
+        ---------------------
+        Recursive + Memoization approach for
+        "Best Time to Buy and Sell Stock with Transaction Fee" (LeetCode 714).
 
-    Parameters:
-        - day   : current index in prices[]
-        - carry : state indicator
-                  0 → not holding stock
-                  1 → holding stock
-        - prices: stock price array
-        - n     : total number of days
-        - dp    : memoization table, dp[day][carry] stores the
-                  maximum profit achievable from this state
-        - fee   : transaction fee paid per sale
+        Parameters:
+            - day   : current index in prices[]
+            - carry : state indicator
+                      0 → not holding stock
+                      1 → holding stock
+            - prices: stock price array
+            - n     : total number of days
+            - dp    : memoization table, dp[day][carry] stores the
+                      maximum profit achievable from this state
+            - fee   : transaction fee paid per sale
 
-    Returns:
-        Maximum profit achievable starting from (day, carry).
+        Returns:
+            Maximum profit achievable starting from (day, carry).
 
-    Recurrence:
-        If carry == 0:
-            profit = max(skipBuy, buy)
-                skipBuy = move to next day without buying
-                buy     = -prices[day] + f(day+1, holding)
-        If carry == 1:
-            profit = max(sell, hold)
-                sell = prices[day] - fee + f(day+1, not holding)
-                hold = f(day+1, holding)
+        Recurrence:
+            If carry == 0:
+                profit = max(skipBuy, buy)
+                    skipBuy = move to next day without buying
+                    buy     = -prices[day] + f(day+1, holding)
+            If carry == 1:
+                profit = max(sell, hold)
+                    sell = prices[day] - fee + f(day+1, not holding)
+                    hold = f(day+1, holding)
 
-    Complexity:
-        - Time  : O(n * 2) = O(n)
-                  (Each day has 2 states, computed once)
-        - Space : O(n * 2) for dp + O(n) recursion stack (worst case)
-*/
+        Complexity:
+            - Time  : O(n * 2) = O(n)
+                      (Each day has 2 states, computed once)
+            - Space : O(n * 2) for dp + O(n) recursion stack (worst case)
+    */
 
     int recmaxProf(int day, int carry, vector<int> &prices, int n, vector<vector<int>> &dp, int fee)
     {
@@ -480,6 +486,89 @@ public:
 
         // Start from day 0, with no stock in hand
         return recmaxProf(0, 0, prices, n, dp, fee);
+    }
+
+    // -------------------------------------
+    // Approach 2: Space optimized [Optimal]
+    //--------------------------------------
+
+    /**
+     * Idea:
+     * This problem is solved using Dynamic Programming with a State Machine approach.
+     * Every day, we can be in one of two states:
+     * - State 0: We do NOT hold a stock (we have the option to BUY).
+     * - State 1: We DO hold a stock (we have the option to SELL).
+     * * Instead of calculating from day 0 forward, we calculate backward from the last day
+     * to day 0. This allows us to easily answer: "If I am in State X on Day Y, what is
+     * the maximum profit I can make from today until the end?"
+     * * Step-by-Step Approach & Logic:
+     * 1. Space Optimization:
+     * Normally, this requires a DP table of size N x 2. However, since the profit on
+     * day `i` only depends on the profit on day `i+1`, we can optimize the space by
+     * just keeping track of the `next` day's profits and calculating the `cur`
+     * (current) day's profits.
+     * * 2. Base Case (Day N-1):
+     * - next[0]: If we don't hold a stock on the last day, we can't buy and sell
+     * anymore. Max profit is 0 (handled by vector initialization).
+     * - next[1]: If we hold a stock on the last day, the best we can do is sell it.
+     * Our profit will be the selling price minus the transaction fee: `prices[N-1] - fee`.
+     * * 3. State Transitions (Day i from N-2 down to 0):
+     * - cur[0] (Not holding stock, can BUY):
+     * We take the maximum of:
+     * a) Buying today: We transition to state 1 (`next[1]`) and spend `prices[i]`.
+     * b) Doing nothing: We remain in state 0 (`next[0]`).
+     * - cur[1] (Holding stock, can SELL):
+     * We take the maximum of:
+     * a) Selling today: We transition to state 0 (`next[0]`), gain `prices[i]`,
+     * and pay the `fee`.
+     * b) Doing nothing: We remain in state 1 (`next[1]`).
+     * * 4. After evaluating the current day, we shift our window backward by setting
+     * `next = cur`.
+     * * 5. Final Answer:
+     * We return `cur[0]` because we start on day 0 not holding any stock, and we
+     * want the maximum profit from day 0 to the end.
+     * * Time Complexity: O(N)
+     * We iterate through the prices array exactly once, performing constant O(1)
+     * operations at each step.
+     * * Space Complexity: O(1)
+     * We only use two arrays of size 2 (`next` and `cur`), meaning the auxiliary
+     * space is strictly constant regardless of the input size N.
+     */
+    int stockBuySell(vector<int> prices, int n, int fee)
+    {
+
+        int N = prices.size();
+
+        // Edge case: if there are no prices, profit is 0
+        if (N == 0)
+            return 0;
+
+        // next[0] = Max profit from day i+1 onwards if NOT holding a stock
+        // next[1] = Max profit from day i+1 onwards if HOLDING a stock
+        vector<int> next(2, 0), cur(2, 0);
+
+        // Base case: Last day logic
+        next[1] = prices[N - 1] - fee;
+
+        // DP transitions from second-to-last day down to day 0
+        for (int i = N - 2; i >= 0; --i)
+        {
+            // Logic for State 0: Max(Buy today, Do nothing)
+            int buyToday = (next[1] - prices[i]);
+            int skipToday = next[0];
+            cur[0] = max(buyToday, skipToday);
+
+            // Logic for State 1: Max(Sell today, Do nothing)
+            int sellToday = (next[0] + prices[i] - fee);
+            skipToday = next[1];
+            cur[1] = max(sellToday, skipToday);
+
+            // Shift states backward for the next iteration
+            next = cur;
+        }
+
+        // We start on day 0 not holding any stock, so cur[0] holds our max profit
+        return cur[0];
     }
 };
 
