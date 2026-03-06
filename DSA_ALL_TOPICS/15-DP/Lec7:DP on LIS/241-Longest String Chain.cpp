@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Longest String Chain | (DP- 45)
+1. Title: Longest String Chain
 
 Links:
 https://takeuforward.org/data-structure/longest-string-chain-dp-45/
@@ -85,138 +85,152 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Longest String Chain
+//-------------------------------------------------------------------------------
+
 class Solution
 {
-public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Longest String Chain | (DP- 45)
-
-    /*
-        Method: checkInWordChain
-        ----------------------------------------
-        Checks whether 'cur' can be formed by adding exactly one character
-        to the previous word 'pre'.
-
-        Parameters:
-        - pre : reference to the previous word in the chain
-        - cur : reference to the current word to check
-
-        Returns:
-        - true if cur can follow pre in the word chain
-        - false otherwise
-
-        Logic:
-        1. First, check if lengths differ exactly by 1. If not, return false.
-        2. Use two pointers (id1 for pre, id2 for cur) to compare characters.
-        3. Count mismatches. If a mismatch occurs, skip a character in cur.
-        4. Continue until all characters are checked.
-        5. After the loops, check if exactly one character difference occurred.
-        If yes, return true; otherwise, false.
-
-        Time Complexity: O(L) where L = length of current word (cur)
-        Space Complexity: O(1)
-    */
-    bool checkInWordChain(string &pre, string &cur)
+private:
+    /**
+     * @brief Checks if 'pred' can be formed by inserting exactly one character into 'succ'.
+     * * --- TWO POINTER APPROACH ---
+     * i tracks the longer string (succ), j tracks the shorter string (pred).
+     * We count the number of mismatches. If the characters don't match, we increment
+     * only the pointer for the longer string (i). If they do match, we increment both.
+     * Finally, we add any leftover characters to the mismatch count.
+     */
+    bool insertDistance(const string &succ, const string &pred)
     {
-        if (pre.size() + 1 != cur.size())
-            return false;
 
-        int missMatch = 0;
-        int n1 = pre.size();
-        int n2 = cur.size();
+        int n = succ.length();
+        int m = pred.length();
 
-        int id1 = 0;
-        int id2 = 0;
-
-        while (id1 < n1 && id2 < n2)
+        // 1. FAST FAIL: A valid predecessor MUST be exactly 1 character shorter.
+        // If it isn't, there's no way a single insertion makes them equal.
+        if (n != m + 1)
         {
-            if (pre[id1] != cur[id2])
+            return false;
+        }
+
+        int i = 0; // Pointer traversing the longer string (succ)
+        int j = 0; // Pointer traversing the shorter string (pred)
+        int mismatch = 0;
+
+        // Traverse both strings simultaneously
+        while (i < n && j < m)
+        {
+
+            // 2. MISMATCH FOUND
+            if (succ[i] != pred[j])
             {
-                missMatch++;
-                id2++;
+                ++mismatch;
+
+                // Since 'succ' is the longer string, we assume the current character
+                // in 'succ' is the "extra" inserted character. We skip it by moving 'i'
+                // forward, but keep 'j' where it is to compare against the next char.
+                ++i;
             }
+            // 3. MATCH FOUND
             else
             {
-                id1++;
-                id2++;
+                // Characters match perfectly, move both pointers forward
+                ++i;
+                ++j;
             }
         }
 
-        while (id1 < n1)
+        // 4. LEFTOVER CHARACTERS IN 'SUCC'
+        // If 'pred' was completely traversed but 'succ' still has characters left,
+        // those remaining characters are considered mismatches.
+        if (i < n)
         {
-            id1++;
-            missMatch++;
+            mismatch += (n - i);
         }
 
-        while (id2 < n2)
+        // 5. LEFTOVER CHARACTERS IN 'PRED'
+        // If 'succ' was traversed but 'pred' has characters left (mathematically rare
+        // here due to the n != m+1 check, but good safety practice).
+        if (j < m)
         {
-            id2++;
-            missMatch++;
+            mismatch += (m - j);
         }
 
-        return missMatch == 1;
+        // 6. FINAL VERDICT
+        // For 'pred' to be a valid predecessor, there must be EXACTLY 1 mismatch
+        // (which represents the 1 allowed insertion).
+        return mismatch == 1;
     }
 
-    /*
-        Method: longestStrChain
-        ----------------------------------------
-        Finds the length of the longest string chain in a given list of words.
-        A word chain is valid if each next word is formed by adding exactly
-        one character to the previous word.
-
-        Parameters:
-        - words : reference to vector of strings
-
-        Returns:
-        - Length of the longest string chain.
-
-        Logic:
-        1. Sort words in increasing order of length.
-        2. Use a dp array where dp[i] = length of longest chain ending at words[i].
-        3. For each word words[curI], check all previous words words[preI].
-        If words[preI] can be a predecessor (checkInWordChain), update dp[curI].
-        4. Return the maximum value in dp.
-
-        Time Complexity: O(n^2 * L)
-            - n = number of words
-            - L = maximum length of a word (for checkInWordChain)
-        Space Complexity: O(n) for dp array
-    */
+public:
+    /**
+     * @brief Computes the length of the longest possible word chain.
+     * * --- APPROACH (LIS Variant) ---
+     * 1. Sort the words by length. A word can only be a predecessor to a longer word.
+     * 2. Use a 1D DP array where dp[i] represents the max chain length ending at words[i].
+     * 3. For every word, look back at all previous (shorter) words. If a previous word
+     * is a valid predecessor, extend the chain: dp[curI] = max(dp[curI], 1 + dp[preI]).
+     * * --- COMPLEXITY ---
+     * Time Complexity  : O(N log N) for sorting + O(N^2 * L) for the nested DP loops and
+     * string comparisons, where N is the number of words and L is the max word length.
+     * Space Complexity : O(N) to store the DP array.
+     */
     int longestStrChain(vector<string> &words)
     {
         int n = words.size();
 
-        // Sort words by increasing length to ensure predecessors appear before successors
-        sort(words.begin(), words.end(), [](string &a, string &b)
-             { return a.size() < b.size(); });
+        // Edge case: No words means no chain possible.
+        if (n == 0)
+            return 0;
 
-        vector<int> dp(n, 1); // dp[i] = longest chain ending at words[i]
+        // --- STEP 1: PRE-PROCESSING (SORT BY LENGTH) ---
+        // We MUST evaluate shorter words first. By sorting from shortest to longest,
+        // we guarantee that by the time we evaluate words[curI], all of its potential
+        // predecessors (which must be shorter) have already been fully calculated.
+        sort(words.begin(), words.end(), [](const string &a, const string &b)
+             { return a.length() < b.length(); });
 
-        for (int curI = 1; curI < n; curI++)
+        // --- STEP 2: DP ARRAY INITIALIZATION ---
+        // dp[i] stores the length of the longest valid chain ending EXACTLY at words[i].
+        // Initialize all to 1, because every individual word forms a valid chain of length 1.
+        vector<int> dp(n, 1);
+
+        // Tracker for the absolute longest chain found anywhere in the array
+        int maxChainLen = 1;
+
+        // --- STEP 3: BOTTOM-UP DP TRANSITIONS ---
+        // Evaluate every word acting as the "end" of our chain
+        for (int curI = 1; curI < n; ++curI)
         {
-            for (int preI = 0; preI < curI; preI++)
+            // Look backward at every previously evaluated word
+            for (int preI = 0; preI < curI; ++preI)
             {
-                if (checkInWordChain(words[preI], words[curI]))
+                // Check if the previous word is a valid 1-character predecessor
+                if (insertDistance(words[curI], words[preI]))
                 {
-                    dp[curI] = max(dp[curI], dp[preI] + 1);
+                    // If it is, the new chain length would be the longest chain
+                    // ending at the predecessor, plus 1 (for the current word).
+                    int take = 1 + dp[preI];
+
+                    // Take the best option: either our current known best for curI,
+                    // or this newly discovered extended chain.
+                    dp[curI] = max(dp[curI], take);
                 }
             }
+
+            // --- STEP 4: TRACK GLOBAL MAXIMUM ---
+            // Update our global tracker to ensure we don't lose the max value
+            maxChainLen = max(maxChainLen, dp[curI]);
         }
 
-        // Find the maximum length from all dp values
-        int maxLen = 0;
-        for (int i = 0; i < n; i++)
-        {
-            maxLen = max(maxLen, dp[i]);
-        }
-
-        return maxLen;
+        // Return the length of the longest chain found
+        return maxChainLen;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

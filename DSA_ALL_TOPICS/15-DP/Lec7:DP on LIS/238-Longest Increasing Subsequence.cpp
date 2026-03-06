@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Longest Increasing Subsequence | (DP-41)
+1. Title: Longest Increasing Subsequence
 
 Links:
 https://takeuforward.org/data-structure/longest-increasing-subsequence-dp-41/
@@ -56,7 +56,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Longest Increasing Subsequence | Binary Search | (DP-43)
+2. Title: Longest Increasing Subsequence | Binary Search
 
 Links:
 https://takeuforward.org/data-structure/longest-increasing-subsequence-binary-search-dp-43/
@@ -96,64 +96,77 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Longest Increasing Subsequence
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Longest Increasing Subsequence | (DP-41)
-
     // -----------------------------------------------------------------------------
     // Approach 1: Recursive + Memoization (Top-Down DP)
     // -----------------------------------------------------------------------------
     //
-    // Function: recLIScount(curIdx, prevIdx, nums, n, dp)
-    //
-    // Idea:
-    //   - At each index, we have two choices:
-    //       1. Take the element (if strictly greater than the last chosen element).
-    //       2. Skip the element.
-    //   - Use recursion to explore both options and pick the max length.
-    //   - Memoize results in a 2D DP table to avoid recomputation.
-    //
-    // dp[curIdx][prevIdx+1]:
-    //   - Stores LIS length starting from index `curIdx`,
-    //     when the previous chosen index is `prevIdx`.
-    //   - Note: `prevIdx == -1` is mapped to `0` (shift by +1 in indexing).
-    //
-    // Base Case:
-    //   - If curIdx == n → reached end of array → return 0.
-    //
-    // Time Complexity: O(n^2)
-    //   - Each state defined by (curIdx, prevIdx) is computed once → O(n * n).
-    // Space Complexity: O(n^2) for DP table + O(n) recursion stack → O(n^2).
-    // -----------------------------------------------------------------------------
-
+    /**
+     * @brief Top-Down DP for LIS using explicit boundary checks instead of index shifting.
+     * * --- STATE DEFINITION ---
+     * dp[curIdx][prevIdx] stores the max LIS from 'curIdx' to the end of the array,
+     * given that the last selected element was at 'prevIdx'.
+     * * --- THE -1 AVOIDANCE TRICK ---
+     * Instead of shifting all prevIdx values by +1 to fit into the DP array, this
+     * implementation explicitly bypasses the DP table whenever prevIdx == -1.
+     * Since prevIdx remains -1 ONLY if we have skipped all previous elements, there
+     * is exactly one unique path to reach any state where prevIdx == -1. Therefore,
+     * those specific states never overlap and do not require memoization!
+     * * --- COMPLEXITY ---
+     * Time Complexity  : O(N^2) - We compute each unique (curIdx, prevIdx) state exactly once.
+     * Space Complexity : O(N^2) - We allocate an N x N matrix (saving an entire column of
+     * memory compared to the N x N+1 approach).
+     */
     int recLIScount(int curIdx, int prevIdx, vector<int> &nums, int n, vector<vector<int>> &dp)
     {
+        // --- BASE CASE ---
+        // If we reach the end of the array, no more elements can be added.
         if (curIdx == n)
             return 0;
 
-        if (dp[curIdx][prevIdx + 1] != -1)
-            return dp[curIdx][prevIdx + 1];
+        // We only check the DP table if we have actually picked a previous element (prevIdx > -1).
+        if (prevIdx > -1 && dp[curIdx][prevIdx] != -1)
+            return dp[curIdx][prevIdx];
 
         int take = 0, notTake = 0;
 
-        // Option 1: Take current element if valid
+        // Valid if it's the very first element picked (-1) OR if it is strictly increasing.
         if (prevIdx == -1 || nums[prevIdx] < nums[curIdx])
         {
+            // If taken, length increases by 1, and the current element becomes the new prevIdx.
             take = 1 + recLIScount(curIdx + 1, curIdx, nums, n, dp);
         }
 
-        // Option 2: Skip current element
+        // Skip this element and carry forward the same prevIdx.
         notTake = recLIScount(curIdx + 1, prevIdx, nums, n, dp);
 
-        return dp[curIdx][prevIdx + 1] = max(take, notTake);
+        // We only store the result in the DP table if prevIdx is a valid array index (> -1).
+        if (prevIdx > -1)
+        {
+            return dp[curIdx][prevIdx] = max(take, notTake);
+        }
+        else
+        {
+            // If prevIdx is -1, just return the answer without caching.
+            // (It will never be asked for this exact state again anyway!)
+            return max(take, notTake);
+        }
     }
 
     int lengthOfLIS(vector<int> &nums)
     {
         int n = nums.size();
-        vector<vector<int>> dp(n, vector<int>(n + 1, -1)); // dp[curIdx][prevIdx+1]
+
+        // Initialize an N x N DP table, saving memory by not adding the +1 pad.
+        vector<vector<int>> dp(n, vector<int>(n, -1));
+
+        // Start at index 0 with no previous element selected.
         return recLIScount(0, -1, nums, n, dp);
     }
 
@@ -197,149 +210,170 @@ public:
                 // Option 1: Take current element
                 if (prevIdx == -1 || nums[prevIdx] < nums[curIdx])
                 {
-                    take = 1 + dp[curIdx + 1][curIdx + (+1)];
+                    take = 1 + dp[curIdx + 1][curIdx + (1)];
                 }
 
                 // Option 2: Skip current element
-                notTake = dp[curIdx + 1][prevIdx + (+1)];
+                notTake = dp[curIdx + 1][prevIdx + (1)];
 
                 dp[curIdx][prevIdx + 1] = max(take, notTake);
             }
         }
 
-        return dp[0][-1 + (+1)]; // starting at index 0 with prevIdx = -1 (mapped to 0)
+        return dp[0][-1 + (1)]; // starting at index 0 with prevIdx = -1 (mapped to 0)
     }
 
     // -----------------------------------------------------------------------------
-    // Approach 3: Iterative DP (Tabulation)    [Needed for printing LIS]
+    // Approach 3: Iterative [1D DP] [RECOMMENDED]
     // Note: This approach
     //            - optimizes space
     //            - Best for Back tracing
     //            - So used for printing LIS
     // -----------------------------------------------------------------------------
     // ---------------------------------------------------------
-    // Method: lengthOfLIS
-    // Purpose: Finds the length of the Longest Increasing Subsequence (LIS)
-    //          in the given array using a classic DP approach.
-    //
-    // Approach (Dynamic Programming - O(n^2)):
-    // 1. Initialize a DP array `dp[n]` where dp[i] represents the length
-    //    of the LIS ending at index i (with nums[i] as the last element).
-    // 2. Base case: Each element alone forms a subsequence of length 1,
-    //    so initialize dp[i] = 1 for all i.
-    // 3. For each index `cur` (from 1 → n-1):
-    //      - Check all previous indices `prev` (from 0 → cur-1).
-    //      - If nums[prev] < nums[cur], then nums[cur] can extend
-    //        the subsequence ending at nums[prev].
-    //      - Update dp[cur] = max(dp[cur], dp[prev] + 1).
-    // 4. The answer is the maximum value in dp[] because the LIS
-    //    can end at any index.
-    //
-    // Example:
-    //   nums = [10, 22, 9, 33, 21, 50]
-    //   dp progression:
-    //   Initially: [1, 1, 1, 1, 1, 1]
-    //   After processing: [1, 2, 1, 3, 2, 4]
-    //   Answer = 4 (LIS = [10, 22, 33, 50])
-    //
-    // Time Complexity: O(n^2)
-    //   - For each element (n iterations), check all previous (up to n).
-    //   - Total = n * n = O(n^2).
-    //
-    // Space Complexity: O(n)
-    //   - Extra dp array of size n.
-    //   - No additional recursion/stack overhead.
-    // ---------------------------------------------------------
-
+    /**
+     * @brief Computes the length of the Longest Increasing Subsequence (LIS).
+     * * --- STATE DEFINITION ---
+     * dp[i] represents the length of the longest strictly increasing subsequence
+     * that ENDS EXACTLY at the element nums[i-1] (using 1-based indexing).
+     * * --- APPROACH ---
+     * We initialize the DP array with 1s because every individual number is,
+     * at minimum, an increasing subsequence of length 1.
+     * As we iterate through the array (curI), we look backwards at every single
+     * previous element (prevI). If the current number is strictly greater than
+     * the previous number, it means we can safely extend the subsequence that
+     * ended at prevI. We take the maximum of all these possible extensions.
+     * * --- COMPLEXITY ---
+     * Time Complexity  : O(N^2) - The nested loops compare every pair of elements.
+     * Space Complexity : O(N)   - We use a single 1D array of size N+1.
+     */
     int lengthOfLIS(vector<int> &nums)
     {
+
         int n = nums.size();
 
-        // dp[i] = length of LIS ending at index i
-        vector<int> dp(n, 1);
+        // Initialize a DP array of size n+1 with 1s.
+        // Base case: A single element is always an increasing sequence of length 1.
+        vector<int> dp(n + 1, 1);
 
-        // Build LIS lengths
-        for (int cur = 1; cur < n; cur++)
+        // Keeps track of the absolute longest sequence found anywhere in the array.
+        int maxLen = 1;
+
+        // curI represents the current element we are evaluating as the "end" of a sequence.
+        // (Using 1-based indexing, so it maps to nums[curI-1])
+        for (int curI = 1; curI <= n; ++curI)
         {
-            for (int prev = 0; prev < cur; prev++)
+
+            // prevI scans every element that came BEFORE curI
+            for (int prevI = 1; prevI < curI; ++prevI)
             {
-                if (nums[prev] < nums[cur])
+
+                // STRICTLY INCREASING CHECK:
+                // Can we append the current number to the sequence ending at prevI?
+                if (nums[prevI - 1] < nums[curI - 1])
                 {
-                    // If nums[cur] can extend LIS ending at nums[prev]
-                    dp[cur] = max(dp[cur], dp[prev] + 1);
+
+                    // If yes, the new sequence length would be the best sequence
+                    // from prevI, plus 1 (for the current number).
+                    int take = 1 + dp[prevI];
+
+                    // We want the MAXIMUM possible length ending at curI,
+                    // so we compare this new 'take' length against whatever we already found.
+                    dp[curI] = max(dp[curI], take);
                 }
             }
+
+            // Update our global maximum
+            maxLen = max(maxLen, dp[curI]);
         }
 
-        // Result = max LIS length across all indices
-        return *max_element(dp.begin(), dp.end());
+        // Return the length of the longest sequence found overall
+        return maxLen;
     }
 
-    //-------------------------------------------------------------------------------
-    // 2. Title: Longest Increasing Subsequence | Binary Search | (DP-43)
-    //-------------------------------------------------------------------------------
-
     // -----------------------------------------------------------------------------
-    // Approach 4: Using Binary Search [OPTIMAL]
+    // Approach 4: Using Patience Sorting + Binary Search [OPTIMAL]
     // -----------------------------------------------------------------------------
-    // Idea:
-    // - Maintain a temporary array `temp` that helps track the smallest possible
-    //   tail elements of increasing subsequences of different lengths.
-    // - Iterate through `nums`:
-    //   1. If current element is greater than the last element in `temp`,
-    //      append it to `temp` (we extend the LIS).
-    //   2. Otherwise, find the first element in `temp` which is >= current element
-    //      (using binary search, i.e., `lower_bound`) and replace it.
-    //      -> This ensures `temp` remains sorted and has the smallest possible
-    //         values at each length, which is crucial for LIS length calculation.
-    // - The size of `temp` at the end is the length of LIS.
-    //
-    // Note:
-    // - `temp` does not store the actual LIS sequence but its length correctly.
-    // - To reconstruct the LIS sequence, extra tracking arrays are required.
-    //
-    // Example: nums = [10, 9, 2, 5, 3, 7, 101, 18]
-    //   Iterations:
-    //     temp = [10]
-    //     temp = [9]
-    //     temp = [2]
-    //     temp = [2, 5]
-    //     temp = [2, 3]
-    //     temp = [2, 3, 7]
-    //     temp = [2, 3, 7, 101]
-    //     temp = [2, 3, 7, 18]
-    //   Answer = 4 (LIS length)
-    //
-    // Time Complexity: O(n log n)
-    //   - For each of the n elements, we may do a binary search in `temp` (O(log n)).
-    // Space Complexity: O(n)
-    //   - In the worst case (strictly increasing input), `temp` can grow to size n.
-    // -----------------------------------------------------------------------------
-    
+    /**
+     * @brief Computes the length of LIS using Greedy + Binary Search (Patience Sorting).
+     *
+     * * --- THE IDEA (Greedy Strategy) ---
+     * To build the longest possible increasing subsequence, we want the numbers
+     * inside our sequence to grow as SLOWLY as possible.
+     * If we have a choice between ending a sequence of length 2 with a '10' or a '3',
+     * we should ALWAYS choose the '3', because a smaller tail makes it much easier
+     * to append future numbers!
+     * * `sortedSeq[k]` will store the SMALLEST possible tail element for an increasing
+     * subsequence of length `k + 1`.
+     *
+     * Note: The elements inside the sorted sequence don't form a valid sequence from the original array.
+     *
+     * * --- THE RULES ---
+     * As we iterate through 'nums', for every number 'x':
+     * 1. If 'x' is larger than the last element in 'sortedSeq', it means we can
+     * extend our longest sequence. We just append 'x' to the end.
+     * 2. If 'x' is smaller, we can't extend the max length. BUT, we can use 'x'
+     * to "upgrade" a previous tail. We use Binary Search to find the first
+     * element in 'sortedSeq' that is >= 'x', and we overwrite it with 'x'.
+     * (This keeps our tails as small as possible for future numbers).
+     *
+     * * --- STEP-BY-STEP EXAMPLE ---
+     * nums = [10, 9, 2, 5, 3, 7, 101, 18]
+     * * 1. x = 10  -> sortedSeq is empty. Append 10.
+     * sortedSeq = [10]
+     * * 2. x = 9   -> 9 is not > 10. Binary search finds 10. Overwrite 10 with 9.
+     * sortedSeq = [9]  (We upgraded our tail for length 1 from 10 to 9!)
+     * * 3. x = 2   -> Overwrite 9 with 2.
+     * sortedSeq = [2]
+     * * 4. x = 5   -> 5 > 2. Append 5.
+     * sortedSeq = [2, 5]
+     * * 5. x = 3   -> 3 is not > 5. Binary search finds 5. Overwrite 5 with 3.
+     * sortedSeq = [2, 3] (Upgraded tail for length 2 from 5 to 3. Brilliant!)
+     * * 6. x = 7   -> 7 > 3. Append 7.
+     * sortedSeq = [2, 3, 7]
+     * * 7. x = 101 -> 101 > 7. Append 101.
+     * sortedSeq = [2, 3, 7, 101]
+     * * 8. x = 18  -> Overwrite 101 with 18.
+     * sortedSeq = [2, 3, 7, 18]
+     * * Result: Size is 4. (Notice how the tails were kept perfectly minimal!)
+     * * --- COMPLEXITY ---
+     * Time Complexity  : O(N log N) - We iterate N times, and each binary search is O(log N).
+     * Space Complexity : O(N)       - The sortedSeq array can grow up to size N.
+     */
     int lengthOfLIS(vector<int> &nums)
     {
+
         int n = nums.size();
+        if (n == 0)
+            return 0;
 
-        // `temp` will hold the "LIS candidate tails"
-        vector<int> temp;
-        temp.push_back(nums[0]);
+        // This array holds the smallest tails of all increasing subsequences found.
+        vector<int> sortedSeq;
 
-        for (int i = 1; i < n; i++)
+        for (int i = 0; i < n; ++i)
         {
-            if (nums[i] > temp.back())
+
+            // RULE 1: If 'sortedSeq' is empty, or the current number is strictly
+            // greater than the largest tail we've found, we extend our max length!
+            if (sortedSeq.empty() || sortedSeq.back() < nums[i])
             {
-                // Case 1: Current number extends LIS
-                temp.push_back(nums[i]);
+                sortedSeq.push_back(nums[i]);
             }
+            // RULE 2: If the current number is smaller, we can't extend the length,
+            // but we CAN optimize one of our previous tails to be smaller.
             else
             {
-                // Case 2: Replace the first element >= nums[i] to keep sequence optimal
-                auto it = lower_bound(temp.begin(), temp.end(), nums[i]);
+                // lower_bound uses binary search to find the FIRST iterator pointing
+                // to a value that is greater than or equal to nums[i].
+                auto it = lower_bound(sortedSeq.begin(), sortedSeq.end(), nums[i]);
+
+                // Overwrite the old, larger tail with our new, smaller tail.
                 *it = nums[i];
             }
         }
 
-        return temp.size(); // LIS length
+        // The length of sortedSeq represents the length of the longest sequence.
+        return sortedSeq.size();
     }
 };
 

@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Longest Divisible Subset | (DP-44)
+1. Title: Longest Divisible Subset
 
 Links:
 https://takeuforward.org/data-structure/longest-divisible-subset-dp-44/
@@ -28,9 +28,8 @@ https://leetcode.com/problems/largest-divisible-subset/description/
 
 Problem statement:
 Given a set of distinct positive integers nums, return the largest subset answer such that every pair (answer[i], answer[j]) of elements in this subset satisfies:
-
-answer[i] % answer[j] == 0, or
-answer[j] % answer[i] == 0
+    answer[i] % answer[j] == 0, or
+    answer[j] % answer[i] == 0
 If there are multiple solutions, return any of them.
 
 Examples:
@@ -77,85 +76,123 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Longest Divisible Subset
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Longest Divisible Subset | (DP-44)
-
-    /* -------------------------------------------------------------------------
-       Problem: Largest Divisible Subset
-       Idea:
-       - Find the largest subset where every pair (a, b) satisfies a % b == 0 or b % a == 0.
-       - Sort the array for easier divisibility checks.
-       - dp[i] stores the length of the largest divisible subset ending at index i.
-       - prev[i] stores the previous index in the subset chain.
-       - Update dp[curI] if nums[curI] can extend a previous divisible subset.
-       - Reconstruct the subset using prev[].
-       Time Complexity: O(n^2)
-       Space Complexity: O(n)
-   ------------------------------------------------------------------------- */
-
+    /**
+     * @brief Computes and reconstructs the Largest Divisible Subset.
+     *
+     *
+     * * --- THE APPROACH (LIS Variant + Math Transitivity) ---
+     * 1. Sort the array. This guarantees that for any valid subset [a, b, c]
+     * where a < b < c, we only need to check if c % b == 0. If it is,
+     * transitivity ensures c % a == 0 is also true!
+     *
+     * 2. Use a DP array to track the longest subset ending at each index.
+     *
+     * 3. Use a 'pre' (parent) array to remember exactly which previous element
+     * gave us the optimal length.
+     *
+     * 4. Trace backward from the best ending index to reconstruct the subset.
+     *
+     *
+     * * --- COMPLEXITY ---
+     * Time Complexity: O(N log N) for sorting + O(N^2) for the nested DP loops = O(N^2).
+     * Space Complexity: O(N) to store the dp and parent arrays.
+     */
     vector<int> largestDivisibleSubset(vector<int> &nums)
     {
 
-        int n = nums.size();
-
-        /* Step 1: Sort the array to simplify divisibility checking */
+        // --- STEP 1: THE CRUCIAL SORT ---
+        // Sorting guarantees that we only ever check smaller divisors against
+        // larger multiples, unlocking the transitivity rule.
         sort(nums.begin(), nums.end());
 
-        /* dp[i] = length of largest divisible subset ending at i */
-        vector<int> dp(n, 1);
+        int n = nums.size();
 
-        /* prev[i] = index of previous element in chain ending at i */
-        vector<int> prev(n, -1);
+        // Edge case safety (though LeetCode constraints guarantee n >= 1)
+        if (n == 0)
+            return {};
 
-        /* Step 2: Build dp table by checking all previous elements */
-        for (int curI = 1; curI < n; curI++)
+        // dp[i] stores the max length of a divisible subset ending at index i.
+        // pre[i] stores the index of the previous element in that subset.
+        vector<int> dp(n, 1), pre(n, -1);
+
+        // Trackers for the global maximum subset found anywhere in the array.
+        int maxLen = 1;
+
+        // Initialize to n-1. If no elements divide each other (e.g., [2, 3, 5]),
+        // any single element is a valid subset of length 1. Picking the last one is fine.
+        int lastIdx = n - 1;
+
+        // --- STEP 2: BUILD DP TABLE & PARENT POINTERS ---
+        for (int curI = 1; curI < n; ++curI)
         {
-            for (int preI = 0; preI < curI; preI++)
+
+            // Look back at all smaller numbers before curI
+            for (int prevI = 0; prevI < curI; ++prevI)
             {
-                /* Check divisibility condition */
-                if (nums[curI] % nums[preI] == 0)
+
+                // THE CONDITION: Is curI completely divisible by prevI?
+                if (nums[curI] % nums[prevI] == 0)
                 {
-                    int newCount = dp[preI] + 1;
-                    if (newCount > dp[curI])
+
+                    // If yes, we can append curI to the subset that ended at prevI
+                    int take = 1 + dp[prevI];
+
+                    // If this forms a strictly longer subset than what curI currently has:
+                    if (dp[curI] < take)
                     {
-                        dp[curI] = newCount;
-                        prev[curI] = preI; /* Link current element to previous in subset */
+
+                        // 1. Update the max length for curI
+                        dp[curI] = take;
+
+                        // 2. PARENT TRACKING: Remember that prevI is the element that
+                        // successfully divided curI to give us this optimal length!
+                        pre[curI] = prevI;
                     }
                 }
             }
-        }
 
-        /* Step 3: Find the index of maximum subset length */
-        int maxLen = 0, maxIndex = -1;
-        for (int i = 0; i < n; i++)
-        {
-            if (dp[i] > maxLen)
+            // --- STEP 3: TRACK THE GLOBAL MAXIMUM ---
+            // After evaluating all predecessors for curI, check if it forms
+            // the longest divisible subset seen so far globally.
+            if (maxLen < dp[curI])
             {
-                maxLen = dp[i];
-                maxIndex = i;
+                maxLen = dp[curI];
+
+                // Update the starting point for our backward reconstruction
+                lastIdx = curI;
             }
         }
 
-        /* Step 4: Reconstruct subset by backtracking prev[] */
+        // --- STEP 4: RECONSTRUCT THE SUBSET ---
         vector<int> ans;
-        int idx = maxIndex;
-        while (idx != -1)
+
+        // Start tracing back from the index that holds the end of the longest subset
+        int i = lastIdx;
+
+        // Follow the breadcrumbs in the 'pre' array until we hit -1
+        while (i != -1)
         {
-            ans.push_back(nums[idx]);
-            idx = prev[idx];
+            ans.push_back(nums[i]); // Add the actual value to our answer
+            i = pre[i];             // Jump backwards to the parent index
         }
 
-        /* Optional: reverse(ans.begin(), ans.end()); to get increasing order */
+        // Because we traced backwards, the subset is currently largest-to-smallest.
+        // Reverse it to return it in standard smallest-to-largest order.
+        reverse(ans.begin(), ans.end());
+
         return ans;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

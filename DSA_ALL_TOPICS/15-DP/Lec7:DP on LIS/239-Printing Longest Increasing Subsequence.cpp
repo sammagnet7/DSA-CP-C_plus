@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Printing Longest Increasing Subsequence | (DP-42)
+1. Title: Printing Longest Increasing Subsequence
 
 Links:
 https://takeuforward.org/data-structure/printing-longest-increasing-subsequence-dp-42/
@@ -67,20 +67,17 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Printing Longest Increasing Subsequence
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Printing Longest Increasing Subsequence | (DP-42)
-
     // -----------------------------------------------------------------------------
     // Approach 1: Iterative DP (Bottom-Up Tabulation) => Then Trace-back
     //             Note: This same trace-back won't work for Top-down dp. Need tweak.
     // -----------------------------------------------------------------------------
-    // ---------------------------------------------------------
-    // Method: printingLongestIncreasingSubsequence
-    // Purpose: Computes the Longest Increasing Subsequence (LIS)
-    //          of an array and reconstructs the actual subsequence.
     //
     // Approach:
     // 1. Bottom-up DP table construction (tabulation).
@@ -177,85 +174,104 @@ public:
     }
 
     // -----------------------------------------------------------------------------
-    // Approach 2: Iterative DP (Tabulation)    [Needed for printing LIS]
+    // Approach 2: Iterative DP (Tabulation) [RECOMMENDED]
     // Note: This approach
     //            - optimizes space
     //            - Best for Back tracing
     //            - So used for printing LIS
     // -----------------------------------------------------------------------------
-    // ------------------------------------------------------------------
-    // Method: printingLongestIncreasingSubsequence
-    // Purpose: Returns the Longest Increasing Subsequence (LIS) of an array
-    // Approach:
-    //   - Dynamic Programming (O(n^2)) + predecessor tracking
-    //   - dp[i] = length of LIS ending at index i
-    //   - pre[i] = index of the previous element in the LIS ending at i
-    //   - After filling dp[] and pre[], reconstruct LIS by backtracking
-    //
-    // Time Complexity: O(n^2)
-    //   -> Nested loop for building dp and predecessor arrays
-    //
-    // Space Complexity: O(n)
-    //   -> dp[] and pre[] arrays of size n
-    // ------------------------------------------------------------------
-
+    /**
+     * @brief Computes and reconstructs the actual Longest Increasing Subsequence (LIS).
+     * * --- THE APPROACH (DP + Parent Pointers) ---
+     * 1. Calculate the LIS using standard O(N^2) 1D DP.
+     * 2. Maintain a `prev` array. Whenever we update `dp[curI]` to a better length
+     * by appending to `prevI`, we record `prev[curI] = prevI`. This creates a
+     * chain of indices we can follow backward.
+     * 3. Track the index `lisLastI` where the absolute longest sequence ends.
+     * 4. Trace backward from `lisLastI` using the `prev` array to build the sequence,
+     * then reverse it to get the correct forward order.
+     * * --- COMPLEXITY ---
+     * Time Complexity: O(N^2) to build the DP table, plus O(N) to reconstruct. Total: O(N^2).
+     * Space Complexity: O(N) for the dp array, prev array, and the answer array.
+     */
     vector<int> printingLongestIncreasingSubsequence(vector<int> arr, int n)
     {
 
-        // dp[i] -> length of LIS ending at index i
-        vector<int> dp(n, 1);
+        // dp[i] stores the max length of LIS ending at index i. Initialized to 1.
+        // prev[i] stores the index of the previous element in the LIS ending at i.
+        // Initialized to -1 (meaning "no previous element / start of sequence").
+        vector<int> dp(n, 1), prev(n, -1);
 
-        // pre[i] -> predecessor index in LIS ending at i (-1 means no predecessor)
-        vector<int> predecessor(n, -1);
+        // Trackers for the global maximum LIS
+        int maxLen = 1;
 
-        // Build dp and predecessor arrays
-        for (int current = 1; current < n; current++)
+        // Default the last index to the end of the array. (If the array is strictly
+        // decreasing, any single element is a valid LIS of length 1, so picking n-1 is safe).
+        int lisLastI = n - 1;
+
+        // --- STEP 1: BUILD DP TABLE & PARENT POINTERS ---
+        for (int curI = 0; curI < n; ++curI)
         {
-            for (int previous = 0; previous < current; previous++)
+
+            // Look back at all previous elements
+            for (int prevI = 0; prevI < curI; ++prevI)
             {
-                if (arr[previous] < arr[current])
+
+                // Check if we can strictly increase the sequence
+                if (arr[prevI] < arr[curI])
                 {
-                    // If arr[current] can extend LIS ending at arr[previous]
-                    int newLen = dp[previous] + 1;
-                    if (newLen > dp[current])
+
+                    // Calculate the potential new length if we append arr[curI] to arr[prevI]
+                    int take = 1 + dp[prevI];
+
+                    // If this new length is strictly better than what we currently have for curI...
+                    if (dp[curI] < take)
                     {
-                        dp[current] = newLen;
-                        predecessor[current] = previous; // link to best predecessor
+
+                        // 1. Update the max length for curI
+                        dp[curI] = take;
+
+                        // 2. PARENT TRACKING: Remember that prevI is the element that
+                        // gave us this optimal length!
+                        prev[curI] = prevI;
                     }
                 }
             }
-        }
 
-        // Find index of last element of LIS (max value in dp)
-        int lisEndIndex = -1;
-        int lisLength = 0;
-        for (int i = 0; i < n; i++)
-        {
-            if (dp[i] > lisLength)
+            // --- STEP 2: TRACK THE GLOBAL MAXIMUM ---
+            // After fully evaluating curI, check if it forms the longest sequence seen so far globally.
+            if (maxLen < dp[curI])
             {
-                lisLength = dp[i];
-                lisEndIndex = i;
+                maxLen = dp[curI];
+                // Update the starting point for our backward reconstruction
+                lisLastI = curI;
             }
         }
 
-        // Reconstruct LIS by backtracking using predecessor[]
-        vector<int> lis(lisLength);
-        int idx = lisEndIndex;
-        int fillPos = lisLength - 1;
+        // --- STEP 3: RECONSTRUCT THE SEQUENCE ---
+        vector<int> ans;
 
-        while (idx >= 0)
+        // Start tracing back from the index that holds the end of the global longest sequence
+        int i = lisLastI;
+
+        // Follow the breadcrumbs in the `prev` array until we hit -1 (the start of the sequence)
+        while (i != -1)
         {
-            lis[fillPos--] = arr[idx];
-            idx = predecessor[idx];
+            ans.push_back(arr[i]); // Add the actual value to our answer
+            i = prev[i];           // Jump backwards to the parent index
         }
 
-        return lis;
-    }
+        // Because we traced backwards from the end to the start, our sequence is in reverse order.
+        // Reverse it to get the correct chronological LIS!
+        reverse(ans.begin(), ans.end());
 
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
+        return ans;
+    }
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
