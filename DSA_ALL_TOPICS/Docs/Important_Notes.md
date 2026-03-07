@@ -1129,5 +1129,12 @@ bool wrong = static_cast<bool>('0'); // Result: true
     - Ans: `n chose n/2`, this complexity rougly equivalent to `4^(n/2) = 2^n`. 
     - [source](https://en.wikipedia.org/wiki/Central_binomial_coefficient)
 50. In **recursion** or **DP** while doing substraction remember to add the `MOD` value before `%MOD`, to get rid of wrong `-ve` value cause by modular arithmatic.
-51. 
+51. Erase by Index/Position in string
+The std::string::erase() function has overloads that take a starting position (index) and an optional length, or iterators defining a range. 
+
+| Method | Parameters | Description | Example |
+|------|------|-------------|---------|
+| `erase(pos, len)` | `size_t pos, size_t len` | Removes `len` characters starting from index `pos`. | `str.erase(5, 1);` // Removes 1 char at index 5 |
+| `erase(position)` | `iterator position` | Removes a single character at the given iterator position. | `str.erase(str.begin() + 5);` // Removes char at index 5 |
+| `erase(first, last)` | `iterator first, iterator last` | Removes characters in the range `[first, last)` (inclusive of `first`, exclusive of `last`). | `str.erase(str.begin(), str.begin() + 5);` // Removes first 5 chars |
 ---
