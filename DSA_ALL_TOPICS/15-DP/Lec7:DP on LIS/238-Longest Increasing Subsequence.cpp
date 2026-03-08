@@ -317,26 +317,15 @@ public:
      * element in 'sortedSeq' that is >= 'x', and we overwrite it with 'x'.
      * (This keeps our tails as small as possible for future numbers).
      *
-     * * --- STEP-BY-STEP EXAMPLE ---
-     * nums = [10, 9, 2, 5, 3, 7, 101, 18]
-     * * 1. x = 10  -> sortedSeq is empty. Append 10.
-     * sortedSeq = [10]
-     * * 2. x = 9   -> 9 is not > 10. Binary search finds 10. Overwrite 10 with 9.
-     * sortedSeq = [9]  (We upgraded our tail for length 1 from 10 to 9!)
-     * * 3. x = 2   -> Overwrite 9 with 2.
-     * sortedSeq = [2]
-     * * 4. x = 5   -> 5 > 2. Append 5.
-     * sortedSeq = [2, 5]
-     * * 5. x = 3   -> 3 is not > 5. Binary search finds 5. Overwrite 5 with 3.
-     * sortedSeq = [2, 3] (Upgraded tail for length 2 from 5 to 3. Brilliant!)
-     * * 6. x = 7   -> 7 > 3. Append 7.
-     * sortedSeq = [2, 3, 7]
-     * * 7. x = 101 -> 101 > 7. Append 101.
-     * sortedSeq = [2, 3, 7, 101]
-     * * 8. x = 18  -> Overwrite 101 with 18.
-     * sortedSeq = [2, 3, 7, 18]
-     * * Result: Size is 4. (Notice how the tails were kept perfectly minimal!)
-     * * --- COMPLEXITY ---
+     * * * --- EXAMPLE TRACE: nums = [10, 11, 12, 1, 2, 3, 4] ---
+     * 1. num = 10 -> tails = [10]         (Length 1)
+     * 2. num = 11 -> tails = [10, 11]     (Length 2)
+     * 3. num = 12 -> tails = [10, 11, 12] (Length 3)
+     * 4. num = 1  -> tails = [1,  11, 12] (Overwrite 10. Length is still 3, but we lowered the barrier!)
+     * 5. num = 2  -> tails = [1,  2,  12] (Overwrite 11)
+     * 6. num = 3  -> tails = [1,  2,  3]  (Overwrite 12. We fully replaced the old sequence!)
+     * 7. num = 4  -> tails = [1,  2,  3, 4] (BOOM. 4 extends 3. Final Length is 4!)
+     * * * --- COMPLEXITY ---
      * Time Complexity  : O(N log N) - We iterate N times, and each binary search is O(log N).
      * Space Complexity : O(N)       - The sortedSeq array can grow up to size N.
      */

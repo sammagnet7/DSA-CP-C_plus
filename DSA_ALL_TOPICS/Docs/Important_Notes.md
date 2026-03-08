@@ -789,6 +789,29 @@ Convert string of digits to num:
      long long num = stoll(str_num);
      unsigned long num = stoull(str_num);
 ```
+Convert string of binary digits to int number:
+```cpp
+     #include <bitset>
+     #include <string>
+     string str_num = "101";
+     int num = stoi(str_num, nullptr, 2);
+```
+Convert int number to string of binary digits:
+```cpp
+     #include <bitset>
+     #include <string>
+     int num = 5;
+     string str_num;
+
+     if(num == 0)
+     str_num = "0";
+     else{
+     string str_num_bits = bitset<32>(num).to_string();
+     int leadingZeros = __builtin_clz(num);
+     int usefulBits = 32 - leadingZeros;
+     str_num = str_num_bits.substr(leadingZeros, usefulBits);
+     }
+```
 25.  How to parse comma:
 ```cpp
      stringstream ss(data);
