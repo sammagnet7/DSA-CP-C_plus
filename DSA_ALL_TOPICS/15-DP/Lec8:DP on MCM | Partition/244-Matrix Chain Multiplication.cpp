@@ -18,8 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Matrix Chain Multiplication | (DP-48)
-          Matrix Chain Multiplication | Tabulation Method | (DP-49)
+1. Title: Matrix Chain Multiplication
 
 Links:
 https://takeuforward.org/dynamic-programming/matrix-chain-multiplication-dp-48/
@@ -35,7 +34,7 @@ Problem statement:
 Given a chain of matrices A1, A2, A3,.....An. Your task is to find out the minimum cost to multiply these matrices. The cost of matrix multiplication is defined as the number of scalar multiplications. A Chain of matrices A1, A2, A3,.....An is represented by a sequence of numbers in an array ‘arr’ where the dimension of 1st matrix is equal to arr[0] * arr[1] , 2nd matrix is arr[1] * arr[2], and so on.
 
 For example:
-For arr[ ] = { 10, 20, 30, 40}, matrix A1 = [10 * 20], A2 = [20 * 30], A3 = [30 * 40]
+For arr[ ] = { 10, 20, 30, 40}, matrix A1 = (10 * 20), A2 = (20 * 30), A3 = (30 * 40)
 
 Scalar multiplication of matrix with dimension 10 * 20 is equal to 200.
 
@@ -69,22 +68,18 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Matrix Chain Multiplication
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Matrix Chain Multiplication | (DP-48)
-    //           Matrix Chain Multiplication | Tabulation Method | (DP-49)
+    // ------------------------------
+    // Approach 1: Recursive Method
+    // ------------------------------
 
     /*
-     Problem: Matrix Chain Multiplication
-     -----------------------------------
-     Given an array 'arr' of size N where:
-         - Matrix i has dimensions arr[i-1] x arr[i]
-     Goal: Find the minimum number of scalar multiplications
-           required to multiply the entire chain of matrices.
-
-     Approach: Recursion + Memoization (Top-Down DP)
+    Approach: Recursion + Memoization (Top-Down DP)
      -----------------------------------------------
      - Define recMatrix(i, j) as the minimum number of multiplications
        required to multiply matrices from index i to j.
@@ -146,28 +141,24 @@ public:
         return recMatrix(1, N - 1, arr, N, dp);
     }
 
+    // ------------------------------
+    // Approach 2: Tabulation Method
+    // ------------------------------
     /*
-        Problem: Matrix Chain Multiplication
-        -----------------------------------
-        Given an array 'arr' of size N where:
-            - Matrix i has dimensions arr[i-1] x arr[i]
-        Goal: Find the minimum number of scalar multiplications
-              required to multiply the entire chain of matrices.
-
         Approach: Bottom-Up Dynamic Programming (Tabulation)
         ----------------------------------------------------
         - dp[i][j] = minimum number of multiplications required
                      to multiply matrices from index i to j.
         - Base case:
-            If i == j, only one matrix ? No multiplication ? dp[i][j] = 0
+            If i == j, only one matrix -> No multiplication -> dp[i][j] = 0
         - Transition:
-            For every possible split point k (i ? k < j):
+            For every possible split point k (i <= k < j):
                 cost = dp[i][k] + dp[k+1][j] + (arr[i-1] * arr[k] * arr[j])
             Take the minimum among all splits.
         - Filling order:
             We fill the DP table diagonally (increasing chain length).
-            That?s why the outer loop runs i backwards (N-1 ? 0)
-            and inner loop runs j forward (i+1 ? N-1).
+            That's why the outer loop runs i backwards (N-1 -> 0)
+            and inner loop runs j forward (i+1 -> N-1).
         - Answer is stored in dp[1][N-1].
 
         Time Complexity: O(N^3)
@@ -212,11 +203,11 @@ public:
         // Final answer: cost of multiplying entire chain (1..N-1)
         return dp[1][N - 1];
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
