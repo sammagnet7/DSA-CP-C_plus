@@ -266,10 +266,10 @@ private:
     if (prev == -1 || prev == 1)
     {
       // Try placing a block of size `i` (from 1 up to the allowed limit)
-      for (int i = 1; i <= min(zeroleft, limit); ++i)
+      for (int bs = 1; bs <= min(zeroleft, limit); ++bs)
       {
         // After placing 'i' zeros, the previous block becomes '0'
-        accVal = (accVal + recCount(zeroleft - i, oneleft, 0, limit)) % MOD;
+        accVal = (accVal + recCount(zeroleft - bs, oneleft, 0, limit)) % MOD;
       }
     }
 
@@ -278,10 +278,10 @@ private:
     if (prev == -1 || prev == 0)
     {
       // Try placing a block of size `i` (from 1 up to the allowed limit)
-      for (int i = 1; i <= min(oneleft, limit); ++i)
+      for (int bs = 1; bs <= min(oneleft, limit); ++bs)
       {
         // After placing 'i' ones, the previous block becomes '1'
-        accVal = (accVal + recCount(zeroleft, oneleft - i, 1, limit)) % MOD;
+        accVal = (accVal + recCount(zeroleft, oneleft - bs, 1, limit)) % MOD;
       }
     }
 
@@ -308,11 +308,251 @@ public:
   }
 };
 
-// ----------------------------------------------------------
-// Approach 3: 2d DP [OPTIMAL]
-// ----------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Approach 3: Bottom-Up DP (Block-by-Block / Space Optimized)  [RECOMMENDED 1]
+// ----------------------------------------------------------------------------
+/**
+ * Idea: Bottom-Up Dynamic Programming (Block-Building Approach)
+ * * * Concept:
+ * Instead of generating the array character-by-character, we build it by appending
+ * "blocks" of identical characters. We alternate between adding a block of '0's and
+ * a block of '1's. By enforcing that the size of any block is between 1 and `limit`,
+ * we guarantee the resulting array is always "stable".
+ * * * DP State Definition:
+ * dp[zerosUsed][onesUsed][endsWith]
+ * - `zerosUsed`: The exact number of '0's used to build the current prefix.
+ * - `onesUsed`: The exact number of '1's used to build the current prefix.
+ * - `endsWith`: A boolean-like integer (0 or 1) representing the character
+ * that the current prefix ends with.
+ * - 0: The prefix ends with a block of '0's.
+ * - 1: The prefix ends with a block of '1's.
+ * * * Contrast: Bottom-Up (Prefixes) vs. Top-Down (Suffixes)
+ * This is a classic "State-Machine" DP, which causes a shift in perspective:
+ * - Top-Down (Recursive): You start with the full amount of zeros/ones and ask,
+ * "How do I finish the REST of this array?" The state tracks what is LEFT to
+ * place. The third parameter (`prev`) acts as a RESTRICTION from the past,
+ * dictating what you are allowed to place next.
+ * - Bottom-Up (Iterative): You start with empty arrays and ask, "How did I build
+ * what I CURRENTLY have?" The state tracks what has ALREADY BEEN PLACED. The
+ * third parameter (`endsWith`) acts as a DESCRIPTION of the present, telling
+ * the future loops what they are allowed to append to this prefix.
+ * * * Time Complexity: O(zero * one * limit)
+ * We have two outer loops iterating `zero` and `one` times. Inside, we have
+ * two loops iterating up to `limit` times.
+ * * * Space Complexity: O(zero * one)
+ * We allocate a 3D vector of size (`zero`+1) x (`one`+1) x 2.
+ */
+class Solution
+{
+  // A large prime number used to modulo the results to prevent integer
+  // overflow and satisfy the problem's requirement for large answers.
+  int MOD = 1e9 + 7;
 
+public:
+  int numberOfStableArrays(int zero, int one, int limit)
+  {
 
+    // Initialize the 3D DP table with 0s.
+    // Dimensions are +1 to allow indexing from 0 up to exactly `zero` and `one`.
+    vector<vector<vector<int>>> dp(zero + 1, vector<vector<int>>(one + 1, vector<int>(2, 0)));
+
+    // ==========================================
+    // BASE CASES: Seeding the initial states
+    // ==========================================
+
+    // Base Case 1: Prefixes made ENTIRELY of '0's.
+    // We can place anywhere from 1 up to `limit` zeros in a row.
+    // The `min(zero, limit)` bound ensures we don't try to place more zeros
+    // than we globally possess.
+    for (int zerosUsed = 1; zerosUsed <= min(zero, limit); ++zerosUsed)
+    {
+      dp[zerosUsed][0][0] = 1; // Exactly 1 way to make a pure string of `zerosUsed` zeros.
+    }
+
+    // Base Case 2: Prefixes made ENTIRELY of '1's.
+    // We can place anywhere from 1 up to `limit` ones in a row.
+    for (int onesUsed = 1; onesUsed <= min(one, limit); ++onesUsed)
+    {
+      dp[0][onesUsed][1] = 1; // Exactly 1 way to make a pure string of `onesUsed` ones.
+    }
+
+    // ==========================================
+    // DP TRANSITIONS: Building the prefixes
+    // ==========================================
+
+    // Outer loops: Iterate through all possible quantities of '0's and '1's used so far.
+    // We start at 1 because the 0-cases (pure 0s or pure 1s) are seeded above.
+    for (int zerosUsed = 1; zerosUsed <= zero; ++zerosUsed)
+    {
+      for (int onesUsed = 1; onesUsed <= one; ++onesUsed)
+      {
+
+        // Accumulators to hold the sum of valid configurations for the current state.
+        int waysEndingInZero = 0;
+        int waysEndingInOne = 0;
+
+        // ---------------------------------------------------------
+        // TRANSITION A: Calculating arrays that end in '0'
+        // ---------------------------------------------------------
+        // To end in '0', we must have just appended a block of '0's to a prefix that ended in '1'.
+        // 'blockSize' represents the size of the '0' block we are currently appending.
+        // It must be at least 1, and at most `limit` OR the total '0's we are using (`zerosUsed`).
+        for (int blockSize = 1; blockSize <= min(zerosUsed, limit); ++blockSize)
+        {
+          // If we just appended `blockSize` zeros, the previous state must have had
+          // `zerosUsed - blockSize` zeros, the exact same number of ones (`onesUsed`),
+          // and it MUST have ended in '1' (index 1).
+          waysEndingInZero = (waysEndingInZero + dp[zerosUsed - blockSize][onesUsed][1]) % MOD;
+        }
+
+        // Store the calculated sum into the DP table.
+        dp[zerosUsed][onesUsed][0] = waysEndingInZero;
+
+        // ---------------------------------------------------------
+        // TRANSITION B: Calculating arrays that end in '1'
+        // ---------------------------------------------------------
+        // To end in '1', we must have just appended a block of '1's to a prefix that ended in '0'.
+        // 'blockSize' represents the size of the '1' block we are currently appending.
+        // It must be at least 1, and at most `limit` OR the total '1's we are using (`onesUsed`).
+        for (int blockSize = 1; blockSize <= min(onesUsed, limit); ++blockSize)
+        {
+          // If we just appended `blockSize` ones, the previous state must have had
+          // `onesUsed - blockSize` ones, the exact same number of zeros (`zerosUsed`),
+          // and it MUST have ended in '0' (index 0).
+          waysEndingInOne = (waysEndingInOne + dp[zerosUsed][onesUsed - blockSize][0]) % MOD;
+        }
+
+        // Store the calculated sum into the DP table.
+        dp[zerosUsed][onesUsed][1] = waysEndingInOne;
+      }
+    }
+
+    // ==========================================
+    // FINAL RESULT
+    // ==========================================
+    // The total number of valid stable arrays using EXACTLY `zero` 0s and `one` 1s
+    // is the sum of those configurations that end in '0' and those that end in '1'.
+    return (dp[zero][one][0] + dp[zero][one][1]) % MOD;
+  }
+};
+
+// ----------------------------------------------------------------------------
+// Approach 4: Bottom-Up DP (Time-Space optimized)  [OPTIMAL]  [RECOMMENDED 2]
+// ----------------------------------------------------------------------------
+
+/**
+ * Idea: Bottom-Up Dynamic Programming with Inclusion-Exclusion
+ * * * Concept:
+ * To achieve O(1) time complexity per state, we stop building the array using
+ * "blocks" of characters. Instead, we build it one character at a time.
+ * We naively assume we can append a '0' to ANY valid array from the previous
+ * step. Then, we use the Inclusion-Exclusion principle to mathematically subtract
+ * the exact number of configurations that became invalid (i.e., those that formed
+ * exactly `limit + 1` consecutive characters).
+ * * * DP State Definition:
+ * dp[zerosUsed][onesUsed][endsWith]
+ * - `zerosUsed`: The exact number of '0's used to build the current prefix.
+ * - `onesUsed`: The exact number of '1's used to build the current prefix.
+ * - `endsWith`: The character (0 or 1) that sits at the very end of the prefix.
+ * * * Time Complexity: O(zero * one)
+ * We fill a 2D grid. Every cell calculates its value using O(1) math operations,
+ * completely eliminating the inner `limit` loop. This allows it to pass the
+ * N = 1000 constraints of Version II.
+ * * * Space Complexity: O(zero * one)
+ * The 3D vector allocates space proportional to (zero * one * 2).
+ */
+class Solution
+{
+  int MOD = 1e9 + 7;
+
+public:
+  int numberOfStableArrays(int zero, int one, int limit)
+  {
+
+    // Initialize the DP table. We use standard 'int' to save memory, as our
+    // modulo operations will keep the values well within the 32-bit limit.
+    vector<vector<vector<int>>> dp(zero + 1, vector<vector<int>>(one + 1, vector<int>(2, 0)));
+
+    // ==========================================
+    // BASE CASES
+    // ==========================================
+
+    // Base Case 1: Prefixes made entirely of '0's.
+    // Valid only up to the `limit`.
+    for (int zerosUsed = 1; zerosUsed <= min(zero, limit); ++zerosUsed)
+    {
+      dp[zerosUsed][0][0] = 1;
+    }
+
+    // Base Case 2: Prefixes made entirely of '1's.
+    // Valid only up to the `limit`.
+    for (int onesUsed = 1; onesUsed <= min(one, limit); ++onesUsed)
+    {
+      dp[0][onesUsed][1] = 1;
+    }
+
+    // ==========================================
+    // DP TRANSITIONS
+    // ==========================================
+
+    for (int zerosUsed = 1; zerosUsed <= zero; ++zerosUsed)
+    {
+      for (int onesUsed = 1; onesUsed <= one; ++onesUsed)
+      {
+
+        // ---------------------------------------------------------
+        // CALCULATING ARRAYS ENDING IN '0'
+        // ---------------------------------------------------------
+
+        // 1. Naive Addition:
+        // Assume we can safely append a '0' to ANY valid array that has 1 less zero.
+        // It doesn't matter if the previous array ended in '0' or '1'.
+        dp[zerosUsed][onesUsed][0] = (dp[zerosUsed - 1][onesUsed][0] + dp[zerosUsed - 1][onesUsed][1]) % MOD;
+
+        // 2. Inclusion-Exclusion (Subtracting Invalid States):
+        // If we have used enough zeros that a sequence of `limit + 1` zeros is possible:
+        if (zerosUsed - 1 - limit >= 0)
+        {
+
+          // The invalid states are those that just formed exactly `limit + 1` zeros.
+          // This happens ONLY IF the array was previously formed by a valid prefix
+          // ending in '1', followed by exactly `limit + 1` zeros.
+          // We look back `limit + 1` steps to find how many such prefixes exist:
+          // dp[zerosUsed - 1 - limit][onesUsed][1]
+
+          // Note: We use 1LL * MOD to temporarily cast MOD to a 64-bit integer.
+          // This prevents integer overflow when adding MOD to a potentially negative subtraction result.
+          dp[zerosUsed][onesUsed][0] = (dp[zerosUsed][onesUsed][0] - dp[zerosUsed - 1 - limit][onesUsed][1] + 1LL * MOD) % MOD;
+        }
+
+        // ---------------------------------------------------------
+        // CALCULATING ARRAYS ENDING IN '1'
+        // ---------------------------------------------------------
+
+        // 1. Naive Addition:
+        // Append a '1' to ANY valid array that has 1 less one.
+        dp[zerosUsed][onesUsed][1] = (dp[zerosUsed][onesUsed - 1][0] + dp[zerosUsed][onesUsed - 1][1]) % MOD;
+
+        // 2. Inclusion-Exclusion (Subtracting Invalid States):
+        // If we have used enough ones that a sequence of `limit + 1` ones is possible:
+        if (onesUsed - 1 - limit >= 0)
+        {
+
+          // Subtract configurations that formed exactly `limit + 1` ones.
+          // We look back `limit + 1` steps to find prefixes ending in '0'.
+          dp[zerosUsed][onesUsed][1] = (dp[zerosUsed][onesUsed][1] - dp[zerosUsed][onesUsed - 1 - limit][0] + 1LL * MOD) % MOD;
+        }
+      }
+    }
+
+    // ==========================================
+    // FINAL RESULT
+    // ==========================================
+
+    // Sum the valid combinations ending in '0' and ending in '1'.
+    return (dp[zero][one][0] + dp[zero][one][1]) % MOD;
+  }
+};
 
 int main()
 {
