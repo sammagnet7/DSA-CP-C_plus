@@ -353,6 +353,10 @@
 * **Exactness:** You need to land on a specific integer index. Fixed loops may stop "near" the answer but not *on* it.
 * **Efficiency:** For small ranges, a fixed loop (e.g., 100) is wasteful. A `while` loop terminates immediately when the target is found or boundaries cross.
 
+**3. while(l <= r) vs while(l < r)**
+* Use **`while(l <= r)`** when excluding `mid` from both sides (`l = mid + 1`, `r = mid - 1`), ensuring you check the very last element when `l == r`.
+* Use **`while(l < r)`** when `mid` could be the answer (`r = mid` or `l = mid`), meaning the loop safely terminates exactly when `l == r` pinpoints the boundary.
+
 ---
 <span style="color: violet; font-size: 18px;">**Binary tree:**</span>
 
