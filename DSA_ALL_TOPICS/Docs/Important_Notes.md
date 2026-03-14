@@ -1159,9 +1159,39 @@ bool wrong = static_cast<bool>('0'); // Result: true
 51. Erase by Index/Position in string
 The std::string::erase() function has overloads that take a starting position (index) and an optional length, or iterators defining a range. 
 
-| Method | Parameters | Description | Example |
-|------|------|-------------|---------|
-| `erase(pos, len)` | `size_t pos, size_t len` | Removes `len` characters starting from index `pos`. | `str.erase(5, 1);` // Removes 1 char at index 5 |
-| `erase(position)` | `iterator position` | Removes a single character at the given iterator position. | `str.erase(str.begin() + 5);` // Removes char at index 5 |
-| `erase(first, last)` | `iterator first, iterator last` | Removes characters in the range `[first, last)` (inclusive of `first`, exclusive of `last`). | `str.erase(str.begin(), str.begin() + 5);` // Removes first 5 chars |
+     | Method | Parameters | Description | Example |
+     |------|------|-------------|---------|
+     | `erase(pos, len)` | `size_t pos, size_t len` | Removes `len` characters starting from index `pos`. | `str.erase(5, 1);` // Removes 1 char at index 5 |
+     | `erase(position)` | `iterator position` | Removes a single character at the given iterator position. | `str.erase(str.begin() + 5);` // Removes char at index 5 |
+     | `erase(first, last)` | `iterator first, iterator last` | Removes characters in the range `[first, last)` (inclusive of `first`, exclusive of `last`). | `str.erase(str.begin(), str.begin() + 5);` // Removes first 5 chars |
+
+52. The 0-Index vs 1-Index Trap in Combinatorial Math:
+
+     In decision-tree or combinatorial problems, you are often asked to find the **$k$-th** element (which is `1-indexed`). However, to safely navigate branches using integer division (`/`) and modulo (`%`), your math needs to be **`0-indexed`**. 
+
+     **The Trap (Mixing Indexes):**
+     Doing `k = (k - 1) % prob` repeatedly inside a loop is a fatal bug. 
+     * *Iteration 1:* `k` correctly becomes a 0-indexed remainder.
+     * *Iteration 2:* You subtract `1` from a number that is *already* 0-indexed, creating negative numbers and breaking all subsequent `curPos = (k - 1) / prob` calculations.
+
+     **The Golden Rule:**
+     Convert `k` to 0-indexed **exactly once** at the very beginning of the function. From that point forward, drop the `- 1` entirely.
+
+     **Code Example:**
+     ```cpp
+     // ❌ BAD: Mixing indexes inside the loop
+     int curPos = (k - 1) / prob; 
+     k = (k - 1) % prob; // Breaks on the next loop!
+
+     // ✅ GOOD: Convert ONCE, then use pure 0-indexed math
+     k = k - 1; // Do this at the very top of the function
+
+     while (...) {
+     int curPos = k / prob; // Perfectly isolates the branch index
+     k = k % prob;          // Perfectly updates the remainder for the next level
+     } 
+     ```
+
+53.
+
 ---
