@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Partition Array for Maximum Sum | Front Partition : DP 54
+1. Title: Partition Array for Maximum Sum
 
 Links:
 https://takeuforward.org/data-structure/partition-array-for-maximum-sum-front-partition-dp-54/
@@ -47,7 +47,7 @@ Examples:
 
 Constraints:
 1 <= arr.length <= 500
-0 <= arr[i] <= 109
+0 <= arr[i] <= 10^9
 1 <= k <= arr.length
 
 
@@ -79,13 +79,15 @@ OUTPUT::::::
 
 
 */
-
+//-------------------------------------------------------------------------------
+// 1. Title: Partition Array for Maximum Sum | Front Partition
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Partition Array for Maximum Sum | Front Partition : DP 54
-    //-------------------------------------------------------------------------------
+    //---------------------------------------------
+    // Approach 1: Top-down [OPTIMAL] [Recommended]
+    //---------------------------------------------
 
     /*
         Function: maxPartSum
@@ -168,11 +170,87 @@ public:
 
         return maxPartSum(0, arr, k, n, dp);
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//---------------------------------
+// Approach 2: Bottom up [OPTIMAL]
+//---------------------------------
+
+class Solution
+{
+
+public:
+    /**
+     * @brief Computes the largest sum of the array after partitioning into subarrays of length at most k.
+     * * * * --- THE CORE IDEA: 1D PARTITION DP (FIXED COST) ---
+     * We are avoiding the O(N^3) Matrix Chain Multiplication (MCM) trap!
+     * When we split the array at index 'p', the cost of the left chunk (arr[start...p])
+     * is completely known and FIXED: it's simply the maximum element in that chunk
+     * multiplied by the chunk's length. We lock in this 'leftSum' and immediately
+     * add it to the pre-computed optimal 'rightSum' of the remaining suffix.
+     * * * * --- 1D STATE DEFINITION & TOPOLOGICAL ORDER ---
+     * dp[start]: The maximum sum we can achieve for the suffix arr[start...n-1].
+     * Topological Order: To calculate dp[start], we rely on dp[p+1] (which is to the right).
+     * Therefore, the outer loop MUST iterate backwards from n-1 down to 0.
+     * * * * --- COMPLEXITY ---
+     * Time Complexity  : O(N * K). For each of the N elements, the inner loop runs at most
+     * K times. By tracking the maximum value on the fly ('tillnowMax'), we avoid any
+     * redundant iterations.
+     * Space Complexity : O(N) auxiliary space for the 1D DP array.
+     */
+    int maxSumAfterPartitioning(vector<int> &arr, int k)
+    {
+
+        int n = arr.size();
+
+        // dp array of size n + 1 to easily handle the out-of-bounds base case (dp[n] = 0).
+        vector<int> dp(n + 1, 0);
+
+        // Loop backwards to solve smaller right-side suffixes first
+        for (int start = n - 1; start >= 0; --start)
+        {
+
+            // Track the maximum value seen in the current left chunk
+            int tillnowMax = -1e9;
+
+            // Track the absolute best partition sum for the suffix starting at 'start'
+            int curMaxSum = -1e9;
+
+            // Try placing a cut after index 'p'.
+            // Constraint 1: The chunk length (p - start + 1) cannot exceed 'k'.
+            // Constraint 2: 'p' cannot go out of bounds (p < n).
+            for (int p = start; p <= start + k - 1 && p < n; ++p)
+            {
+
+                // Dynamically update the maximum value as our chunk expands to the right
+                tillnowMax = max(tillnowMax, arr[p]);
+
+                // --- THE "FIXED COST" MATH ---
+                // 1. The left chunk is locked in. Its value is max_element * length.
+                int leftSum = tillnowMax * (p - start + 1);
+
+                // 2. The right suffix is already optimally solved in our DP array!
+                int rightSum = dp[p + 1];
+
+                // Combine them for the total sum of this specific partition split
+                int curSum = leftSum + rightSum;
+
+                // Keep the maximum result across all valid cuts 'p'
+                curMaxSum = max(curMaxSum, curSum);
+            }
+
+            // Store the optimal answer for this specific 'start' index
+            dp[start] = curMaxSum;
+        }
+
+        // The final answer is the maximum sum for the entire array starting at index 0
+        return dp[0];
+    }
+};
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

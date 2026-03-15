@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Count Square Submatrices with All 1s | DP on Rectangles : DP 56
+1. Title: Count Square Submatrices with All 1s | DP on Rectangles
 
 Links:
 https://takeuforward.org/data-structure/count-square-submatrices-with-all-1s-dp-on-rectangles-dp-56/
@@ -93,88 +93,96 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Count Square Submatrices with All 1s | DP on Rectangles
+//-------------------------------------------------------------------------------
+
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Count Square Submatrices with All 1s | DP on Rectangles : DP 56
-    //-------------------------------------------------------------------------------
-
-    /*
-        Function: countSquares
-        --------------------------------------
-        Problem:
-        Given a binary matrix (containing 0s and 1s), count the total number of square submatrices
-        that consist only of 1s.
-
-        Approach:
-        - Use **Dynamic Programming (DP)** to compute the size of the largest square ending at each cell.
-        - Let dp[i][j] represent the size of the largest square submatrix with the bottom-right corner at (i, j).
-        - Recurrence:
-            - If matrix[i][j] == 0 → dp[i][j] = 0 (cannot form a square).
-            - If matrix[i][j] == 1:
-                - If i == 0 OR j == 0 → dp[i][j] = 1 (edge cells can only form 1x1 square).
-                - Otherwise:
-                    dp[i][j] = 1 + min(dp[i-1][j], dp[i-1][j-1], dp[i][j-1])
-                    (Take minimum of top, top-left diagonal, and left squares).
-        - Why? Because a square can only expand if all three directions have at least that size.
-
-        Counting:
-        - Each dp[i][j] contributes to the total count since it represents how many squares end at that cell.
-        - For example, if dp[i][j] = 3, it means:
-            - One 1x1 square, one 2x2 square, and one 3x3 square ending at (i, j).
-
-        Time Complexity:
-        - O(m * n) → Fill DP table and sum up.
-        Space Complexity:
-        - O(m * n) for DP table (can be optimized to O(n) with 1D DP).
-    */
+    /**
+     * @brief Computes the total number of square submatrices containing only 1s.
+     *
+     * * * * * --- THE CORE IDEA: THE "TOP-LEFT" ANCHOR & BOTTLENECK ---
+     * Instead of looking back at the top/left neighbors, we anchor our squares at
+     * the TOP-LEFT corner and look FORWARD (down and right).
+     * To form a square of size K starting at (i, j), the cells immediately below it,
+     * to the right of it, and diagonally bottom-right MUST all be able to form
+     * squares of size K-1. We are bottlenecked by the minimum of those three neighbors.
+     *
+     * * * * * --- THE TRICK: MATRIX PADDING ---
+     * By creating a DP table slightly larger than the original matrix (m+2, n+2),
+     * we surround our grid with an invisible wall of 0s. When our loop checks the
+     * boundaries (the bottom row or rightmost column), it safely reads those 0s
+     * instead of throwing an "Index Out of Bounds" error. This completely eliminates
+     * the need for messy edge-case checks!
+     *
+     * * * * * --- 2D STATE DEFINITION & THE MAGIC AGGREGATION ---
+     * dp[dpi][dpj]: The size of the LARGEST square whose top-left corner is at (i, j).
+     * The Magic: If the largest square starting at (i, j) is size 3, it naturally implies
+     * there is also a size 2 and a size 1 square starting at that exact same spot.
+     * Therefore, the size of the maximum square directly equals the COUNT of valid squares!
+     *
+     * * * * * --- COMPLEXITY ---
+     * Time Complexity  : O(M * N). We iterate through every cell of the matrix exactly once.
+     * Space Complexity : O(M * N) auxiliary space for the padded DP table.
+     */
     int countSquares(vector<vector<int>> &matrix)
     {
 
         int m = matrix.size();
         int n = matrix[0].size();
 
-        vector<vector<int>> dp(m, vector<int>(n, 0)); // DP table to store max square size ending at (i,j)
+        // Create a padded DP table filled with 0s.
+        // (Note: m+1 and n+1 is technically enough, but m+2 and n+2 is perfectly safe!)
+        vector<vector<int>> dp(m + 2, vector<int>(n + 2, 0));
 
-        for (int i = 0; i < m; i++)
+        // This will accumulate the total count of all valid squares
+        int totSqrs = 0;
+
+        // TOPOLOGICAL ORDER: Iterate backwards!
+        // Because a cell relies on the cells below it and to its right, we must
+        // calculate the bottom-right of the matrix first and build upwards.
+        for (int i = m - 1; i >= 0; --i)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = n - 1; j >= 0; --j)
             {
 
-                // Base case: First row or first column → same as input
-                if (i == 0 || j == 0)
+                // Shift our coordinates by +1 to map the 0-indexed original matrix
+                // into our 1-indexed padded DP table.
+                int dpi = i + 1;
+                int dpj = j + 1;
+
+                // If the original cell is a 0, it cannot act as the top-left corner
+                // of ANY square. It remains 0 in the DP table.
+                if (matrix[i][j] == 0)
                 {
-                    dp[i][j] = matrix[i][j];
                     continue;
                 }
 
-                // If current cell is 0 → no square can end here
-                if (matrix[i][j] == 0)
-                    continue;
+                // --- THE TRANSITION (BOTTLENECK) ---
+                // The current cell is a 1. It can form a square of size 1 PLUS the
+                // minimum square size that its three forward-looking neighbors can form.
+                // Because of our padded 0s, boundary cells naturally get a minimum of 0!
+                dp[dpi][dpj] = 1 + min({
+                                       dp[dpi + 1][dpj],    // Cell directly below
+                                       dp[dpi][dpj + 1],    // Cell directly to the right
+                                       dp[dpi + 1][dpj + 1] // Cell diagonally bottom-right
+                                   });
 
-                // Otherwise, compute size of square ending at (i,j)
-                dp[i][j] = 1 + min({dp[i - 1][j], dp[i - 1][j - 1], dp[i][j - 1]});
+                // Add the valid squares starting exactly at this cell to our global total
+                totSqrs += dp[dpi][dpj];
             }
         }
 
-        int ans = 0;
-        // Sum all dp[i][j] values → total number of squares
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                ans += dp[i][j];
-            }
-        }
-
-        return ans;
+        return totSqrs;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
