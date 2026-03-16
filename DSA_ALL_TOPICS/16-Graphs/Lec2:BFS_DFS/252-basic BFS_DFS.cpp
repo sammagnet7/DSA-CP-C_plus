@@ -52,8 +52,8 @@ Examples:
     Visit 4 (the next neighbor of 2) → Final Output: 0, 1, 2, 3, 4
 
 Constraints:
-    1 ≤ V = adj.size() ≤ 104
-    1 ≤ adj[i][j] ≤ 104
+    1 ≤ V = adj.size() ≤ 10^4
+    1 ≤ adj[i][j] ≤ 10^4
 
 
 
@@ -130,9 +130,9 @@ public:
 
     Space Complexity:
     - O(N) for 'visited' array.
-    - O(N) for 'bfs' result array.
     - O(N) for the queue in the worst case (when all nodes are in queue).
-    - Overall: O(3N) ≈ O(N).
+    - Ignoring O(N) for 'bfs' result array.
+    - Overall: O(2N) ≈ O(N).
 
     Steps:
     1. Start BFS from node 0 (assuming graph is connected).
@@ -162,12 +162,12 @@ public:
             bfs.push_back(cur); // Add current node to result
 
             // Traverse all adjacent nodes of 'cur'
-            for (auto e : adjL[cur])
+            for (auto v : adjL[cur])
             { // Loop runs for all edges → O(E) overall
-                if (!visited[e])
+                if (!visited[v])
                 {
-                    visited[e] = 1; // Mark as visited upon first encounter
-                    q.push(e);      // Push neighbor into queue
+                    visited[v] = 1; // Mark as visited upon first encounter
+                    q.push(v);      // Push neighbor into queue
                 }
             }
         }
@@ -213,11 +213,11 @@ public:
         dfs.push_back(cur); // Process current node
 
         // Explore all adjacent nodes of 'cur'
-        for (auto e : adjL[cur])
+        for (auto v : adjL[cur])
         { // Iterates for all neighbors (degree of the node)
-            if (!visited[e])
+            if (!visited[v])
             {
-                traversDFS(e, adjL, visited, dfs); // Recursive DFS call
+                traversDFS(v, adjL, visited, dfs); // Recursive DFS call
             }
         }
     }

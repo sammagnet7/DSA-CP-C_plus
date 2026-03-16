@@ -64,18 +64,14 @@ OUTPUT::::::
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title:
-    //-------------------------------------------------------------------------------
 
     //-------------------------------------------------------------------------------
-    // 2. Title: Graph Representation | C++
+    // 1. Title: Graph Representation | C++
     //-------------------------------------------------------------------------------
 
     void printGraph(int V, vector<vector<int>> &edges)
     {
-        // code here
-
+        
         vector<vector<int>> adj_matrix(V + 1, vector<int>(V + 1, 0));
 
         vector<vector<int>> adj_list(V + 1);

@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Connected Components | Logic Explanation
+1. Title: Connected Components
 
 Links:
 https://takeuforward.org/graph/connected-components-in-graphs/
@@ -27,7 +27,7 @@ https://takeuforward.org/plus/dsa/problems/connected-components?tab=editorial
 https://www.geeksforgeeks.org/problems/connected-components-in-an-undirected-graph/1    (Uses adjacency list as input)
 https://www.naukri.com/code360/problems/dfs-traversal_630462?leftPanelTabValue=PROBLEM  (Uses adjacency list as input)
 
-Similar problems:   
+Similar problems:
     Number of Provinces / Connected Components Problem in Matrix:
     https://takeuforward.org/data-structure/number-of-provinces/
     https://www.youtube.com/watch?v=ACzkVtewUYA
@@ -46,14 +46,13 @@ Examples :
     Input: V = 5, edges[][] = [[0, 1], [2, 1], [3, 4]]
     Output: [[0, 1, 2], [3, 4]]
     Explanation:
-
-    Input: V = 7, edges[][] = [[0, 1], [6, 0], [2, 4], [2, 3], [3, 4]]
-    Output: [[0, 1, 6], [2, 3, 4], [5]]
-    Explanation:
+        Input: V = 7, edges[][] = [[0, 1], [6, 0], [2, 4], [2, 3], [3, 4]]
+        Output: [[0, 1, 6], [2, 3, 4], [5]]
+        Explanation:
 
 Constraints:
-    1 ≤ V ≤ 105
-    1 ≤ edges.size() ≤ 105
+    1 ≤ V ≤ 10^5
+    1 ≤ edges.size() ≤ 10^5
     0 <= edges[i][0], edges[i][1] < V
 
 
@@ -84,39 +83,39 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Connected Components
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Connected Components
-    //-------------------------------------------------------------------------------
     /*
-           Function: traversDFS
-           --------------------
-           Recursive DFS traversal to explore all nodes in the same connected component.
+        Function: traversDFS
+        --------------------
+        Recursive DFS traversal to explore all nodes in the same connected component.
 
-           Parameters:
-           - cur: Current node being processed.
-           - adjL: Graph represented as adjacency list.
-           - visited: Keeps track of visited nodes to avoid revisiting.
-           - dfs: Stores nodes of the current connected component.
+        Parameters:
+        - cur: Current node being processed.
+        - adjL: Graph represented as adjacency list.
+        - visited: Keeps track of visited nodes to avoid revisiting.
+        - dfs: Stores nodes of the current connected component.
 
-           Steps:
-           1. Mark the current node as visited.
-           2. Add the current node to the component list.
-           3. Recursively explore all unvisited neighbors.
+        Steps:
+        1. Mark the current node as visited.
+        2. Add the current node to the component list.
+        3. Recursively explore all unvisited neighbors.
 
-           Time Complexity:
-           - Each node is visited exactly once → O(V)
-           - Each edge is traversed exactly once → O(2E) for undirected graph
-           - Overall: O(V + E)
+        Time Complexity:
+        - Each node is visited exactly once → O(V)
+        - Each edge is traversed exactly once → O(2E) for undirected graph
+        - Overall: O(V + E)
 
-           Space Complexity:
-           - O(V) for visited array
-           - O(V) for current component storage
-           - O(V) for recursion stack (worst case skewed graph)
-           - Overall: O(3V) ≈ O(V)
-       */
+        Space Complexity:
+        - O(V) for visited array
+        - O(V) for current component storage
+        - O(V) for recursion stack (worst case skewed graph)
+        - Overall: O(3V) ≈ O(V)
+    */
     void traversDFS(int cur, vector<vector<int>> &adjL, vector<int> &visited, vector<int> &dfs)
     {
         visited[cur] = 1;   // Mark current node as visited
@@ -193,11 +192,11 @@ public:
 
         return graph;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
