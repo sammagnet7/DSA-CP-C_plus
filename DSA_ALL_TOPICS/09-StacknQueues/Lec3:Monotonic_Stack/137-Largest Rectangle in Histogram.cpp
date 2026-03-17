@@ -25,6 +25,9 @@ https://www.youtube.com/watch?v=Bzat9vgD0fs&list=PLgUwDviBIf0pOd5zvVVSzgpo6BaCpH
 https://takeuforward.org/plus/dsa/problems/largest-rectangle-in-a-histogram?tab=editorial
 https://leetcode.com/problems/largest-rectangle-in-histogram/description/
 
+Similar:
+    https://leetcode.com/problems/largest-submatrix-with-rearrangements/description/
+
 
 Problem statement:
 Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.
