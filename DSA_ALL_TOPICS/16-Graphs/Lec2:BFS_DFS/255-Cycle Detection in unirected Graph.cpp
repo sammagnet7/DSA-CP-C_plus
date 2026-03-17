@@ -27,7 +27,7 @@ https://www.youtube.com/watch?v=BPlrALf1LDU
 https://takeuforward.org/data-structure/detect-cycle-in-an-undirected-graph-using-dfs/
 https://www.youtube.com/watch?v=zQ3zgFypzX4
 https://takeuforward.org/plus/dsa/problems/detect-a-cycle-in-an-undirected-graph?tab=editorial
-https://www.naukri.com/code360/problems/cycle-detection-in-undirected-graph_1062670?leftPanelTabValue=PROBLEM
+https://www.naukri.com/code360/problems/cycle-detection-in-undirected-graph_1062670
 
 
 
@@ -64,7 +64,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Detect cycle in a directed graph (using DFS) : G 19
+2. Title: Detect cycle in a directed graph (using DFS)
 
 Links:
 https://takeuforward.org/data-structure/detect-cycle-in-a-directed-graph-using-dfs-g-19/
@@ -100,7 +100,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-3. Title: G-23. Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS
+3. Title: Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS
 
 Links:
 https://www.youtube.com/watch?v=iTBaI90lpDQ
@@ -121,13 +121,12 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Detect Cycle in an Undirected Graph (using BFS / DFS)
+//-------------------------------------------------------------------------------
 class Solution
 {
-public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Detect Cycle in an Undirected Graph (using BFS / DFS)
-    //-------------------------------------------------------------------------------
-
+private:
     //---------------------------------------------------------
     //               Approach1: using DFS
     //--------------------------------------------------------
@@ -223,19 +222,18 @@ public:
             q.pop();
 
             // Traverse all adjacent nodes
-            for (auto e : adjL[node])
+            for (auto adjN : adjL[node])
             {
-                if (!vis[e])
-                {
-                    // If neighbor is unvisited, mark it visited and push to queue
-                    vis[e] = 1;
-                    q.push({e, node});
+                if(adjN == parent){
+                    continue;
                 }
-                // If neighbor is visited and is NOT the parent, cycle detected
-                else if (e != parent)
-                {
+                if(vis[adjN]){
                     return true;
                 }
+                
+                // If neighbor is unvisited, mark it visited and push to queue
+                vis[adjN] = 1;
+                q.push({adjN, node});
             }
         }
 
@@ -243,6 +241,7 @@ public:
         return false;
     }
 
+public:
     /**
      * Main Function: cycleDetection
      * Detects whether an undirected graph contains a cycle.
@@ -299,11 +298,15 @@ public:
 
         return "No"; // No cycle detected in any component
     }
+};
 
-    //-------------------------------------------------------------------------------
-    // 2. Title: Detect cycle in a Directed graph (using DFS) : G 19
-    //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Detect cycle in a Directed graph (using DFS)
+//-------------------------------------------------------------------------------
 
+class Solution
+{
+private:
     /**
      * @brief DFS helper function to detect cycle in a directed graph
      *
@@ -352,6 +355,7 @@ public:
         return false;
     }
 
+public:
     /**
      * @brief Detect if a directed graph contains a cycle
      *
@@ -396,11 +400,16 @@ public:
 
         return false; // No cycle found
     }
+};
 
-    //---------------------------------------------------------------------------------------------
-    // 3. Title: G-23. Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS
-    //---------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// 3. Title: Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS
+//---------------------------------------------------------------------------------------------
 
+class Solution
+{
+
+public:
     /**
      * @brief Detect cycle in a directed graph using Kahn's Algorithm (BFS Topological Sort)
      *
