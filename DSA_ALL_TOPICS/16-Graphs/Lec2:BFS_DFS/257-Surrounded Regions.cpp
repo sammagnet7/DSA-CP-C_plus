@@ -18,14 +18,17 @@ using namespace std;
 
 /*
 
-1. Title: Surrounded Regions | Replace O’s with X’s
+1. Title: Surrounded Regions [Connected components]
 
 
 Links:
 https://takeuforward.org/graph/surrounded-regions-replace-os-with-xs/
 https://www.youtube.com/watch?v=BtdgAys4yMk
 https://takeuforward.org/plus/dsa/problems/surrounded-regions?tab=editorial
-https://leetcode.com/problems/surrounded-regions/submissions/1747411603/
+https://leetcode.com/problems/surrounded-regions/
+
+Similar:
+    https://leetcode.com/problems/number-of-enclaves/description/
 
 
 Problem statement:
@@ -60,37 +63,13 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Number of Enclaves [flood fill implementation - multisource]
+2. Title:
 
 Links:
-https://takeuforward.org/graph/number-of-enclaves/
-https://www.youtube.com/watch?v=rxKcepXQgU4
-https://takeuforward.org/plus/dsa/problems/number-of-enclaves?tab=editorial
-https://leetcode.com/problems/number-of-enclaves/description/
+
 
 
 Problem statement:
-You are given an m x n binary matrix grid, where 0 represents a sea cell and 1 represents a land cell.
-A move consists of walking from one land cell to another adjacent (4-directionally) land cell or walking off the boundary of the grid.
-Return the number of land cells in grid for which we cannot walk off the boundary of the grid in any number of moves.
-
-Example:
-    Example 1:
-    Input: grid = [[0,0,0,0],[1,0,1,0],[0,1,1,0],[0,0,0,0]]
-    Output: 3
-    Explanation: There are three 1s that are enclosed by 0s, and one 1 that is not enclosed because its on the boundary.
-
-    Example 2:
-    Input: grid = [[0,1,1,0],[0,0,1,0],[0,0,1,0],[0,0,0,0]]
-    Output: 0
-    Explanation: All 1s are either on the boundary or can reach the boundary.
-
-
-Constraints:
-    m == grid.length
-    n == grid[i].length
-    1 <= m, n <= 500
-    grid[i][j] is either 0 or 1.
 
 
 INPUT::::::
@@ -103,300 +82,221 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Surrounded Regions [Connected components]
+//-------------------------------------------------------------------------------
+
+//============================================================================
+// Approach 1: BFS-based (Multi-source from boundary)
+//============================================================================
+
 class Solution
 {
+private:
+    // Direction array for moving right, left, down, up
+    vector<vector<int>> dir = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Surrounded Regions | Replace O’s with X’s
-    //-------------------------------------------------------------------------------
-
-    // Direction array for moving in 4 directions: Down, Up, Right, Left
-    int dir[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
     /**
-     * Helper function to check if (r, c) is a valid index within matrix bounds.
-     * @param r: current row
-     * @param c: current column
-     * @param m: total rows
-     * @param n: total columns
-     * @return true if valid index, false otherwise
-     */
-    bool isIdxValid(int r, int c, int m, int n)
-    {
-        return !(r < 0 || r >= m || c < 0 || c >= n);
-    }
-
-    /**
-     * DFS function to mark all connected 'O' cells starting from (i, j).
-     * These represent boundary-connected regions which should NOT be flipped.
-     * @param i, j: current cell coordinates
-     * @param vis: visited matrix to track processed cells
-     * @param board: input board of 'X' and 'O'
-     * @param m, n: dimensions of the board
-     */
-    void markDFS(int i, int j, vector<vector<int>> &vis, vector<vector<char>> &board, int m, int n)
-    {
-        vis[i][j] = 1; // mark as visited
-
-        // Explore all 4 directions
-        for (int k = 0; k < 4; k++)
-        {
-            int r = i + dir[k][0];
-            int c = j + dir[k][1];
-
-            // Skip invalid or already visited or 'X' cells
-            if (!isIdxValid(r, c, m, n))
-                continue;
-            if (vis[r][c] || board[r][c] == 'X')
-                continue;
-
-            // Recurse for valid 'O' cell
-            markDFS(r, c, vis, board, m, n);
-        }
-    }
-
-    /**
-     * Main function to solve the "Surrounded Regions" problem.
-     * Approach:
-     * 1. Identify all 'O's connected to boundary and mark them as safe (cannot be flipped).
-     * 2. For all other unvisited 'O's, flip them to 'X'.
-     *
-     * Time Complexity: O(M * N) - each cell visited at most once.
-     * Space Complexity: O(M * N) for visited array + recursion stack.
-     *
-     * @param board: reference to the input 2D board
+     * @brief Captures surrounded regions using Multi-Source BFS.
+     * * @idea
+     * Instead of looking for trapped 'O's, we use "Reverse Thinking" to find the
+     * safe 'O's. Any 'O' connected to the boundary cannot be surrounded. We gather
+     * all boundary 'O's and run a Multi-Source BFS to mark their entire connected
+     * components as safe.
+     * * @approach
+     * 1. Scan only the borders of the matrix. If we find an 'O', change it to 'M'
+     * (Marked/Safe) and push it into our BFS queue.
+     * 2. Run the BFS. For every connected 'O', mark it as 'M' and queue it.
+     * 3. Do one final sweep of the entire board. If a cell is 'M', it's safe—revert
+     * it to 'O'. If a cell is 'O', it was trapped—flip it to 'X'.
+     * * @time O(M * N)
+     * The boundary scan takes O(M + N). The BFS visits each safe 'O' exactly once.
+     * The final board sweep takes O(M * N).
+     * * @space O(M * N)
+     * We achieve O(1) auxiliary space for visited tracking by mutating the board
+     * in-place. The only extra space is the BFS queue, which takes O(M * N) in the worst case.
      */
     void solve(vector<vector<char>> &board)
     {
+
         int m = board.size();
         int n = board[0].size();
 
-        // Visited matrix to keep track of processed cells
-        vector<vector<int>> vis(m, vector<int>(n, 0));
+        queue<tuple<int, int>> q;
 
-        // Step 1: Traverse boundary cells and run DFS for each 'O'
-        for (int i = 0; i < m; i++)
+        // --- STEP 1: GATHER BORDER SURVIVORS (Optimized Scan) ---
+
+        // Check first and last column
+        for (int i = 0; i < m; ++i)
         {
-            for (int j = 0; j < n; j++)
+            if (board[i][0] == 'O')
             {
-
-                // Only process boundary cells
-                if (i == 0 || i == m - 1 || j == 0 || j == n - 1)
-                {
-
-                    // If it's already visited or 'X', skip
-                    if (board[i][j] == 'X' || vis[i][j])
-                        continue;
-
-                    // Run DFS for boundary 'O'
-                    markDFS(i, j, vis, board, m, n);
-                }
+                board[i][0] = 'M';
+                q.push({i, 0});
+            }
+            if (board[i][n - 1] == 'O')
+            {
+                board[i][n - 1] = 'M';
+                q.push({i, n - 1});
             }
         }
 
-        // Step 2: Flip all unvisited 'O's to 'X'
-        for (int i = 0; i < m; i++)
+        // Check first and last row
+        for (int j = 0; j < n; ++j)
         {
-            for (int j = 0; j < n; j++)
+            // Note: Corners might be checked twice, but the 'O' check prevents duplicate pushing
+            if (board[0][j] == 'O')
             {
-                if (!vis[i][j])
-                {
-                    board[i][j] = 'X';
-                }
+                board[0][j] = 'M';
+                q.push({0, j});
             }
-        }
-    }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title: Number of Enclaves [flood fill implementation - multisource]
-    //-------------------------------------------------------------------------------
-
-    //============================================================================
-    // Approach 1: DFS-based Flood Fill (Multi-source from boundary)
-    //============================================================================
-
-    // Direction array for 4 possible moves: Down, Up, Right, Left
-    int disDFS[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
-    /**
-     * Check if a given (i, j) lies within the grid boundaries.
-     *
-     * @param i, j: Current cell coordinates
-     * @param m, n: Grid dimensions
-     * @return true if (i, j) is a valid index within grid, false otherwise
-     */
-    bool isValidIdx(int i, int j, int m, int n)
-    {
-        return !(i < 0 || j < 0 || i >= m || j >= n);
-    }
-
-    /**
-     * DFS function to mark all land cells (1) connected to (i, j) as visited.
-     * These cells are connected to the boundary, so they cannot be enclaves.
-     *
-     * @param i, j: Current cell coordinates
-     * @param grid: Input grid (1 = land, 0 = water)
-     * @param vis: Visited matrix
-     * @param m, n: Grid dimensions
-     */
-    void markDFS(int i, int j, vector<vector<int>> &grid, vector<vector<int>> &vis, int m, int n)
-    {
-        vis[i][j] = 1; // Mark current cell as visited
-
-        // Explore 4 directions
-        for (int k = 0; k < 4; k++)
-        {
-            int r = i + disDFS[k][0];
-            int c = j + disDFS[k][1];
-
-            // Skip if out of bounds, already visited, or water
-            if (!isValidIdx(r, c, m, n) || vis[r][c] || grid[r][c] != 1)
-                continue;
-
-            // Recursive DFS call
-            markDFS(r, c, grid, vis, m, n);
-        }
-    }
-
-    /**
-     * Count number of land cells that cannot reach the boundary (enclaves).
-     *
-     * Steps:
-     * 1. Traverse all boundary cells.
-     * 2. For each unvisited land cell on the boundary, run DFS to mark all connected cells.
-     * 3. Count remaining unvisited land cells in the grid.
-     *
-     * Time Complexity: O(M * N) - Each cell visited once
-     * Space Complexity: O(M * N) - Visited matrix + DFS recursion stack
-     *
-     * @param grid: 2D grid representing land and water
-     * @return number of enclaves
-     */
-
-    int numEnclaves(vector<vector<int>> &grid)
-    {
-        int m = grid.size();
-        int n = grid[0].size();
-        vector<vector<int>> vis(m, vector<int>(n, 0));
-
-        // Step 1: DFS from boundary land cells
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
+            if (board[m - 1][j] == 'O')
             {
-                if (i == 0 || j == 0 || i == m - 1 || j == n - 1)
-                {
-                    if (grid[i][j] == 1 && !vis[i][j])
-                        markDFS(i, j, grid, vis, m, n);
-                }
+                board[m - 1][j] = 'M';
+                q.push({m - 1, j});
             }
         }
 
-        // Step 2: Count unvisited land cells
-        int count = 0;
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                if (grid[i][j] == 1 && !vis[i][j])
-                    count++;
-            }
-        }
-        return count;
-    }
-
-    //============================================================================
-    // Approach 2: BFS-based Flood Fill (Multi-source from boundary)
-    //============================================================================
-
-    // Direction array for BFS: Down, Up, Right, Left
-    int disBFS[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
-    /**
-     * BFS function to mark all land cells connected to (i, j) as visited.
-     *
-     * Steps:
-     * - Start BFS from boundary land cell
-     * - For each cell, explore its 4 neighbors and enqueue valid land cells
-     *
-     * @param cur_i, cur_j: Starting cell coordinates
-     * @param grid: Input grid
-     * @param vis: Visited matrix
-     * @param m, n: Grid dimensions
-     *
-     * Time Complexity: O(M * N)
-     * Space Complexity: O(M * N) for queue and visited matrix
-     */
-    void markBFS(int cur_i, int cur_j, vector<vector<int>> &grid, vector<vector<int>> &vis, int m, int n)
-    {
-        queue<pair<int, int>> q;
-        q.push({cur_i, cur_j});
-        vis[cur_i][cur_j] = 1;
-
+        // --- STEP 2: MULTI-SOURCE BFS (Mark all connected safe zones) ---
         while (!q.empty())
         {
-            int i = q.front().first;
-            int j = q.front().second;
+
+            auto [i, j] = q.front();
             q.pop();
 
-            // Explore 4 directions
-            for (int k = 0; k < 4; k++)
+            // Plunge outward in all 4 directions
+            for (int k = 0; k < 4; ++k)
             {
-                int r = i + disBFS[k][0];
-                int c = j + disBFS[k][1];
 
-                if (!isValidIdx(r, c, m, n) || vis[r][c] || grid[r][c] != 1)
+                int adi = i + dir[k][0];
+                int adj = j + dir[k][1];
+
+                // Boundary check
+                if (adi < 0 || adj < 0 || adi >= m || adj >= n)
+                {
                     continue;
+                }
 
-                vis[r][c] = 1;
-                q.push({r, c});
+                // State check: Only spread to connected 'O's
+                if (board[adi][adj] != 'O')
+                {
+                    continue;
+                }
+
+                // Mark as safe and push to queue
+                board[adi][adj] = 'M';
+                q.push({adi, adj});
+            }
+        }
+
+        // --- STEP 3: THE GREAT FLIP ---
+        for (int i = 0; i < m; ++i)
+        {
+            for (int j = 0; j < n; ++j)
+            {
+                // If it's 'M', it's safe ('O'). Otherwise, it's either an original 'X'
+                // or a trapped 'O', both of which become 'X'.
+                board[i][j] = (board[i][j] == 'M') ? 'O' : 'X';
             }
         }
     }
+};
+
+//============================================================================
+// Approach 2: DFS-based (Multi-source from boundary)
+//============================================================================
+
+class Solution
+{
+private:
+    int m, n;
+
+    // Direction array for moving right, left, down, up
+    vector<vector<int>> dir = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     /**
-     * Count number of enclaves using BFS.
-     *
-     * Approach:
-     * - Similar to DFS approach, but uses BFS for marking boundary-connected lands.
-     *
-     * Time Complexity: O(M * N)
-     * Space Complexity: O(M * N)
-     *
-     * @param grid: 2D grid representing land and water
-     * @return number of enclaves
+     * @brief Recursively explores and marks a contiguous region of 'O's as safe ('M').
+     * * @idea
+     * We use the Call Stack to plunge as deep as possible into connected 'O' cells.
+     * By immediately marking a visited cell as 'M', we naturally prevent infinite
+     * recursion loops without needing a separate boolean visited matrix.
      */
-
-    int numEnclaves(vector<vector<int>> &grid)
+    void dfs(vector<vector<char>> &board, int i, int j)
     {
-        int m = grid.size();
-        int n = grid[0].size();
-        vector<vector<int>> vis(m, vector<int>(n, 0));
 
-        // BFS from boundary land cells
-        for (int i = 0; i < m; i++)
+        // 1. Boundary Check: Ensure we don't step outside the board
+        // 2. State Check: If we hit water ('X') or an already marked safe zone ('M'), stop.
+        if (i < 0 || j < 0 || i >= m || j >= n || board[i][j] != 'O')
         {
-            for (int j = 0; j < n; j++)
-            {
-                if (i == 0 || j == 0 || i == m - 1 || j == n - 1)
-                {
-                    if (grid[i][j] == 1 && !vis[i][j])
-                        markBFS(i, j, grid, vis, m, n);
-                }
-            }
+            return;
         }
 
-        // Count unvisited land cells
-        int count = 0;
-        for (int i = 0; i < m; i++)
+        // --- MARK AS SAFE ---
+        board[i][j] = 'M';
+
+        // Recursively plunge outward in all 4 adjacent directions
+        for (int k = 0; k < 4; ++k)
         {
-            for (int j = 0; j < n; j++)
+            dfs(board, i + dir[k][0], j + dir[k][1]);
+        }
+    }
+
+public:
+    /**
+     * @brief Captures surrounded regions using Depth-First Search.
+     * * @idea
+     * "Reverse Thinking": Any 'O' connected to the boundary is safe and cannot be
+     * surrounded. We scan the perimeter, and if we find an 'O', we trigger our DFS
+     * to mark that entire connected component as safe ('M'). After exploring the
+     * boundaries, any remaining 'O's in the middle of the board are guaranteed
+     * to be trapped and can be safely flipped to 'X'.
+     * * @time O(M * N)
+     * Scanning the boundaries takes O(M + N). In the worst case, the DFS visits each
+     * cell exactly once. The final grid sweep takes O(M * N).
+     * * @space O(M * N)
+     * We achieve O(1) auxiliary space by mutating the board directly. The only extra
+     * memory is the DFS Recursion Call Stack, which takes O(M * N) in the absolute
+     * worst case (e.g., the entire board is 'O's).
+     */
+    void solve(vector<vector<char>> &board)
+    {
+
+        m = board.size();
+        n = board[0].size();
+
+        // --- STEP 1: GATHER BORDER SURVIVORS (Optimized O(M+N) Scan) ---
+        // For every boundary 'O', we trigger a DFS to mark its whole connected island as 'M'.
+
+        // Scan the first and last column
+        for (int i = 0; i < m; ++i)
+        {
+            if (board[i][0] == 'O')
+                dfs(board, i, 0);
+            if (board[i][n - 1] == 'O')
+                dfs(board, i, n - 1);
+        }
+
+        // Scan the first and last row
+        for (int j = 0; j < n; ++j)
+        {
+            if (board[0][j] == 'O')
+                dfs(board, 0, j);
+            if (board[m - 1][j] == 'O')
+                dfs(board, m - 1, j);
+        }
+
+        // --- STEP 2: THE GREAT FLIP ---
+        for (int i = 0; i < m; ++i)
+        {
+            for (int j = 0; j < n; ++j)
             {
-                if (grid[i][j] == 1 && !vis[i][j])
-                    count++;
+
+                // If it's 'M', it's safe (revert to 'O').
+                // Otherwise, it's either an original 'X' or a trapped 'O', both become 'X'.
+                board[i][j] = (board[i][j] == 'M') ? 'O' : 'X';
             }
         }
-        return count;
     }
 };
 

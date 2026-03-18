@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Word Ladder - I : G-29
+1. Title: Word Ladder - I
 
 
 Links:
@@ -67,7 +67,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: G-30 : Word Ladder-II
+2. Title: Word Ladder-II
 
 Links:
 https://takeuforward.org/graph/g-30-word-ladder-ii/
@@ -81,7 +81,7 @@ Problem statement:
 
     Every adjacent pair of words differs by a single letter.
     Every si for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.
-    sk == endWord
+    sk == endWord.
     Given two words, beginWord and endWord, and a dictionary wordList, return all the shortest transformation sequences from beginWord to endWord, or an empty list if no such sequence exists. Each sequence should be returned as a list of the words [beginWord, s1, s2, ..., sk].
 
 Examples:
@@ -106,7 +106,7 @@ Constraints:
     beginWord, endWord, and wordList[i] consist of lowercase English letters.
     beginWord != endWord
     All the words in wordList are unique.
-    The sum of all shortest transformation sequences does not exceed 105.
+    The sum of all shortest transformation sequences does not exceed 10^5.
 
 
 
@@ -122,106 +122,120 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Word Ladder - I
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Word Ladder - I : G-29
-    //-------------------------------------------------------------------------------
-
     /**
-     * Function: ladderLength
-     * -----------------------
-     * Computes the shortest transformation sequence length from `beginWord` to `endWord`
-     * where each transformation changes only one character at a time and every intermediate
-     * word must exist in the given word list.
-     *
-     * Approach:
-     * - Use **Breadth-First Search (BFS)** because we need the shortest path in an unweighted graph.
-     * - Treat each word as a node, and an edge exists between two words if they differ by exactly one character.
-     * - Start BFS from `beginWord` with initial level = 1.
-     * - For each word, generate all possible words by changing each character to every letter from 'a' to 'z'.
-     * - If the new word exists in the word set, add it to the BFS queue and remove it from the set (to avoid revisiting).
-     * - If `endWord` is found during BFS, return the current level (distance).
-     * - If BFS finishes without finding `endWord`, return 0.
-     *
-     * Time Complexity:
-     * - Let N = number of words in wordList, L = length of each word.
-     * - For each word popped from the queue, we generate 26 * L possible transformations.
-     * - Each transformation check in the unordered_set takes O(1) average.
-     * - In worst case, all N words are processed: O(N * L * 26) ≈ O(N * L).
-     *
-     * Space Complexity:
-     * - O(N) for unordered_set + O(N) for BFS queue → O(N).
-     *
-     * @param beginWord: Starting word
-     * @param endWord: Target word
-     * @param wordList: List of allowed words
-     * @return Length of shortest transformation sequence (or 0 if none exists)
+     * @brief Computes the length of the shortest transformation sequence.
+     * * @idea
+     * This is a shortest-path problem on an unweighted, implicit graph. Therefore,
+     * Level-Order Breadth-First Search (BFS) is the optimal algorithm. The "levels"
+     * of our BFS represent the number of transformation steps.
+     * * @approach
+     * 1. Load all valid words into an `unordered_set` for O(1) lookups.
+     * 2. Start a BFS queue with the `beginWord` and set the step count to 1.
+     * 3. For each word popped from the queue, generate all possible 1-letter mutations.
+     * 4. If a mutated word exists in the dictionary, push it to the queue.
+     * 5. CRITICAL: Erase the word from the set immediately. Removing it acts as our
+     * O(1) visited tracking, preventing infinite loops (e.g., hot -> dot -> hot).
+     * * @time O(N * L^2)
+     * N is the number of words, L is the word length. We process up to N words.
+     * For each word, we loop L times, replacing characters. Creating the new string
+     * and hashing it for the set lookup takes O(L) time. (L * L * 26 -> O(L^2)).
+     * * @space O(N * L)
+     * We store up to N words in our `unordered_set` and the BFS `queue`.
      */
     int ladderLength(string beginWord, string endWord, vector<string> &wordList)
     {
 
-        // Convert wordList to unordered_set for O(1) lookup
-        unordered_set<string> wordSet(wordList.begin(), wordList.end());
+        // --- STEP 1: INITIALIZE DICTIONARY & QUEUE ---
+        unordered_set<string> dict(wordList.begin(), wordList.end());
 
-        // If endWord not in dictionary, no valid transformation exists
-        if (wordSet.find(endWord) == wordSet.end())
-            return 0;
-
-        // BFS queue: stores {currentWord, currentLevel}
-        queue<pair<string, int>> q;
-        q.push({beginWord, 1});
-
-        // Perform BFS
-        while (!q.empty())
+        // If the target word isn't even in the dictionary, a path is impossible.
+        if (dict.find(endWord) == dict.end())
         {
-            string curW = q.front().first;
-            int curLv = q.front().second;
-            q.pop();
-
-            // If we reached the endWord, return level (distance)
-            if (curW == endWord)
-                return curLv;
-
-            // Try changing each character in current word
-            for (int i = 0; i < curW.size(); i++)
-            {
-                char origCh = curW[i]; // store original character
-
-                // Replace with all 26 letters
-                for (int j = 0; j < 26; j++)
-                {
-                    curW[i] = 'a' + j;
-
-                    // If transformed word exists in dictionary
-                    if (wordSet.find(curW) != wordSet.end())
-                    {
-                        wordSet.erase(curW); // mark as visited
-                        q.push({curW, curLv + 1});
-                    }
-                }
-
-                // Restore original character for next iteration
-                curW[i] = origCh;
-            }
+            return 0;
         }
 
-        // No transformation possible
+        queue<string> q;
+        q.push(beginWord);
+
+        // The problem states the sequence length includes the starting word
+        int steps = 1;
+
+        // --- STEP 2: LEVEL-ORDER BFS ---
+        while (!q.empty())
+        {
+
+            int qsize = q.size();
+
+            // Process all words at the current transformation step
+            while (qsize--)
+            {
+
+                string word = q.front();
+                q.pop();
+
+                // If we reached the target, return the steps immediately!
+                if (word == endWord)
+                {
+                    return steps;
+                }
+
+                // --- GENERATE ALL 1-LETTER MUTATIONS ---
+                for (int i = 0; i < word.length(); ++i)
+                {
+
+                    char originalChar = word[i]; // Remember the original letter
+
+                    // Try replacing the current character with 'a' through 'z'
+                    for (char c = 'a'; c <= 'z'; ++c)
+                    {
+
+                        // Don't bother checking the exact same word
+                        if (c == originalChar)
+                            continue;
+
+                        word[i] = c; // Mutate the string
+
+                        // If this valid mutation exists in our dictionary
+                        if (dict.find(word) != dict.end())
+                        {
+
+                            q.push(word);
+
+                            // Mark as visited by erasing it from the dictionary!
+                            // This prevents other paths from redundantly processing it.
+                            dict.erase(word);
+                        }
+                    }
+
+                    // Backtrack the mutation so we can test the next letter position
+                    word[i] = originalChar;
+                }
+            }
+
+            // Increment steps after finishing a complete level of transformations
+            steps++;
+        }
+
+        // Queue emptied, target never found
         return 0;
     }
+};
 
-    //-------------------------------------------------------------------------------
-    // 2. Title: G-30 : Word Ladder-II
-    //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Word Ladder-II
+//-------------------------------------------------------------------------------
 
+class Solution
+{
+public:
     /**
-     * Function: findSequences
-     * -----------------------
-     * Finds all the shortest transformation sequences from `beginWord` to `endWord` such that:
-     * - Only one letter can be changed at a time.
-     * - Every transformed word must exist in the given word list.
-     *
      * Unlike the ladderLength function (which returns only the length), this function returns **all paths**
      * that achieve the minimum transformation length.
      *
