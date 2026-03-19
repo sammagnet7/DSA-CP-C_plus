@@ -1192,6 +1192,9 @@ The std::string::erase() function has overloads that take a starting position (i
      } 
      ```
 
-53.
+53. **Memory Optimization (2D Vectors):** For small, fixed inner dimensions (like size 2), use `std::vector<std::pair<T, T>>` instead of `std::vector<std::vector<T>>` or two seperate `flat vectors`. This guarantees a single contiguous memory block, completely eliminating the heap fragmentation and CPU cache-miss penalties caused by the 2D vector's array-of-pointers architecture.
+
+54. 
+
 
 ---

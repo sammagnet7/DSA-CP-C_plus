@@ -91,12 +91,106 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Bipartite Graph | BFS Implementation
+//-------------------------------------------------------------------------------
 class Solution
 {
+    //-----------------
+    // Approach 1: DFS
+    //-----------------
+private:
+    /**
+     * @brief DFS helper to 2-color the graph and detect odd-length cycles.
+     * * @idea
+     * We attempt to color the current node with `nodeClr`. For every neighbor,
+     * they MUST be painted with the opposite color. If we ever encounter a neighbor
+     * that has already been painted with our exact same color, the graph contains
+     * an odd-length cycle and cannot be bipartite.
+     */
+    bool dfs(int node, int nodeClr, const vector<vector<int>> &graph, vector<int> &colored)
+    {
+
+        // Bitwise XOR trick: 0 becomes 1, and 1 becomes 0.
+        // (Alternatively, 1 - nodeClr works perfectly too!)
+        int adjClr = nodeClr ^ 1;
+
+        // Iterate through all explicit neighbors in the adjacency list
+        for (int adjN : graph[node])
+        {
+
+            // STATE CHECK: Neighbor is colored AND it matches my color. CONFLICT!
+            if (colored[adjN] == nodeClr)
+            {
+                return false;
+            }
+
+            // STATE CHECK: Neighbor is uncolored (-1).
+            if (colored[adjN] == -1)
+            {
+
+                // Paint the neighbor with the opposite color
+                colored[adjN] = adjClr;
+
+                // Recursively color the neighbor's neighbors.
+                // EARLY EXIT: If any deep recursion finds a conflict, bubble it up immediately!
+                if (!dfs(adjN, adjClr, graph, colored))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Bipartite Graph | BFS Implementation
-    //-------------------------------------------------------------------------------
+    /**
+     * @brief Determines if an explicit graph is Bipartite.
+     * * @idea
+     * We use a standard graph coloring approach. We map an array `colored` initialized
+     * to -1. We loop through all vertices to handle disconnected graph components.
+     * If a component is uncolored, we seed it with color 0 and launch a DFS.
+     * * @time O(V + E)
+     * V is the number of vertices, E is the number of edges. We visit each vertex
+     * exactly once, and iterate over its outgoing edges exactly once.
+     * * @space O(V)
+     * We allocate an array of size V to store the colors. The recursive DFS call
+     * stack will take O(V) space in the worst-case scenario (e.g., a straight line graph).
+     */
+    bool isBipartite(vector<vector<int>> &graph)
+    {
+
+        int v = graph.size();
+
+        // -1 represents uncolored, 0 and 1 are our two distinct colors
+        vector<int> colored(v, -1);
+
+        // --- SWEEP ALL COMPONENTS ---
+        // A graph might be disconnected. We must ensure every component is checked.
+        for (int i = 0; i < v; ++i)
+        {
+
+            if (colored[i] == -1)
+            {
+
+                // Seed the starting node of this component with color 0
+                colored[i] = 0;
+
+                // Launch the DFS coloring process
+                if (!dfs(i, 0, graph, colored))
+                {
+                    return false; // Conflict found in this component!
+                }
+            }
+        }
+
+        return true; // Successfully 2-colored the entire graph
+    }
+
+    //-----------------
+    // Approach 2: BFS
+    //-----------------
 
     /**
      * @brief Check if an undirected graph is bipartite using BFS
@@ -175,11 +269,11 @@ public:
         // No conflicts found, graph is bipartite
         return true;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

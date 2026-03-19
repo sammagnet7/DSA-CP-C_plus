@@ -232,105 +232,262 @@ public:
 // 2. Title: Word Ladder-II
 //-------------------------------------------------------------------------------
 
+// ======================================================
+// Approach 1 : maintain ALL shortest paths [sub-optimal]
+// ======================================================
+
 class Solution
 {
 public:
     /**
-     * Unlike the ladderLength function (which returns only the length), this function returns **all paths**
-     * that achieve the minimum transformation length.
-     *
-     * Approach:
-     * 1. Use **Breadth-First Search (BFS)** because we are interested in shortest paths.
-     * 2. Maintain a queue where each element stores:
-     *      - current BFS level
-     *      - the current transformation sequence (vector<string>).
-     * 3. For each word, generate all possible words by changing each character to 'a'..'z'.
-     * 4. If a generated word is in the wordSet, push the new sequence into the queue.
-     * 5. Use `temp_erase_list` to collect words seen in the current level and erase them
-     *    from the set **only after the level completes** (to allow multiple paths in the same level).
-     * 6. Stop BFS once `endWord` is found (since we only need shortest sequences).
-     *
-     * Time Complexity:
-     * - Let N = number of words, L = length of each word.
-     * - Each word can generate 26 * L new words → O(26 * L) per word.
-     * - In worst case, BFS explores all N words: O(N * L * 26).
-     * - Additionally, storing paths adds overhead, but still within O(N * L) for minimal paths.
-     *
-     * Space Complexity:
-     * - O(N) for unordered_set (dictionary)
-     * - O(N * L) for BFS queue (since each path can be up to L words).
-     *
-     * @param beginWord: The starting word
-     * @param endWord: The target word
-     * @param wordList: List of allowed words
-     * @return A vector of all shortest transformation sequences
+     * @brief Finds all shortest transformation sequences from beginWord to endWord.
+     * * @idea
+     * We use a Level-Order BFS, but instead of just storing the current word, we store
+     * the entire PATH taken to reach it. To ensure we find ALL shortest paths, we
+     * cannot immediately delete a visited word from the dictionary (as another path
+     * might need it on the same level). Instead, we track used words and delete them
+     * at the END of each BFS level.
+     * * @approach
+     * 1. Initialize a queue holding paths (`vector<string>`).
+     * 2. For each path popped, take the last word and generate all 1-letter mutations.
+     * 3. If a mutation is valid, append it to the path and push the new path to the queue.
+     * 4. If the mutation is `endWord`, flag `found = true` and save the path to `ans`.
+     * 5. Collect all valid mutations in `usedWords` and erase them from `wordSet`
+     * only after the current level (while(qSize--)) completely finishes.
+     * 6. The outer loop naturally breaks early thanks to `!found`, ensuring we don't
+     * keep digging deeper once the shortest paths are found!
+     * * @time O(N * L^2 + P)
+     * Where N is the dictionary size, L is word length, and P is the total number
+     * of valid paths. The time can grow exponentially in the worst case if the graph
+     * is highly dense and branches heavily.
+     * * @space O(P * K)
+     * Where P is the number of paths stored in the queue and K is the average path
+     * length. Storing entire paths in the queue is very memory-intensive.
      */
     vector<vector<string>> findSequences(string beginWord, string endWord, vector<string> &wordList)
     {
 
+        unordered_set<string> wordSet(wordList.begin(), wordList.end());
         vector<vector<string>> ans;
 
-        // Store all words in a set for O(1) lookup
-        unordered_set<string> wordSet(wordList.begin(), wordList.end());
+        // Queue now holds the sequence of words (the path)
+        queue<vector<string>> q;
+        q.push({beginWord});
 
-        // Queue for BFS: {currentLevel, transformationSequence}
-        queue<pair<int, vector<string>>> q;
-        q.push({1, {beginWord}});
+        // Flag to stop the BFS from going deeper once we find the shortest path layer
+        bool found = false;
 
-        bool found = false;                           // Flag to stop when we find the shortest sequences
-        int prevLv = -1;                              // Tracks previous BFS level
-        vector<string> temp_erase_list = {beginWord}; // Words to erase after level completes
+        // --- LEVEL-ORDER BFS ---
+        while (!q.empty() && !found)
+        {
+
+            int qSize = q.size();
+
+            // Tracks words visited DURING THIS SPECIFIC LEVEL
+            unordered_set<string> usedWords;
+
+            while (qSize--)
+            {
+
+                vector<string> curVec = q.front();
+                q.pop();
+
+                // The word we are currently trying to mutate is the last one in the path
+                string curWord = curVec.back();
+
+                // Generate all 1-letter mutations
+                for (int i = 0; i < curWord.size(); ++i)
+                {
+
+                    char exChar = curWord[i];
+
+                    for (char upChar = 'a'; upChar <= 'z'; ++upChar)
+                    {
+
+                        curWord[i] = upChar;
+
+                        if (exChar == upChar)
+                        {
+                            continue;
+                        }
+
+                        if (wordSet.find(curWord) != wordSet.end())
+                        {
+                            // --- VALID NEIGHBOR FOUND ---
+                            curVec.push_back(curWord);
+                            q.push(curVec);
+
+                            // EARLY EXIT CHECK: Did we hit the target?
+                            if (curWord == endWord)
+                            {
+                                found = true; // Signals the outer loop to stop after this level
+                                ans.push_back(curVec);
+                            }
+
+                            // Backtrack the path vector so we can reuse it for the next mutation
+                            curVec.pop_back();
+
+                            // Mark this word to be deleted at the end of the level
+                            usedWords.insert(curWord);
+                        }
+                    }
+
+                    // Backtrack the string mutation
+                    curWord[i] = exChar;
+                }
+            }
+
+            // --- DEFERRED ERASURE ---
+            // Now that the level is over, delete the used words so deeper levels
+            // don't visit them, preventing infinite loops.
+            for (const string &used : usedWords)
+            {
+                wordSet.erase(used);
+            }
+        }
+
+        return ans;
+    }
+};
+
+// =================================
+// Approach 2 : BFS + DFS [OPTIMAL]
+// =================================
+
+class Solution
+{
+private:
+    // Maps each word to its shortest distance from the beginWord
+    unordered_map<string, int> mpp;
+
+    // Stores all valid shortest transformation sequences
+    vector<vector<string>> ans;
+
+    /**
+     * @brief DFS helper to reconstruct paths by backtracking from endWord to beginWord.
+     */
+    void dfs(string word, string &beginWord, vector<string> &path)
+    {
+
+        // BASE CASE: We successfully backtracked all the way to the start!
+        if (word == beginWord)
+        {
+            vector<string> validPath = path;
+            // Because we built this path backwards (end -> begin), we must reverse it
+            reverse(validPath.begin(), validPath.end());
+            ans.push_back(validPath);
+            return;
+        }
+
+        int currentSteps = mpp[word];
+
+        // Generate all 1-letter mutations to find valid parents
+        for (int i = 0; i < word.size(); ++i)
+        {
+
+            char originalChar = word[i];
+
+            for (char c = 'a'; c <= 'z'; ++c)
+            {
+
+                word[i] = c;
+
+                // STATE CHECK: Is this mutated word a valid parent?
+                // It must exist in our BFS map AND it must be exactly 1 step
+                // closer to the beginWord than our current word.
+                if (mpp.count(word) && mpp[word] == currentSteps - 1)
+                {
+
+                    path.push_back(word);       // Add to current path
+                    dfs(word, beginWord, path); // Plunge deeper backwards
+                    path.pop_back();            // Backtrack to explore other routes
+                }
+            }
+
+            word[i] = originalChar; // Restore the character
+        }
+    }
+
+public:
+    /**
+     * @brief Finds all shortest transformation sequences.
+     * * @idea
+     * Storing entire `vector<string>` paths inside a BFS queue consumes massive memory
+     * and causes MLE on highly branched graphs. To fix this, we split the logic:
+     * 1. Use BFS ONLY to find the shortest distance from beginWord to every node.
+     * 2. Use DFS to backtrack from endWord to beginWord, relying on the BFS distance map
+     * to only step onto valid nodes that are exactly 1 step closer to the start.
+     * * @approach
+     * PHASE 1 (BFS Distances): Start a queue with beginWord. Generate 1-letter mutations.
+     * If a valid word is found in the dictionary, record its distance in the map
+     * (`mpp[word] = steps + 1`), queue it, and erase it from the set. Stop expanding
+     * paths once the `endWord` level is reached.
+     * PHASE 2 (DFS Backtracking): Start at `endWord`. Generate mutations. If a mutation
+     * is in our map and its distance is `current_distance - 1`, recursively explore it.
+     * When `beginWord` is reached, reverse the path and add it to our answers.
+     * * @time O(N * L^2 + P * L)
+     * N = dictionary size, L = word length, P = number of valid shortest paths.
+     * BFS maps the distances in O(N * L^2). DFS reconstructs P paths, taking O(P * L).
+     * * @space O(N * L)
+     * We eliminated storing massive arrays in the queue. The BFS queue and distance map
+     * only store strings and integers, dropping our memory footprint drastically to O(N * L).
+     * DFS call stack takes at most O(N) space.
+     */
+    vector<vector<string>> findSequences(string beginWord, string endWord, vector<string> &wordList)
+    {
+
+        unordered_set<string> st(wordList.begin(), wordList.end());
+        queue<string> q;
+
+        // --- PHASE 1: BFS TO MAP SHORTEST DISTANCES ---
+        q.push(beginWord);
+        mpp[beginWord] = 1;
+        st.erase(beginWord);
 
         while (!q.empty())
         {
-            int curLv = q.front().first;
-            vector<string> curList = q.front().second;
-            string curW = curList.back();
+
+            string word = q.front();
             q.pop();
 
-            // When we reach a new level, erase all words from previous level
-            if (prevLv < curLv)
+            int steps = mpp[word];
+
+            // Optimization: If we reached the endWord, we don't need to map anything further away.
+            // We just need to finish processing the other words CURRENTLY at this distance level.
+            if (word == endWord)
+                break;
+
+            for (int i = 0; i < word.size(); ++i)
             {
-                if (found)
-                    break; // Stop BFS if we've already found shortest sequences
 
-                for (string s : temp_erase_list)
-                    wordSet.erase(s);
+                char originalChar = word[i];
 
-                temp_erase_list.clear();
-                prevLv = curLv;
-            }
-
-            // If we found endWord, store the current sequence
-            if (curW == endWord)
-            {
-                found = true;
-                ans.push_back(curList);
-                continue; // Continue to find other sequences in the same level
-            }
-
-            // Try replacing each character of curW with 'a'..'z'
-            for (int i = 0; i < curW.size(); i++)
-            {
-                char origChar = curW[i];
-
-                for (int j = 0; j < 26; j++)
+                for (char c = 'a'; c <= 'z'; ++c)
                 {
-                    curW[i] = 'a' + j;
 
-                    // If transformed word exists in dictionary and not yet erased
-                    if (wordSet.find(curW) != wordSet.end())
+                    word[i] = c;
+
+                    // If we find an unvisited valid word
+                    if (st.count(word))
                     {
-                        curList.push_back(curW);
-                        q.push({curLv + 1, curList});
-                        temp_erase_list.push_back(curW);
-                        curList.pop_back(); // Backtrack
+                        q.push(word);
+                        st.erase(word);        // Instantly erase to prevent redundant processing
+                        mpp[word] = steps + 1; // Record its exact shortest distance
                     }
                 }
 
-                // Restore original character
-                curW[i] = origChar;
+                word[i] = originalChar; // Backtrack mutation
             }
+        }
+
+        // --- PHASE 2: DFS BACKTRACKING ---
+        // If the endWord was never reached during BFS, it won't be in the map.
+        // We only trigger DFS if a valid path actually exists!
+        if (mpp.count(endWord))
+        {
+            vector<string> path;
+            path.push_back(endWord);
+            dfs(endWord, beginWord, path);
         }
 
         return ans;
