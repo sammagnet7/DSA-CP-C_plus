@@ -18,19 +18,20 @@ using namespace std;
 
 /*
 
-1. Title: Course Schedule I and II | Pre-requisite Tasks | Topological Sort: G-24
+1. Title: Course Schedule I | Pre-requisite Tasks
 
 
 Links:
 https://takeuforward.org/data-structure/course-schedule-i-and-ii-pre-requisite-tasks-topological-sort-g-24/
 https://www.youtube.com/watch?v=WAOfKpxYHR8
-https://takeuforward.org/plus/dsa/problems/course-schedule-ii?tab=editorial
+https://takeuforward.org/plus/dsa/problems/course-schedule-ii
+https://leetcode.com/problems/course-schedule/
 
 Problem statement:
-There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [ai, bi]` indicates that you must take course `bi` first if you want to take course `ai`.
 
-For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
-Return true if you can finish all courses. Otherwise, return false.
+For example, the pair `[0, 1]`, indicates that to take course `0` you have to first take course `1`.
+Return `true` if you can finish all courses. Otherwise, return `false`.
 
 
     Example 1:
@@ -62,13 +63,14 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Course Schedule II | Topological Sort: G-24
+2. Title: Course Schedule II
 
 
 Links:
 https://takeuforward.org/data-structure/course-schedule-i-and-ii-pre-requisite-tasks-topological-sort-g-24/
 https://www.youtube.com/watch?v=WAOfKpxYHR8
-https://takeuforward.org/plus/dsa/problems/course-schedule-ii?tab=editorial
+https://takeuforward.org/plus/dsa/problems/course-schedule-i
+https://leetcode.com/problems/course-schedule-ii/
 
 
 Problem statement:
@@ -117,7 +119,7 @@ class Solution
 {
 public:
     //-------------------------------------------------------------------------------
-    // 1. Title: Course Schedule I and II | Pre-requisite Tasks | Topological Sort: G-24
+    // 1. Title: Course Schedule I | Pre-requisite Tasks
     //-------------------------------------------------------------------------------
 
     /**
@@ -170,7 +172,7 @@ public:
         }
 
         queue<int> q;    // Queue for BFS
-        vector<int> ans; // Stores topological order
+        int takenCount = 0;
 
         // Step 2: Push all nodes with indegree 0 into the queue
         for (int i = 0; i < V; i++)
@@ -186,7 +188,7 @@ public:
         {
             int node = q.front();
             q.pop();
-            ans.push_back(node);
+            ++takenCount;
 
             // Reduce indegree of neighbors
             for (int adj : adjL[node])
@@ -199,13 +201,13 @@ public:
             }
         }
 
-        // If all courses are processed (ans.size() == V), no cycle exists → return true
+        // If all courses are processed (takenCount == V), no cycle exists → return true
         // Else, cycle exists → return false
-        return (ans.size() == V);
+        return (takenCount == V);
     }
 
     //-------------------------------------------------------------------------------
-    // 2. Title: Course Schedule II | Topological Sort: G-24
+    // 2. Title: Course Schedule II
     //-------------------------------------------------------------------------------
 
     /**
@@ -309,9 +311,6 @@ public:
             return {}; // Cycle detected → no valid ordering
         }
 
-        // reverse(ans.begin(), ans.end());  // Reverse because of dependency direction
-
-        // No need to reverse, adjacency list ensures correct order
         return ans;
     }
 };

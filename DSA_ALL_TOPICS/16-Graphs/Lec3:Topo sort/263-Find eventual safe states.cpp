@@ -18,60 +18,13 @@ using namespace std;
 
 /*
 
-1. Title: Find Eventual Safe States - DFS: G-20
+1. Title: Find Eventual Safe States - DFS
 
 
 Links:
 https://takeuforward.org/data-structure/find-eventual-safe-states-dfs-g-20/
-https://www.youtube.com/watch?v=uRbJ1OF9aYM
-https://takeuforward.org/plus/dsa/problems/find-eventual-safe-states?tab=editorial
-https://leetcode.com/problems/find-eventual-safe-states/description/
-
-
-Problem statement:
-There is a directed graph of n nodes with each node labeled from 0 to n - 1. The graph is represented by a 0-indexed 2D integer array graph where graph[i] is an integer array of nodes adjacent to node i, meaning there is an edge from node i to each node in graph[i].
-A node is a terminal node if there are no outgoing edges. A node is a safe node if every possible path starting from that node leads to a terminal node (or another safe node).
-Return an array containing all the safe nodes of the graph. The answer should be sorted in ascending order.
-
-Examples:
-    Example 1:
-    Illustration of graph
-    Input: graph = [[1,2],[2,3],[5],[0],[5],[],[]]
-    Output: [2,4,5,6]
-    Explanation: The given graph is shown above.
-    Nodes 5 and 6 are terminal nodes as there are no outgoing edges from either of them.
-    Every path starting at nodes 2, 4, 5, and 6 all lead to either node 5 or 6.
-
-    Example 2:
-    Input: graph = [[1,2,3,4],[1,2],[3,4],[0,4],[]]
-    Output: [4]
-    Explanation:
-    Only node 4 is a terminal node, and every path starting at node 4 leads to node 4.
-
-
-Constraints:
-    n == graph.length
-    1 <= n <= 104
-    0 <= graph[i].length <= n
-    0 <= graph[i][j] <= n - 1
-    graph[i] is sorted in a strictly increasing order.
-    The graph may contain self-loops.
-    The number of edges in the graph will be in the range [1, 4 * 104].
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
-
-----------------------------------------------------------------------------------------------------
-
-2. Title: Find Eventual Safe States - BFS - Topological Sort: G-25
-
-
-Links:
 https://takeuforward.org/data-structure/find-eventual-safe-states-bfs-topological-sort-g-25/
+https://www.youtube.com/watch?v=uRbJ1OF9aYM
 https://www.youtube.com/watch?v=2gtg3VsDGyc
 https://takeuforward.org/plus/dsa/problems/find-eventual-safe-states?tab=editorial
 https://leetcode.com/problems/find-eventual-safe-states/description/
@@ -100,12 +53,29 @@ Examples:
 
 Constraints:
     n == graph.length
-    1 <= n <= 104
+    1 <= n <= 10^4
     0 <= graph[i].length <= n
     0 <= graph[i][j] <= n - 1
     graph[i] is sorted in a strictly increasing order.
     The graph may contain self-loops.
-    The number of edges in the graph will be in the range [1, 4 * 104].
+    The number of edges in the graph will be in the range [1, 4 * 10^4].
+
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
+----------------------------------------------------------------------------------------------------
+
+2. Title:
+
+
+Links:
+
+
+Problem statement:
 
 
 INPUT::::::
@@ -118,116 +88,134 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Find Eventual Safe States
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Find Eventual Safe States - DFS: G-20
-    //-------------------------------------------------------------------------------
-
     //============================================================================
-    // Approach 1 — DFS + Cycle Detection (mark & memoize)
+    // Approach 1 — DFS + Cycle Detection (3-State Validation)
     //============================================================================
 
     /**
      * @brief Find all eventually safe nodes in a directed graph.
      *
      * Intuition:
-     * - A node is considered "eventually safe" if all possible paths starting from it lead to a terminal node
-     *   (a node with no outgoing edges) and do NOT enter a cycle.
-     * - Nodes that are either:
-     *     1. Part of a cycle, or
-     *     2. Lead to a cycle,
-     *   are unsafe.
+     * - A node is "eventually safe" if every possible path starting from it eventually
+     *   reaches a terminal node (a node with no outgoing edges).
+     * - Conversely, any node that is part of a cycle, or has any path leading to a cycle,
+     *   can never be safe because traversal could get trapped infinitely.
      *
      * Understanding:
      * - Example:
-     *     If a node is part of a cycle or can reach a cycle, it's unsafe.
-     *     Nodes that do not participate in cycles and cannot reach any cycle are safe.
+     *     During a Depth-First Search (DFS), we can track our current path. If we ever
+     *     step on a node that is currently active in our path, we have found a "back-edge"
+     *     (a directed cycle).
+     *     To optimize and prevent Time Limit Exceeded (TLE), we use an `unsafe` array.
+     *     If we hit a node that a previous DFS run already proved is unsafe, we can
+     *     immediately conclude our current path is also unsafe without re-exploring it.
      *
-     * Approach (DFS + Cycle Detection):
-     * 1. Use three arrays:
+     * Approach (DFS + Memoization):
+     * 1. Initialize three boolean tracking arrays:
      *    - `vis[i]`: Marks if node i has been visited.
-     *    - `pathVis[i]`: Marks if node i is in the current DFS path (used for cycle detection).
-     *    - `safeCheck[i]`: Marks if node i is safe (true = safe, false = unsafe).
+     *    - `pathVis[i]`: Marks if node i is currently in the active DFS recursion stack.
+     *    - `unsafe[i]`: Memoizes if node i is confirmed to lead to a cycle (true = unsafe).
      *
-     * 2. For each node (0 to V-1):
-     *    - If not visited, perform DFS:
-     *      a) Mark current node as visited and add it to path (`pathVis`).
-     *      b) For every adjacent node:
-     *         - If `pathVis[adj]` is true → cycle detected → return true.
-     *         - If `adj` is not visited, recurse DFS on it.
-     *         - If recursion returns true (cycle found), propagate `true` upwards.
-     *    - After exploring all adjacents:
-     *      - Remove current node from `pathVis` (as DFS for this node is done).
-     *      - Mark `safeCheck[cur] = 1` (safe node) if no cycle found.
+     * 2. For each node (0 to n-1):
+     *    - If it is not visited, trigger the DFS.
+     *      a) Mark the current node as visited (`vis`), add it to the active path (`pathVis`),
+     *         and pre-emptively mark it as `unsafe` (assume guilty until proven innocent).
+     *      b) Iterate through all adjacent nodes:
+     *         - Case 1: If unvisited, recursively call DFS. If it returns true, bubble up the cycle.
+     *         - Case 2: If visited and in `pathVis` → Cycle detected! Return true.
+     *         - Case 3: If visited, NOT in `pathVis`, but marked `unsafe` → Leads to a known cycle! Return true.
+     *      c) If the loop finishes without returning true, the node survived all paths!
+     *         - Mark `unsafe[curN] = false` (it is officially safe).
+     *         - Revert `pathVis[curN] = false` so other branches can explore it normally.
+     *         - Return false (no cycle found).
      *
-     * 3. After processing all nodes, collect all nodes marked safe.
+     * 3. After sweeping the whole graph, any node where `unsafe[i] == false` is an eventual safe node.
      *
      * Time Complexity:
-     * - O(V + E): Each node and edge is visited once during DFS.
+     * - O(V + E): Each vertex (V) and edge (E) is visited and processed exactly once.
      *
      * Space Complexity:
-     * - O(V) for recursion stack (DFS) + O(V) for `vis` + O(V) for `pathVis` + O(V) for `safeCheck` → O(V).
-     *
-     * This approach ensures we efficiently detect cycles and mark safe nodes.
+     * - O(V): For the recursion stack (DFS) + O(V) for `vis` + O(V) for `pathVis` + O(V) for `unsafe`.
      */
-
-    bool dfsWithCycle(int cur, vector<vector<int>> &graph, vector<int> &vis, vector<int> &pathVis, vector<int> &safeCheck)
+    bool dfs(int curN, vector<bool> &vis, vector<bool> &pathVis,
+             vector<bool> &unsafe, const vector<vector<int>> &graph)
     {
-        vis[cur] = 1;     // Mark current node as visited
-        pathVis[cur] = 1; // Add current node to recursion stack (path)
 
-        for (int adj : graph[cur])
+        vis[curN] = true;
+        pathVis[curN] = true;
+
+        // Assume this node is unsafe (cyclic) until proven otherwise
+        unsafe[curN] = true;
+
+        for (int adjN : graph[curN])
         {
-            // If adjacent node is already in the path → cycle detected
-            if (pathVis[adj])
-            {
-                return true; // Cycle exists
-            }
 
-            // If adjacent node not visited → recurse
-            if (!vis[adj])
+            // Case 1: The neighbor is unvisited. Plunge deeper!
+            if (!vis[adjN])
             {
-                bool ret = dfsWithCycle(adj, graph, vis, pathVis, safeCheck);
-
-                if (ret) // If cycle detected in recursion → propagate true
+                if (dfs(adjN, vis, pathVis, unsafe, graph))
+                {
+                    // We don't even need to unmark pathVis here. We found a cycle, bubble it up!
                     return true;
+                }
+            }
+            // Case 2: The neighbor is visited AND currently in our DFS path. CYCLE!
+            else if (pathVis[adjN])
+            {
+                return true;
+            }
+            // Case 3: The neighbor is visited, NOT in our path, but is known to be UNSAFE!
+            // This means our current node leads to a cycle.
+            else if (unsafe[adjN])
+            {
+                return true;
             }
         }
 
-        // Backtrack: remove from current path
-        pathVis[cur] = 0;
+        // --- SAFE NODE CONFIRMED ---
+        // We survived all neighbors! This node does not lead to any cycles.
+        unsafe[curN] = false;
 
-        // Mark current node as safe (no cycle found from this node)
-        safeCheck[cur] = 1;
+        // Remove from the current path so other DFS branches can process it properly
+        pathVis[curN] = false;
 
-        return false; // No cycle detected
+        // Return FALSE because NO cycle was detected on this path!
+        return false;
     }
 
     vector<int> eventualSafeNodes(vector<vector<int>> &graph)
     {
-        int V = graph.size();
 
-        // Arrays to track visited nodes, nodes in current path, and safe nodes
-        vector<int> vis(V, 0);
-        vector<int> pathVis(V, 0);
-        vector<int> safeCheck(V, 0);
-        vector<int> ans;
+        int n = graph.size();
 
-        // Perform DFS for all nodes
-        for (int i = 0; i < V; i++)
+        vector<bool> vis(n, false);
+        vector<bool> pathVis(n, false);
+
+        // True means "leads to a cycle". We initialize all to false.
+        vector<bool> unsafe(n, false);
+
+        // Sweep all components of the graph
+        for (int i = 0; i < n; ++i)
         {
             if (!vis[i])
             {
-                dfsWithCycle(i, graph, vis, pathVis, safeCheck);
+                dfs(i, vis, pathVis, unsafe, graph);
             }
         }
 
-        // Collect nodes marked as safe
-        for (int i = 0; i < V; i++)
+        vector<int> ans;
+
+        // Any node that is NOT unsafe is an eventual safe node!
+        for (int i = 0; i < n; ++i)
         {
-            if (safeCheck[i])
+            if (!unsafe[i])
             {
                 ans.push_back(i);
             }
@@ -235,10 +223,6 @@ public:
 
         return ans;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title: Find Eventual Safe States - BFS - Topological Sort: G-25
-    //-------------------------------------------------------------------------------
 
     //============================================================================
     // Approach 2 — Reverse-Graph + Kahn’s Algorithm (BFS Topological Pruning)

@@ -23,12 +23,12 @@ using namespace std;
 
 Links:
 
-https://www.geeksforgeeks.org/problems/topological-sort/1
 https://www.youtube.com/watch?v=5lZ0iJMrUMk
 https://takeuforward.org/data-structure/topological-sort-algorithm-dfs-g-21/
 https://takeuforward.org/data-structure/kahns-algorithm-topological-sort-algorithm-bfs-g-22/
 https://www.youtube.com/watch?v=iTBaI90lpDQ
 https://takeuforward.org/plus/dsa/problems/topological-sort-or-kahns-algorithm?tab=editorial
+https://www.geeksforgeeks.org/problems/topological-sort/1
 
 
 Problem statement:
@@ -40,20 +40,20 @@ Note: As there are multiple Topological orders possible, you may return any of t
 Examples:
     Input: V = 4, E = 3, edges[][] = [[3, 0], [1, 0], [2, 0]]
     Output: true
-    Explanation: The output true denotes that the order is valid. Few valid Topological orders for the given graph are:
+    Explanation: Few valid Topological orders for the given graph are:
     [3, 2, 1, 0]
     [1, 2, 3, 0]
     [2, 3, 1, 0]
 
     Input: V = 6, E = 6, edges[][] = [[1, 3], [2, 3], [4, 1], [4, 0], [5, 0], [5,2]]
     Output: true
-    Explanation: The output true denotes that the order is valid. Few valid Topological orders for the graph are:
+    Explanation: Few valid Topological orders for the graph are:
     [4, 5, 0, 1, 2, 3]
     [5, 2, 4, 0, 1, 3]
 
 Constraints:
-    2  ≤  V  ≤  5 x 103
-    1  ≤  E = edges.size()  ≤  min[105, (V * (V - 1)) / 2]
+    2  ≤  V  ≤  5 x 10^3
+    1  ≤  E = edges.size()  ≤  min[10^5, (V * (V - 1)) / 2]
 
 
 
@@ -87,13 +87,12 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Topo Sort
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Topo Sort
-    //-------------------------------------------------------------------------------
-
     //============================================================================
     // Approach 1: Topological Sort using DFS (Post-order + Stack)
     //============================================================================
@@ -175,7 +174,7 @@ public:
 
         vector<int> vis(V, 0); // Visited array
         stack<int> st;         // Stack to store nodes in reverse order
-        vector<int> topo;       // Result vector
+        vector<int> topo;      // Result vector
 
         // Step 2: Perform DFS for all unvisited nodes
         for (int i = 0; i < V; i++)
@@ -265,11 +264,11 @@ public:
 
         return topo; // If ans.size() < V → cycle exists
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
