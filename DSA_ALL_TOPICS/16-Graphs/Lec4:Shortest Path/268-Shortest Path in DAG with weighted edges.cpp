@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Shortest Path in Directed Acyclic Graph Topological Sort: G-27
+1. Title: Shortest Path in Directed Acyclic Graph with weighted edges
 
 
 Links:
@@ -44,9 +44,9 @@ Examples :
 
 Constraint:
     1 <= V <= 100
-    1 <= E <= min((N*(N-1))/2,4000)
-    0 <= edgesi,0, edgesi,1 < n
-    0 <= edgei,2 <=105
+    1 <= E <= min((V*(V-1))/2, 4000)
+    0 <= edges[i][0], edges[i][1] < n
+    0 <= edges[i][2] <=10^5
 
 
 
@@ -84,7 +84,7 @@ class Solution
 {
 public:
     //-------------------------------------------------------------------------------
-    // 1. Title: Shortest Path in Directed Acyclic Graph Topological Sort: G-27
+    // 1. Title: Shortest Path in Directed Acyclic Graph Topological Sort
     //-------------------------------------------------------------------------------
 
     /**
@@ -258,11 +258,10 @@ public:
 
         return dist;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {

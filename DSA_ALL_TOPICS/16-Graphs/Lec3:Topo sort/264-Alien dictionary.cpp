@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Alien Dictionary - Topological Sort: G-26
+1. Title: Alien Dictionary
 
 
 Links:
@@ -34,7 +34,6 @@ Your task is to determine the correct order of letters in this alien language ba
 However, if the given arrangement of words is inconsistent with any possible letter ordering, return an empty string ("").
 A string a is lexicographically smaller than a string b if, at the first position where they differ, the character in a appears earlier in the alien language than the corresponding character in b. If all characters in the shorter word match the beginning of the longer word, the shorter word is considered smaller.
 
-Note: Your implementation will be tested using a driver code. It will print true if your returned order correctly follows the alien language’s lexicographic rules; otherwise, it will print false.
 
 Examples:
     Input: words[] = ["baa", "abcd", "abca", "cab", "cad"]
@@ -96,145 +95,170 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Alien Dictionary
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: Alien Dictionary - Topological Sort: G-26
-    //-------------------------------------------------------------------------------
+    //============================================================================
+    // Approach 1 — BFS (Kahn's Algorithm with Integer Mapping)
+    //============================================================================
 
     /**
-     * @brief Finds the order of characters in an alien dictionary.
-     *
-     * Approach:
-     * - Model the problem as a graph problem where letters are nodes and directed edges
-     *   represent ordering constraints derived from consecutive words.
-     * - Perform topological sorting (BFS / Kahn’s algorithm) to get the character order.
+     * @brief Determines the valid character order for an alien dictionary.
      *
      * Intuition:
-     * - Comparing consecutive words reveals the relative order of letters.
-     * - Any character that appears earlier in a word but differs from the next word's character
-     *   must come before the next character in the ordering.
-     * - Letters not appearing in the dictionary words are ignored in the final output.
+     * - The lexicographical rules of the dictionary can be modeled as a Directed Graph.
+     * - By comparing adjacent words, the first non-matching character establishes a
+     *   directional dependency (e.g., 'a' must come before 'c').
+     * - Because the alphabet is limited to 26 lowercase English letters, we can heavily
+     *   optimize performance by mapping characters ('a'-'z') to integers (0-25) and
+     *   using fixed-size vectors instead of expensive Hash Maps.
+     *
+     * Understanding:
+     * - Example: ["baa", "abcd"]
+     *   'b' (index 1) differs from 'a' (index 0). We create a directed edge: 1 -> 0.
+     * - Prefix Edge Case: If a longer word appears before its own exact prefix
+     *   (e.g., ["abcd", "abc"]), the dictionary is fundamentally invalid. We return "".
+     * - Cycle Detection: If the final sorted string length does not match the total
+     *   number of unique characters discovered, Kahn's algorithm was trapped by a cycle.
+     *
+     * Approach (BFS / Kahn's Algorithm):
+     * 1. Track Unique Characters:
+     *    - Use a boolean array `exists[26]` to flag all unique characters present in the words.
+     *
+     * 2. Build the Graph:
+     *    - Iterate through adjacent pairs of words.
+     *    - Check for the prefix anomaly immediately. If triggered, return "".
+     *    - Find the first differing character, add the edge `u -> v` to an array of Hash Sets
+     *      (to prevent duplicate rules), and increment `ins[v]`.
+     *
+     * 3. Process BFS Queue:
+     *    - Push all integers (characters) where `exists[i] == true` AND `ins[i] == 0` into the queue.
+     *    - Pop elements, convert them back to characters (`'a' + curN`), and append to the result string.
+     *    - Decrement neighbors' in-degrees. Push neighbors to the queue when they hit 0.
+     *
+     * 4. Verify Validity:
+     *    - Check if the result string length equals the total number of unique characters.
      *
      * Time Complexity:
-     * - O(N * L + V + E), where N = number of words, L = max word length,
-     *   V = 26 (letters), E = number of edges added.
+     * - O(C): Where C is the total number of characters across all words (used for alphabet extraction
+     *   and word comparisons). The BFS graph traversal is O(V + E) bounded to O(26 + 26^2) = O(1).
      *
      * Space Complexity:
-     * - O(V + E) for adjacency list and indegree array
-     * - O(V) for queue and topological ordering
-     *
-     * @param words Vector of words in alien dictionary order.
-     * @return string Characters in the determined order.
+     * - O(1): Fixed size arrays for `exists` (26), `ins` (26), and `adjL` (max 26x26 edges).
+     *   This is highly memory efficient.
      */
     string findOrder(vector<string> &words)
     {
-        int n = words.size();
 
-        unordered_set<char> seen;  // Set of characters that appear in the dictionary
-        vector<vector<int>> edges; // Store directed edges as pairs [u, v] (u -> v)
+        // Fixed-size memory allocation for O(1) space/time lookups
+        vector<bool> exists(26, false);
+        vector<unordered_set<int>> adjL(26); // Set prevents duplicate edges
+        vector<int> ins(26, 0);
+        queue<int> q;
 
-        // Step 0: Record all characters that appear in the words
-        for (auto &w : words)
+        int totalUniqueChars = 0;
+
+        // --- STEP 1: Mark all unique alphabets present in the dictionary ---
+        for (const string &word : words)
         {
-            for (char c : w)
+            for (char c : word)
             {
-                seen.insert(c);
-            }
-        }
-
-        // Step 1: Build edges based on consecutive words
-        for (int i = 0; i <= n - 2; i++)
-        {
-            string s1 = words[i];
-            string s2 = words[i + 1];
-
-            // Edge case: if s2 is prefix of s1 but longer, ordering is invalid
-            if (s1.size() > s2.size() && s1.find(s2) == 0)
-            {
-                return ""; // invalid order
-            }
-
-            int ptr = 0;
-
-            // Find first differing character between two consecutive words
-            while (ptr < s1.size() && ptr < s2.size())
-            {
-                if (s1[ptr] != s2[ptr])
+                if (!exists[c - 'a'])
                 {
-                    // Add edge s1[ptr] -> s2[ptr]
-                    edges.push_back({(s1[ptr] - 'a'), (s2[ptr] - 'a')});
-                    break; // Only the first differing character matters
+                    exists[c - 'a'] = true;
+                    ++totalUniqueChars;
                 }
-                ptr++;
             }
         }
 
-        int V = 26; // Total letters in English alphabet
-
-        // Step 2: Build adjacency list and indegree array
-        vector<vector<int>> adjL(V); // adjL[u] = list of nodes v such that u -> v
-        vector<int> indegree(V, 0);  // indegree[v] = number of incoming edges to node v
-
-        for (auto &e : edges)
+        // --- STEP 2: Build the Graph by comparing adjacent words ---
+        for (int i = 1; i < words.size(); ++i)
         {
-            adjL[e[0]].push_back(e[1]);
-            indegree[e[1]]++;
+
+            string w1 = words[i - 1];
+            string w2 = words[i];
+
+            int minLen = min(w1.length(), w2.length());
+
+            // EDGE CASE: Prefix Anomaly (e.g., "abcd" before "abc")
+            if (w1.length() > w2.length() && w1.substr(0, minLen) == w2)
+            {
+                return "";
+            }
+
+            // Find the first rule-defining difference
+            for (int j = 0; j < minLen; ++j)
+            {
+
+                if (w1[j] != w2[j])
+                {
+
+                    int u = w1[j] - 'a';
+                    int v = w2[j] - 'a';
+
+                    // Prevent redundant duplicate edges from inflating the in-degree
+                    if (adjL[u].find(v) == adjL[u].end())
+                    {
+                        adjL[u].insert(v);
+                        ++ins[v];
+                    }
+
+                    break; // Only the first difference gives us a rule
+                }
+            }
         }
 
-        queue<int> q;     // Queue for Kahn's algorithm
-        vector<int> topo; // Topologically sorted nodes
-
-        // Step 3: Push all nodes with indegree 0 (no dependencies) into queue
-        for (int i = 0; i < V; i++)
+        // --- STEP 3: Setup Kahn's BFS Algorithm ---
+        for (int i = 0; i < 26; ++i)
         {
-            if (indegree[i] == 0)
+            // Push ONLY existing characters that have NO prerequisites
+            if (exists[i] && ins[i] == 0)
             {
                 q.push(i);
             }
         }
 
-        // Step 4: Process nodes using BFS (Kahn's algorithm)
+        string ans = "";
+
+        // --- STEP 4: Execute Topological Sort ---
         while (!q.empty())
         {
-            int node = q.front();
-            q.pop();
-            topo.push_back(node);
 
-            // Reduce indegree of neighbors; add to queue if indegree becomes 0
-            for (int adj : adjL[node])
+            int curN = q.front();
+            q.pop();
+
+            // Convert the integer back to the character and store it
+            ans.push_back('a' + curN);
+
+            for (int adjN : adjL[curN])
             {
-                indegree[adj]--;
-                if (indegree[adj] == 0)
+
+                --ins[adjN];
+
+                if (ins[adjN] == 0)
                 {
-                    q.push(adj);
+                    q.push(adjN);
                 }
             }
         }
 
-        string ans = "";
-
-        // Step 5: Build answer string only from characters that actually appear in words
-        if (topo.size() == V)
-        { // Ensure topological sort completed
-            for (int i : topo)
-            {
-                char cur = (char)(i + 'a');
-                if (seen.find(cur) != seen.end())
-                {
-                    ans.append(1, cur);
-                }
-            }
+        // --- STEP 5: Cycle Verification ---
+        // If we didn't extract every unique character, a cyclic paradox exists
+        if (ans.length() != totalUniqueChars)
+        {
+            return "";
         }
 
         return ans;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
+
+//-------------------------------------------------------------------------------
+// 2. Title:
+//-------------------------------------------------------------------------------
 
 int main()
 {
