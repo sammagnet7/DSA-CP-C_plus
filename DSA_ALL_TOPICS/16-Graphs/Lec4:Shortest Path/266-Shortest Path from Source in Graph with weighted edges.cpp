@@ -74,7 +74,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title: Shortest Path in Directed Graph with weighted edges | Network Delay Time
+2. Title: Shortest Path in Directed Graph with weighted edges 
 
 
 Links:

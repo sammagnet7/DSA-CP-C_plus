@@ -88,137 +88,139 @@ OUTPUT::::::
 
 */
 
+//-------------------------------------------------------------------------------
+// 1. Title: Print Shortest Path
+//-------------------------------------------------------------------------------
+
 class Solution
 {
 public:
-    //-------------------------------------------------------------------------------
-    // 1. Title: G-35. Print Shortest Path - Dijkstra's Algorithm
-    //-------------------------------------------------------------------------------
+    //============================================================================
+    // Approach 1 — Dijkstra's Algorithm + Parent Tracking (Path Reconstruction)
+    //============================================================================
 
-    /*
-    Problem: Find the shortest path from node 1 to node n in an undirected weighted graph.
-    Input:
-        n → number of nodes
-        m → number of edges
-        edges → list of edges in the form [u, v, weight]
-    Output:
-        A vector containing:
-            -1 if there is no path from node 1 to node n
-            OR
-            The sequence of nodes representing the shortest path from 1 → n,
-            followed by the total distance at the end.
-
-    Approach:
-    - Use Dijkstra's algorithm with a set (balanced BST) for efficient decrease-key operation.
-    - Maintain a `parent` array to reconstruct the path after shortest distances are computed.
-
-    Complexity:
-    - Time: O((V + E) * log V) due to set operations (insert, erase, extract-min)
-    - Space: O(V + E) for adjacency list, O(V) for distance and parent arrays, O(V) for set
-    */
-
+    /**
+     * @brief Finds the shortest path and its total cost from node 1 to node n.
+     *
+     * Intuition:
+     * - Standard Dijkstra's algorithm finds the shortest *distance* to a node, but it
+     *   doesn't remember *how* it got there.
+     * - To reconstruct the path, we use a `par` (parent) array. Every time we find a
+     *   shorter path to a neighbor `v` coming from node `u`, we record `par[v] = u`.
+     * - Once we reach the destination `n`, we can just follow the parent pointers
+     *   backwards all the way to the source!
+     *
+     * Understanding:
+     * - Example: 1 -> 2 (cost 2), 2 -> 4 (cost 3).
+     *   When relaxing node 2, `par[2] = 1`. When relaxing node 4, `par[4] = 2`.
+     *   To rebuild the path from 4: `cur = 4`, then `cur = par[4] (2)`, then `cur = par[2] (1)`.
+     *   The reversed path is [1, 2, 4].
+     *
+     * Approach:
+     * 1. Graph Construction:
+     *    - Build a 1-indexed undirected Adjacency List.
+     * 2. Dijkstra's Setup:
+     *    - `dist` array initialized to `1e9`. `dist[1] = 0`.
+     *    - `par` array initialized to `-1`.
+     *    - Push `{0, 1}` (distance 0, node 1) into the Min-Heap.
+     * 3. Relaxation Loop:
+     *    - Extract `{curW, curN}` from the priority queue.
+     *    - Skip stale nodes (`if (dist[curN] < curW) continue;`).
+     *    - Relax neighbors. If a faster path is found:
+     *      a) Update `dist[adjN]`.
+     *      b) Push the new path to the queue.
+     *      c) RECORD PARENT: `par[adjN] = curN;`
+     * 4. Path Backtracking:
+     *    - If `dist[n] == 1e9`, it's unreachable, return `{-1}`.
+     *    - Start at `n` and backtrack using the `par` array until you hit the source.
+     *    - Append the total weight (`dist[n]`) to the end.
+     *    - Reverse the entire array to get the required format: [weight, 1, ..., n].
+     *
+     * Time Complexity:
+     * - O(E log V) for standard Dijkstra. Backtracking the path takes O(V) time.
+     *   Overall Time: O(E log V).
+     *
+     * Space Complexity:
+     * - O(V + E) for the Adjacency List + O(V) for the Min-Heap, `dist`, and `par` arrays.
+     */
     vector<int> shortestPath(int n, int m, vector<vector<int>> &edges)
     {
 
-        int V = n + 1; // +1 because nodes are 1-indexed
-        int src = 1;   // Start node is 1
-        int t = n;     // Target node is n
+        // --- STEP 1: Build the Adjacency List (1-Indexed) ---
+        vector<vector<pair<int, int>>> adjL(n + 1);
 
-        // -----------------------------
-        // Step 1: Build adjacency list
-        // -----------------------------
-        vector<vector<pair<int, int>>> adjL(V); // Each node stores {neighbor, weight}
-
-        for (auto e : edges)
+        for (const auto &e : edges)
         {
-            adjL[e[0]].push_back({e[1], e[2]}); // u → v
-            adjL[e[1]].push_back({e[0], e[2]}); // v → u (because graph is undirected)
+            int u = e[0], v = e[1], w = e[2];
+            adjL[u].push_back({v, w});
+            adjL[v].push_back({u, w}); // Added undirected edge
         }
 
-        // -----------------------------------------
-        // Step 2: Initialize distance and parent
-        // -----------------------------------------
-        vector<int> dist(V, 1e9); // Distance array initialized to infinity
-        dist[src] = 0;            // Distance to source = 0
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 
-        vector<int> parent(V, -1); // To reconstruct path
-        parent[src] = -1;          // Source has no parent
+        vector<int> dist(n + 1, 1e9);
+        vector<int> par(n + 1, -1);
 
-        // ------------------------------------------------
-        // Step 3: Use Set to simulate a min-priority queue
-        // ------------------------------------------------
-        set<pair<int, int>> st; // Stores {distance, node}, sorted by distance
-        st.insert({0, src});
+        // --- STEP 2: Initialize Start Node ---
+        pq.push({0, 1});
+        dist[1] = 0;
 
-        // --------------------------
-        // Step 4: Dijkstra's Loop
-        // --------------------------
-        while (!st.empty())
+        // --- STEP 3: Dijkstra's Relaxation Loop ---
+        while (!pq.empty())
         {
-            // Extract node with smallest distance
-            auto [curDist, curN] = *st.begin();
-            st.erase(st.begin());
 
-            // Relax all adjacent nodes
-            for (auto adj : adjL[curN])
+            auto [curW, curN] = pq.top();
+            pq.pop();
+
+            // Lazy Deletion
+            if (dist[curN] < curW)
             {
-                int adjN = adj.first;     // Neighbor node
-                int adjDist = adj.second; // Edge weight
+                continue;
+            }
 
-                int newDist = curDist + adjDist;
+            // FIX: Iterate over adjL[curN], not adjL[curW]!
+            for (const auto &[adjN, adjW] : adjL[curN])
+            {
 
-                // If a shorter path to adjN is found
-                if (newDist < dist[adjN])
+                int newW = curW + adjW;
+
+                if (newW < dist[adjN])
                 {
-                    // Remove the old entry from set (if exists)
-                    if (dist[adjN] != 1e9)
-                    {
-                        st.erase({dist[adjN], adjN});
-                    }
+                    dist[adjN] = newW;
+                    pq.push({newW, adjN});
 
-                    // Update distance and parent
-                    dist[adjN] = newDist;
-                    parent[adjN] = curN;
-
-                    // Insert new distance into set
-                    st.insert({newDist, adjN});
+                    // Track the breadcrumb
+                    par[adjN] = curN;
                 }
             }
         }
 
-        // -----------------------------
-        // Step 5: Build the result path
-        // -----------------------------
+        // --- STEP 4: Path Reconstruction ---
+        // If the destination is unreachable
+        if (dist[n] == 1e9)
+        {
+            return {-1};
+        }
+
         vector<int> ans;
+        int cur = n;
 
-        if (dist[t] == 1e9)
+        // Backtrack from destination to source
+        while (cur != -1)
         {
-            // If target node is unreachable
-            ans.push_back(-1);
+            ans.push_back(cur);
+            cur = par[cur];
         }
-        else
-        {
-            // Reconstruct path from t to src using parent array
-            int p = t;
-            while (p != -1)
-            {
-                ans.push_back(p);
-                p = parent[p];
-            }
 
-            // Append total distance at the end
-            ans.push_back(dist[t]);
+        // The problem expects the total weight to be the first element
+        // The total weight from 1 to n is exactly dist[n]
+        ans.push_back(dist[n]);
 
-            // Reverse path to get correct order (src → t)
-            reverse(ans.begin(), ans.end());
-        }
+        // Reverse to get [weight, 1, node_a, node_b, ..., n]
+        reverse(ans.begin(), ans.end());
 
         return ans;
     }
-
-    //-------------------------------------------------------------------------------
-    // 2. Title:
-    //-------------------------------------------------------------------------------
 };
 
 int main()
