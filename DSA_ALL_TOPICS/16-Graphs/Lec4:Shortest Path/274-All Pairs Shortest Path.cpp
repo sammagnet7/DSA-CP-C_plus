@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Floyd Warshall Algorithm: G-42
+1. Title: All-Pairs Shortest Path | Floyd Warshall Algorithm
 
 Links:
 https://takeuforward.org/data-structure/floyd-warshall-algorithm-g-42/
@@ -32,8 +32,6 @@ Similar problems:
     https://www.youtube.com/watch?v=PwMVNSJ5SLI&t=1s
     https://takeuforward.org/plus/dsa/problems/find-the-city-with-the-smallest-number-of-neighbors?tab=editorial
     https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/description/
-    https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envType=daily-question&envId=2026-01-29
-
 
 
 Problem statement:
@@ -90,11 +88,9 @@ OUTPUT::::::
 
 */
 
-//-------------------------------------------------------------------------------
-// 1. Title: Floyd Warshall Algorithm: G-42
-//-------------------------------------------------------------------------------
-//
-
+//============================================================================
+// Approach 1 — Floyd-Warshall Algorithm (All-Pairs Shortest Path)
+//============================================================================
 /**
  * Floyd-Warshall Algorithm
  *
@@ -139,38 +135,44 @@ class Solution
 public:
     void floydWarshall(vector<vector<int>> &dist)
     {
-        int V = dist.size();
+        int n = dist.size();
 
-        // Try every vertex as an intermediate node
-        for (int k = 0; k < V; k++)
+        // 'k' MUST be the outermost loop! It represents the permitted intermediate node.
+        for (int k = 0; k < n; ++k)
         {
-            // For every source vertex
-            for (int i = 0; i < V; i++)
+
+            for (int i = 0; i < n; ++i)
             {
-                // For every destination vertex
-                for (int j = 0; j < V; j++)
+                for (int j = 0; j < n; ++j)
                 {
 
-                    int oldDist = dist[i][j];              // current distance i->j
-                    int newDist = dist[i][k] + dist[k][j]; // distance i->k->j
-
-                    // Relax only if both subpaths are valid (not INF)
-                    if (dist[i][k] != 1e8 && dist[k][j] != 1e8 && newDist < oldDist)
+                    // Optimization: No need to calculate paths to self here
+                    if (i == j)
                     {
-                        dist[i][j] = newDist; // update with shorter path
+                        continue;
                     }
+
+                    // SAFETY: Prevent integer overflow from adding to "infinity"
+                    if (dist[i][k] == 1e8 || dist[k][j] == 1e8)
+                    {
+                        continue;
+                    }
+
+                    // Edge Relaxation via intermediate node 'k'
+                    int newDist = dist[i][k] + dist[k][j];
+                    dist[i][j] = min(newDist, dist[i][j]);
                 }
             }
         }
 
-        // Detect negative weight cycle:
-        // If distance from a vertex to itself becomes negative,
-        // it means there exists a cycle with negative total weight.
-        for (int i = 0; i < V; i++)
+        // --- STEP 3: Negative Cycle Detection ---
+        for (int i = 0; i < n; ++i)
         {
+            // If the cost to reach yourself is negative, a negative cycle exists
             if (dist[i][i] < 0)
             {
-                cout << "Graph contains a negative weight cycle" << endl;
+                cout << "Negative Weight Cycle exists!";
+                // In a real competitive programming scenario, you might return here or throw an error.
             }
         }
     }

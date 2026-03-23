@@ -505,6 +505,26 @@ It can be of two types:
    - For undirected graph with unit weights -> Use plain BFS
    - For undirected graph with weighted edge - use Dijkstra -> Queue [Slow]-> Priority_queue -> Set [OPTIMAL]
    - The original Dijkstra algo works for undirected graphs only having non-ngetives edges.
+   - 
+     - Cycles with all positive edges: Dijkstra handles them perfectly.
+     - Negative edges (even without cycles): Dijkstra fails or becomes highly inefficient.
+     - Negative weight cycles: Mathematically impossible to find a "shortest path." 
+   - 🏆 The Big Three Shortest Path Algorithms
+     1. BFS (Breadth-First Search)
+        * **Use Case:** Unweighted graphs (all edges cost 1).
+        * **Time Complexity:** `O(V + E)`
+
+     2. Dijkstra's Algorithm
+        * **Use Case:** Weighted graphs with strictly positive weights.
+        * **Time Complexity:** `O((V + E) log V)`
+
+     3. Bellman-Ford Algorithm
+        * **Use Case:** Graphs with negative weights (and negative cycle detection).
+        * **Time Complexity:** `O(V * E)` — *Notice this is much slower than Dijkstra, which is why we only use it when forced to by negative weights!*
+     4. Floyd Warshall Algorithm
+        * **Use Case:** Graphs with negative weights (and negative cycle detection).
+        * **Time Complexity:** `O(V^3)` — *Notice this is much slower, which is why we only use it when need to find all pairs shortest paths!*
+  
    - We have modified `Dijkstra` incorporating priority_queue, so it can now handle negetive edges or non-negetive weight cycles only if graph is having directed edges. (Because undirected graph with a single negetive weight creates a negetive weight cycle.)
    - `Bellman-ford` algo can detect negetive weight cycles(a cycle where sum of all weights is negative). 
    - `Floyd warshall` can be used for for Directed and undirected graphs. 
@@ -707,7 +727,7 @@ It can be of two types:
 18. For questions like printing *combinations* or *subsequences*, the first thing that should strike your mind is **recursion**.
 Whenever the problem is related to picking up elements from an array to form a combination, start thinking about the “pick and non-pick” approach.
 
-19.   Below is a way to get the next valid index while traversing a 2-D matrix:
+1.    Below is a way to get the next valid index while traversing a 2-D matrix:
       
 ```cpp
           int curFlatIndex = curRowIdx * N + curColIdx; // Flatten to 1D index

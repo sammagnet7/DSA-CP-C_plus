@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Bellman Ford Algorithm: G-41
+1. Title: Shortest Path from Source with Negetive weight Cycle detection | Bellman Ford Algorithm
 
 Links:
 https://takeuforward.org/data-structure/bellman-ford-algorithm-g-41/
@@ -28,8 +28,8 @@ https://www.geeksforgeeks.org/problems/distance-from-the-source-bellman-ford-alg
 
 
 Problem statement:
-Given an weighted graph with V vertices numbered from 0 to V-1 and E edges, represented by a 2d array edges[][], where edges[i] = [u, v, w] represents a direct edge from node u to v having w edge weight. You are also given a source vertex src.
-Your task is to compute the shortest distances from the source to all other vertices. If a vertex is unreachable from the source, its distance should be marked as 108. Additionally, if the graph contains a negative weight cycle, return [-1] to indicate that shortest paths cannot be reliably computed.
+Given an weighted graph with V vertices numbered from 0 to V-1 and E edges, represented by a 2d array edges[][], where edges[i] = [u, v, w] represents a direct edge from node u to v having w edge weight. You are also given a source vertex `src`.
+Your task is to compute the shortest distances from the source to all other vertices. If a vertex is unreachable from the source, its distance should be marked as 10^8. Additionally, if the graph contains a `negative weight cycle`, return [-1] to indicate that shortest paths cannot be reliably computed.
 
 Examples:
     Input: V = 5, edges[][] = [[1, 3, 2], [4, 3, -1], [2, 4, 1], [1, 2, 1], [0, 1, 5]], src = 0
@@ -49,8 +49,6 @@ Constraints:
     1 ≤ E = edges.size() ≤ V*(V-1)
     -1000 ≤ w ≤ 1000
     0 ≤ src < V
-
-
 
 
 INPUT::::::
@@ -84,9 +82,8 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Bellman Ford Algorithm: G-41
+// 1. Title: Bellman Ford Algorithm
 //-------------------------------------------------------------------------------
-//
 
 class Solution
 {
@@ -96,7 +93,7 @@ public:
      *
      * Intuition:
      * ----------
-     * Dijkstra's algorithm fails with negative weight cycles because it assumes
+     * Dijkstra's algorithm fails with `negative weight cycles` because it assumes
      * once a node is "popped", its distance is finalized.
      * Bellman-Ford does not assume this. Instead, it keeps relaxing edges up to (V-1) times,
      * ensuring correct shortest paths even with negative weights.

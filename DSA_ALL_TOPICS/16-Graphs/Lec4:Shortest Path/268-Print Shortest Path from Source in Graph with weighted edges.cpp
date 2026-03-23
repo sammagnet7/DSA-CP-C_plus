@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Print Shortest Path - Dijkstra's Algorithm
+1. Title: Print Shortest Path from Source in Graph with weighted edges - Dijkstra's Algorithm
 
 
 Links:
@@ -89,7 +89,7 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Print Shortest Path
+// 1. Title: Print Shortest Path from Source to Destination node
 //-------------------------------------------------------------------------------
 
 class Solution
