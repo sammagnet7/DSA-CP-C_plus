@@ -18,11 +18,11 @@ using namespace std;
 
 /*
 
-1. Title: Disjoint Set | Union by Rank | Union by Size | Path Compression: G-46
+1. Title: Disjoint Set | Union by Rank | Union by Size | Path Compression
 
 Links:
 https://takeuforward.org/data-structure/disjoint-set-union-by-rank-union-by-size-path-compression-g-46/
-youtube.com/watch?v=aBxjDBC4M1U&feature=youtu.be
+https://www.youtube.com/watch?v=aBxjDBC4M1U
 https://takeuforward.org/plus/dsa/problems/disjoint-set-?tab=editorial
 
 
@@ -48,7 +48,7 @@ Functionalities of Disjoint Set Data Structure:
     Terminologies:
         Ultimate Parent: The parent of a node refers to the node right above that particular node.
         The ultimate parent refers to the topmost node or the root node of that component.
-        Rank: The rank of a node refers to the distance (the number of nodes including the leaf node) between the furthest leaf node and the current node.
+        Rank: The rank of a node refers to the height of the graph.
                 Rank includes all nodes beneath the current node.
 
 
@@ -86,21 +86,20 @@ OUTPUT::::::
 //--------------------------------------------------------------------------------
 //  Title: Disjoint Set (Union-Find)
 //  Variants: Union by Rank | Union by Size | Path Compression
-//  Reference: G-46 (Striver’s Graph Series)
 //--------------------------------------------------------------------------------
 //
 // Intuition:
 // A Disjoint Set (DSU/Union-Find) is a data structure to efficiently handle
 // dynamic connectivity queries: "Are two nodes in the same connected component?"
 // It supports two main operations:
-//   1. find(u): Find representative (ultimate parent) of the set containing u.
-//   2. union(u, v): Merge the sets containing u and v.
+//   1. find(u): Find representative (ultimate parent/ final Boss) of the set containing u.
+//   2. union(u, v): Merge the sets containing u and v. -> <merge the Bosses of the two>
 //
 // Optimizations:
 // - Path Compression: Flattens the structure of the tree, so future queries
 //   are faster (almost O(1)).
 // - Union by Rank / Union by Size: Ensures the smaller tree is attached to
-//   the larger tree to prevent height growth.
+//   the larger tree to prevent height growth. -> <Small boss joins below Big Boss>
 //
 // Time Complexity: Nearly O(1) (amortized) per operation using α(n) inverse Ackermann.
 // Space Complexity: O(N) for parent[], rank[], size[].
@@ -209,15 +208,10 @@ public:
         if (p_u == p_v) // Already in same set
             return;
 
-        if (size[p_u] == size[p_v])
+        if (size[p_u] <= size[p_v])
         {
             parent[p_u] = p_v;      // Attach u under v
             size[p_v] += size[p_u]; // Update size of v’s set
-        }
-        else if (size[p_u] < size[p_v])
-        {
-            parent[p_u] = p_v;
-            size[p_v] += size[p_u];
         }
         else
         {
@@ -230,31 +224,31 @@ public:
 // ----------------------------------------------------------------------
 // Example usage with Union by Rank
 // ----------------------------------------------------------------------
-// int main()
-// {
-//     DisjointSet ds(7);
+int main()
+{
+    DisjointSet ds(7);
 
-//     ds.unionByRank(1, 2); // Connect 1-2
-//     ds.unionByRank(2, 3); // Connect 2-3
-//     ds.unionByRank(4, 5); // Connect 4-5
-//     ds.unionByRank(6, 7); // Connect 6-7
-//     ds.unionByRank(5, 6); // Connect 5-6
+    ds.unionByRank(1, 2); // Connect 1-2
+    ds.unionByRank(2, 3); // Connect 2-3
+    ds.unionByRank(4, 5); // Connect 4-5
+    ds.unionByRank(6, 7); // Connect 6-7
+    ds.unionByRank(5, 6); // Connect 5-6
 
-//     // Check connectivity between 3 and 7
-//     if (ds.find(3, 7))
-//         cout << "They belong to the same components.\n";
-//     else
-//         cout << "They do not belong to the same components.\n";
+    // Check connectivity between 3 and 7
+    if (ds.find(3, 7))
+        cout << "They belong to the same components.\n";
+    else
+        cout << "They do not belong to the same components.\n";
 
-//     ds.unionByRank(3, 7); // Connect 3-7
+    ds.unionByRank(3, 7); // Connect 3-7
 
-//     if (ds.find(3, 7))
-//         cout << "They belong to the same components.\n";
-//     else
-//         cout << "They do not belong to the same components.\n";
+    if (ds.find(3, 7))
+        cout << "They belong to the same components.\n";
+    else
+        cout << "They do not belong to the same components.\n";
 
-//     return 0;
-// }
+    return 0;
+}
 
 // ----------------------------------------------------------------------
 // Example usage with Union by Size
