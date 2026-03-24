@@ -146,103 +146,119 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 // 1. Title: Minimum Cost to Convert String I
 //-------------------------------------------------------------------------------
-//
+
 class Solution
 {
-    using ll = long long;
-    const ll INF = 1e9; // Sentinel value for infinity (larger than any possible path sum)
-
 public:
-    /*
-     * METHOD: minimumCost
-     * -------------------
-     * APPROACH: All-Pairs Shortest Path (Floyd-Warshall)
-     * * 1. Graph Representation:
-     * - We treat the 26 lowercase English letters as nodes in a directed weighted graph.
-     * - The input arrays (original, changed, cost) represent directed edges with specific weights.
-     * * 2. Algorithm Choice: Floyd-Warshall
-     * - The problem requires us to find the cheapest way to convert ANY character 'u' to ANY character 'v',
-     * possibly through intermediate steps (e.g., a -> b -> c).
-     * - Since the number of nodes (V) is very small (26), Floyd-Warshall is the optimal choice.
-     * - It computes the shortest path between all pairs of nodes in O(V^3) time.
-     * * 3. Process:
-     * - Initialize a 26x26 adjacency matrix with INF, where minCost[i][i] = 0.
-     * - Populate the matrix with the given direct conversion costs. Handle duplicate edges by keeping the minimum.
-     * - Run the 3 nested loops of Floyd-Warshall to update the matrix with transitive shortest paths.
-     * - Iterate through the 'source' string and sum up the conversion costs for each character to match 'target'.
-     * * COMPLEXITY:
-     * Time: O(M + 26^3 + N)
-     * - M: Number of entries in the 'cost' array (Graph construction).
-     * - 26^3: Floyd-Warshall algorithm (Constant time ~17,576 operations).
-     * - N: Length of 'source' string (Final linear scan).
-     * Space: O(1)
-     * - We use a fixed 26x26 matrix, which is constant space regardless of input size.
+    //============================================================================
+    // Approach 1 — Floyd-Warshall Algorithm (Alphabet Graph)
+    //============================================================================
+
+    /**
+     * @brief Finds the minimum cost to convert a source string to a target string.
+     *
+     * Idea & Intuition:
+     * - The allowed character changes form a directed, weighted graph where the nodes
+     * are the 26 lowercase English letters.
+     * - Because we need to know the cheapest conversion cost from *any* character to
+     * *any* other character, this is an All-Pairs Shortest Path problem.
+     * - The graph has exactly 26 nodes. Floyd-Warshall runs in O(V^3) time, which is
+     * 26^3 = 17,576 operations. This is phenomenally fast and effectively O(1)
+     * constant time, making it the perfect algorithm here.
+     *
+     * Approach:
+     * 1. Initialization:
+     * - Create a 26x26 `dist` matrix initialized to `1e9`.
+     * - Set the distance from any character to itself to 0 (`dist[i][i] = 0`).
+     * - Populate the directed edges. If there are duplicate rules for the same
+     * conversion, strictly keep the minimum cost.
+     * 2. Floyd-Warshall DP:
+     * - Run the standard 3 nested loops (k, i, j) strictly bounded to 26.
+     * - Include overflow protection (`1e9` checks).
+     * 3. Cost Calculation:
+     * - Iterate through the `source` and `target` strings simultaneously.
+     * - If `source[i] == target[i]`, no cost is incurred.
+     * - If `dist[u][v] == 1e9`, the conversion is impossible. Return -1 immediately.
+     * - Otherwise, add the pre-calculated shortest path cost to `minCost`.
+     *
+     * Time Complexity:
+     * - O(N + L): Where N is the size of the `original` array and L is the length of
+     * the `source` string. Building the graph takes O(N). Floyd-Warshall takes O(26^3)
+     * which simplifies to O(1). Calculating the final cost takes O(L).
+     *
+     * Space Complexity:
+     * - O(1): The `dist` matrix is fixed at 26x26 integers, meaning it requires O(1)
+     * auxiliary memory regardless of the input size.
      */
-    ll minimumCost(string source, string target, vector<char> &original, vector<char> &changed, vector<int> &cost)
+    long long minimumCost(string source, string target, vector<char> &original, vector<char> &changed, vector<int> &cost)
     {
 
-        // 1. Initialize Distance Matrix (26x26)
-        // minCost[i][j] stores the minimum cost to convert char (i+'a') to char (j+'a')
-        vector<vector<ll>> minCost(26, vector<ll>(26, INF));
+        // --- STEP 1: Graph Initialization ---
+        // 26x26 matrix for the English alphabet
+        vector<vector<int>> dist(26, vector<int>(26, 1e9));
 
-        // Base case: The cost to convert a character to itself is always 0.
-        for (int i = 0; i < 26; i++)
+        // Distance to self is always 0
+        for (int i = 0; i < 26; ++i)
         {
-            minCost[i][i] = 0;
+            dist[i][i] = 0;
         }
 
-        // 2. Build the Graph from Input
-        // Populate the matrix with initial direct edge weights.
-        for (int i = 0; i < cost.size(); i++)
+        // Populate directed edges (keeping the cheapest option if duplicates exist)
+        for (int i = 0; i < original.size(); ++i)
         {
             int u = original[i] - 'a';
             int v = changed[i] - 'a';
-            // If multiple edges exist between u and v, keep the one with the smallest cost.
-            minCost[u][v] = min(minCost[u][v], (ll)cost[i]);
+            int w = cost[i];
+
+            dist[u][v] = min(dist[u][v], w);
         }
 
-        // 3. Run Floyd-Warshall Algorithm
-        // Update matrix to find the shortest path between every pair of nodes considering intermediate nodes 'k'.
-        int V = 26;
-        for (int k = 0; k < V; k++)
-        { // Intermediate node
-            for (int i = 0; i < V; i++)
-            { // Source node
-                for (int j = 0; j < V; j++)
-                { // Destination node
-                    // Relaxation: If going through 'k' is cheaper, update the path i->j
-                    // Check for INF to prevent overflow (though logic ensures safe range with 1e9)
-                    if (minCost[i][k] < INF && minCost[k][j] < INF)
+        // --- STEP 2: Floyd-Warshall Algorithm ---
+        for (int k = 0; k < 26; ++k)
+        {
+            for (int i = 0; i < 26; ++i)
+            {
+                for (int j = 0; j < 26; ++j)
+                {
+
+                    // Overflow protection
+                    if (dist[i][k] == 1e9 || dist[k][j] == 1e9)
                     {
-                        minCost[i][j] = min(minCost[i][j], minCost[i][k] + minCost[k][j]);
+                        continue;
                     }
+
+                    int newDist = dist[i][k] + dist[k][j];
+                    dist[i][j] = min(dist[i][j], newDist);
                 }
             }
         }
 
-        // 4. Calculate Total Transformation Cost
-        ll finalCost = 0;
-        int N = source.size();
+        // --- STEP 3: Final Cost Calculation ---
+        // Must use long long as the accumulated cost can easily exceed 32-bit limits
+        long long minCost = 0;
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < source.length(); ++i)
         {
+
             int u = source[i] - 'a';
             int v = target[i] - 'a';
 
-            // No conversion needed
+            // No change needed
             if (u == v)
+            {
                 continue;
+            }
 
-            // If the cost is still INF, it means 'v' is unreachable from 'u'
-            if (minCost[u][v] >= INF)
+            // Impossible to convert
+            if (dist[u][v] == 1e9)
             {
                 return -1;
             }
 
-            finalCost += minCost[u][v];
+            minCost += dist[u][v];
         }
 
-        return finalCost;
+        return minCost;
     }
 };
 
@@ -254,92 +270,149 @@ public:
 // Approach 1: Using Hash + Backward/Pull DP [OPTIMAL]
 // ---------------------------------------------------------
 
+/*
+ * METHOD: minimumCost
+ * -------------------
+ * APPROACH: Shortest Path (Floyd-Warshall) + Dynamic Programming
+ *
+ * * 1. PRE-PROCESSING (Graph Construction):
+ * - We treat every unique string in 'original' and 'changed' as a node in a graph.
+ * - Since strings are not integers, we map them to IDs (0, 1, 2...) using a HashMap.
+ * - Build an adjacency matrix where dist[u][v] is the cost to change string 'u' to 'v'.
+ * - Run Floyd-Warshall Algorithm to find the shortest path between ALL pairs of strings.
+ * This handles transitive conversions (e.g., "a" -> "b" -> "c").
+ *
+ * * 2. OPTIMIZATION (Length Filtering):
+ * - We collect all unique lengths of strings from the 'original' array into a Set.
+ * - During DP, we only try to match substrings of these specific lengths.
+ * - This reduces the inner loop complexity significantly compared to checking all j < i.
+ *
+ * * 3. MAIN LOGIC (Dynamic Programming) (Backward / Pull DP):
+ * - dp[i] represents the minimum cost to convert the prefix source[0...i-1] to target[0...i-1].
+ * - For each index 'i' (current character in source), we have two choices:
+ * a) Exact Match: If source[i] == target[i], we can potentially carry over the cost from dp[i].
+ * b) Replacement: Look back 'len' characters. If source[i-len+1...i] can be converted
+ * to target[i-len+1...i] using our pre-computed graph, update the cost.
+ * * COMPLEXITY:
+ * Time: O(V^3 + N * K * L)
+ * - V^3: Floyd-Warshall (V <= 200 unique strings).
+ * - N: Length of source (1000).
+ * - K: Number of unique lengths in 'original' (<= 100).
+ * - L: Average length of substring hashing (<= 1000).
+ * Space: O(V^2) for the distance matrix.
+ */
+
+using ll = long long;
+
 class Solution
 {
-    // Use a large infinity value (1e14) to prevent overflow when adding costs.
-    // Max cost is ~1e6, max operations could correspond to string length ~1000.
-    // 1e9 might overflow if we sum many edge weights.
-    const long long INF = 1e14;
+    // A safe infinity for long long that won't overflow when added to itself
+    const ll INF = 1e15;
 
 public:
-    /*
-     * METHOD: minimumCost
-     * -------------------
-     * APPROACH: Shortest Path (Floyd-Warshall) + Dynamic Programming
-     * * 1. PRE-PROCESSING (Graph Construction):
-     * - We treat every unique string in 'original' and 'changed' as a node in a graph.
-     * - Since strings are not integers, we map them to IDs (0, 1, 2...) using a HashMap.
-     * - Build an adjacency matrix where dist[u][v] is the cost to change string 'u' to 'v'.
-     * - Run Floyd-Warshall Algorithm to find the shortest path between ALL pairs of strings.
-     * This handles transitive conversions (e.g., "a" -> "b" -> "c").
-     * * 2. OPTIMIZATION (Length Filtering):
-     * - We collect all unique lengths of strings from the 'original' array into a Set.
-     * - During DP, we only try to match substrings of these specific lengths.
-     * - This reduces the inner loop complexity significantly compared to checking all j < i.
-     * * 3. MAIN LOGIC (Dynamic Programming) (Backward / Pull DP):
-     * - dp[i] represents the minimum cost to convert the prefix source[0...i-1] to target[0...i-1].
-     * - For each index 'i' (current character in source), we have two choices:
-     * a) Exact Match: If source[i] == target[i], we can potentially carry over the cost from dp[i].
-     * b) Replacement: Look back 'len' characters. If source[i-len+1...i] can be converted
-     * to target[i-len+1...i] using our pre-computed graph, update the cost.
-     * * COMPLEXITY:
-     * Time: O(V^3 + N * K * L)
-     * - V^3: Floyd-Warshall (V <= 200 unique strings).
-     * - N: Length of source (1000).
-     * - K: Number of unique lengths in 'original' (<= 100).
-     * - L: Average length of substring hashing (<= 1000).
-     * Space: O(V^2) for the distance matrix.
+    //============================================================================
+    // Approach 1 — Floyd-Warshall (APSP) + Forward 1D Dynamic Programming
+    //============================================================================
+
+    /**
+     * @brief Finds the minimum cost to convert source to target using disjoint substring replacements.
+     *
+     * Idea & Intuition:
+     * - The problem explicitly states that chosen substrings must be "disjoint or identical".
+     * In plain English, this means we are cutting the string into independent chunks and
+     * paying for them sequentially. This perfectly sets up a 1D Dynamic Programming approach.
+     * - However, to perform the DP, we first need to know the absolute cheapest cost to
+     * convert ANY known chunk to ANY other known chunk. Because the number of unique
+     * strings in the rules is very small (<= 200), we can map each string to an Integer ID
+     * and use the Floyd-Warshall Algorithm to precompute all shortest paths in O(V^3) time.
+     *
+     * Approach:
+     * 
+     ** 1. Graph Construction & Floyd-Warshall:
+     * - Iterate through `original` and `changed` to assign a unique integer ID to every
+     * distinct string. Let this count be V.
+     * - Initialize a V x V `dist` matrix to `INF` (1e15). Set the diagonal to 0.
+     * - Populate the matrix with the given costs, taking the `min` to protect against
+     * duplicate rules with worse costs.
+     * - Run the 3-nested loop Floyd-Warshall algorithm to find All-Pairs Shortest Paths.
+     * 
+     * * 2. Precompute Available Lengths:
+     * - Insert the lengths of all strings in `original` into a `set<int>`.
+     * - OPTIMIZATION: A C++ `set` automatically sorts the lengths in ascending order.
+     * This is crucial for early-breaking in the DP step.
+     * 
+     * * 3. Forward 1D Dynamic Programming:
+     * - Let `minCost[k]` be the minimum cost to correctly convert the prefix of length `k`.
+     * - Base Case: `minCost[0] = 0` (converting an empty prefix costs nothing).
+     * - Loop `i` from 0 to N-1 (representing the current end character of our prefix):
+     * a) Free Match: If `source[i] == target[i]`, we can trivially extend the previous
+     *  prefix's cost: `curMinCost = minCost[i]`.
+     * b) Chunk Replacement: Iterate through our sorted `avlLens`.
+     * - Calculate the start index `l = i - len + 1`.
+     * - EARLY BREAK: If `l < 0`, the chunk is too big for our current prefix. Because
+     * the set is sorted ascending, all subsequent lengths will also be too big, so
+     * we immediately `break`.
+     * - Extract the `source` and `target` substrings. If both exist in our ID map,
+     * check the `dist` matrix.
+     * - If a valid path exists, calculate `newConvCost = minCost[l] + dist[u][v]`.
+     * c) Finally, lock in the best found cost for the prefix of length `i + 1`:
+     * `minCost[i + 1] = curMinCost`.
+     *
+     * Time Complexity:
+     * - O(V^3 + N * U * L):
+     * - V is the number of unique strings (<= 200). Floyd-Warshall takes O(V^3) ~ 8,000,000 ops.
+     * - N is the string length (<= 1000).
+     * - U is the number of unique string lengths in the rules (<= 100).
+     * - L is the maximum length of a string being extracted via `substr` (<= N).
+     * The set optimization keeps the DP extremely fast.
+     *
+     * Space Complexity:
+     * - O(V^2 + V * L + N):
+     * - `dist` matrix takes O(V^2).
+     * - The string-to-ID hash map takes O(V * L) to store the strings.
+     * - The DP array takes O(N).
      */
-    long long minimumCost(string source, string target, vector<string> &original, vector<string> &changed, vector<int> &cost)
+    ll minimumCost(string source, string target, vector<string> &original, vector<string> &changed, vector<int> &cost)
     {
 
-        int M = cost.size();
-        int N = source.size();
+        // ==========================================
+        // STEP 1: Graph Construction & Floyd-Warshall
+        // ==========================================
+        unordered_map<string, int> mp;
+        int count = 0;
 
-        // --- Step 1: Map Strings to Integer IDs ---
-        unordered_map<string, int> str_to_id;
-        int id = 0;
-
-        for (int i = 0; i < M; i++)
+        for (int i = 0; i < original.size(); ++i)
         {
-            if (str_to_id.find(original[i]) == str_to_id.end())
-            {
-                str_to_id[original[i]] = id++;
-            }
-            if (str_to_id.find(changed[i]) == str_to_id.end())
-            {
-                str_to_id[changed[i]] = id++;
-            }
+            if (mp.find(original[i]) == mp.end())
+                mp[original[i]] = count++;
+            if (mp.find(changed[i]) == mp.end())
+                mp[changed[i]] = count++;
         }
 
-        int V = id; // Total number of unique string nodes
+        // Upgraded to 1e15 Infinity
+        vector<vector<ll>> dist(count, vector<ll>(count, INF));
 
-        // --- Step 2: Initialize Distance Matrix ---
-        vector<vector<long long>> dist(V, vector<long long>(V, INF));
+        for (int i = 0; i < original.size(); ++i)
+        {
+            int u = mp[original[i]];
+            int v = mp[changed[i]];
+            ll w = cost[i];
 
-        // Base case: Cost to convert a string to itself is 0
-        for (int i = 0; i < V; ++i)
+            dist[u][v] = min(dist[u][v], w);
+        }
+
+        for (int i = 0; i < count; ++i)
+        {
             dist[i][i] = 0;
-
-        // Populate direct edges from input
-        for (int i = 0; i < M; i++)
-        {
-            int u = str_to_id[original[i]];
-            int v = str_to_id[changed[i]];
-            // Handle duplicate rules: keep the minimum cost
-            dist[u][v] = min(dist[u][v], (long long)cost[i]);
         }
 
-        // --- Step 3: Floyd-Warshall Algorithm ---
-        // Compute All-Pairs Shortest Path to handle chained conversions (A->B->C)
-        for (int k = 0; k < V; k++)
+        for (int k = 0; k < count; ++k)
         {
-            for (int i = 0; i < V; i++)
+            for (int i = 0; i < count; ++i)
             {
-                for (int j = 0; j < V; j++)
+                for (int j = 0; j < count; ++j)
                 {
-                    // Check bounds to prevent overflow and ensure reachability
-                    if (dist[i][k] < INF && dist[k][j] < INF)
+                    if (dist[i][k] != INF && dist[k][j] != INF)
                     {
                         dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
                     }
@@ -347,74 +420,73 @@ public:
             }
         }
 
-        // --- Step 4: Optimization Setup ---
-        // Store only valid lengths to avoid iterating irrelevant substring sizes
-        unordered_set<int> validLens;
-        for (const auto &s : original)
+        // ==========================================
+        // STEP 2: Precompute Available Lengths
+        // ==========================================
+        // Set automatically sorts lengths ascending, which makes the DP break condition mathematically safe!
+        set<int> avlLens;
+        for (const string &s : original)
         {
-            validLens.insert(s.size());
+            avlLens.insert(s.length());
         }
 
-        // --- Step 5: Dynamic Programming ---
-        // DP[i] = Min cost to convert prefix of length 'i'
-        vector<long long> DP(N + 1, INF);
-        DP[0] = 0;
+        // ==========================================
+        // STEP 3: Forward 1D Dynamic Programming
+        // ==========================================
+        int n = source.length();
+        vector<ll> minCost(n + 1, INF);
 
-        // Iterate through the string. 'i' represents the index of the character
-        // we are currently trying to resolve (0-based index in source/target).
-        // We are computing the state for DP[i+1] (prefix length i+1).
-        for (int i = 0; i < N; i++)
+        minCost[0] = 0; // Cost to convert a prefix of length 0 is 0
+
+        for (int i = 0; i < n; ++i)
         {
 
-            long long minCost = INF;
+            ll curMinCost = INF;
 
-            // Option A: Skip Character (if they match)
-            // If characters are identical, we can carry over the cost from the previous prefix.
+            // Option 1: Free character match
             if (source[i] == target[i])
             {
-                minCost = DP[i]; // Equivalent to DP[(i+1)-1]
+                curMinCost = minCost[i];
             }
 
-            // Option B: Apply Substring Conversion Rule
-            // Try all possible substring lengths that exist in our rules
-            for (auto it = validLens.begin(); it != validLens.end(); it++)
+            // Option 2: Attempt chunk replacements ending at index i
+            for (auto &len : avlLens)
             {
 
-                int len = *it;
+                int l = i - len + 1;
 
-                // Boundary Check: Ensure the substring starts at a valid non-negative index
-                // Substring range: [i - len + 1, i]
-                if (i - len + 1 < 0)
+                // Because avlLens is sorted ascending, if this length is out of bounds, all larger lengths will be too!
+                if (l < 0)
                 {
-                    continue;
+                    break;
                 }
 
-                // Extract substrings from source and target
-                string srcStr = source.substr((i - len + 1), len);
-                string targetStr = target.substr((i - len + 1), len);
+                string srcStr = source.substr(l, len);
+                string trgStr = target.substr(l, len);
 
-                // Check if both substrings are known nodes in our graph
-                if (str_to_id.count(srcStr) > 0 && str_to_id.count(targetStr) > 0)
+                // If both chunks are recognized by our conversion graph
+                if (mp.find(srcStr) != mp.end() && mp.find(trgStr) != mp.end())
                 {
-                    int srcId = str_to_id[srcStr];
-                    int targetId = str_to_id[targetStr];
 
-                    // Transition:
-                    // Cost = (Cost to reach state BEFORE this substring) + (Cost to transform this substring)
-                    // Previous state is at index: (i - len + 1)
-                    if (dist[srcId][targetId] < INF && DP[i - len + 1] < INF)
+                    int u = mp[srcStr];
+                    int v = mp[trgStr];
+                    ll curConvCost = dist[u][v];
+                    ll restConvCost = minCost[l];
+
+                    // If a valid path exists
+                    if (restConvCost != INF && curConvCost != INF)
                     {
-                        long long curDist = DP[i - len + 1] + dist[srcId][targetId];
-                        minCost = min(minCost, curDist);
+                        ll newConvCost = restConvCost + curConvCost;
+                        curMinCost = min(curMinCost, newConvCost);
                     }
                 }
             }
 
-            // Store result for prefix length i+1
-            DP[i + 1] = minCost;
+            // Lock in the minimum cost for the prefix of length i + 1
+            minCost[i + 1] = curMinCost;
         }
 
-        return DP[N] == INF ? -1 : DP[N];
+        return minCost[n] == INF ? -1 : minCost[n];
     }
 };
 
