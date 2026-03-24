@@ -1214,7 +1214,28 @@ The std::string::erase() function has overloads that take a starting position (i
 
 53. **Memory Optimization (2D Vectors):** For small, fixed inner dimensions (like size 2), use `std::vector<std::pair<T, T>>` instead of `std::vector<std::vector<T>>` or two seperate `flat vectors`. This guarantees a single contiguous memory block, completely eliminating the heap fragmentation and CPU cache-miss penalties caused by the 2D vector's array-of-pointers architecture.
 
-54. 
+54. ⚠️ Division in Modulo Arithmetic & The Coprime Trap
+    -  Standard division does not exist in modulo arithmetic. To perform $(A / B) \pmod M$, you must instead multiply by the **Modular Multiplicative Inverse** of $B$.
 
+     #### 1. How Modulo Division Works
+     Instead of dividing, you find a number $B^{-1}$ such that:
+     $$(B \cdot B^{-1}) \pmod M \equiv 1$$
+     Once you have $B^{-1}$, you rewrite the division as multiplication:
+     $$(A / B) \pmod M \equiv (A \cdot B^{-1}) \pmod M$$
+     *(If $M$ is prime, $B^{-1}$ is easily found using Fermat's Little Theorem: $B^{M-2} \pmod M$)*.
 
+     #### 2. The Strict Mathematical Rule
+     The modular inverse $B^{-1}$ **only exists if $B$ and $M$ are coprime**. 
+     This means their Greatest Common Divisor must be 1: $\gcd(B, M) = 1$. 
+     If they share any prime factors, the inverse is mathematically impossible to calculate.
+
+     #### 3. Why it Fails in This Problem (Modulo 12345)
+     In the "Construct Product Matrix" problem, the modulo is $M = 12345$. 
+     * $12345$ is **not prime**. Its prime factorization is $3 \cdot 5 \cdot 823$.
+     * If the grid contains a number that shares a factor with 12345 (e.g., `grid[i][j] = 15`), then $\gcd(15, 12345) = 15$. 
+     * Because $\gcd \neq 1$, the modular inverse does not exist. The math shatters, and division becomes literally impossible.
+
+     **The Takeaway:** If the modulo $M$ is not a prime number (like $10^9 + 7$), attempting to use division to "undo" a running product is a massive red flag. You must pivot to Prefix/Suffix arrays.
+
+55. 
 ---
