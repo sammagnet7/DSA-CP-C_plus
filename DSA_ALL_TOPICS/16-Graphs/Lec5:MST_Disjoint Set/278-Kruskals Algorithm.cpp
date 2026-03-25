@@ -18,12 +18,13 @@ using namespace std;
 
 /*
 
-1. Title: Kruskal's Algorithm - Minimum Spanning Tree : G-47
+1. Title: Minimum Spanning Tree | Kruskal's Algorithm
 
 Links:
 https://takeuforward.org/data-structure/kruskals-algorithm-minimum-spanning-tree-g-47/
 https://www.youtube.com/watch?v=DMnDM_sxVig
 https://takeuforward.org/plus/dsa/problems/find-the-mst-weight?tab=editorial
+https://www.geeksforgeeks.org/problems/minimum-spanning-tree-kruskals-algorithm/1
 
 
 Problem statement:
@@ -78,173 +79,154 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Kruskal's Algorithm - Minimum Spanning Tree : G-47
+// 1. Title: Kruskal's Algorithm - Minimum Spanning Tree
 //-------------------------------------------------------------------------------
-//
 
-//----------------------------------------------------------------------------
-//  Disjoint Set Union (Union-Find) with Union by Size + Path Compression
-//----------------------------------------------------------------------------
-// Intuition:
-// - DSU (Disjoint Set Union) is a data structure used to keep track of
-//   elements partitioned into disjoint (non-overlapping) sets.
-// - It efficiently answers connectivity queries ("are two nodes in the same set?")
-//   and supports merging sets.
-//
-// Optimizations used:
-// 1. Path Compression → makes find() very fast (flattening the tree).
-// 2. Union by Size → always attach smaller tree under bigger tree to keep tree shallow.
-//
-// Time Complexity: Amortized O(4α(N)) ≈ O(1) per operation (α = inverse Ackermann).
-// Space Complexity: O(N) for parent[] and size[].
-//----------------------------------------------------------------------------
-
-class DisjointSet
+//============================================================================
+// Data Structure — Disjoint Set Union (Union-Find)
+//============================================================================
+class DSU
 {
-private:
-    vector<int> parent; // parent[i] = parent of node i
-    vector<int> size;   // size[i] = number of nodes in the set rooted at i
+    vector<int> parent, size;
 
-    // ------------------------------------------------------------------------
-    // Find with Path Compression
-    // ------------------------------------------------------------------------
-    // - Recursively finds the ultimate parent (root) of node u.
-    // - While returning, compresses the path: directly connects u to root.
-    // - This ensures very flat trees (near constant time queries).
-    int findUltParent(int u)
+    /**
+     * @brief Recursively finds the ultimate root of a node with Path Compression.
+     * Path compression flattens the tree, ensuring future queries take O(1) time.
+     */
+    int findPar(int i)
     {
-        if (parent[u] == u) // base case: u is the root of its set
-            return u;
-        // recursive step + path compression
-        parent[u] = findUltParent(parent[u]);
-        return parent[u];
+        int p = parent[i];
+
+        // Base case: If the node is its own boss, it is the ultimate root
+        if (p == i)
+        {
+            return p;
+        }
+
+        // Path Compression: Recursively find the root and attach the current node directly to it
+        return parent[i] = findPar(p);
     }
 
 public:
-    // ------------------------------------------------------------------------
-    // Constructor: initialize DSU with n elements
-    // ------------------------------------------------------------------------
-    // Initially: each node is its own parent, and each set has size 1.
-    DisjointSet(int n)
+    // Initialize with n + 1 to safely handle both 0-indexed and 1-indexed graphs
+    DSU(int n)
     {
         parent.resize(n + 1);
         size.resize(n + 1, 1);
-        for (int i = 0; i <= n; i++)
+
+        for (int i = 0; i <= n; ++i)
         {
-            parent[i] = i; // each node is root of itself initially
+            parent[i] = i;
         }
     }
 
-    // ------------------------------------------------------------------------
-    // Check if two nodes are in the same set
-    // ------------------------------------------------------------------------
-    bool isSameSet(int u, int v)
+    // Checks if two nodes belong to the same connected component
+    // Time taken: O(1)
+    bool dfind(int u, int v)
     {
-        return (findUltParent(u) == findUltParent(v));
+        int pU = findPar(u);
+        int pV = findPar(v);
+
+        return pU == pV;
     }
 
-    // ------------------------------------------------------------------------
-    // Union by Size
-    // ------------------------------------------------------------------------
-    // Algorithm:
-    // 1. Find ultimate parents of u and v.
-    // 2. If same parent → already in same set → no need to merge.
-    // 3. Else, attach the smaller-sized tree under the bigger-sized tree.
-    // 4. Update the size of the new root.
-    void unionBySize(int u, int v)
+    // Merges two components using Union by Size
+    // Time taken: O(1)
+    void dunion(int u, int v)
     {
-        int p_u = findUltParent(u);
-        int p_v = findUltParent(v);
+        int pU = findPar(u);
+        int pV = findPar(v);
 
-        if (p_u == p_v)
-            return; // already in same set
-
-        if (size[p_u] == size[p_v])
+        // If they share the same root, they are already connected
+        if (pU == pV)
         {
-            // attach p_u under p_v (arbitrary when sizes are equal)
-            parent[p_u] = p_v;
-            size[p_v] += size[p_u];
+            return;
         }
-        else if (size[p_u] < size[p_v])
+
+        int sU = size[pU];
+        int sV = size[pV];
+
+        // Attach the smaller tree under the larger tree to keep the overall height minimal
+        if (sU <= sV)
         {
-            // attach smaller set p_u under larger set p_v
-            parent[p_u] = p_v;
-            size[p_v] += size[p_u];
+            parent[pU] = pV;
+            size[pV] += size[pU];
         }
         else
         {
-            // attach smaller set p_v under larger set p_u
-            parent[p_v] = p_u;
-            size[p_u] += size[p_v];
+            parent[pV] = pU;
+            size[pU] += size[pV];
         }
     }
 };
 
-//----------------------------------------------------------------------------
-// Kruskal’s Algorithm for Minimum Spanning Tree (MST)
-//----------------------------------------------------------------------------
-// Intuition:
-// - MST = spanning tree of graph with minimum total edge weight.
-// - Kruskal’s Algorithm builds MST by:
-//    1. Sorting all edges by weight.
-//    2. Iterating over edges in increasing order.
-//    3. Adding edge (u,v) if u and v are not already connected
-//       (i.e., adding it won’t form a cycle).
-//    4. Continue until MST has (V-1) edges.
-//
-// Implementation:
-// - Uses DSU to efficiently check connectivity and merge components.
-// - Returns total MST weight.
-//
-// Complexity:
-// - Sorting edges: O(E log E)
-// - Union-Find operations: O(E α(V)) ≈ O(E)
-// - Overall: O(E log E)
-//----------------------------------------------------------------------------
-
 class Solution
 {
 public:
+    //============================================================================
+    // Approach — Kruskal's Algorithm (Minimum Spanning Tree)
+    //============================================================================
+
+    /**
+     * @brief Calculates the total weight of the Minimum Spanning Tree (MST).
+     *
+     * Idea & Intuition:
+     * - Kruskal's Algorithm builds the MST using an "Edge-First" Greedy approach.
+     * - We evaluate every possible road (edge) in the entire graph, strictly from
+     * cheapest to most expensive.
+     * - We pick the cheapest edge. If building this road connects two cities that
+     * don't already have a path between them, we build it!
+     * - If they ARE already connected (detected via our DSU), building this road
+     * would create a redundant cycle, so we throw the edge away.
+     *
+     * Time Complexity:
+     * - O(E log E): Sorting the edges dominates the execution time. The DSU `find`
+     * and `union` operations take nearly O(1) amortized time.
+     *
+     * Space Complexity:
+     * - O(V): The DSU strictly requires O(V) space for its `parent` and `size` arrays.
+     */
     int kruskalsMST(int V, vector<vector<int>> &edges)
     {
-        vector<vector<int>> wt_edges; // will store edges as {weight, u, v}
-        vector<pair<int, int>> MST;   // stores the chosen edges of MST
-        int MST_wt = 0;               // total weight of MST
-        DisjointSet DS(V);            // initialize DSU for V vertices
 
-        // Step 1: Convert edges into {weight, u, v} format
+        // --- STEP 1: Sort all edges ascending by weight ---
+        sort(edges.begin(), edges.end(), [](const auto &a, const auto &b)
+             { return a[2] < b[2]; });
+
+        // --- STEP 2: Initialize DSU and Trackers ---
+        DSU ds(V);
+        int sum = 0;
+        int edgesCount = 0;
+
+        // --- STEP 3: Greedy Edge Selection ---
         for (auto &e : edges)
         {
+
             int u = e[0];
             int v = e[1];
-            int wt = e[2];
-            wt_edges.push_back({wt, u, v});
-        }
+            int w = e[2];
 
-        // Step 2: Sort edges by weight
-        sort(wt_edges.begin(), wt_edges.end());
-
-        // Step 3: Iterate over edges and build MST
-        for (auto &e : wt_edges)
-        {
-            int wt = e[0];
-            int u = e[1];
-            int v = e[2];
-
-            // If u and v are in different sets, add this edge to MST
-            if (!DS.isSameSet(u, v))
+            // CYCLE CHECK: If u and v have the same ultimate boss, an edge already exists
+            if (ds.dfind(u, v))
             {
-                    DS.unionBySize(u, v);  // merge sets
-                    MST.push_back({u, v}); // include edge in MST
-                    MST_wt += wt;          // add weight
-                }
+                continue;
+            }
 
-                if (MST.size() == V - 1)
+            // Connect the two components and add the cost
+            ds.dunion(u, v);
+            sum += w;
+
+            // --- STEP 4: Senior-Level Optimization (Early Exit) ---
+            // A valid MST on V vertices mathematically ALWAYS has exactly V - 1 edges.
+            // Once we hit that number, the tree is complete, and we can stop looping!
+            ++edgesCount;
+            if (edgesCount == V - 1)
+            {
                 break;
+            }
         }
 
-        // Final: return weight of MST
-        return MST_wt;
+        return sum;
     }
 };
 
