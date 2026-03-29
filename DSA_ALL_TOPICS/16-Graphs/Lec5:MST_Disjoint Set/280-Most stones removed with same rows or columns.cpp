@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Most Stones Removed with Same Row or Column - DSU: G-53
+1. Title: Most Stones Removed with Same Row or Column - DSU
 Links:
 https://takeuforward.org/data-structure/most-stones-removed-with-same-row-or-column-dsu-g-53/
 https://www.youtube.com/watch?v=OwMNX8SPavM
@@ -60,7 +60,7 @@ Examples:
 
 Constraints:
     1 <= stones.length <= 1000
-    0 <= xi, yi <= 104
+    0 <= xi, yi <= 10^4
     No two stones are at the same coordinate point.
 
 
@@ -96,136 +96,167 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Most Stones Removed with Same Row or Column - DSU: G-53
+// 1. Title: Most Stones Removed with Same Row or Column - DSU
 //-------------------------------------------------------------------------------
 //
 
+//============================================================================
+// Helper Class — Disjoint Set Union (Vector Variant for Grid Offsets)
+//============================================================================
+class DSU
+{
+    vector<int> parent, size;
+    int components;
+
+    int getPar(int i)
+    {
+        int p = parent[i];
+        if (i == p)
+        {
+            return p;
+        }
+        // Path Compression
+        return parent[i] = getPar(p);
+    }
+
+public:
+    DSU(int n, int nodesCount)
+    {
+        parent.resize(n);
+        size.resize(n, 1);
+
+        for (int i = 0; i < n; ++i)
+        {
+            parent[i] = i;
+        }
+
+        // Initialize components to exactly the number of unique rows/cols present
+        components = nodesCount;
+    }
+
+    void dunion(int u, int v)
+    {
+        int pu = getPar(u);
+        int pv = getPar(v);
+
+        // If they already share the same root, do nothing
+        if (pu == pv)
+        {
+            return;
+        }
+
+        // A successful merge reduces the number of isolated networks by 1
+        --components;
+
+        int su = size[pu];
+        int sv = size[pv];
+
+        // Union by Size
+        if (su <= sv)
+        {
+            parent[pu] = pv;
+            size[pv] += size[pu];
+        }
+        else
+        {
+            parent[pv] = pu;
+            size[pu] += size[pv];
+        }
+    }
+
+    int getComponents()
+    {
+        return components;
+    }
+};
+
+/**
+ * @class Solution
+ * @brief Solves the "Most Stones Removed with Same Row or Column" problem using DSU.
+ *
+ * ============================================================================
+ * 🧠 INTUITION & APPROACH: The Bipartite Graph Trick
+ * ============================================================================
+ * * Step 1: Rethink the Graph (Nodes vs. Edges)
+ * - Instead of treating the STONES as the nodes in our graph, we treat the
+ * ROWS and COLUMNS as the nodes.
+ * - A stone placed at coordinate (r, c) is simply an EDGE that connects
+ * "Row Node r" to "Column Node c".
+ * * Step 2: Coordinate Offsetting (Preventing Collisions)
+ * - If we have a stone at (5, 5), how does our 1D DSU array know the difference
+ * between "Row 5" and "Column 5"? They would collide at index 5!
+ * - Since the constraints state coordinates go up to 10,000, we OFFSET all
+ * Y-coordinates (columns) by 10,001.
+ * - Now, "Row 5" is index 5, and "Column 5" is safely mapped to index 10006.
+ * * Step 3: Network Building (Connected Components)
+ * - We iterate through every stone and union its Row and its Column.
+ * - If multiple stones share the same row or column, the DSU will chain them
+ * together into a single, massive connected network (Component).
+ * * Step 4: The Mathematical Deduction
+ * - In any connected network of stones, the rules allow us to systematically
+ * remove stones like a collapsing domino chain until exactly ONE stone remains.
+ * - This final surviving stone has no more connections and cannot be removed.
+ * - Therefore, the maximum number of stones we can remove across the entire board is:
+ * [Total Number of Stones] - [Number of Isolated Networks (Components)]
+ * * Step 5: The DSU Pre-Counting Optimization
+ * - We don't want our DSU to count empty rows/cols as components.
+ * - We first loop through the stones and dump all used X and Y (offset)
+ * coordinates into an unordered_set. The size of this set tells us EXACTLY
+ * how many active Row/Col nodes exist.
+ * - We initialize the DSU component tracker with this exact count, and every
+ * valid union dynamically subtracts 1 from it.
+ * * ============================================================================
+ * COMPLEXITY ANALYSIS:
+ * - Time Complexity: O(N) where N is the number of stones. Creating the set
+ * takes O(N). Processing stones through DSU takes ~O(1) amortized time per stone.
+ * - Space Complexity: O(N + MaxCoordinate). The set takes O(N), and the DSU
+ * arrays take a fixed size of 20,002 elements (~160 KB), which is extremely
+ * cache-friendly and memory efficient.
+ */
 class Solution
 {
+    int offset = 1e4 + 1;
+
 public:
-    // ------------------------------------------------------------------------
-    // Disjoint Set (Union-Find) with Union by Size + Path Compression
-    // ------------------------------------------------------------------------
-    class Disjoint
-    {
-    private:
-        vector<int> p, size; // parent array, size array
-    public:
-        // Constructor: O(N)
-        Disjoint(int n)
-        {
-            p.resize(n);
-            size.resize(n, 1);
-            for (int i = 0; i < n; i++)
-                p[i] = i; // initially each node is its own parent
-        }
-
-        // Find with Path Compression: Amortized O(α(N)) ≈ O(1)
-        int findUPar(int u)
-        {
-            if (u == p[u])
-                return u;
-            return p[u] = findUPar(p[u]); // compress path
-        }
-
-        // Union by Size: Amortized O(α(N)) ≈ O(1)
-        void UbyS(int u, int v)
-        {
-            int u_p = findUPar(u);
-            int v_p = findUPar(v);
-
-            if (u_p == v_p)
-                return; // already in same set
-
-            // attach smaller set to larger set
-            if (size[u_p] < size[v_p])
-            {
-                p[u_p] = v_p;
-                size[v_p] += size[u_p];
-            }
-            else
-            {
-                p[v_p] = u_p;
-                size[u_p] += size[v_p];
-            }
-        }
-    };
-
-    // ------------------------------------------------------------------------
-    // Problem: Most Stones Removed with Same Row or Column (LC 947)
-    // Intuition:
-    // - Stones can be removed if they share a row or column with another stone.
-    // - Model each row and column as a node in a graph.
-    // - Union (row, col) for each stone → stones in same row/col belong to same component.
-    // - Number of removable stones = total stones - number of connected components.
-    //
-    // Complexity:
-    // - Finding max dimension: O(stCount)
-    // - Union operations: O(stCount * α(N)) ≈ O(stCount)
-    // - Counting components: O(stCount), since only active nodes are checked
-    // - Overall: O(stCount + α(N)) ≈ O(stCount)
-    //   where:
-    //      stCount = number of stones
-    //      N = total DSU nodes = rows + cols
-    // ------------------------------------------------------------------------
     int removeStones(vector<vector<int>> &stones)
     {
 
-        int stCount = stones.size();    // number of stones
-        int maxDim = 0;                 // track maximum coordinate among rows/cols
-        int compCount = 0;              // number of connected components
-        unordered_set<int> stoneKeeper; // keeps track of all nodes used (rows+cols)
+        int totalStoneCount = stones.size();
 
-        // --------------------------------------------------------------------
-        // Step 1: Find maximum row/col index (for DSU size allocation)
-        // Complexity: O(stCount)
-        // --------------------------------------------------------------------
-        for (auto &st : stones)
+        // 1. Pre-count exactly how many unique rows and columns contain at least one stone
+        unordered_set<int> coordinates;
+
+        for (auto &stone : stones)
         {
-            maxDim = max({maxDim, st[0], st[1]});
+            int x = stone[0];
+            int y = offset + stone[1];
+
+            coordinates.insert(x);
+            coordinates.insert(y);
         }
 
-        int rows = (maxDim + 1); // number of row nodes
-        int cols = (maxDim + 1); // number of column nodes
-        int nodes = rows + cols; // total nodes (rows + cols)
-        Disjoint DS(nodes);
+        int nodesCount = coordinates.size();
 
-        // --------------------------------------------------------------------
-        // Step 2: Union row node and col node for each stone
-        // Each stone connects its row index and col index
-        // Complexity: O(stCount * α(N))
-        // --------------------------------------------------------------------
-        for (auto &st : stones)
+        // 2. Initialize DSU. Max size is 2 * offset (20002) to cover all valid indices.
+        DSU dsu((2 * offset), nodesCount);
+
+        // 3. Group the networks by bridging the row and the column of each stone
+        for (auto &stone : stones)
         {
-            int u = st[0];        // row node
-            int v = rows + st[1]; // column node (shifted to avoid overlap with row indices)
-            DS.UbyS(u, v);
-            stoneKeeper.insert(u);
-            stoneKeeper.insert(v);
+            int x = stone[0];
+            int y = offset + stone[1];
+
+            dsu.dunion(x, y);
         }
 
-        // --------------------------------------------------------------------
-        // Step 3: Count number of connected components among active nodes
-        // Only check the nodes that were actually used by stones.
-        // Complexity: O(stCount) (reduced by stoneKeeper).
-        // --------------------------------------------------------------------
-        for (auto &it : stoneKeeper)
-        {
-            if (DS.findUPar(it) == it)
-            {
-                compCount++;
-            }
-        }
+        // 4. Mathematical formulation: Total Stones - Number of isolated survivor components
+        int componentsCount = dsu.getComponents();
 
-        // --------------------------------------------------------------------
-        // Step 4: Answer = total stones - number of connected components
-        // Because in each connected component, we can remove all stones except 1.
-        // --------------------------------------------------------------------
-        return stCount - compCount;
+        return totalStoneCount - componentsCount;
     }
 };
 
 int main()
 {
     return 0;
-}   
+}
