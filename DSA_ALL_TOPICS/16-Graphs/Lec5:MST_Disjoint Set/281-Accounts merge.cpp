@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Accounts Merge - DSU: G-50
+1. Title: Accounts Merge - DSU
 Links:
 https://takeuforward.org/data-structure/accounts-merge-dsu-g-50/
 https://www.youtube.com/watch?v=FMwpt_aQOGw
@@ -85,167 +85,156 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Accounts Merge - DSU: G-50
+// 1. Title: Accounts Merge - DSU
 //-------------------------------------------------------------------------------
-//
+
+//============================================================================
+// Helper Class — Disjoint Set Union (Union-Find)
+//============================================================================
+class DSU
+{
+private:
+    vector<int> parent, size;
+
+public:
+    DSU(int n)
+    {
+        parent.resize(n);
+        size.resize(n, 1);
+
+        for (int i = 0; i < n; ++i)
+        {
+            parent[i] = i;
+        }
+    }
+
+    int getPar(int i)
+    {
+        int p = parent[i];
+        if (p == i)
+        {
+            return p;
+        }
+        return parent[i] = getPar(p); // Path Compression
+    }
+
+    void dunion(int u, int v)
+    {
+        int pu = getPar(u);
+        int pv = getPar(v);
+
+        if (pu == pv)
+        {
+            return;
+        }
+
+        int su = size[pu];
+        int sv = size[pv];
+
+        // Union by Size
+        if (su <= sv)
+        {
+            parent[pu] = pv;
+            size[pv] += size[pu];
+        }
+        else
+        {
+            parent[pv] = pu;
+            size[pu] += size[pv];
+        }
+    }
+};
 
 class Solution
 {
 public:
-    // ------------------------------------------------------------------------
-    // Disjoint Set (Union-Find) with Union by Size + Path Compression
-    // ------------------------------------------------------------------------
-    class DJS
-    {
-    public:
-        vector<int> p, s; // parent array, size array
+    //============================================================================
+    // Approach — DSU on Account Indices
+    //============================================================================
 
-        // Constructor
-        // Initialize DSU with n nodes, each node is its own parent
-        // Complexity: O(n)
-        DJS(int n)
-        {
-            p.resize(n + 1);
-            s.resize(n + 1, 1); // each set starts with size = 1
-            for (int i = 0; i <= n; i++)
-            {
-                p[i] = i; // parent of itself
-            }
-        }
-
-        // Find ultimate parent with path compression
-        // Complexity: Amortized O(α(n)) ~ constant
-        int fUP(int u)
-        {
-            if (u == p[u])
-                return u;
-            return p[u] = fUP(p[u]); // compress path
-        }
-
-        // Check if two nodes belong to the same set
-        bool isSame(int u, int v)
-        {
-            return (fUP(u) == fUP(v));
-        }
-
-        // Union by Size
-        // Attach smaller set to larger set
-        // Complexity: Amortized O(α(n))
-        void UBS(int u, int v)
-        {
-            int pu = fUP(u);
-            int pv = fUP(v);
-
-            if (pu == pv)
-                return; // already connected
-
-            if (s[pu] == s[pv])
-            {
-                p[pu] = pv;
-                s[pv] += s[pu];
-            }
-            else if (s[pu] < s[pv])
-            {
-                p[pu] = pv;
-                s[pv] += s[pu];
-            }
-            else
-            {
-                p[pv] = pu;
-                s[pu] += s[pv];
-            }
-        }
-    };
-
-    // ------------------------------------------------------------------------
-    // Problem: Accounts Merge (LeetCode 721)
-    //
-    // Intuition:
-    // - Each account has a name and multiple emails.
-    // - If two accounts share at least one email, they belong to the same person.
-    // - This forms a graph: accounts are nodes, shared emails form edges.
-    // - DSU (Disjoint Set Union) efficiently merges such connected components.
-    //
-    // Approach:
-    // 1. Initialize a DSU with "n = accounts.size()" (each account = one node).
-    // 2. Map emails to accounts:
-    //    - Traverse each account and its emails.
-    //    - If an email is seen for the first time, map it → current account ID.
-    //    - If already seen, union the current account with the previous account
-    //      that owned this email.
-    // 3. Build a map from DSU rootID → list of emails.
-    // 4. For each connected component:
-    //    - Sort emails lexicographically.
-    //    - Add the owner's name (from original accounts list).
-    //    - Append [name, email1, email2...] to result.
-    //
-    // Complexity Analysis:
-    // - Traversing emails: O(N + E)
-    // - Union operations: O(E * α(N))
-    // - Grouping emails: O(E * α(N))
-    // - Sorting emails: O(E log E) (worst case: all in one account)
-    // - Overall: O(N + E log E)
-    //
-    // Space Complexity:
-    // - HashMap email→ID: O(E)
-    // - DSU arrays: O(N)
-    // - Grouped emails: O(E)
-    // - Total: O(N + E)
-    // ------------------------------------------------------------------------
+    /**
+     * @brief Merges user accounts based on shared email addresses.
+     *
+     * Idea & Intuition:
+     * - Instead of assigning a unique integer ID to every single email string (which
+     * is messy), we use the DSU to group the ACCOUNT INDICES (0 to N-1).
+     * - We iterate through the accounts. For every email, we record which Account ID
+     * it belongs to in a hash map (`emailToIdMp`).
+     * - If we see an email that is ALREADY in the map, we have found a bridge! We
+     * immediately union the current Account ID with the previously recorded Account ID.
+     * - After all unions, we iterate through our map of unique emails, find the
+     * ultimate "Boss Account ID" for each email, and group them together.
+     *
+     * Time Complexity:
+     * - O(N * K log(N * K)): N is the number of accounts, K is the max emails per account.
+     * The DSU operations take O(N * K * α(N)). The dominating factor is the final
+     * step where we sort the emails for each merged account.
+     *
+     * Space Complexity:
+     * - O(N * K): We store every unique email in our maps and final answer array.
+     */
     vector<vector<string>> accountsMerge(vector<vector<string>> &accounts)
     {
 
-        unordered_map<string, int> EmailtoID; // maps email → accountID
-        DJS DS(accounts.size());              // DSU on account IDs
+        int accCount = accounts.size();
+        DSU dsu(accCount);
 
-        // Step 1: Union accounts that share the same email
-        for (int ID = 0; ID < accounts.size(); ID++)
+        // Map: Email String -> Account Index
+        unordered_map<string, int> emailToIdMp;
+
+        // 1. Build the Networks (Merge Account Indices)
+        for (int id = 0; id < accCount; ++id)
         {
-            for (int j = 1; j < accounts[ID].size(); j++)
-            {
-                string &email = accounts[ID][j];
+            auto &acc = accounts[id];
 
-                if (EmailtoID.find(email) != EmailtoID.end())
+            // Start at j = 1 to skip the person's Name
+            for (int j = 1; j < acc.size(); ++j)
+            {
+                string &email = acc[j];
+
+                // If email has been seen before, merge the current account with the original owner
+                if (emailToIdMp.find(email) != emailToIdMp.end())
                 {
-                    // email already seen → merge current account with previous
-                    int preExistingID = EmailtoID[email];
-                    DS.UBS(preExistingID, ID);
+                    int anotherAccId = emailToIdMp[email];
+                    dsu.dunion(anotherAccId, id);
                 }
                 else
                 {
-                    // first time seeing this email
-                    EmailtoID[email] = ID;
+                    // Record the first time we see this email
+                    emailToIdMp[email] = id;
                 }
             }
         }
 
-        // Step 2: Group emails by their ultimate parent account
-        unordered_map<int, vector<string>> IDtoemails;
-        for (auto &it : EmailtoID)
+        // 2. Group the unique emails under their Ultimate Boss Account ID
+        unordered_map<int, vector<string>> idToEmailsMp;
+
+        for (auto &[email, accId] : emailToIdMp)
         {
-            string email = it.first;
-            int ID = it.second;
-            int rootID = DS.fUP(ID); // ultimate parent ID
-            IDtoemails[rootID].push_back(email);
+            int parAccId = dsu.getPar(accId);
+
+            // C++ automatically creates an empty vector if the key doesn't exist
+            idToEmailsMp[parAccId].push_back(email);
         }
 
-        // Step 3: Build the merged accounts
+        // 3. Format the Output
         vector<vector<string>> ans;
-        for (auto &it : IDtoemails)
+
+        for (auto &[pid, emails] : idToEmailsMp)
         {
-            int ID = it.first;
-            vector<string> &emails = it.second;
 
-            if (emails.empty())
-                continue;
+            // Get the name from the original accounts array using the Boss ID
+            string name = accounts[pid][0];
 
-            sort(emails.begin(), emails.end()); // sort emails
-            string &name = accounts[ID][0];     // account name
+            // Sort the emails alphabetically as required
+            sort(emails.begin(), emails.end());
 
-            vector<string> entry;
-            entry.push_back(name); // add name first
-            entry.insert(entry.end(), emails.begin(), emails.end());
-            ans.push_back(move(entry));
+            // Build the final merged account (Name + Sorted Emails)
+            vector<string> mergedAccount;
+            mergedAccount.push_back(name);
+            mergedAccount.insert(mergedAccount.end(), emails.begin(), emails.end());
+
+            ans.push_back(mergedAccount);
         }
 
         return ans;

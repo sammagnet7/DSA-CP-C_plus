@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Making a Large Island - DSU: G-52
+1. Title: Making a Large Island
 
 Links:
 https://takeuforward.org/data-structure/making-a-large-island-dsu-g-52/
@@ -87,187 +87,198 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Making a Large Island - DSU: G-52
+// 1. Title: Making a Large Island
 //-------------------------------------------------------------------------------
-//
+
+class DSU
+{
+private:
+    vector<int> parent, size;
+    int existingMaxSize;
+
+public:
+    DSU(int n)
+    {
+        parent.resize(n);
+        size.resize(n, 1);
+
+        for (int i = 0; i < n; ++i)
+        {
+            parent[i] = i;
+        }
+
+        existingMaxSize = 1;
+    }
+
+    int getPar(int i)
+    {
+        int p = parent[i];
+
+        if (p == i)
+        {
+            return p;
+        }
+        else
+        {
+            return parent[i] = getPar(p);
+        }
+    }
+
+    bool isConnected(int u, int v)
+    {
+
+        int pu = getPar(u);
+        int pv = getPar(v);
+
+        if (pu == pv)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    void dunion(int u, int v)
+    {
+
+        int pu = getPar(u);
+        int pv = getPar(v);
+
+        if (pu == pv)
+        {
+            return;
+        }
+
+        int su = size[pu];
+        int sv = size[pv];
+
+        if (su <= sv)
+        {
+            parent[pu] = pv;
+            size[pv] += size[pu];
+
+            existingMaxSize = max(existingMaxSize, size[pv]);
+        }
+        else
+        {
+            parent[pv] = pu;
+            size[pu] += size[pv];
+
+            existingMaxSize = max(existingMaxSize, size[pu]);
+        }
+    }
+
+    int getSize(int u)
+    {
+        int p = getPar(u);
+        return size[p];
+    }
+
+    int getExistingMaxSize()
+    {
+        return existingMaxSize;
+    }
+};
 
 class Solution
 {
 public:
-    // ------------------------------------------------------------------------
-    // Disjoint Set (Union-Find) with Union by Size + Path Compression
-    // ------------------------------------------------------------------------
-    class DJS
-    {
-    public:
-        vector<int> p, s; // parent array, size array
-
-        // Constructor
-        // Initialize DSU with n nodes, each node is its own parent
-        // Complexity: O(n)
-        DJS(int n)
-        {
-            p.resize(n);
-            s.resize(n, 1); // each set starts with size = 1
-            for (int i = 0; i < n; i++)
-            {
-                p[i] = i; // parent of itself
-            }
-        }
-
-        // Find ultimate parent with path compression
-        // Complexity: Amortized O(?(n)) ? O(1)
-        int fUP(int u)
-        {
-            if (u == p[u])
-                return u;
-            return p[u] = fUP(p[u]); // compress path
-        }
-
-        // Check if two nodes belong to the same set
-        bool isSame(int u, int v)
-        {
-            return (fUP(u) == fUP(v));
-        }
-
-        // Union by Size
-        // Attach smaller set to larger set
-        // Complexity: Amortized O(?(n))
-        void UBS(int u, int v)
-        {
-            int pu = fUP(u);
-            int pv = fUP(v);
-
-            if (pu == pv)
-                return; // already connected
-
-            if (s[pu] < s[pv])
-            {
-                p[pu] = pv;
-                s[pv] += s[pu];
-            }
-            else
-            {
-                p[pv] = pu;
-                s[pu] += s[pv];
-            }
-        }
-
-        int getSize(int node)
-        {
-            return s[node];
-        }
-    };
-
-    // ------------------------------------------------------------------------
-    // Utility: Boundary check for grid indices
-    // ------------------------------------------------------------------------
-    bool isIdxVal(int x, int y, int row, int col)
-    {
-        return !(x < 0 || x >= row || y < 0 || y >= col);
-    }
-
-    // ------------------------------------------------------------------------
-    // Problem: Making A Large Island (LC 827)
-    //
-    // Intuition:
-    // - The grid contains islands (connected 1s).
-    // - We are allowed to flip at most one 0 → 1.
-    // - Goal: find the size of the largest island possible after one flip.
-    //
-    // Understanding:
-    // - Model each cell (i, j) as a DSU node: nodeId = i * n + j.
-    // - First, union all connected 1s to form initial islands.
-    // - Then, for each 0 cell:
-    //     - Pretend to flip it → check its 4 neighbors.
-    //     - Collect unique neighboring island parents.
-    //     - Potential island size = 1 (flipped cell) + sum of neighbor sizes.
-    //     - Track maximum.
-    // - Edge case: if no 0 exists, the entire grid is already 1s → answer is n*n.
-    //
-    // Approach:
-    // 1. Build DSU for all land cells (union adjacent 1s).
-    // 2. Traverse each 0 cell:
-    //     - Use set to avoid counting same island twice.
-    //     - Compute merged island size.
-    // 3. Return max island size found.
-    //
-    // Complexity:
-    // - Building DSU: O(N^2 * 4α) ≈ O(N^2)
-    // - Evaluating each 0: O(N^2 * 4) ≈ O(N^2)
-    // - Total: O(N^2)
-    // - Space: O(N^2) for DSU parent/size arrays.
-    // ------------------------------------------------------------------------
     int largestIsland(vector<vector<int>> &grid)
     {
+
         int n = grid.size();
-        DJS DS(n * n);                                                  // DSU for n*n cells
-        vector<vector<int>> delta = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // 4 directions
+        DSU dsu(n * n);
+        vector<vector<int>> dir = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}};
 
-        // Step 1: Union all adjacent land cells to form initial islands
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; ++i)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < n; ++j)
             {
+
                 if (grid[i][j] == 0)
-                    continue; // skip water
-
-                for (int k = 0; k < 4; k++)
                 {
-                    int i_k = i + delta[k][0];
-                    int j_k = j + delta[k][1];
+                    continue;
+                }
 
-                    if (isIdxVal(i_k, j_k, n, n) && grid[i_k][j_k] == 1)
+                int pos = (i * n) + j;
+
+                for (int k = 0; k < 4; ++k)
+                {
+
+                    int ni = i + dir[k][0];
+                    int nj = j + dir[k][1];
+
+                    if (ni < 0 || nj < 0 || ni >= n || nj >= n)
                     {
-                        int u = i * n + j;
-                        int v = i_k * n + j_k;
-                        DS.UBS(u, v);
+                        continue;
                     }
+
+                    if (grid[ni][nj] == 0)
+                    {
+                        continue;
+                    }
+
+                    int npos = (ni * n) + nj;
+
+                    dsu.dunion(pos, npos);
                 }
             }
         }
 
-        bool isModified = false; // whether at least one 0 exists
-        int maxCompSize = 0;
+        int maxSize = dsu.getExistingMaxSize();
 
-        // Step 2: Try flipping each 0 → compute potential island size
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; ++i)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < n; ++j)
             {
+
                 if (grid[i][j] == 1)
-                    continue; // skip existing land
-
-                isModified = true;
-                unordered_set<int> parents; // store unique island parents
-                int compSize = 1;           // count flipped cell itself
-
-                for (int k = 0; k < 4; k++)
                 {
-                    int i_k = i + delta[k][0];
-                    int j_k = j + delta[k][1];
-
-                    if (isIdxVal(i_k, j_k, n, n) && grid[i_k][j_k] == 1)
-                    {
-                        int v = i_k * n + j_k;
-                        int v_p = DS.fUP(v); // ultimate parent
-                        if (parents.find(v_p) == parents.end())
-                        {
-                            compSize += DS.getSize(v_p);
-                            parents.insert(v_p);
-                        }
-                    }
+                    continue;
                 }
 
-                maxCompSize = max(maxCompSize, compSize);
+                int pos = (i * n) + j;
+
+                unordered_set<int> localPars;
+                int curSize = 1;
+
+                for (int k = 0; k < 4; ++k)
+                {
+
+                    int ni = i + dir[k][0];
+                    int nj = j + dir[k][1];
+
+                    if (ni < 0 || nj < 0 || ni >= n || nj >= n)
+                    {
+                        continue;
+                    }
+
+                    if (grid[ni][nj] == 0)
+                    {
+                        continue;
+                    }
+
+                    int npos = (ni * n) + nj;
+
+                    int par = dsu.getPar(npos);
+
+                    if (localPars.find(par) != localPars.end())
+                    {
+                        continue;
+                    }
+
+                    localPars.insert(par);
+
+                    curSize += dsu.getSize(par);
+                }
+
+                maxSize = max(maxSize, curSize);
             }
         }
 
-        // Step 3: Handle edge case — grid already full of 1s
-        if (!isModified)
-            return n * n;
-
-        return maxCompSize;
+        return maxSize;
     }
 };
 

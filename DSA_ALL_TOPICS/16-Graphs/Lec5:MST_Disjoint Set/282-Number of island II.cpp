@@ -18,32 +18,30 @@ using namespace std;
 
 /*
 
-1. Title: Number of Islands - II - Online Queries - DSU: G-51
+1. Title: Number of Islands - II - Online Queries
 
 Links:
 https://takeuforward.org/graph/number-of-islands-ii-online-queries-dsu-g-51/
 https://www.youtube.com/watch?v=Rn6B-Q4SNyA
 https://takeuforward.org/plus/dsa/problems/number-of-islands-ii?tab=editorial
-https://www.naukri.com/code360/problems/number-of-islands-ii_1266048?leftPanelTabValue=PROBLEM
+https://leetcode.com/problems/number-of-islands-ii/description/
+https://www.naukri.com/code360/problems/number-of-islands-ii_1266048
 
 
 Problem statement:
-Given n, m denoting the row and column of the 2D matrix, and an array A of size k denoting the number of operations. Matrix elements are 0 if there is water or 1 if there is land. Originally, the 2D matrix is all 0 which means there is no land in the matrix. The array has k operator(s) and each operator has two integers A[i][0], A[i][1] means that you can change the cell matrix[A[i][0]][A[i][1]] from sea to island. Return how many islands are there in the matrix after each operation.
-The answer array will be of size k.
-
-You have a 2D grid of ‘N’ rows and ‘M’ columns which are initially filled with water. You are given ‘Q’ queries each consisting of two integers ‘X’ and ‘Y’ and in each query operation, you have to turn the water at position (‘X’, ‘Y’) into a land. You are supposed to find the number of islands in the grid after each query.
+You have a 2D grid of ‘N’ rows and ‘M’ columns which are initially filled with water i.e. all 0s. You are given ‘Q’ queries each consisting of two integers ‘X’ and ‘Y’ and in each query operation, you have to turn the water at position (‘X’, ‘Y’) into a land. You are supposed to find the number of islands in the grid after each query.
+The query/answer array will be of size k.
 
 An island is a group of lands surrounded by water horizontally, vertically.
 You may assume all four edges of the grid are all surrounded by water.
 
 Examples:
-    Input: n = 4, m = 5, k = 4, A = [[1,1],[0,1],[3,3],[3,4]]
+    Input: n = 4, m = 5, q = [[1,1],[0,1],[3,3],[3,4]]
     Output: [1, 1, 2, 2]
-    Explanation: The following illustration is the representation of the operation:
-    Input: n = 4, m = 5, k = 12, A = [[0,0],[0,0],[1,1],[1,0],[0,1],[0,3],[1,3],[0,4], [3,2], [2,2],[1,2], [0,2]]
 
+    Input: n = 4, m = 5, q = [[0,0],[0,0],[1,1],[1,0],[0,1],[0,3],[1,3],[0,4], [3,2], [2,2],[1,2], [0,2]]
     Output: [1, 1, 2, 1, 1, 2, 2, 2, 3, 3, 1, 1]
-    Explanation: If we follow the process like in example 1, we will get the above result.
+
 
 Constraints:
       1 <= n, m <= 1000
@@ -83,158 +81,315 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Accounts Merge - DSU: G-50
+// 1. Title: Number of Islands - II - Online Queries
 //-------------------------------------------------------------------------------
 //
 
+// ------------------------------------------------------------------------
+// Approach 1: Disjoint Set + Visited matrix
+// ------------------------------------------------------------------------
+
 class Solution
 {
-public:
-    // ------------------------------------------------------------------------
-    // Disjoint Set (Union-Find) with Union by Size + Path Compression
-    // ------------------------------------------------------------------------
-    class DJS
-    {
-    public:
-        vector<int> p, s; // parent array, size array
 
-        // Constructor
-        // Initialize DSU with n nodes, each node is its own parent
-        // Complexity: O(n)
-        DJS(int n)
+    //============================================================================
+    // Helper Class — Disjoint Set Union (Union-Find)
+    //============================================================================
+    class DSU
+    {
+        vector<int> parent, size;
+
+    public:
+        DSU(int n)
         {
-            p.resize(n);
-            s.resize(n, 1); // each set starts with size = 1
-            for (int i = 0; i < n; i++)
+            parent.resize(n);
+            size.resize(n, 1);
+            for (int i = 0; i < n; ++i)
             {
-                p[i] = i; // parent of itself
+                parent[i] = i;
             }
         }
 
-        // Find ultimate parent with path compression
-        // Complexity: Amortized O(?(n)) ? O(1)
-        int fUP(int u)
+        int findPar(int i)
         {
-            if (u == p[u])
-                return u;
-            return p[u] = fUP(p[u]); // compress path
+            if (parent[i] == i)
+            {
+                return i;
+            }
+            return parent[i] = findPar(parent[i]);
         }
 
-        // Check if two nodes belong to the same set
-        bool isSame(int u, int v)
+        void dunion(int u, int v)
         {
-            return (fUP(u) == fUP(v));
-        }
-
-        // Union by Size
-        // Attach smaller set to larger set
-        // Complexity: Amortized O(?(n))
-        void UBS(int u, int v)
-        {
-            int pu = fUP(u);
-            int pv = fUP(v);
+            int pu = findPar(u);
+            int pv = findPar(v);
 
             if (pu == pv)
-                return; // already connected
+                return;
 
-            if (s[pu] < s[pv])
+            if (size[pu] <= size[pv])
             {
-                p[pu] = pv;
-                s[pv] += s[pu];
+                parent[pu] = pv;
+                size[pv] += size[pu];
             }
             else
             {
-                p[pv] = pu;
-                s[pu] += s[pv];
+                parent[pv] = pu;
+                size[pu] += size[pv];
             }
         }
     };
 
-    // ------------------------------------------------------------------------
-    // Utility: Boundary check for grid indices
-    // ------------------------------------------------------------------------
-    bool isIdxVal(int x, int y, int n, int m)
-    {
-        return !(x < 0 || x >= n || y < 0 || y >= m);
-    }
+public:
+    //============================================================================
+    // Approach — Dynamic Connectivity (2D Grid to 1D DSU)
+    //============================================================================
 
-    // ------------------------------------------------------------------------
-    // Problem: Number of Islands II (Dynamic)
-    // Intuition:
-    // - We start with an empty water grid (n x m).
-    // - Each query converts a cell (x, y) from water ? land.
-    // - Each land cell can be seen as a DSU node: nodeId = x*m + y.
-    // - Initially, every new land cell forms a new island (compCount++).
-    // - If it touches existing land neighbors, merge them using DSU.
-    // - Each successful merge reduces island count by 1.
-    // - After each query, store the current island count.
-    //
-    // Approach:
-    // 1. Initialize DSU with n*m nodes (one for each cell).
-    // 2. Keep a visited[][] grid to mark land cells.
-    // 3. For each query (x, y):
-    //    - If already land ? skip.
-    //    - Else, mark as land, increment compCount.
-    //    - For each of its 4 neighbors (up, down, left, right):
-    //        - If neighbor is land and belongs to a different DSU component:
-    //            - Merge sets (UBS).
-    //            - Decrement compCount.
-    //    - Push current compCount into result.
-    // 4. Return result after all queries.
-    //
-    // Complexity:
-    // - For K queries, each processes 4 neighbors.
-    // - Each union/find: O(?(n*m)) ? O(1).
-    // - Total: O(K * 4?) ? O(K).
-    // - Space: O(n*m) for DSU + visited, O(K) for result.
-    // ------------------------------------------------------------------------
-    vector<int> numOfIslandsII(int n, int m, vector<vector<int>> &q)
+    /**
+     * @brief Dynamically calculates the number of islands after adding land step-by-step.
+     *
+     * Idea & Intuition:
+     * - A standard BFS/DFS would require us to traverse the entire N x M grid after
+     * EVERY single query. For 100,000 queries, this causes a Time Limit Exceeded (TLE).
+     * - Instead, we use a Disjoint Set Union (DSU). Since DSU works on 1D arrays, we
+     * "flatten" the 2D grid using the formula: Node ID = (Row * Total_Columns) + Col.
+     * - Every time we place a new piece of land, we initially assume it forms a brand
+     * new, isolated island (incrementing our island count).
+     * - We then look at its 4 immediate neighbors. If any neighbor is already land, we
+     * use our DSU to connect them. When two separate islands merge into one, we simply
+     * decrement our total island count!
+     *
+     * Approach:
+     * 1. Initialize a DSU of size (N * M) and a `visited` grid to track land.
+     * 2. Loop through each query (r, c). If it's already land, record current count and skip.
+     * 3. Mark (r, c) as land and increment `currentIslands`.
+     * 4. Check the 4 neighbors (Up, Down, Left, Right).
+     * 5. If a valid neighbor is also land, check if they belong to different components.
+     * 6. If they do, `dunion` them and decrement `currentIslands` by 1.
+     * 7. Store the current island count in our answer array.
+     *
+     * Time Complexity:
+     * - O(Q * α(N * M)): Where Q is the number of queries. Checking 4 neighbors is O(1).
+     * The DSU operations run in nearly O(1) amortized time. This safely bypasses TLE.
+     *
+     * Space Complexity:
+     * - O(N * M): We require a 2D `visited` array of size N x M, and the DSU internally
+     * requires 1D arrays of size (N * M) for parent and size tracking.
+     */
+    vector<int> numOfIslands(int n, int m, vector<vector<int>> &q)
     {
-        int nodes = n * m;                                              // total possible cells
-        DJS DS(nodes);                                                  // DSU for all cells
-        vector<vector<int>> delta = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // 4 directions
-        vector<vector<int>> land(n, vector<int>(m, 0));                  // visited grid
 
+        DSU ds(n * m);
+        vector<vector<int>> visited(n, vector<int>(m, 0));
+
+        int currentIslands = 0;
         vector<int> ans;
-        int compCount = 0; // number of islands so far
 
-        for (auto &cord : q)
+        // 4-directional traversal arrays (Up, Down, Left, Right)
+        int dRow[] = {-1, 1, 0, 0};
+        int dCol[] = {0, 0, -1, 1};
+
+        for (auto &query : q)
         {
-            int x = cord[0];
-            int y = cord[1];
+            int r = query[0];
+            int c = query[1];
 
-            if (land[x][y] == 1)
+            // Edge Case: The cell is already land
+            if (visited[r][c] == 1)
             {
-                // Already land ? skip, just push current island count
-                ans.push_back(compCount);
+                ans.push_back(currentIslands);
                 continue;
             }
 
-            // Step 1: Convert (x, y) -> land
-            land[x][y] = 1;
-            compCount++; // new island assumed
+            // 1. Mark as land, assume it's an isolated island
+            visited[r][c] = 1;
+            currentIslands++;
 
-            // Step 2: Try merging with neighbors
-            for (int k = 0; k < 4; k++)
+            // The 1D ID for our current cell
+            int currentId = r * m + c;
+
+            // 2. Check all 4 neighbors
+            for (int i = 0; i < 4; ++i)
             {
-                int x_k = x + delta[k][0];
-                int y_k = y + delta[k][1];
+                int adjR = r + dRow[i];
+                int adjC = c + dCol[i];
 
-                if (isIdxVal(x_k, y_k, n, m) && land[x_k][y_k] == 1)
+                // If neighbor is valid and is land
+                if (adjR >= 0 && adjR < n && adjC >= 0 && adjC < m && visited[adjR][adjC] == 1)
                 {
-                    int u = (x * m) + y;     // current cell's node ID
-                    int v = (x_k * m) + y_k; // neighbor's node ID
 
-                    if (DS.fUP(u) != DS.fUP(v))
+                    int adjId = adjR * m + adjC;
+
+                    // If they belong to different components, merge them!
+                    if (ds.findPar(currentId) != ds.findPar(adjId))
                     {
-                        DS.UBS(u, v); // merge two islands
-                        compCount--;  // merged -> reduce island count
+                        ds.dunion(currentId, adjId);
+
+                        // Merging two isolated islands reduces the total count by 1
+                        currentIslands--;
                     }
                 }
             }
 
-            // Step 3: Record current island count
-            ans.push_back(compCount);
+            // Record the dynamic island count after this query
+            ans.push_back(currentIslands);
+        }
+
+        return ans;
+    }
+};
+
+// ------------------------------------------------------------------------
+// Approach 2: Disjoint Set as map
+// ------------------------------------------------------------------------
+
+//============================================================================
+// Data Structure — Dynamic DSU (Sparse Matrix Variant)
+//============================================================================
+class DSU
+{
+private:
+    // unordered_map allows us to handle incredibly massive grids (e.g., 10^9 x 10^9)
+    // by only allocating memory for cells that are actually queried (O(Q) space).
+    unordered_map<int, int> parent;
+    unordered_map<int, int> size;
+    int componentCount;
+
+    int getPar(int i)
+    {
+        int p = parent[i];
+        if (i == p)
+        {
+            return p;
+        }
+        // Path Compression
+        return parent[i] = getPar(p);
+    }
+
+public:
+    DSU()
+    {
+        componentCount = 0;
+    }
+
+    /**
+     * @brief Dynamically adds a new piece of land to the graph.
+     */
+    void addNode(int pos)
+    {
+        // If the node already exists, this is a duplicate query. Ignore it.
+        if (parent.find(pos) != parent.end())
+        {
+            return;
+        }
+
+        // Brand new isolated island created!
+        parent[pos] = pos;
+        size[pos] = 1;
+        ++componentCount;
+    }
+
+    void dunion(int pos1, int pos2)
+    {
+        // Safety Check: If either node doesn't exist in the DSU, it means
+        // that neighbor is currently WATER. We cannot merge with water.
+        if (parent.find(pos1) == parent.end() || parent.find(pos2) == parent.end())
+        {
+            return;
+        }
+
+        int p1 = getPar(pos1);
+        int p2 = getPar(pos2);
+
+        // Already connected
+        if (p1 == p2)
+        {
+            return;
+        }
+
+        // Successfully merging two isolated islands reduces the count by 1
+        --componentCount;
+
+        int s1 = size[p1];
+        int s2 = size[p2];
+
+        // Union by Size
+        if (s1 <= s2)
+        {
+            parent[p1] = p2;
+            size[p2] += size[p1];
+        }
+        else
+        {
+            parent[p2] = p1;
+            size[p1] += size[p2];
+        }
+    }
+
+    int getComponentCount()
+    {
+        return componentCount;
+    }
+};
+
+class Solution
+{
+public:
+    //============================================================================
+    // Approach — Dynamic Connectivity using Sparse DSU
+    //============================================================================
+
+    /**
+     * @brief Finds the number of islands after dynamically adding land.
+     *
+     * Time Complexity:
+     * - O(Q * α(Q)) average time. Q is the number of queries. Hash map lookups
+     * run in O(1) average time, making this vastly faster than BFS.
+     *
+     * Space Complexity:
+     * - O(Q): We only store exactly the nodes that are queried as land. We
+     * completely bypass the need for an O(N * M) visited grid!
+     */
+    vector<int> numOfIslands(int n, int m, vector<vector<int>> &query)
+    {
+
+        vector<int> ans;
+        DSU dsu;
+
+        // Up, Right, Down, Left
+        vector<vector<int>> dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+
+        for (auto &q : query)
+        {
+            int x = q[0];
+            int y = q[1];
+
+            // Flatten 2D coordinate into 1D ID
+            int pos = (x * m) + y;
+
+            // 1. Add the new land to the DSU
+            dsu.addNode(pos);
+
+            // 2. Look in all 4 directions for adjacent land
+            for (int k = 0; k < 4; ++k)
+            {
+                int nx = x + dir[k][0];
+                int ny = y + dir[k][1];
+
+                // Bounds check
+                if (nx < 0 || ny < 0 || nx >= n || ny >= m)
+                {
+                    continue;
+                }
+
+                int npos = (nx * m) + ny;
+
+                // 3. Attempt to merge. The DSU internally checks if 'npos' is valid land.
+                dsu.dunion(pos, npos);
+            }
+
+            // 4. Record the current state of the board
+            ans.push_back(dsu.getComponentCount());
         }
 
         return ans;
