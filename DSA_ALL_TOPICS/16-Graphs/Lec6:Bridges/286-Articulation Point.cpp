@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Articulation Point in Graph: G-56
+1. Title: Articulation Point in Graph
 
 Links:
 https://takeuforward.org/data-structure/articulation-point-in-graph-g-56/
@@ -33,6 +33,7 @@ Your task is to return all the articulation points (or cut vertices) in the grap
 An articulation point is a vertex whose removal, along with all its connected edges, increases the number of connected components in the graph.
 
 Note: The graph may be disconnected, i.e., it may consist of more than one connected component.
+
 If no such point exists, return {-1}.
 
 Examples :
@@ -45,7 +46,7 @@ Examples :
     Explanation: Removing the vertex 0 will increase the number of disconnected components to 3.
 
 Constraints:
-    1 ≤ V, E ≤ 104
+    1 ≤ V, E ≤ 10^4
 
 
 INPUT::::::
@@ -79,150 +80,178 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Articulation Point in Graph: G-56
+// 1. Title: Articulation Point in Graph
 //-------------------------------------------------------------------------------
-//
 
+/**
+ * @class Solution
+ * @brief Finds all Articulation Points (Cut Vertices) using a highly optimized Tarjan's Algorithm.
+ *
+ * ============================================================================
+ * 🧠 INTUITION & IDEA
+ * ============================================================================
+ * An Articulation Point (AP) is a node that, if removed, splits the graph into
+ * multiple disconnected components.
+ * We use Tarjan's Algorithm to track two things for every node:
+ * 1. `discoveryTime`: The exact timer tick when the node was first visited.
+ * 2. `lowestReachTime`: The earliest `discoveryTime` this node (or its children) can reach.
+ * * A node is an Articulation Point if it has a child that CANNOT reach any node
+ * discovered *before* the current node. Mathematically: `discoveryTime[curr] <= lowestReachTime[child]`.
+ *
+ * ============================================================================
+ * ⚙️ APPROACH, LOGIC & TRAPS AVOIDED
+ * ============================================================================
+ * 1. Duplicate Prevention (The Local Boolean):
+ * Instead of using a global `isAP` boolean array or a Set, we use a local
+ * `isArtPoint` boolean inside the DFS frame. If multiple independent children
+ * flag the current node as an AP, it is still only pushed to the final array
+ * EXACTLY ONCE at the very end of its DFS frame.
+ * * 2. The Forward Edge Trap (Why the AP check is INSIDE the Tree Edge block):
+ * We ONLY evaluate the AP condition (`discoveryTime <= lowestAdjReachTime`)
+ * for actual, unvisited DFS children. If we evaluated this for already-visited
+ * nodes, we might accidentally check a "Forward Edge" to a descendant. Since
+ * descendants are discovered *after* the current node, the math would trivially
+ * and falsely flag the current node as an AP.
+ * * 3. The Data Leak Trap (Why Back Edges strictly use `discoveryTime`):
+ * When hitting a Back Edge (an already visited ancestor), we update our reach
+ * using `discoveryTime[adjN]`, NOT `lowestReachTime[adjN]`. If we used the
+ * latter, we risk "leaking" a lower time from an unrelated subtree (e.g., the
+ * other side of a Bowtie Graph), which would mask a valid Articulation Point.
+ * * 4. The Root Node Exception:
+ * The starting node of the DFS (`parN == -1`) has no ancestors, so the math
+ * check is invalid. A root node is an AP *only* if it physically acts as a
+ * bridge between 2 or more completely independent DFS subtrees (`IndpChildCount > 1`).
+ *
+ * 5. Platform-Specific Fixes:
+ * - `clear()` and `assign()` are called on global states in the main function
+ * to prevent data leaking between multiple test cases run on the same object.
+ * - The output array is sorted at the end, as required by the platform.
+ * - Returns `{-1}` if the array is empty.
+ *
+ * ============================================================================
+ * ⏱️ COMPLEXITY ANALYSIS
+ * ============================================================================
+ * - Time Complexity: O(V + E) + O(A log A)
+ * Standard DFS processes every vertex (V) once and every edge (E) twice.
+ * Sorting the resulting AP array takes O(A log A) where A is the number of APs.
+ * - Space Complexity: O(V + E)
+ * O(V + E) for the Adjacency List. O(V) for the tracking arrays (`vis`,
+ * `discoveryTime`, `lowestReachTime`) and the recursion stack.
+ */
 class Solution
 {
-    // ------------------------------------------------------------------------
-    // Tarjan’s Algorithm for Articulation Points (Cut Vertices)
-    // ------------------------------------------------------------------------
-    // Intuition:
-    // - A vertex u is an articulation point if removing u (and all its incident
-    //   edges) increases the number of connected components.
-    // - Using DFS, we track for every node:
-    //     * visTime[u]  : discovery time (the time u is first seen)
-    //     * minAdjTime[u] (low[u]) : the earliest discovery time reachable
-    //       from u via any downward edges (tree edges) + at most one back edge.
-    // - Key condition (for non-root u):
-    //     If there exists a child v of u in the DFS tree such that
-    //         low[v] >= disc[u]
-    //       then u is an articulation point.
-    // - Root special case:
-    //     The DFS-root is an articulation point iff it has > 1 children.
-    //
-    // Approach:
-    // 1) Build adjacency list.
-    // 2) DFS each unvisited node:
-    //     - Set disc[u] and low[u] to timer++
-    //     - For each neighbor v:
-    //         - If v == parent, skip
-    //         - If v not visited:
-    //               recurse on v, update low[u] = min(low[u], low[v])
-    //               if (low[v] >= disc[u] and u is not root) → mark u
-    //           Else (back edge):
-    //               low[u] = min(low[u], disc[v])
-    //     - After iterating neighbors:
-    //         if (u is root and childCount > 1) → mark u
-    //
-    // Complexity:
-    // - Time:  O(V + E) (single DFS over the graph)
-    // - Space: O(V + E) for adjacency + O(V) for vis/disc/low/mark arrays
-    // ------------------------------------------------------------------------
+private:
+    vector<bool> vis;
+    vector<int> discoveryTime, lowestReachTime;
+    vector<int> artPoints;
+    int timer = 0;
 
-    int time = 0; // global DFS timer to assign discovery times (disc[])
-
-    // DFS utility to find articulation points
-    void artPointFindRec(int cur, int par,
-                         vector<int> adj[],
-                         vector<int> &vis,
-                         vector<int> &visTime,     // disc[]
-                         vector<int> &minAdjTime,  // low[]
-                         vector<int> &cutVertices) // mark array: 1 if articulation
+    void dfs(int curN, int parN, vector<vector<int>> &adjL)
     {
-        vis[cur] = 1;                            // mark current node visited
-        visTime[cur] = minAdjTime[cur] = time++; // initialize disc & low
 
-        int child = 0; // counts DFS-tree children of `cur` (needed for root rule)
+        vis[curN] = true;
+        discoveryTime[curN] = timer;
+        lowestReachTime[curN] = timer;
+        ++timer;
 
-        // Explore all neighbors
-        for (int &adjN : adj[cur])
+        bool isArtPoint = false;
+        int IndpChildCount = 0;
+
+        for (int adjN : adjL[curN])
         {
 
-            if (adjN == par)
+            if (adjN == parN)
             {
-                // Skip the edge leading back to parent (not a back-edge)
                 continue;
             }
 
+            // Tree edge (Unvisited Node)
             if (!vis[adjN])
             {
-                // Tree-edge: go deeper
-                child++;
-                artPointFindRec(adjN, cur, adj, vis, visTime, minAdjTime, cutVertices);
 
-                // After DFS on child, update low[cur] with low[child]
-                minAdjTime[cur] = min(minAdjTime[cur], minAdjTime[adjN]);
+                ++IndpChildCount;
 
-                // ---------- Bridge-style check adapted for cut vertices ----------
-                // If the earliest reachable ancestor from child adjN is NOT earlier
-                // than cur's discovery, then removing `cur` disconnects child’s subtree.
-                // This condition applies only if `cur` is NOT the DFS root.
-                if (visTime[cur] <= minAdjTime[adjN] && par != -1)
-                { // NOTE
-                    cutVertices[cur] = 1;
+                dfs(adjN, curN, adjL);
+
+                // 1. Get the child's lowest reach
+                int lowestAdjReachTime = lowestReachTime[adjN];
+
+                // 2. ONLY evaluate the AP condition for actual DFS children!
+                // This avoids the Forward Edge Trap.
+                if (discoveryTime[curN] <= lowestAdjReachTime)
+                {
+                    isArtPoint = true;
                 }
+
+                // 3. Update current node's reach
+                lowestReachTime[curN] = min(lowestReachTime[curN], lowestAdjReachTime);
             }
+            // Back edge / Forward edge (Already Visited Node)
             else
             {
-                // Back-edge: adjN is visited and NOT parent → update low[cur]
-                // Use neighbor's discovery time to potentially lower low[cur].
-                minAdjTime[cur] = min(minAdjTime[cur], visTime[adjN]); // NOTE
+                // Safely use discovery time to prevent data leak across unrelated subtrees.
+                // DO NOT check AP condition here!
+                lowestReachTime[curN] = min(lowestReachTime[curN], discoveryTime[adjN]);
             }
         }
 
-        // ---------- Root special case ----------
-        // If cur is root (par == -1) and has more than one DFS child,
-        // removing cur will split the component.
-        if (par == -1 && child > 1)
-        { // NOTE
-            cutVertices[cur] = 1;
+        // If it's a normal node and flagged as an AP, record it exactly once
+        if (parN != -1 && isArtPoint)
+        {
+            artPoints.push_back(curN);
+            return;
+        }
+
+        // Edge case handling for ROOT nodes
+        if (parN == -1 && IndpChildCount > 1)
+        {
+            artPoints.push_back(curN);
+            return;
         }
     }
 
 public:
     vector<int> articulationPoints(int V, vector<vector<int>> &edges)
     {
-        // Build adjacency list (undirected)
-        vector<int> adj[V];
+
+        int n = V;
+        vector<vector<int>> adjL(n);
+
         for (auto &e : edges)
         {
-            adj[e[0]].push_back(e[1]);
-            adj[e[1]].push_back(e[0]);
+            int u = e[0];
+            int v = e[1];
+
+            adjL[u].push_back(v);
+            adjL[v].push_back(u);
         }
 
-        // Helper arrays:
-        // vis[i]       : visited marker
-        // visTime[i]   : discovery time (disc)
-        // minAdjTime[i]: lowest reachable discovery time (low)
-        // cutVertices[i]: mark array for articulation points
-        vector<int> vis(V, 0);
-        vector<int> visTime(V, -1);
-        vector<int> minAdjTime(V, -1);
-        vector<int> cutVertices(V, 0); // NOTE: use a mark array to avoid duplicates
-        vector<int> ans;
+        // CRITICAL: Reset states for multiple test cases on the same object
+        vis.assign(n, false);
+        discoveryTime.assign(n, INT_MAX);
+        lowestReachTime.assign(n, INT_MAX);
+        artPoints.clear();
+        timer = 0;
 
-        // Graph can be disconnected → run DFS from every unvisited node
-        for (int i = 0; i < V; i++)
+        // Run DFS (Graph might be disconnected)
+        for (int i = 0; i < n; ++i)
         {
             if (!vis[i])
             {
-                artPointFindRec(i, -1, adj, vis, visTime, minAdjTime, cutVertices);
+                dfs(i, -1, adjL);
             }
         }
 
-        // Collect all articulation points in ascending order
-        for (int i = 0; i < V; i++)
+        // Problem requires returning {-1} if empty
+        if (artPoints.empty())
         {
-            if (cutVertices[i] == 1)
-            {
-                ans.push_back(i);
-            }
+            return {-1};
         }
 
-        // If none, return [-1] as per convention
-        return ans.empty() ? vector<int>(1, -1) : ans;
+        // Problem requires sorted output
+        sort(artPoints.begin(), artPoints.end());
+
+        return artPoints;
     }
 };
 

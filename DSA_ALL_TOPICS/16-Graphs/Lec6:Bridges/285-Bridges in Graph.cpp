@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Bridges in Graph - Using Tarjan's Algorithm of time in and low time: G-55
+1. Title: Bridges in Graph - Using Tarjan's Algorithm of time in and low time
 
 Links:
 https://takeuforward.org/graph/bridges-in-graph-using-tarjans-algorithm-of-time-in-and-low-time-g-55/
@@ -44,8 +44,8 @@ Examples:
 
 
 Constraints:
-    2 <= n <= 105
-    n - 1 <= connections.length <= 105
+    2 <= n <= 10^5
+    n - 1 <= connections.length <= 10^5
     0 <= ai, bi <= n - 1
     ai != bi
     There are no repeated connections.
@@ -82,116 +82,141 @@ OUTPUT::::::
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Bridges in Graph - Using Tarjan's Algorithm of time in and low time: G-55
+// 1. Title: Bridges in Graph - Tarjan's Algorithm
 //-------------------------------------------------------------------------------
-//
 
+/**
+ * @class Solution
+ * @brief Finds all Critical Connections (Bridges) using a highly optimized Tarjan's Algorithm.
+ *
+ * ============================================================================
+ * 🧠 INTUITION & IDEA
+ * ============================================================================
+ * A "Bridge" or "Critical Connection" is an edge that, if removed, splits the
+ * graph into multiple disconnected components.
+ * We track two things for every node:
+ * 1. `discoveryTime`: The exact timer tick when the node was first visited.
+ * 2. `lowestReachTime`: The earliest `discoveryTime` this node (or its children) can reach.
+ * * An edge connecting `curr` to `child` is a Bridge if the `child` CANNOT reach
+ * ANY node discovered *before or at the same time* as `curr`.
+ * Mathematically: `discoveryTime[curr] < lowestReachTime[child]`.
+ * (Notice the strict '<'. If it was '<=', the child has a backdoor to `curr` itself,
+ * meaning they are part of a cycle, so the edge between them isn't critical!)
+ *
+ * ============================================================================
+ * ⚙️ APPROACH, LOGIC & TRAPS AVOIDED
+ * ============================================================================
+ * 1. The Forward Edge Trap (Why the Bridge check is INSIDE the Tree Edge block):
+ * We ONLY evaluate the Bridge condition (`discoveryTime < lowestAdjReachTime`)
+ * for actual, unvisited DFS children. If we evaluated this for already-visited
+ * nodes, we might accidentally check a "Forward Edge" to a descendant. Since
+ * descendants are discovered *after* the current node, the math would trivially
+ * and falsely flag the edge as a Bridge.
+ * * 2. The Data Leak Trap (Why Back Edges strictly use `discoveryTime`):
+ * When hitting a Back Edge (an already visited ancestor), we update our reach
+ * using `discoveryTime[adjN]`, NOT `lowestReachTime[adjN]`. If we used the
+ * latter, we risk "leaking" a lower time from an unrelated subtree, which would
+ * mask a valid Bridge.
+ * * 3. No Root Node Exception:
+ * Unlike Articulation Points, Bridges are just edges. We don't care if a node
+ * is the root of the DFS tree or not. The math holds true universally.
+ *
+ * 4. Platform-Specific Fixes:
+ * - `clear()` and `assign()` are called on global states in the main function
+ * to prevent data leaking between multiple test cases run on the same object.
+ *
+ * ============================================================================
+ * ⏱️ COMPLEXITY ANALYSIS
+ * ============================================================================
+ * - Time Complexity: O(V + E)
+ * Standard DFS processes every vertex (V) once and every edge (E) twice.
+ * - Space Complexity: O(V + E)
+ * O(V + E) for the Adjacency List. O(V) for the tracking arrays (`vis`,
+ * `discoveryTime`, `lowestReachTime`, `bridges`) and the recursion stack.
+ */
 class Solution
 {
-    int time = 0; // Global timer to assign discovery times during DFS
+private:
+    vector<bool> vis;
+    vector<int> discoveryTime, lowestReachTime;
+    vector<vector<int>> bridges;
+    int timer = 0;
 
-    // ------------------------------------------------------------------------
-    // DFS Recursive Function to Find Bridges
-    //
-    // Parameters:
-    // - cur: current node being visited
-    // - parent: parent node in DFS tree (to avoid trivial backtracking)
-    // - adjL: adjacency list of graph
-    // - bridges: stores all critical connections (bridges)
-    // - vis: visited array to track visited nodes
-    // - vis_time: discovery time (when a node was first visited)
-    // - min_adj_time: lowest discovery time reachable from this node
-    //
-    // Core Idea (Tarjan’s Algorithm):
-    // - discovery time (vis_time[u]) = order in which u was visited
-    // - lowest time (min_adj_time[u]) = earliest discovered node reachable
-    //   from u (including back edges)
-    // - if low[v] > tin[u] → edge (u,v) is a bridge
-    // ------------------------------------------------------------------------
-    void findBridgeRec(int cur, int parent, vector<vector<int>> &adjL,
-                       vector<vector<int>> &bridges, vector<int> &vis,
-                       vector<int> &vis_time, vector<int> &min_adj_time)
+    void dfs(int curN, int parN, const vector<vector<int>> &adjL)
     {
 
-        vis[cur] = 1;
-        vis_time[cur] = min_adj_time[cur] = time++; // initialize discovery & low
+        vis[curN] = true;
+        discoveryTime[curN] = timer;
+        lowestReachTime[curN] = timer;
+        ++timer;
 
-        // Explore all neighbors
-        for (int adjN : adjL[cur])
+        for (int adjN : adjL[curN])
         {
 
-            if (adjN == parent)
-                continue; // skip the edge back to parent
+            // Do not immediately walk backward to the parent
+            if (adjN == parN)
+            {
+                continue;
+            }
 
+            // Tree edge (Unvisited Node)
             if (!vis[adjN])
             {
-                // If neighbor not visited, DFS deeper
-                findBridgeRec(adjN, cur, adjL, bridges, vis, vis_time, min_adj_time);
 
-                // After return, update current node's low value
-                min_adj_time[cur] = min(min_adj_time[cur], min_adj_time[adjN]);
+                dfs(adjN, curN, adjL);
 
-                // Bridge condition: If neighbor’s low > current’s discovery
-                if (vis_time[cur] < min_adj_time[adjN])
+                // 1. Get the child's lowest reach
+                int lowestAdjReachTime = lowestReachTime[adjN];
+
+                // 2. ONLY evaluate the Bridge condition for actual DFS children!
+                // Strictly `<` implies absolutely NO backdoors exist.
+                if (discoveryTime[curN] < lowestAdjReachTime)
                 {
-                    bridges.push_back({cur, adjN});
+                    bridges.push_back({curN, adjN});
                 }
+
+                // 3. Update current node's reach
+                lowestReachTime[curN] = min(lowestReachTime[curN], lowestAdjReachTime);
             }
+            // Back edge / Forward edge (Already Visited Node)
             else
             {
-                // If neighbor already visited (back edge), update low
-                min_adj_time[cur] = min(min_adj_time[cur], vis_time[adjN]);
+                // Safely use discovery time to prevent data leak across unrelated subtrees.
+                lowestReachTime[curN] = min(lowestReachTime[curN], discoveryTime[adjN]);
             }
         }
     }
 
 public:
-
-    // ------------------------------------------------------------------------
-    // Function: criticalConnections
-    // Problem: Find all bridges in an undirected graph
-    //
-    // Intuition:
-    // - A bridge is an edge that, if removed, increases the number of components.
-    // - Use DFS + Tarjan’s algorithm with discovery & low arrays.
-    //
-    // Approach:
-    // 1. Build adjacency list from edge list.
-    // 2. Initialize:
-    //    - vis[]: visited markers
-    //    - vis_time[]: discovery times
-    //    - min_adj_time[]: lowest reachable discovery times
-    // 3. Perform DFS (Tarjan’s) starting from node 0 (or any unvisited node).
-    // 4. Collect all edges (u,v) satisfying low[v] > disc[u].
-    //
-    // Complexity:
-    // - Time: O(V + E) → standard DFS traversal
-    // - Space: O(V + E) for adjacency list, O(V) for arrays
-    // ------------------------------------------------------------------------
     vector<vector<int>> criticalConnections(int n, vector<vector<int>> &connections)
     {
 
-        // Step 1: Build adjacency list
+        // Build Adjacency List
         vector<vector<int>> adjL(n);
-        for (auto &e : connections)
+        for (const auto &e : connections)
         {
-            adjL[e[0]].push_back(e[1]);
-            adjL[e[1]].push_back(e[0]);
+            int u = e[0];
+            int v = e[1];
+
+            adjL[u].push_back(v);
+            adjL[v].push_back(u);
         }
 
-        // Step 2: Initialize helper arrays
-        vector<vector<int>> bridges;     // stores all found bridges
-        vector<int> vis(n, 0);           // visited array
-        vector<int> vis_time(n, -1);     // discovery times
-        vector<int> min_adj_time(n, -1); // lowest reachable discovery times
+        // CRITICAL: Reset states for multiple test cases on the same object
+        vis.assign(n, false);
+        discoveryTime.assign(n, INT_MAX);
+        lowestReachTime.assign(n, INT_MAX);
+        bridges.clear();
+        timer = 0;
 
-        // Step 3: Run DFS (Tarjan’s)
-        // Note: Graph may be disconnected, so loop over all nodes
-        for (int i = 0; i < n; i++)
+        // Run DFS
+        // (LeetCode guarantees a connected graph for this specific problem,
+        // but the loop safely handles disconnected graphs if constraints change).
+        for (int i = 0; i < n; ++i)
         {
             if (!vis[i])
             {
-                findBridgeRec(i, -1, adjL, bridges, vis, vis_time, min_adj_time);
+                dfs(i, -1, adjL);
             }
         }
 
