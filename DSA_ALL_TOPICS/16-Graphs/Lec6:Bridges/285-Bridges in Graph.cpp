@@ -108,8 +108,9 @@ OUTPUT::::::
  * ============================================================================
  * 1. The Forward Edge Trap (Why the Bridge check is INSIDE the Tree Edge block):
  * We ONLY evaluate the Bridge condition (`discoveryTime < lowestAdjReachTime`)
- * for actual, unvisited DFS children. If we evaluated this for already-visited
- * nodes, we might accidentally check a "Forward Edge" to a descendant. Since
+ * for actual, unvisited DFS children. 
+ * If we evaluated this for already-visited nodes, 
+ * we might accidentally check a "Forward Edge" to a descendant. Since
  * descendants are discovered *after* the current node, the math would trivially
  * and falsely flag the edge as a Bridge.
  * * 2. The Data Leak Trap (Why Back Edges strictly use `discoveryTime`):

@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Strongly Connected Components - Kosaraju's Algorithm: G-54
+1. Title: Strongly Connected Components - Kosaraju's Algorithm
 
 Links:
 https://takeuforward.org/graph/strongly-connected-components-kosarajus-algorithm-g-54/
@@ -28,22 +28,24 @@ https://www.geeksforgeeks.org/problems/strongly-connected-components-kosarajus-a
 
 
 Problem statement:
-Given an adjacency list, adj of Directed Graph, Find the number of strongly connected components in the graph.
+Given a Directed Graph with V vertices (Numbered from 0 to V-1) and E edges. The graph is represented as a 2D vector edges[][], where each entry edges[i] = [u, v] denotes a direct edge from vertex u to v. Find the number of strongly connected components in the graph.
 
 
 Examples :
-    Input: adj[][] = [[2, 3], [0], [1], [4], []]
+    Input: V = 5, E = 5, edges[][] = [[0, 2], [0, 3], [1, 0], [2, 1], [3, 4]]
     Output: 3
     Explanation: We can clearly see that there are 3 Strongly Connected Components in the Graph.
-    Input: adj[][] = [[1], [2], [0]]
+
+    Input: V = 3, E = 3, edges[][] = [[0, 1], [1, 2], [2, 0]]
     Output: 1
     Explanation: All of the nodes are connected to each other. So, there's only one SCC.
 
-    Input: adj[][] = [[1], []]
+    Input: V = 2, E = 1, edges[][] = [[0, 1]]
     Output: 2
 
+
 Constraints:
-    2<=adj.size()<=106
+    2<=adj.size()<=10^6
     0<=edges<=adj.size()-1
 
 
@@ -74,108 +76,150 @@ OUTPUT::::::
 
 
 ----------------------------------------------------------------------------------------------------
-
 */
 
 //-------------------------------------------------------------------------------
-// 1. Title: Strongly Connected Components - Kosaraju's Algorithm: G-54
+// 1. Title: Strongly Connected Components - Kosaraju's Algorithm
 //-------------------------------------------------------------------------------
-//
 
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+/**
+ * @class Solution
+ * @brief Finds the number of Strongly Connected Components (SCCs) using Kosaraju's Algorithm.
+ *
+ * ============================================================================
+ * 🧠 INTUITION & IDEA (The "Bleeding" Problem)
+ * ============================================================================
+ * In a directed graph, finding SCCs with a normal DFS is dangerous because
+ * the DFS can "bleed" from one component into another across one-way bridges.
+ * Kosaraju's Algorithm prevents this "bleeding" using a brilliant 3-step trick:
+ * * 1. The Finish Time Stack: We run a normal DFS. A node is pushed to a stack ONLY
+ * after all its neighbors are fully explored. This naturally puts "sink" clusters
+ * at the bottom of the stack and "source" clusters at the top.
+ * 2. Reverse the World (Transpose): We reverse the direction of every single arrow
+ * in the graph. This magically turns all the old "source" clusters into "sinks".
+ * 3. Pop and Count (Trapped DFS): We pop nodes from our stack (starting with the
+ * old sources, which are now sinks) and run a second DFS. Because the edges
+ * are reversed, the DFS cannot cross the bridges and gets perfectly TRAPPED
+ * inside its own SCC. Every trapped DFS equals one SCC!
+ *
+ * ============================================================================
+ * ⏱️ COMPLEXITY ANALYSIS
+ * ============================================================================
+ * - Time Complexity: O(V + E)
+ * We perform two DFS passes O(V + E) and one graph reversal O(E).
+ * - Space Complexity: O(V + E)
+ * For the Adjacency List, visited array, and the recursion/stack space. By
+ * clearing and reusing the same Adjacency List, we save significant memory!
+ */
 class Solution
 {
 
-    // --------------------------------------------------------------------------
-    // DFS that records finishing times (1st pass) OR just visits (2nd pass)
-    // - finishTimes is used only in the 1st pass to push nodes *after* exploring
-    //   their descendants (i.e., in post-order). In the 2nd pass we can pass a
-    //   dummy stack we ignore.
-    // --------------------------------------------------------------------------
 private:
-    void dfs(int cur,
-             vector<vector<int>> &adjL,
-             vector<int> &vis,
-             stack<int> &finishTimes)
-    {
-        vis[cur] = 1; // mark current node visited
+    vector<bool> vis;
+    vector<vector<int>> adjL;
+    stack<int> finishStack;
+    int sccCount;
 
-        // explore all outgoing edges
-        for (int adjN : adjL[cur])
+    /**
+     * @brief A unified DFS that handles both Step 1 (filling stack) and Step 3 (counting).
+     * @param curN The current node being explored.
+     * @param isFirstPass Boolean flag. If true, it pushes nodes to the stack upon finishing.
+     */
+    void dfs(int curN, bool isFirstPass)
+    {
+
+        vis[curN] = true;
+
+        for (int adjN : adjL[curN])
         {
             if (!vis[adjN])
             {
-                dfs(adjN, adjL, vis, finishTimes);
+                dfs(adjN, isFirstPass);
             }
         }
 
-        // post-order push: records finishing time (used by 1st pass only)
-        finishTimes.push(cur);
+        // Step 1 logic: Push to stack ONLY after exploring all paths from this node
+        if (isFirstPass)
+        {
+            finishStack.push(curN);
+        }
     }
 
 public:
-    // --------------------------------------------------------------------------
-    // Kosaraju's Algorithm: Count Strongly Connected Components (SCCs)
-    //
-    // Intuition:
-    // 1) Run DFS on the original graph to compute nodes' finishing times.
-    //    (Nodes finishing later get pushed later; they should be processed first
-    //     on the reversed graph.)
-    // 2) Build the transpose (reverse) graph by reversing all edges.
-    // 3) Pop nodes in decreasing finishing time order; for each unvisited node,
-    //    run DFS on the transpose graph. Each DFS tree corresponds to one SCC.
-    //
-    // Complexity:
-    // - Time:  O(V + E)  (two DFS traversals + O(E) edge reversal)
-    // - Space: O(V + E)  (adjacency lists, visited array, stack)
-    // --------------------------------------------------------------------------
-    int kosaraju(vector<vector<int>> &adjL)
+    int kosaraju(int V, vector<vector<int>> &edges)
     {
-        const int V = (int)adjL.size();
 
-        // -------------------- 1) First pass: finishing times on original graph
-        vector<int> vis(V, 0);
-        stack<int> finishTimes; // stores nodes by finish order (top = latest)
+        int n = V;
 
-        for (int i = 0; i < V; i++)
+        // ====================================================================
+        // STEP 1: The Finish Time Stack
+        // Run DFS to order nodes by their finish times. Source nodes will
+        // end up at the top of the stack, and Sink nodes at the bottom.
+        // ====================================================================
+        vis.assign(n, false);
+        adjL.assign(n, {});
+        finishStack = stack<int>(); // Clear stack to prevent multi-testcase leakage
+        sccCount = 0;
+
+        // Build original graph
+        for (auto &e : edges)
         {
-            if (vis[i])
-                continue;
-            dfs(i, adjL, vis, finishTimes); // pushes nodes after full exploration
+            int u = e[0];
+            int v = e[1];
+            adjL[u].push_back(v); // Directed edge: u -> v
         }
 
-        // -------------------- 2) Build transpose graph (reverse all edges)
-        // Note: Reversing edges does not change SCCs, but in the transpose graph,
-        // exploring in decreasing finish time isolates one SCC per DFS.
-        vector<vector<int>> adjL_MOD(V);
-        for (int u = 0; u < V; u++)
+        // Run first DFS pass
+        for (int i = 0; i < n; ++i)
         {
-            for (int v : adjL[u])
+            if (!vis[i])
             {
-                adjL_MOD[v].push_back(u); // reverse edge u->v to v->u
+                dfs(i, true);
             }
         }
 
-        // -------------------- 3) Second pass: DFS in finish-time order on transpose
-        fill(vis.begin(), vis.end(), 0); // reset visited
-        int componentCount = 0;
+        // ====================================================================
+        // STEP 2: Reverse the World (Transpose Graph)
+        // Reverse all arrows so that Source SCCs become Sink SCCs.
+        // We reuse the existing adjL to save O(V+E) memory!
+        // ====================================================================
+        adjL.assign(n, {}); // Clear the old graph
 
-        // dummy stack for dfs call in 2nd pass (we don't need finishing times now)
-        stack<int> dummy;
-
-        while (!finishTimes.empty())
+        for (auto &e : edges)
         {
-            int cur = finishTimes.top();
-            finishTimes.pop();
-
-            if (vis[cur])
-                continue;
-
-            // Each DFS here visits exactly one SCC in the transpose graph.
-            dfs(cur, adjL_MOD, vis, dummy);
-            componentCount++;
+            int u = e[0];
+            int v = e[1];
+            adjL[v].push_back(u); // Reversed edge: v -> u
         }
 
-        return componentCount;
+        // ====================================================================
+        // STEP 3: Pop and Count (Trapped DFS)
+        // Pop nodes from the stack. Because the graph is reversed and we
+        // process in this specific order, the DFS hits the walls of previously
+        // visited SCCs and cannot bleed. It gets trapped inside exactly one SCC.
+        // ====================================================================
+        vis.assign(n, false); // Reset visited array for the second pass
+
+        while (!finishStack.empty())
+        {
+
+            int curN = finishStack.top();
+            finishStack.pop();
+
+            // If unvisited, we found a new SCC head!
+            if (!vis[curN])
+            {
+                ++sccCount;
+                dfs(curN, false); // Trapped DFS (doesn't push to stack)
+            }
+        }
+
+        return sccCount;
     }
 };
 
