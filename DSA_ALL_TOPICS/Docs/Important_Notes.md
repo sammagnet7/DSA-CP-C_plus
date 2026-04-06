@@ -1237,5 +1237,13 @@ The std::string::erase() function has overloads that take a starting position (i
 
      **The Takeaway:** If the modulo $M$ is not a prime number (like $10^9 + 7$), attempting to use division to "undo" a running product is a massive red flag. You must pivot to Prefix/Suffix arrays.
 
-55. 
+55. #### The Safe Subtraction Modulo Trick
+     In C++ and Java, the `%` operator calculates the *remainder*, meaning negative numbers evaluate to negative results (e.g., `-1 % 4` evaluates to `-1`, which causes array out-of-bounds errors). 
+
+     To safely wrap backward, **add the modulo base before applying the `%` operator**:
+
+     * **Formula:** `(value - subtraction + MOD) % MOD`
+     * **Example (4-way directions):** `dir = (dir - 1 + 4) % 4; // Safely wraps 0 down to 3`.
+
+56. 
 ---
