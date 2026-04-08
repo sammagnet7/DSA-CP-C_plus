@@ -28,13 +28,13 @@ https://leetcode.com/problems/implement-trie-prefix-tree/
 
 
 Problem statement:
-A trie (pronounced as "try") or prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. There are various applications of this data structure, such as autocomplete and spellchecker.
+A trie (pronounced as "try", short for Retrieval Tree) or prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. This data structure built purely for raw speed and text processing. There are various applications of this data structure, such as autocomplete and spellchecker.
 
 Implement the Trie class:
 Trie() Initializes the trie object.
 void insert(String word) Inserts the string word into the trie.
 boolean search(String word) Returns true if the string word is in the trie (i.e., was inserted before), and false otherwise.
-boolean startsWith(String prefix) Returns true if there is a previously inserted string word that has the prefix prefix, and false otherwise.
+boolean startsWith(String prefix) Returns true if there is a previously inserted string word that has the prefix `prefix`, and false otherwise.
 
 
 Example 1:
@@ -92,70 +92,48 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 // 1. Title: Implement Trie - 1
 //-------------------------------------------------------------------------------
-//
 
-// -----------------------------------------------------------------------------
-// Node Class: Represents a single Trie Node
-// Each node stores:
-//   - arr[26]: pointers to child nodes (for 'a' to 'z')
-//   - endStatus: marks if the node represents the end of a valid word
-// -----------------------------------------------------------------------------
-class Node
-{ 
-private:
-    vector<Node *> arr; // children links: size 26 (for lowercase English letters)
-    bool endStatus;     // true if node represents the end of a word
-
+/**
+ * @class TrieNode
+ * @brief Represents a single character node within the Trie.
+ * * Note: The node does not explicitly store its own character. Instead, its
+ * character value is implicitly defined by the index (0-25) it occupies in
+ * its parent's `children` vector.
+ */
+class TrieNode
+{
 public:
-    // Constructor: initialize children as null, endStatus = false
-    Node() : arr(vector<Node *>(26, nullptr))
+    vector<TrieNode *> children;
+    bool isEndOfWord;
+
+    /**
+     * @brief Constructs a new TrieNode.
+     * Initializes a vector of 26 null pointers (representing 'a' through 'z')
+     * and defaults the end-of-word flag to false.
+     */
+    TrieNode()
     {
-        endStatus = false;
+        children.resize(26, nullptr);
+        isEndOfWord = false;
     }
 
-    // Destructor: recursively delete all children to free memory
-    ~Node()
+    /**
+     * @brief Destructor to safely deallocate heap memory (Cascading Delete).
+     * * By placing the deletion logic inside the Node itself, we leverage RAII
+     * (Resource Acquisition Is Initialization). When a parent node is deleted,
+     * it automatically triggers the deletion of all its children first via
+     * Post-Order Traversal. This guarantees zero memory leaks.
+     */
+    ~TrieNode()
     {
-        for (int i = 0; i < 26; i++)
+        for (int i = 0; i < 26; ++i)
         {
-            if (arr[i] != nullptr)
+            if (children[i] != nullptr)
             {
-                delete arr[i];
-                arr[i] = nullptr;
+                delete children[i];
+                children[i] = nullptr;
             }
         }
-    }
-
-    // Check if child node for character (chID) exists
-    bool charExists(int chID)
-    {
-        return (this->arr[chID] != nullptr);
-    }
-
-    // Insert new child node for character (chID) and return pointer
-    Node *insertChar(int chID)
-    {
-        Node *newN = new Node();
-        this->arr[chID] = newN;
-        return newN;
-    }
-
-    // Get pointer to child node for character (chID)
-    Node *getNextNode(int chID)
-    {
-        return this->arr[chID];
-    }
-
-    // Update the end-of-word flag
-    void updateEndStatus(bool status)
-    {
-        this->endStatus = status;
-    }
-
-    // Check if this node marks the end of a word
-    bool getStatus()
-    {
-        return this->endStatus;
     }
 };
 
@@ -166,106 +144,139 @@ public:
 //   - search(word)   → O(L)   (true if word exists in Trie)
 //   - startsWith(pre)→ O(L)   (true if any word starts with given prefix)
 // -----------------------------------------------------------------------------
+
+/**
+ * @class Trie
+ * @brief A Prefix Tree used for ultra-fast string retrieval and prefix matching.
+ *
+ * ============================================================================
+ * 🧠 INTUITION & ARCHITECTURE
+ * ============================================================================
+ * The Trie stores strings as overlapping paths of characters. Words that share
+ * the same prefix (e.g., "apple" and "ape") share the same parent nodes in memory,
+ * branching off only when their characters differ.
+ * * This provides strict O(L) time complexity for searches (where L is word length),
+ * massively outperforming standard Hash Sets when querying prefixes.
+ */
 class Trie
 {
-
 private:
-    Node *root; // Root node (does not store any character)
+    TrieNode *root;
 
 public:
-    // Constructor: initialize empty Trie with root node
+    /**
+     * @brief Initializes the Trie with an empty root node.
+     * The root node conceptually represents the empty string ("").
+     */
     Trie()
     {
-        root = new Node();
+        root = new TrieNode();
     }
 
-    // Destructor: delete entire Trie (frees memory recursively via Node destructor)
+    /**
+     * @brief Destructor to safely tear down the entire Trie.
+     * Deleting the root triggers the cascading `~TrieNode()` destructors,
+     * safely wiping the entire tree from the heap in a single, elegant line.
+     */
     ~Trie()
     {
         delete root;
     }
 
-    // -------------------------------------------------------------------------
-    // Insert a word into the Trie
-    // Approach:
-    // - Start from root, traverse each character
-    // - If child node exists → move to it
-    // - If not → create new node and move to it
-    // - After last character, mark node as "end of word"
-    // Complexity: O(L), where L = word length
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Inserts a word into the Trie.
+     * @param word The lowercase English string to insert.
+     * * Time Complexity: O(L) where L is the length of the word.
+     * Space Complexity: O(L) worst case if no prefix overlaps with existing words.
+     */
     void insert(string word)
     {
-        Node *tmp = this->root;
+        TrieNode *curNode = root;
 
-        for (int i = 0; i < word.size(); i++)
+        for (char c : word)
         {
-            int chID = word[i] - 'a'; // map character → index [0-25]
+            int idx = c - 'a';
 
-            if (tmp->charExists(chID))
+            // If the path for this character doesn't exist, dynamically build it.
+            if (curNode->children[idx] == nullptr)
             {
-                tmp = tmp->getNextNode(chID); // go to child
+                curNode->children[idx] = new TrieNode();
             }
-            else
-            {
-                tmp = tmp->insertChar(chID); // create child if missing
-            }
+
+            // Step down to the next node.
+            curNode = curNode->children[idx];
         }
-        tmp->updateEndStatus(true); // mark last node as end of word
+
+        // Lock in the word by marking the final character's node.
+        curNode->isEndOfWord = true;
     }
 
-    // -------------------------------------------------------------------------
-    // Search for a complete word in the Trie
-    // Approach:
-    // - Traverse each character from root
-    // - If at any step character link missing → word not found
-    // - After last character, check end flag to ensure it's a full word
-    // Complexity: O(L)
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Searches for a complete word in the Trie.
+     * @param word The lowercase English string to search for.
+     * @return True if the exact word is in the Trie, False otherwise.
+     * * Time Complexity: O(L) where L is the length of the word.
+     * Space Complexity: O(1) auxiliary space.
+     */
     bool search(string word)
     {
-        Node *tmp = this->root;
+        TrieNode *curNode = root;
 
-        for (int i = 0; i < word.size(); i++)
+        for (char c : word)
         {
-            int chID = word[i] - 'a';
+            int idx = c - 'a';
 
-            if (!tmp->charExists(chID))
+            // If the path breaks before the word ends, the word does not exist.
+            if (curNode->children[idx] == nullptr)
             {
-                return false; // missing link → word not present
+                return false;
             }
-            tmp = tmp->getNextNode(chID);
+            curNode = curNode->children[idx];
         }
 
-        return tmp->getStatus(); // must be marked as end of word
+        // We survived the loop, but we must check if this specific node was
+        // explicitly marked as the end of an inserted word.
+        return curNode->isEndOfWord;
     }
 
-    // -------------------------------------------------------------------------
-    // Check if there exists any word with the given prefix
-    // Approach:
-    // - Traverse characters of prefix
-    // - If missing link found → return false
-    // - If all chars matched → return true
-    // Complexity: O(L)
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Checks if there is any word in the Trie that starts with the given prefix.
+     * @param prefix The lowercase English prefix to search for.
+     * @return True if the prefix exists, False otherwise.
+     * * Time Complexity: O(L) where L is the length of the prefix.
+     * Space Complexity: O(1) auxiliary space.
+     */
     bool startsWith(string prefix)
     {
-        Node *tmp = this->root;
+        TrieNode *curNode = root;
 
-        for (int i = 0; i < prefix.size(); i++)
+        for (char c : prefix)
         {
-            int chID = prefix[i] - 'a';
+            int idx = c - 'a';
 
-            if (!tmp->charExists(chID))
+            // If the path breaks, no words exist with this prefix.
+            if (curNode->children[idx] == nullptr)
             {
-                return false; // missing link → prefix not present
+                return false;
             }
-            tmp = tmp->getNextNode(chID);
+            curNode = curNode->children[idx];
         }
 
-        return true; // successfully matched full prefix
+        // If we successfully navigated the entire prefix string without hitting
+        // a nullptr, the prefix exists. We do not care if it's the end of a full word.
+        return true;
     }
 };
+
+/**
+ * Usage Example:
+ * Trie* obj = new Trie();
+ * obj->insert("apple");
+ * bool param_2 = obj->search("apple");   // returns true
+ * bool param_3 = obj->search("app");     // returns false
+ * bool param_4 = obj->startsWith("app"); // returns true
+ * delete obj; // Safely cleans up memory via RAII
+ */
 
 int main()
 {
