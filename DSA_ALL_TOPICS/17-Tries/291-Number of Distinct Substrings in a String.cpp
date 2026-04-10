@@ -106,155 +106,179 @@ OUTPUT::::::
 //
 
 #include <unordered_set>
-
-// -----------------------------------------------------------------------------
-// Approach1: Count Distinct Substrings (Suboptimal Approach)
-// -----------------------------------------------------------------------------
-// Idea:
-//   Generate all substrings and store them in a set to remove duplicates.
-//   The size of the set = number of distinct substrings.
-//
-// Complexity:
-//   - Time: O(n^3) (O(n^2) substrings * O(n) copy per substring).
-//   - Space: O(n^2) for storing substrings.
-//   Works only for very small strings. Efficient methods use SAM or Suffix Array.
-// -----------------------------------------------------------------------------
-
-int countDistinctSubstrings(string &s)
+class Solution
 {
-    int n = s.size();
-    unordered_set<string> subStrs;
-    subStrs.insert(""); // include the empty substring
+    // -----------------------------------------------------------------------------
+    // Approach1: Count Distinct Substrings (Suboptimal Approach)
+    // -----------------------------------------------------------------------------
+    // Idea:
+    //   Generate all substrings and store them in a set to remove duplicates.
+    //   The size of the set = number of distinct substrings.
+    //
+    // Complexity:
+    //   - Time: O(n^3) (O(n^2) substrings * O(n) copy per substring).
+    //   - Space: O(n^2) for storing substrings.
+    //   Works only for very small strings. Efficient methods use SAM or Suffix Array.
+    // -----------------------------------------------------------------------------
 
-    for (int i = 0; i < n; i++)
+    int countDistinctSubstrings(string &s)
     {
-        for (int j = n - 1; j >= i; j--)
-        {
-            subStrs.insert(s.substr(i, (j - i + 1)));
-        }
-    }
+        int n = s.size();
+        unordered_set<string> subStrs;
+        subStrs.insert(""); // include the empty substring
 
-    return subStrs.size();
-}
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = n - 1; j >= i; j--)
+            {
+                subStrs.insert(s.substr(i, (j - i + 1)));
+            }
+        }
+
+        return subStrs.size();
+    }
+};
 
 // -----------------------------------------------------------------------------
 // Approach2: Trie-based solution [Optimal Approach]
 // -----------------------------------------------------------------------------
-/*
-  Trie-based solution to count distinct substrings (non-empty).
-  The key insight is: Every substring of a string S is a prefix of some suffix of S.
-  Idea:
-    - Insert all suffixes of the string into a Trie.
-    - Each time we create a new Trie node it corresponds to a distinct substring
-      that was not seen before (because that character-path didn't exist).
-    - The total number of new nodes created while inserting all suffixes equals
-      the number of distinct non-empty substrings.
-    - We return that count + 1 if we want to include the empty substring.
 
-  Complexity:
-    - Time:  O(N^2) worst-case. For each of N starting positions we may walk up
-      to O(N) characters inserting nodes or following existing links.
-    - Space: O(N^2) worst-case (there can be (N^2) (more accurately N*(N+1)/2 e.g. "abcde") distinct substrings -> nodes).
-*/
-
-class Node
+/**
+ * @class TrieNode
+ * @brief Stripped-down Prefix Tree Node optimized for substring counting.
+ * Note: We omit the standard `isEndOfWord` boolean here because in this specific
+ * algorithm, every single physically created node represents a valid, distinct substring.
+ */
+class TrieNode
 {
-    Node *link[26]; // fixed 26-ary children for 'a'..'z'
-
 public:
-    // Constructor: initialize all child pointers to nullptr
-    Node()
+    // Raw array for maximum performance and minimum memory overhead
+    TrieNode *children[26];
+
+    /**
+     * @brief Constructs a new TrieNode and initializes child pointers.
+     */
+    TrieNode()
     {
-        // Need to initialize.
-        for (int i = 0; i < 26; i++)
+        for (int i = 0; i < 26; ++i)
         {
-            link[i] = nullptr;
+            children[i] = nullptr;
         }
     }
 
-    // Check if a child for character index 'key' exists
-    // key: integer in [0..25] representing a lower-case letter
-    bool keyExists(int key)
+    /**
+     * @brief Cascading Destructor (RAII).
+     * Recursively deletes all child nodes before deleting itself (Post-Order).
+     * This guarantees zero memory leaks when the root Trie dies.
+     */
+    ~TrieNode()
     {
-        return (this->link[key] != nullptr);
-    }
-
-    // Return pointer to the child node for 'key' (may be nullptr)
-    Node *getNextNode(int key)
-    {
-        return this->link[key];
-    }
-
-    // Create a new child node at 'key' and return pointer to it
-    // Caller is responsible for counting/usage
-    Node *insertKey(int key)
-    {
-        Node *newN = new Node();
-        this->link[key] = newN;
-        return newN;
+        for (int i = 0; i < 26; ++i)
+        {
+            if (children[i] != nullptr)
+            {
+                delete children[i];
+                children[i] = nullptr;
+            }
+        }
     }
 };
 
+/**
+ * @class Trie
+ * @brief Specialized Trie to count distinct substrings using the "Prefix of a Suffix" method.
+ */
 class Trie
 {
-    Node *root; // root node (does not represent any character)
+private:
+    TrieNode *root;
+
+    // Encapsulated state to track the number of distinct substrings discovered
+    int nodeCount;
 
 public:
-    // Constructor: allocate an empty root
+    /**
+     * @brief Initializes the Trie.
+     * nodeCount starts at 1 to automatically account for the empty string ("").
+     */
     Trie()
     {
-        root = new Node();
+        root = new TrieNode();
+        nodeCount = 1;
     }
 
-    // countWhileInserting:
-    // - Walk all suffixes of `str` and insert characters into the Trie.
-    // - Each time we create a new node we increment `count` because that node
-    //   represents a substring that wasn't present before.
-    //
-    // Returns:
-    // - number of NEW nodes created while inserting all suffixes = number of
-    //   distinct non-empty substrings.
-    int countWhileInserting(string &str)
+    /**
+     * @brief Safely destroys the Trie, triggering the cascading node destructors.
+     */
+    ~Trie()
     {
-        Node *tmp;
-        int count = 0; // counts newly created nodes (distinct substrings)
+        delete root;
+    }
 
-        // For each starting index (i.e., each suffix)
-        for (int start = 0; start < (int)str.size(); start++)
+    /**
+     * @brief Inserts a virtual substring into the Trie and counts new nodes.
+     * * ZERO-COPY OPTIMIZATION: Instead of generating and passing expensive string
+     * copies (like `s.substr()`), we pass the original string by constant reference
+     * alongside logical boundary pointers `l` and `r`.
+     * * @param word The original complete string.
+     * @param l The starting index of the current suffix.
+     * @param r The ending index of the string.
+     * * Time Complexity: O(K) where K is the length of the suffix (r - l + 1).
+     * Space Complexity: O(K) worst case if all characters form a new branch.
+     */
+    void insert(const string &word, int l, int r)
+    {
+        TrieNode *curNode = root;
+
+        for (int i = l; i <= r; ++i)
         {
-            tmp = root; // start traversal from root for this suffix
+            int idx = word[i] - 'a';
 
-            // Extend the current suffix one character at a time
-            for (int i = start; i < (int)str.size(); i++)
+            // If the path breaks, we just discovered a brand new distinct substring!
+            if (curNode->children[idx] == nullptr)
             {
-                int cur = str[i] - 'a'; // map char -> index [0..25]
-
-                if (tmp->keyExists(cur))
-                {
-                    // Path already exists: this substring was already seen
-                    tmp = tmp->getNextNode(cur);
-                }
-                else
-                {
-                    // New path: create node and increment distinct-substring count
-                    tmp = tmp->insertKey(cur);
-                    count++;
-                }
+                curNode->children[idx] = new TrieNode();
+                ++nodeCount; // Increment our global count
             }
-            // end of one suffix; move to next suffix
-        }
 
-        return count;
+            // Step down the tree
+            curNode = curNode->children[idx];
+        }
+    }
+
+    /**
+     * @brief Safely retrieves the encapsulated total count of distinct substrings.
+     */
+    int getDistinctCount()
+    {
+        return nodeCount;
     }
 };
 
-// Public function required by problem: countDistinctSubstrings
-// - returns number of distinct substrings including empty string (+1)
+/**
+ * @brief Returns the number of distinct substrings (including empty) of a given string.
+ * * APPROACH: "Prefix of a Suffix"
+ * Every substring is simply a prefix of some suffix. By generating every possible
+ * suffix of the string and inserting them into a Trie, the Trie naturally filters
+ * out duplicates. The total number of nodes created equals the number of distinct substrings.
+ * * @param s The input string.
+ * @return The integer count of distinct substrings.
+ * * Time Complexity: O(N^2) where N is the length of the string.
+ * Space Complexity: O(N^2) max nodes in the worst-case scenario.
+ */
 int countDistinctSubstrings(string &s)
 {
-    Trie t;
-    // The trie count returns distinct non-empty substrings; add 1 for empty string
-    return t.countWhileInserting(s) + 1;
+    Trie trie;
+    int n = s.length();
+
+    // Iterate through every starting character to generate every suffix
+    for (int i = 0; i < n; ++i)
+    {
+        // Insert the suffix starting at index 'i' to the end of the string.
+        trie.insert(s, i, n - 1);
+    }
+
+    return trie.getDistinctCount();
 }
 
 int main()
