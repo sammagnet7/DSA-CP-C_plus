@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Implement Trie - 1
+1. Title: Implement Trie - 1 : Standard Tries (Strings & Prefixes)
 
 Links:
 https://takeuforward.org/data-structure/implement-trie-1/

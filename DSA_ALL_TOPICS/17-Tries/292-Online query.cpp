@@ -46,8 +46,8 @@ Examples:
 
 
 Constraints:
-    1 <= nums.length <= 2 * 105
-    0 <= nums[i] <= 231 - 1
+    1 <= nums.length <= 2 * 10^5
+    0 <= nums[i] <= 2^31 - 1
 
 
 INPUT::::::
@@ -83,154 +83,134 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 // 1. Title: Maximum XOR of Two Numbers in an Array
 //-------------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-// Problem: Maximum XOR of two numbers in an array
-// Intuition:
-//  - For any bit position, XOR is maximized when the two bits differ (1^0 = 1).
-//  - To maximize the overall XOR between two numbers, we try to maximize the
-//    contribution from the most significant bit down to the least significant.
-//  - A binary Trie (0/1 children) stores bit paths of numbers (MSB → LSB).
-//    For a query number, we greedily walk the Trie choosing the opposite bit
-//    if present (to set the current XOR bit to 1); otherwise we follow the
-//    same bit. This yields the maximum XOR achievable with any inserted number.
-// Approach:
-//  - Build a Trie by inserting all numbers' 32-bit representations.
-//  - For each number, query the Trie to find the best partner that gives the
-//    maximum XOR, and track the global maximum.
-// Complexity:
-//  - Time: O(32*N) for insertion + O(32*N) for queries ≈ O(N) (constants: 32 bits).
-//  - Space: O(32*N) worst-case for Trie nodes (each number potentially adds 32 nodes).
-// -----------------------------------------------------------------------------
 
-class Node
+class TrieNode
 {
-    Node *link[2]; // children: link[0] for bit 0, link[1] for bit 1
-
 public:
-    // Constructor: initialize child pointers to nullptr
-    Node()
+    TrieNode *children[2];
+
+    TrieNode()
     {
-        link[0] = link[1] = nullptr;
+        children[0] = nullptr;
+        children[1] = nullptr;
     }
 
-    // Returns true if child for bit 'key' exists
-    bool keyExists(int key)
-    {
-        return !(this->link[key] == nullptr);
-    }
-
-    // Return pointer to child node for bit 'key'
-    Node *getNextNode(int key)
-    {
-        return this->link[key];
-    }
-
-    // Create/attach a child node for bit 'key' and return it
-    Node *put(int key)
-    {
-        Node *newN = new Node();
-        this->link[key] = newN;
-        return newN;
-    }
+    /* HACK: Destructor intentionally commented out for Competitive Programming platforms
+     * like LeetCode to bypass slow memory deallocation times (prevents MLE).
+     */
+    // ~TrieNode(){
+    //     if(children[0] != nullptr){ delete children[0]; children[0] = nullptr; }
+    //     if(children[1] != nullptr){ delete children[1]; children[1] = nullptr; }
+    // }
 };
 
+/**
+ * @class Trie
+ * @brief A Bitwise Prefix Tree designed to find the Maximum XOR in O(N) time.
+ * * ============================================================================
+ * 🧠 INTUITION & WHY WE USE A TRIE
+ * ============================================================================
+ * A brute-force approach compares every pair in the array, resulting in O(N^2)
+ * time complexity. For an array of size 10^5, this requires 10 billion operations,
+ * which guarantees a Time Limit Exceeded (TLE) error.
+ * * The goal of XOR is to find differing bits (1 ^ 0 = 1). To yield the maximum
+ * numerical value, we desperately want '1's in the Most Significant Bit (MSB)
+ * positions. For example, securing a '1' in the 31st bit is worth over 2 billion,
+ * which is mathematically better than having '1's in every single bit after it.
+ * * WHY A TRIE?
+ * A Trie perfectly organizes and groups numbers by their leading bits. By inserting
+ * binary representations from MSB (31) down to LSB (0), the Trie transforms into a
+ * "greedy decision tree". Instead of checking all numbers, we can take a number
+ * and actively "hunt" down the branches of the Trie for the exact bits that will
+ * maximize our XOR, skipping millions of suboptimal pairs instantly.
+ * * ============================================================================
+ * ⚙️ APPROACH
+ * ============================================================================
+ * 1. Build Phase: Insert every number's 32-bit sequence into the Trie.
+ * 2. Query Phase: For every number, calculate its max possible XOR by walking
+ * down the Trie.
+ * 3. The Greedy Choice: At each bit level, identify the "opposite" bit. If the
+ * Trie has a branch for the opposite bit, we MUST take it. We shift our running
+ * total left and append a '1'. If the opposite bit doesn't exist, we are forced
+ * to take the matching bit, shifting our total left and appending a '0'.
+ */
 class Trie
 {
-    Node *root; // root of the binary trie
+private:
+    TrieNode *root;
 
 public:
-    // Initialize trie with empty root node
     Trie()
     {
-        root = new Node();
+        root = new TrieNode();
     }
 
-    // Insert the 32-bit binary representation of num into the trie.
-    // We traverse from bit 31 (most significant) down to bit 0 (least significant).
-    // If the required child doesn't exist, create it.
+    // ~Trie(){ delete root; }
+
     void insert(int num)
     {
+        TrieNode *curNode = root;
 
-        Node *tmp = root;
-
-        for (int i = 31; i >= 0; i--)
+        for (int i = 31; i >= 0; --i)
         {
-            int probe = num >> i; // shift right to bring bit i to LSB
-            int cur = probe & 1;  // extract the i-th bit (0 or 1)
+            int curBit = (num >> i) & 1;
 
-            if (tmp->keyExists(cur))
+            if (curNode->children[curBit] == nullptr)
             {
-                // If child exists for this bit, follow it
-                tmp = tmp->getNextNode(cur);
+                curNode->children[curBit] = new TrieNode();
             }
-            else
-            {
-                // Otherwise create the child and move to it
-                tmp = tmp->put(cur);
-            }
+            curNode = curNode->children[curBit];
         }
     }
 
-    // Query the trie for the maximum XOR partner for 'num'.
-    // For each bit (MSB → LSB) prefer the opposite bit (1-cur) if present;
-    // that will set the corresponding XOR bit to 1. Otherwise follow the
-    // same bit path.
-    int max_XOR(int num)
+    int getMaxXor(int num)
     {
+        TrieNode *curNode = root;
+        int maxXor = 0;
 
-        Node *tmp = root;
-        int max_XOR_val = 0;
-
-        for (int i = 31; i >= 0; i--)
+        for (int i = 31; i >= 0; --i)
         {
-            int probe = num >> i; // bring bit i to LSB
-            int cur = probe & 1;  // current bit of num
-            int needed = 1 - cur; // opposite bit to maximize XOR at this position
+            int curBit = (num >> i) & 1;
+            int oppBit = (!curBit);
 
-            if (tmp->keyExists(needed))
+            if (curNode->children[oppBit] != nullptr)
             {
-                // Opposite bit exists → we can set this bit in the XOR result
-                max_XOR_val = max_XOR_val | (1 << i);
-                tmp = tmp->getNextNode(needed);
+                maxXor = (maxXor << 1) | 1;
+                curNode = curNode->children[oppBit];
             }
             else
             {
-                // Opposite bit doesn't exist → fallback to same bit
-                tmp = tmp->getNextNode(cur);
+                maxXor = (maxXor << 1);
+                curNode = curNode->children[curBit];
             }
         }
-
-        return max_XOR_val;
+        return maxXor;
     }
 };
 
 class Solution
 {
 public:
-    // Build the trie with all numbers and then query each number to find the
-    // maximum XOR partner. Return the maximum found.
     int findMaximumXOR(vector<int> &nums)
     {
+        Trie trie;
 
-        Trie t;
-
-        // Insert all numbers into the trie (building the search space)
-        for (int i = 0; i < nums.size(); i++)
+        // 1. Build the Trie
+        for (int i = 0; i < nums.size(); ++i)
         {
-            t.insert(nums[i]);
+            trie.insert(nums[i]);
         }
 
-        // Initialize to the smallest integer so the first comparison succeeds
-        int max_XOR_val = INT_MIN;
+        int globalMax = 0;
 
-        // For every number, query the trie to compute the best XOR partner
-        for (int i = 0; i < nums.size(); i++)
+        // 2. Greedily find the max XOR for every number
+        for (int i = 0; i < nums.size(); ++i)
         {
-            max_XOR_val = max(max_XOR_val, t.max_XOR(nums[i]));
+            int curMaxXor = trie.getMaxXor(nums[i]);
+            globalMax = max(globalMax, curMaxXor);
         }
 
-        return max_XOR_val;
+        return globalMax;
     }
 };
 

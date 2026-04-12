@@ -47,9 +47,9 @@ Examples:
 
 
 Constraints:
-    1 <= nums.length, queries.length <= 105
+    1 <= nums.length, queries.length <= 10^5
     queries[i].length == 2
-    0 <= nums[j], xi, mi <= 109
+    0 <= nums[j], xi, mi <= 10^9
 
 
 INPUT::::::
@@ -85,201 +85,172 @@ OUTPUT::::::
 //-------------------------------------------------------------------------------
 // 1. Title: Maximum XOR With an Element From Array
 //-------------------------------------------------------------------------------
-//
 
-class Node
+/**
+ * @class TrieNode
+ * @brief A Bitwise Prefix Tree Node optimized for binary math (0s and 1s).
+ */
+class TrieNode
 {
-    Node *link[2]; // children: link[0] for bit 0, link[1] for bit 1
-
 public:
-    // Constructor: initialize child pointers to nullptr
-    Node()
-    {
-        link[0] = link[1] = nullptr;
-    }
+    TrieNode *children[2];
 
-    // Returns true if child for bit 'key' exists
-    bool keyExists(int key)
+    TrieNode()
     {
-        return !(this->link[key] == nullptr);
+        children[0] = nullptr;
+        children[1] = nullptr;
     }
-
-    // Return pointer to child node for bit 'key'
-    Node *getNextNode(int key)
-    {
-        return this->link[key];
-    }
-
-    // Create/attach a child node for bit 'key' and return it
-    Node *put(int key)
-    {
-        Node *newN = new Node();
-        this->link[key] = newN;
-        return newN;
-    }
+    // HACK: Destructor omitted for competitive programming to prevent MLE.
 };
 
+/**
+ * @class Trie
+ * @brief Bitwise Trie designed to greedily maximize XOR operations.
+ */
 class Trie
 {
-    Node *root; // root of the binary trie
+    TrieNode *root;
 
 public:
-    // Initialize trie with empty root node
     Trie()
     {
-        root = new Node();
+        root = new TrieNode();
     }
 
-    // Insert the 32-bit binary representation of num into the trie.
-    // We traverse from bit 31 (most significant) down to bit 0 (least significant).
-    // If the required child doesn't exist, create it.
+    /**
+     * @brief Inserts a 32-bit integer into the Trie.
+     * * APPROACH:
+     * We iterate from the Most Significant Bit (31) down to the Least Significant Bit (0).
+     * By placing the highest-value bits at the top of the tree, we set up the structure
+     * perfectly for the greedy search later. If a path for a bit doesn't exist, we build it.
+     */
     void insert(int num)
     {
+        TrieNode *curNode = root;
 
-        Node *tmp = root;
-
-        for (int i = 31; i >= 0; i--)
+        for (int i = 31; i >= 0; --i)
         {
-            int probe = num >> i; // shift right to bring bit i to LSB
-            int cur = probe & 1;  // extract the i-th bit (0 or 1)
+            int curBit = (num >> i) & 1;
 
-            if (tmp->keyExists(cur))
+            if (curNode->children[curBit] == nullptr)
             {
-                // If child exists for this bit, follow it
-                tmp = tmp->getNextNode(cur);
+                curNode->children[curBit] = new TrieNode();
             }
-            else
-            {
-                // Otherwise create the child and move to it
-                tmp = tmp->put(cur);
-            }
+
+            curNode = curNode->children[curBit];
         }
     }
 
-    // Query the trie for the maximum XOR partner for 'num'.
-    // For each bit (MSB → LSB) prefer the opposite bit (1-cur) if present;
-    // that will set the corresponding XOR bit to 1. Otherwise follow the
-    // same bit path.
-    int max_XOR(int num)
+    /**
+     * @brief Greedily finds the maximum possible XOR for a given number.
+     * @param num The number we want to XOR against the Trie.
+     * @return The maximum XOR value achieved.
+     * * APPROACH:
+     * Starting from the MSB (31), we look at the current bit of `num`. To maximize XOR,
+     * we desperately want to find the opposite bit in the Trie (since 1^0=1 and 0^1=1).
+     * - If the opposite bit branch exists: We take it! We shift our running `maxXor`
+     * left by 1 and turn the new bit ON (| 1).
+     * - If the opposite bit branch does NOT exist: We are forced to take the matching bit.
+     * We shift our running `maxXor` left by 1, leaving the new bit OFF (0).
+     */
+    int getMaxXor(int num)
     {
+        TrieNode *curNode = root;
+        int maxXor = 0;
 
-        Node *tmp = root;
-        int max_XOR_val = 0;
-
-        for (int i = 31; i >= 0; i--)
+        for (int i = 31; i >= 0; --i)
         {
-            int probe = num >> i; // bring bit i to LSB
-            int cur = probe & 1;  // current bit of num
-            int needed = 1 - cur; // opposite bit to maximize XOR at this position
+            int curBit = (num >> i) & 1;
+            int oppBit = (!curBit);
 
-            if (tmp->keyExists(needed))
+            if (curNode->children[oppBit] != nullptr)
             {
-                // Opposite bit exists → we can set this bit in the XOR result
-                max_XOR_val = max_XOR_val | (1 << i);
-                tmp = tmp->getNextNode(needed);
+                maxXor = (maxXor << 1) | 1;
+                curNode = curNode->children[oppBit];
             }
             else
             {
-                // Opposite bit doesn't exist → fallback to same bit
-                tmp = tmp->getNextNode(cur);
+                maxXor = (maxXor << 1);
+                curNode = curNode->children[curBit];
             }
         }
 
-        return max_XOR_val;
+        return maxXor;
     }
 };
 
-#define P pair<pair<int, int>, int>
+// Alias to cleanly store {threshold_m, original_index_i, value_x}
+using T = tuple<int, int, int>;
 
 class Solution
 {
 public:
-    // -------------------------------------------------------------------------
-    // Problem: Maximum XOR With an Element From Array (LeetCode 1707)
-    //
-    // Intuition:
-    // - We are asked multiple queries (xi, mi): find max XOR of xi with an element
-    //   from nums[] that is ≤ mi. If no such element exists, return -1.
-    // - Naively checking all nums for each query is too slow (O(N*Q)).
-    // - Optimization:
-    //   1. Sort nums[] and queries by mi.
-    //   2. Process queries in increasing order of mi.
-    //   3. Maintain a Trie of numbers ≤ current mi.
-    //   4. For each query, insert new eligible nums into the Trie,
-    //      then query max XOR with xi using Trie.
-    //   5. If Trie is empty (no nums ≤ mi), answer is -1.
-    //
-    // Approach:
-    // - Each number and xi is treated as a 32-bit binary string.
-    // - Trie supports:
-    //      insert(num): insert binary digits of num into Trie.
-    //      max_XOR(xi): greedily match opposite bits to maximize XOR.
-    //
-    // Complexity:
-    // - Sorting nums: O(N log N)
-    // - Sorting queries: O(Q log Q)
-    // - Trie insertion: O(32*N) = O(N)
-    // - Trie query: O(32*Q) = O(Q)
-    // - Total: O(N log N + Q log Q + N + Q) ≈ O(N log N + Q log Q)
-    //
-    // Space:
-    // - Trie nodes: O(32*N) in worst case.
-    // - Extra arrays: O(N + Q).
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Finds the max XOR for queries bounded by a maximum element threshold 'm_i'.
+     * * APPROACH (Offline Queries):
+     * Deleting numbers from a Trie is difficult. Instead of processing queries in the
+     * order they are given, we process them "offline".
+     * 1. Sort the `nums` array in ascending order.
+     * 2. Store the original indices of the queries, then sort the queries based on their
+     * threshold `m` in ascending order.
+     * 3. Because `m` is strictly increasing, we can use a two-pointer approach. We iterate
+     * through the sorted queries and continuously `insert` numbers into the Trie as long
+     * as they are <= the current `m`. We never have to remove a number!
+     * 4. Query the Trie and store the result in the original index.
+     */
     vector<int> maximizeXor(vector<int> &nums, vector<vector<int>> &queries)
     {
 
-        int nn = nums.size();
-        int nq = queries.size();
+        // 1. Sort the data array
+        sort(nums.begin(), nums.end());
 
-        vector<int> ans(nq);
-        vector<P> modifiedQueries; // Store queries as {{mi, xi}, original_index}
+        int q = queries.size();
+        vector<T> offlineQueries;
 
-        // Step 1: Reformat queries -> pair {mi, xi} + original index
-        for (int i = 0; i < nq; i++)
+        // 2. Bind query data together to preserve the original index during sorting
+        for (int i = 0; i < q; ++i)
         {
-            modifiedQueries.push_back({{queries[i][1], queries[i][0]}, i});
+            int x = queries[i][0];
+            int m = queries[i][1];
+            offlineQueries.push_back({m, i, x});
         }
 
-        // Step 2: Sort nums ascending (for incremental insertion into Trie)
-        sort(nums.begin(), nums.end());
-        // Step 3: Sort queries by mi (so we process in increasing mi order)
-        sort(modifiedQueries.begin(), modifiedQueries.end());
+        // Sort queries by threshold 'm' (first element of the tuple)
+        sort(offlineQueries.begin(), offlineQueries.end());
 
-        Trie t;                            // binary Trie for numbers
-        int numsArrayIndex = 0;            // pointer in nums[]
-        int checkForSkip = numsArrayIndex; // track if Trie is empty (no insertion)
+        Trie trie;
 
-        // Step 4: Process queries one by one in order of increasing mi
-        for (int i = 0; i < modifiedQueries.size(); i++)
+        // Pre-fill answers with -1 to safely handle cases where the Trie remains empty
+        vector<int> ans(q, -1);
+
+        int numsIdx = 0;
+
+        // 3. Process the queries in increasing order of 'm'
+        for (int idx = 0; idx < q; ++idx)
         {
 
-            int mi = modifiedQueries[i].first.first;  // max value allowed
-            int xi = modifiedQueries[i].first.second; // query number
-            int index = modifiedQueries[i].second;    // original query index
+            // Unpack the tuple
+            auto [m, i, x] = offlineQueries[idx];
 
-            // Insert all nums[] ≤ current mi into the Trie
-            while (numsArrayIndex < nn && nums[numsArrayIndex] <= mi)
+            // Insert numbers into the Trie strictly up to the current threshold
+            while (numsIdx < nums.size() && nums[numsIdx] <= m)
             {
-                t.insert(nums[numsArrayIndex]);
-                numsArrayIndex++;
+                trie.insert(nums[numsIdx]);
+                ++numsIdx;
             }
 
-            // If no numbers inserted, Trie is empty → answer = -1
-            if (numsArrayIndex == checkForSkip)
+            // If numsIdx > 0, the Trie has at least one number, so it is safe to query
+            if (numsIdx > 0)
             {
-                ans[index] = -1;
-                continue;
+                int curMaxXor = trie.getMaxXor(x);
+                ans[i] = curMaxXor;
             }
-
-            // Step 5: Query Trie to get maximum XOR for xi
-            int max_limited_XOR_val = t.max_XOR(xi);
-            ans[index] = max_limited_XOR_val;
         }
 
         return ans;
     }
 };
+
 int main()
 {
     return 0;

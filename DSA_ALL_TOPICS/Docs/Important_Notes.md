@@ -815,11 +815,18 @@ Convert string of digits to num:
 ```
 Convert string of binary digits to int number:
 ```cpp
-     #include <bitset>
      #include <string>
      string str_num = "101";
      int num = stoi(str_num, nullptr, 2);
 ```
+
+Convert `bitset` to `int`:
+```cpp
+     int num = 10;
+     bitset<int> bits = bitset<32>(num);
+     int sameNum = static_cast<int>(bits.to_ulong());
+```
+
 Convert int number to string of binary digits:
 ```cpp
      #include <bitset>

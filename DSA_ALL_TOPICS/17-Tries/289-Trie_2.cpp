@@ -18,7 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Implement Trie - 2 : Advance : prefix counting
+1. Title: Implement Trie - 2 : Frequency Tries (Counting occurrences)
 
 Links:
 https://takeuforward.org/data-structure/implement-trie-ii/
