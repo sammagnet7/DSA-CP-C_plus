@@ -326,3 +326,4 @@
 3. [Minimum Cost to Convert String II](https://leetcode.com/problems/minimum-cost-to-convert-string-ii/description/?envType=daily-question&envId=2026-01-30)
 4. [Minimum Operations to Equalize Binary String](https://leetcode.com/problems/minimum-operations-to-equalize-binary-string/description/)
 5. [LIS optimized](https://leetcode.com/problems/maximum-balanced-subsequence-sum/description/)
+6. [Redo](https://leetcode.com/problems/maximum-walls-destroyed-by-robots/)
