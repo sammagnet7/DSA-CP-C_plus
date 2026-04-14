@@ -100,131 +100,167 @@ OUTPUT::::::
 // 1. Title: Maximum Walls Destroyed by Robots
 //-------------------------------------------------------------------------------
 
-/**
- * ============================================================================
- * Approach: Top-Down DP (State Machine) + Binary Search + Range Pre-computation
- * ============================================================================
- * Concept:
- * Break the problem down into two clean phases:
- * 1. Pre-computation: We calculate the absolute maximum boundary `[L, R]` each
- * robot's bullet can reach before it is blocked by adjacent robots.
- * 2. State Machine DP: We iterate through the robots. For each robot, we decide
- * whether to fire Left or Right. We use the previous robot's decision
- * (`prevDir`) to dynamically adjust the current robot's Left bound, ensuring
- * we never double-count a wall.
- * ============================================================================
- * Complexity:
- * - Time: O(N log N + W log W + N * log W). Sorting the robots and walls takes
- * N log N and W log W. The DP visits N states exactly once (since prevDir
- * only has 2 states), and each state does an O(log W) binary search.
- * - Space: O(N) for the memoization table, range array, and recursion stack.
- * ============================================================================
- */
-
 using P = pair<int, int>;
 
 class Solution
 {
-public:
-  // Memoization table: t[robot_index][previous_robot_direction]
-  vector<vector<int>> t;
+private:
+  vector<P> robo_dist;
+  vector<int> sorted_walls;
+  int r;
+  vector<vector<int>> dp;
 
-  // Helper: O(log W) query to count walls strictly within the interval [l, r]
-  int countWalls(vector<int> &walls, int l, int r)
+  /**
+   * ============================================================================
+   * Method: brokenWallsCountInRange
+   * ============================================================================
+   * Intuition: Since walls are sorted, finding the number of walls in a range
+   * is equivalent to finding the difference between their index boundaries.
+   * * Logic: Uses std::lower_bound to find the first wall >= left_range, and
+   * std::upper_bound to find the first wall > right_range. Subtracting the
+   * iterators gives the exact count of walls inside [left_range, right_range].
+   * * Time: O(log W) per call.
+   * Space: O(1).
+   * ============================================================================
+   */
+  int brokenWallsCountInRange(int left_range, int right_range)
   {
-    auto left = lower_bound(walls.begin(), walls.end(), l);
-    auto right = upper_bound(walls.begin(), walls.end(), r);
+    auto left_point = lower_bound(sorted_walls.begin(), sorted_walls.end(), left_range);
+    auto right_point = upper_bound(sorted_walls.begin(), sorted_walls.end(), right_range);
 
-    // The distance between the upper and lower iterators is exactly
-    // the number of elements falling within the inclusive range.
-    return right - left;
+    return right_point - left_point;
   }
 
-  int solve(vector<int> &walls, vector<P> &roboDist, vector<P> &range, int i, int prevDir)
+  /**
+   * ============================================================================
+   * Method: solve (Recursive State Machine)
+   * ============================================================================
+   * Intuition:
+   * The core realization is that bullets stop when they hit other robots.
+   * This means the infinite number line can be chunked into isolated segments
+   * between adjacent robots. If we dynamically cap the bullet range of the
+   * current robot so it never crosses the physical position (or the bullet path)
+   * of the previous/next robot, we guarantee that no wall is ever double-counted.
+   * * Logic:
+   * 1. Check the memoization table `dp` for the state [roboidx][prev_fired_right].
+   * 2. Calculate `cur_left_range`:
+   * - If the previous robot fired Right, our Left bullet must start strictly
+   * after where the previous bullet stopped.
+   * - If it fired Left, the space is clear, so our Left bullet just stops
+   * at the previous robot's physical body.
+   * 3. Calculate `cur_right_range`:
+   * - Our Right bullet travels its full distance, but stops exactly 1 unit
+   * before hitting the next robot's physical body.
+   * 4. Use Binary Search (`brokenWallsCountInRange`) to count the walls destroyed
+   * in both scenarios (firing Left vs. firing Right).
+   * 5. Recursively compute the best future outcome for both choices and return
+   * the maximum.
+   * * Time Complexity: O(R * log W)
+   * There are R robots and 2 possible states for `prev_fired_right`, leading
+   * to exactly 2*R unique DP states. For each state, we perform an O(log W)
+   * binary search to count walls.
+   * * Space Complexity: O(R)
+   * The recursive call stack goes up to maximum depth R.
+   * ============================================================================
+   */
+  int solve(int roboidx, bool prev_fired_right)
   {
 
-    // Base Case: We have evaluated every robot
-    if (i == roboDist.size())
-      return 0;
-
-    // Return cached result if this state was already computed
-    if (t[i][prevDir] != -1)
-      return t[i][prevDir];
-
-    // Retrieve the pre-computed maximum leftward reach for this robot
-    int leftStart = range[i].first;
-
-    // --------------------------------------------------------
-    // CRITICAL OVERLAP PREVENTION:
-    // --------------------------------------------------------
-    // If the previous robot fired Right (prevDir == 1), its bullet destroyed
-    // everything up to `range[i-1].second`. To prevent double-counting
-    // those walls, we must restrict our current Left bullet to start strictly
-    // after the previous bullet's stopping point (+1).
-    if (prevDir == 1)
+    if (roboidx == r)
     {
-      leftStart = max(leftStart, range[i - 1].second + 1);
+      return 0;
     }
 
-    // Option A: Fire Left
-    // Count walls destroyed to the left, then move to the next robot.
-    // Pass `0` to signal the next robot that we fired Left.
-    int leftTake = countWalls(walls, leftStart, roboDist[i].first) + solve(walls, roboDist, range, i + 1, 0);
+    if (dp[roboidx][prev_fired_right] != -1)
+    {
+      return dp[roboidx][prev_fired_right];
+    }
 
-    // Option B: Fire Right
-    // Count walls destroyed to the right, then move to the next robot.
-    // Pass `1` to signal the next robot that we fired Right.
-    int rightTake = countWalls(walls, roboDist[i].first, range[i].second) + solve(walls, roboDist, range, i + 1, 1);
+    auto [cur_robo_pos, cur_fire_dist] = robo_dist[roboidx];
 
-    // Cache and return the best choice
-    return t[i][prevDir] = max(leftTake, rightTake);
+    int cur_left_range = cur_robo_pos;
+    int cur_right_range = cur_robo_pos;
+
+    // --- Left Boundary Calculation ---
+    if (prev_fired_right)
+    {
+      int prev_robo_pos = robo_dist[roboidx - 1].first;
+      int prev_fire_dist = robo_dist[roboidx - 1].second;
+      int prev_right_range = min(prev_robo_pos + prev_fire_dist, cur_robo_pos - 1);
+
+      cur_left_range = max(cur_robo_pos - cur_fire_dist, prev_right_range + 1);
+    }
+    else
+    {
+      int prev_robo_pos = 0;
+      if (roboidx != 0)
+      {
+        prev_robo_pos = robo_dist[roboidx - 1].first;
+      }
+      cur_left_range = max(prev_robo_pos + 1, cur_robo_pos - cur_fire_dist);
+    }
+
+    // --- Right Boundary Calculation ---
+    if (roboidx < r - 1)
+    {
+      int next_robo_pos = robo_dist[roboidx + 1].first;
+      cur_right_range = min(cur_robo_pos + cur_fire_dist, next_robo_pos - 1);
+    }
+    else
+    {
+      cur_right_range = cur_robo_pos + cur_fire_dist;
+    }
+
+    // --- State Transitions ---
+    int fire_left = brokenWallsCountInRange(cur_left_range, cur_robo_pos) + solve(roboidx + 1, false);
+
+    int fire_right = brokenWallsCountInRange(cur_robo_pos, cur_right_range) + solve(roboidx + 1, true);
+
+    return dp[roboidx][prev_fired_right] = max(fire_left, fire_right);
   }
 
+public:
+  /**
+   * ============================================================================
+   * Method: maxWalls
+   * ============================================================================
+   * Intuition:
+   * To process the robots from left to right, we must first sort them by their
+   * physical coordinates on the 1D line. Sorting the walls allows us to use
+   * lightning-fast binary searches to count destroyed walls within any range.
+   * * Logic:
+   * 1. Bundle `robots[i]` and `distance[i]` into pairs so their distances move
+   * with them when sorted by position.
+   * 2. Sort the robots array and the walls array in ascending order.
+   * 3. Initialize the DP table with dimensions (R + 1) x 2, filled with -1.
+   * 4. Trigger the recursive `solve` function starting at the 0th robot.
+   * * Time Complexity: O(R log R + W log W)
+   * Sorting the robots takes O(R log R) and sorting the walls takes O(W log W).
+   * Combined with the solve() method, the total Time Complexity is
+   * O(R log R + W log W + R log W).
+   * * Space Complexity: O(R + W)
+   * We allocate O(R) space for the `robo_dist` pairs and `dp` table, and
+   * O(W) space for the `sorted_walls` copy.
+   * ============================================================================
+   */
   int maxWalls(vector<int> &robots, vector<int> &distance, vector<int> &walls)
   {
 
-    int n = robots.size();
+    r = robots.size();
 
-    // Pair each robot's position with its bullet distance so they move
-    // together when we sort by position.
-    vector<P> roboDist(n);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < r; ++i)
     {
-      roboDist[i] = {robots[i], distance[i]};
+      robo_dist.push_back({robots[i], distance[i]});
     }
 
-    sort(begin(roboDist), end(roboDist));
-    sort(begin(walls), end(walls));
+    sorted_walls = walls;
 
-    // --------------------------------------------------------
-    // Phase 1: Prepare the maximum physical ranges
-    // --------------------------------------------------------
-    vector<P> range(n);
+    sort(robo_dist.begin(), robo_dist.end());
+    sort(sorted_walls.begin(), sorted_walls.end());
 
-    for (int i = 0; i < n; i++)
-    {
-      int pos = roboDist[i].first;
-      int d = roboDist[i].second;
+    dp.assign(r + 1, vector<int>(2, -1));
 
-      // Determine the physical coordinates of the adjacent robots.
-      // If there is no robot to the left/right, use the problem's constraints.
-      int leftLimit = (i == 0) ? 1 : roboDist[i - 1].first + 1;
-      int rightLimit = (i == n - 1) ? 1e9 : roboDist[i + 1].first - 1;
-
-      // A bullet stops at either its max distance `d`, or when it hits
-      // the adjacent robot's limit boundary.
-      int L = max(pos - d, leftLimit);
-      int R = min(pos + d, rightLimit);
-
-      range[i] = {L, R};
-    }
-
-    // Initialize memoization table: N states, 2 possible previous directions
-    t.assign(n + 1, vector<int>(2, -1));
-
-    // Start recursion: At index 0, the "previous" direction doesn't matter
-    // because there is no previous robot to overlap with. Passing 0 is safe.
-    return solve(walls, roboDist, range, 0, 0);
+    return solve(0, false);
   }
 };
 
