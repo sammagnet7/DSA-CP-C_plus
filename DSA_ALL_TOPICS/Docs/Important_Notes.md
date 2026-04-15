@@ -1253,4 +1253,17 @@ The std::string::erase() function has overloads that take a starting position (i
      * **Example (4-way directions):** `dir = (dir - 1 + 4) % 4; // Safely wraps 0 down to 3`.
 
 56. The perimeter of a m * n matrix would be: ` [ 2 * (m-1) + 2 * (n-1) ]`
+    
+57. **`contains()` vs `find()`:** Use `str.contains(target)` (C++23) for a clean boolean return, but default to `str.find(target) != std::string::npos` for universal compatibility across older C++ environments.
+
+     ```cpp
+     string s = "hello world", target = "world";
+
+     // Modern (C++23+): Direct boolean evaluation
+     bool modernCheck = s.contains(target); 
+
+     // Universal Standard (C++20 and older): Check if index is not 'npos' (end of string)
+     bool legacyCheck = s.find(target) != string::npos;
+     ```
+58. 
 ---
