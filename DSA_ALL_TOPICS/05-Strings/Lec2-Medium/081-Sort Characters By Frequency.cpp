@@ -47,50 +47,78 @@ cccaaa
 Aabb
 
 OUTPUT::::::
-eetr 
-cccaaa 
+eetr
+cccaaa
 bbaA
 
 -----------------------------------------------------------------------
 
  */
+
+using namespace std;
+
+// Type Aliasing: Clean, modern C++ practice for readability
+using P = pair<int, int>;
+
 class Solution
 {
 public:
-    //-----------------------------------------------------------------------
-    // Optimal approach
-    // Time: O(N)
-    // Space: O(N)
+    /**
+     * @brief Sorts characters by their frequency in descending order.
+     * * * 🧠 IDEA & INTUITION:
+     * Sorting a string of 500,000 characters using standard sorting algorithms
+     * takes O(N log N) time, which is too slow. Instead, we use a Frequency Map.
+     * Because there are only 256 possible ASCII characters, we map them to a
+     * fixed-size array. We then sort this tiny 256-element array based on
+     * frequency. Finally, we reconstruct the string using the sorted counts.
+     * * * ⏱️ COMPLEXITY:
+     * - Time Complexity: O(N). Counting characters takes O(N). Sorting the fixed
+     * 256-element array takes O(1) time (since 256 log 256 is a mathematical constant).
+     * Rebuilding the string takes O(N). Total = O(N) linear time.
+     * - Space Complexity: O(1) auxiliary space. We use exactly 256 pairs, which
+     * never scales up regardless of how large the input string gets.
+     * (Note: The O(N) space for the returned string is not counted against auxiliary space).
+     */
     string frequencySort(string s)
     {
-        int N = s.size();
 
-        vector<pair<int, int>> freq(256, make_pair(0, 0)); // < <freq,char> >
+        // Allocate a fixed vector of 256 elements for all possible ASCII characters
+        vector<P> freq(256);
 
-        // O(N)
-        for (int i = 0; i < N; i++)
+        // 1. Initialize the pairs {character_ascii, count}
+        for (int i = 0; i < 256; ++i)
         {
-            int curChar = s[i];
-            int count = freq[curChar].first;
-            count++;
-            freq[curChar] = {count, curChar};
+            freq[i] = {i, 0};
         }
 
-        // O(1) as freq arr is of size 256
-        sort(freq.begin(), freq.end());
-
-        // #include<functional>
-        // sort(freq.begin(), freq.end(), greater<pair<int,int>>());
-
-        string ans;
-
-        for (int i = 255; i >= 0; i--)
+        // 2. Count the frequencies in a single pass
+        for (char c : s)
         {
-            int frequency = freq[i].first;
-            char thisChar = freq[i].second;
+            freq[c].second += 1;
+        }
 
-            ans.append(frequency, thisChar); // DO NOT USE string concat here,
-                                             // as it creates new strings every time
+        // 3. Sort by frequency descending using a custom lambda comparator
+        sort(freq.begin(), freq.end(), [](const auto &a, const auto &b)
+             { return a.second > b.second; });
+
+        string ans = "";
+
+        // ⚙️ OPTIMIZATION 1 (Memory): Pre-allocate exact memory needed to
+        // prevent expensive dynamic array resizing under the hood.
+        ans.reserve(s.length());
+
+        // 4. Build the result using C++17 Structured Bindings
+        for (auto [idx, fr] : freq)
+        {
+
+            // ⚙️ OPTIMIZATION 2 (Speed): If frequency is 0, we can stop entirely
+            // because the rest of the array is sorted descending to 0.
+            if (fr == 0)
+                break;
+
+            // ⚙️ OPTIMIZATION 3 (Speed): Write 'fr' number of characters directly
+            // to memory in one operation instead of using a slow while-loop.
+            ans.append(fr, (char)idx);
         }
 
         return ans;
