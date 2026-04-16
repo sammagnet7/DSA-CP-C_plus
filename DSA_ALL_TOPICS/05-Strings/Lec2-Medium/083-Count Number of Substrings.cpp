@@ -19,8 +19,9 @@ Links:
 https://www.youtube.com/watch?v=xtqN4qlgr8s&list=PLgUwDviBIf0q7vrFA_HEWcqRqMpCXzYAL&index=9
 https://takeuforward.org/plus/dsa/problems/number-of-substrings-containing-all-three-characters?tab=editorial
 
-https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/
 https://www.naukri.com/code360/problems/count-substring-with-abc_8160465
+https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/
+
 
 Problem statement:
 Given a string s consisting only of characters a, b and c.
@@ -28,36 +29,24 @@ Given a string s consisting only of characters a, b and c.
 Return the number of substrings containing at least one occurrence of all these characters a, b and c.
 
 
-Eaxamples:
-    Example 1:
+Example 1:
     Input: s = "abcabc"
     Output: 10
     Explanation: The substrings containing at least one occurrence of the characters a, b and c are "abc", "abca", "abcab", "abcabc", "bca", "bcab", "bcabc", "cab", "cabc" and "abc" (again).
-class Solution {
-public:
-    //-----------------------------------------------------------------------
 
-    // Optimal approach: Recursive
-    // Time: O(N)
-    // Space: O(1)
-    int myAtoi(string s)
-    {
-
-…    //     return recursiveAtoI(s, 0, 1, 0, false);
-    // }
-};
-    Example 2:
+Example 2:
     Input: s = "aaacb"
     Output: 3
     Explanation: The substrings containing at least one occurrence of the characters a, b and c are "aaacb", "aacb" and "acb".
 
-    Example 3:
+Example 3:
     Input: s = "abc"
     Output: 1
 
-    Example 4:
-    Input: s = "acbbcac"
-    Output: 11
+
+Constraints:
+    3 <= s.length <= 5 x 10^4
+    s only consists of a, b or c characters.
 
 
 INPUT::::::
@@ -70,81 +59,117 @@ OUTPUT::::::
 class Solution
 {
 public:
-    // -------------------------------------------------------------------------------------------
-    // Number of Substrings Containing All Three Characters
-    // Approach1:
-    //
+    //-----------------------------------
+    // Approach 1: Sliding window 2 pass [Sub-optimal]
+    //-----------------------------------
 
-    // Optimal approach: Two pointer approach: 2 pass
-    // Time: O(2N)
-    // Space: O(3)
+    /**
+     * @brief Calculates valid substrings using a traditional Sliding Window.
+     * * * 🧠 INTUITION & APPROACH:
+     * We use a two-pointer approach (left 'l' and right 'r') to create a "window".
+     * 1. Expand the window by moving 'r' to the right and adding characters to our frequency map.
+     * 2. The moment our window becomes VALID (contains at least one 'a', 'b', and 'c'):
+     * - Every substring starting at 'l' and ending anywhere from 'r' to the end of
+     * the string (n-1) is mathematically guaranteed to be valid.
+     * - Therefore, we can instantly add `n - r` to our answer.
+     * 3. Shrink the window by removing the character at 'l' and moving 'l' forward
+     * to see if we can find a smaller valid window.
+     * * * ⏱️ COMPLEXITY:
+     * - Time Complexity: O(N) where N is the string length. Both 'l' and 'r' only
+     * move forward, meaning we process each character at most twice.
+     * - Space Complexity: O(1) auxiliary space. The vector is fixed at size 3.
+     */
     int numberOfSubstrings(string s)
     {
 
-        int N = s.size();
+        int n = s.length();
+
+        // Fixed frequency map for 'a', 'b', and 'c'
+        vector<int> freq(3, 0);
+
         int ans = 0;
+        int l = 0, r = 0;
 
-        int l = 0;
-        int r = 0;
+        // Iterate through the string with the right pointer
+        while (r < n)
+        {
 
-        vector<int> lastSeen(3, 0); // O(3)
+            // 1. EXPAND: Add the current character to our window
+            ++freq[s[r] - 'a'];
 
-        while (r < N)
-        { // O(N)
+            // 2. EVALUATE: While the window is valid, mathematically calculate the permutations
+            while (freq[0] > 0 && freq[1] > 0 && freq[2] > 0)
+            {
 
-            lastSeen[s[r] - 'a']++;
+                // If the substring from l to r is valid, then extending it further
+                // right up to the end of the string 'n' will also be valid.
+                ans += (n - r);
 
-            while (lastSeen['a' - 'a'] >= 1 && lastSeen['b' - 'a'] >= 1 && lastSeen['c' - 'a'] >= 1)
-            { // O(N)
-                ans += (N - r);
-                lastSeen[s[l] - 'a']--;
-                l++;
+                // 3. SHRINK: Remove the leftmost character and move the left pointer
+                --freq[s[l] - 'a'];
+                ++l;
             }
 
-            r++;
+            // Move right pointer to evaluate the next character
+            ++r;
         }
 
         return ans;
     }
 
-    // ------------------------------------------------------
-    // Approach2:
-    //
+    //----------------------------------------------------
+    // Approach 2: Track last seen index: 1 Pass [OPTIMAL]
+    //----------------------------------------------------
 
-    // // Optimal approach: Two pointer approach: single pass
-    // Step1: For every char find minimum window left of it, having all the three chars ending at that char
-    //
-    // Time: O(N)
-    // Space: O(1)
+    /**
+     * @brief Calculates substrings containing at least one 'a', 'b', and 'c'.
+     * * * 🧠 INTUITION & APPROACH:
+     * Instead of a shrinking sliding window, we track the most recent index where
+     * we saw each character. At any given index `i`, if we have seen all three
+     * characters, the "bottleneck" (the furthest we have to look back to secure
+     * all three) is the minimum of their last seen indices.
+     * Any string starting at `0, 1, 2... min_idx` and ending at `i` contains
+     * all three characters. Thus, we add `min_idx + 1` to our total count.
+     * * * ⏱️ COMPLEXITY:
+     * - Time Complexity: O(N) where N is the length of the string. We iterate
+     * through the string exactly once.
+     * - Space Complexity: O(1) auxiliary space. We use a fixed array of size 3.
+     */
     int numberOfSubstrings(string s)
     {
 
-        int N = s.size();
-        int ans = 0;
+        // Fixed array to track the last seen index of 'a', 'b', and 'c'.
+        // We initialize with -1 to safely indicate "this character hasn't appeared yet".
+        int lastSeen[3] = {-1, -1, -1};
+        int count = 0;
 
-        vector<int> lastSeen(3, -1); // O(3): stores last seen indexes of char
+        for (int i = 0; i < s.length(); ++i)
+        {
 
-        int r = 0;
+            // 1. UPDATE STATE: Record the current index for this specific character.
+            // s[i] - 'a' maps 'a'->0, 'b'->1, 'c'->2.
+            lastSeen[s[i] - 'a'] = i;
 
-        while (r < N)
-        { // O(N)
-
-            lastSeen[s[r] - 'a'] = r; // storing last seen index for char s[r]
-
-            if (lastSeen['a' - 'a'] >= 0 && lastSeen['b' - 'a'] >= 0 && lastSeen['c' - 'a'] >= 0)
+            // 2. CHECK VALIDITY: Have all three characters appeared at least once?
+            if (lastSeen[0] != -1 && lastSeen[1] != -1 && lastSeen[2] != -1)
             {
 
-                int windowMinIdx = min(lastSeen[0], min(lastSeen[1], lastSeen[2]));
+                // 3. FIND THE BOTTLENECK:
+                // The minimum of these three indices tells us the closest we can get
+                // to the start of the string while STILL capturing an 'a', 'b', and 'c'.
+                int minIdx = min({lastSeen[0], lastSeen[1], lastSeen[2]});
 
-                int countEndingHere = windowMinIdx - 0 + 1;
-
-                ans += countEndingHere;
+                // 4. THE MATHEMATICAL TRICK:
+                // If a valid substring ending at 'i' can start as late as 'minIdx',
+                // then it is mathematically guaranteed that starting at any index BEFORE
+                // 'minIdx' (like minIdx-1, minIdx-2... all the way to 0) will also be valid!
+                // Because arrays are 0-indexed, there are exactly `minIdx + 1` valid
+                // starting positions.
+                count += (minIdx + 1);
             }
-
-            r++;
         }
 
-        return ans;
+        return count;
     }
 };
 
