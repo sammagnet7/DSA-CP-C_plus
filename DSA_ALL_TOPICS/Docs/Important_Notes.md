@@ -1265,5 +1265,18 @@ The std::string::erase() function has overloads that take a starting position (i
      // Universal Standard (C++20 and older): Check if index is not 'npos' (end of string)
      bool legacyCheck = s.find(target) != string::npos;
      ```
-58. 
+58. Min distance in a circular array: 
+    ```cpp
+          // Helper to calculate the shortest path on a circular track (DRY Principle)
+          int getCircularDistance(int a, int b, int n) {
+               int straight_dist = abs(a - b);
+               int circular_dist = n - straight_dist;
+               return min(straight_dist, circular_dist);
+          }
+    ```
+
+59. Get the index of `lower_bound` returned `iterator`:
+     ```cpp
+          int idx = lower_bound(arr.begin(), arr.end(), target) - arr.begin();
+     ```
 ---
