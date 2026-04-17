@@ -18,41 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: Minimum number of bracket reversals needed to make an expression balanced
-
-Links:
-https://takeuforward.org/plus/dsa/problems/minimum-number-of-bracket-reversals-to-make-an-expression-balanced?tab=editorial
-https://www.geeksforgeeks.org/problems/count-the-reversals0401/1
-
-
-Problem statement:
-Given a string s consisting of only opening and closing curly brackets '{' and '}', find out the minimum number of reversals required to convert the string into a balanced expression. A reversal means changing '{' to '}' or vice-versa.
-
-Examples:
-    Input: s = "}{{}}{{{"
-    Output: 3
-    Explanation: One way to balance is:
-    "{{{}}{}}". There is no balanced sequence
-    that can be formed in lesser reversals.
-
-    Input: s = "{{}{{{}{{}}{{"
-    Output: -1
-    Explanation: There's no way we can balance
-    this sequence of braces.
-
-Constraints:
-    1 ≤ |s| ≤ 105
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
-
-----------------------------------------------------------------------------------------------------
-
-2. Title: Minimum Add to Make Parentheses Valid
+1. Title: Minimum Add to Make Parentheses Valid
 
 
 Links:
@@ -93,154 +59,175 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
+2. Title: Minimum number of bracket reversals needed to make an expression balanced
+
+Links:
+https://takeuforward.org/plus/dsa/problems/minimum-number-of-bracket-reversals-to-make-an-expression-balanced?tab=editorial
+https://www.geeksforgeeks.org/problems/count-the-reversals0401/1
+
+
+Problem statement:
+Given a string s consisting of only opening and closing curly brackets '{' and '}', find out the minimum number of reversals required to convert the string into a balanced expression. A reversal means changing '{' to '}' or vice-versa.
+
+Examples:
+    Input: s = "}{{}}{{{"
+    Output: 3
+    Explanation: One way to balance is: "{{{}}{}}".
+    There is no balanced sequence that can be formed in lesser reversals.
+
+    Input: s = "{{}{{{}{{}}{{"
+    Output: -1
+    Explanation: There's no way we can balance this sequence of braces.
+
+Constraints:
+    1 ≤ |s| ≤ 10^5
+
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
+----------------------------------------------------------------------------------------------------
+
 */
 
-//-------------------------------------------------------------------------------
-// 1. Title: Minimum number of bracket reversals needed to make an expression balanced
-//-------------------------------------------------------------------------------
-//
-
 class Solution
 {
 public:
-    // -------------------------------------------------------------------------
-    // Problem: Count minimum reversals needed to balance a string of '{' and '}'
-    //
-    // Intuition:
-    // - We are given a string consisting of only '{' and '}'.
-    // - We need to make the string balanced (properly matched braces) using
-    //   the minimum number of reversals of braces.
-    // - For example: "}{" → reverse either of them → "{}" → 1 reversal.
-    //
-    // Approach:
-    // 1. Traverse the string once.
-    // 2. Maintain two counters:
-    //      lc = count of unmatched '{'
-    //      rc = count of unmatched '}'
-    // 3. When we see '{', increment lc.
-    // 4. When we see '}', if there is an unmatched '{' (lc > 0),
-    //    we can match it (decrement lc). Otherwise, this '}' is unmatched,
-    //    so increment rc.
-    // 5. At the end of traversal, lc = unmatched '{', rc = unmatched '}'.
-    // 6. If (lc + rc) is odd, balancing is impossible → return -1.
-    // 7. Otherwise:
-    //      - If lc and rc are even → answer = (lc + rc)/2
-    //      - If lc and rc are odd → one extra reversal is required
-    //        → answer = (lc + rc)/2 + 1
-    //
-    // Complexity:
-    // - Time: O(N), one pass over the string.
-    // - Space: O(1), just counters.
-    // -------------------------------------------------------------------------
-    int countMinReversals(string s)
-    {
-        int n = s.size();
+    //-------------------------------------------------------------------------------
+    // 1. Title: Minimum Add to Make Parentheses Valid
+    //-------------------------------------------------------------------------------
 
-        // If braces is odd → impossible to balance
-        if (n % 2 != 0)
-            return -1;
-
-        int lc = 0; // counts unmatched '{'
-        int rc = 0; // counts unmatched '}'
-
-        // Traverse string
-        for (int i = 0; i < n; i++)
-        {
-            if (s[i] == '{')
-            {
-                lc++; // new '{' → unmatched for now
-            }
-            else if (s[i] == '}')
-            {
-                if (lc > 0)
-                {
-                    lc--; // match this '}' with a previous unmatched '{'
-                }
-                else
-                {
-                    rc++; // no unmatched '{' → this '}' is unmatched
-                }
-            }
-        }
-
-        // If both are even → half reversals needed
-        if (lc % 2 == 0)
-        {
-            return (lc + rc) / 2;
-        }
-        else
-        {
-            // If odd → one extra reversal needed
-            return (lc + rc) / 2 + 1;
-        }
-    }
-};
-
-//-------------------------------------------------------------------------------
-// 2. Title: Minimum Add to Make Parentheses Valid
-//-------------------------------------------------------------------------------
-//
-
-class Solution
-{
-public:
-    // -------------------------------------------------------------------------
-    // Problem: Minimum Additions to Make Parentheses Valid (LC 921)
-    //
-    // Intuition:
-    // - We are given a string with only '(' and ')'.
-    // - A valid parentheses string means:
-    //     - Every '(' has a matching ')'.
-    //     - Order must be correct (no extra closing before an opening).
-    // - If the string is not valid, we need to add the minimum number of
-    //   parentheses to make it valid.
-    //
-    // Approach:
-    // 1. Traverse the string once.
-    // 2. Maintain:
-    //      lc = count of unmatched '('
-    //      rc = count of unmatched ')'
-    // 3. For every '(' → increment lc.
-    // 4. For every ')' →
-    //      - if lc > 0 → match it with an existing '(' (decrement lc).
-    //      - else → this ')' is unmatched, so increment rc.
-    // 5. At the end:
-    //      - lc = remaining unmatched '('.
-    //      - rc = remaining unmatched ')'.
-    // 6. To make the string valid, we must add (lc + rc) parentheses.
-    //
-    // Complexity:
-    // - Time: O(N) for one pass.
-    // - Space: O(1), only counters used.
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Calculates the minimum additions to make a parentheses string valid.
+     * * * 🧠 INTUITION & APPROACH:
+     * A valid parentheses string requires every '(' to have a matching ')', and
+     * the order must be strictly preserved (no closing bracket before an opening one).
+     * If the string is invalid, we simply need to count how many brackets are left
+     * unmatched and add that exact amount.
+     * 1. Traverse the string once, maintaining counts for unmatched '(' and ')'.
+     * 2. For every '(', we increment our left-count (`lc`) tracker.
+     * 3. For every ')', we check if we have a pending '(' to cancel it out.
+     * - If yes (`lc > 0`), we match them and decrement `lc`.
+     * - If no, this ')' is permanently unmatched, so we increment `rc`.
+     * 4. By the end of the string, all valid pairs have annihilated each other.
+     * The total additions required is simply the sum of the remaining residues.
+     * * * ⏱️ COMPLEXITY:
+     * - Time: O(N) for a single pass through the string.
+     * - Space: O(1) auxiliary space, utilizing only two integer variables.
+     */
     int minAddToMakeValid(string s)
     {
-        int n = s.size();
 
-        int lc = 0; // counts unmatched '('
-        int rc = 0; // counts unmatched ')'
+        int n = s.length(); // .size() or .length() both compile to the same O(1) call
+
+        int lc = 0; // Tracks unmatched opening brackets '('
+        int rc = 0; // Tracks unmatched closing brackets ')'
 
         for (int i = 0; i < n; i++)
         {
+
             if (s[i] == '(')
             {
-                lc++; // new '(' unmatched so far
+                // New opening bracket waiting for a match
+                lc++;
             }
             else if (s[i] == ')')
             {
+
+                // Does this closing bracket have an opening pair?
                 if (lc > 0)
                 {
-                    lc--; // match with a previous '('
+                    lc--; // Match found, cancel them out
                 }
                 else
                 {
-                    rc++; // unmatched ')'
+                    rc++; // No opening bracket available, this is unmatched
                 }
             }
         }
 
-        // total unmatched '(' + unmatched ')' = additions needed
+        // Total additions needed is the sum of both unmatched sets
         return (lc + rc);
+    }
+
+    //------------------------------------------------------------------------------------
+    // 2. Title: Minimum number of bracket reversals needed to make an expression balanced
+    //------------------------------------------------------------------------------------
+    /**
+     * @brief Finds the minimum reversals required to balance a bracket string.
+     * * 🧠 INTUITION & APPROACH:
+     * To balance the string with the minimum number of reversals, we must first
+     * eliminate all the brackets that are ALREADY balanced.
+     *
+     * * Step 1: Filter out the noise.
+     * As we iterate through the string, we cancel out any valid `{}` pairs.
+     * Whatever is left over is the "residue" of unmatched brackets. Because all
+     * valid pairs are gone, this residue will always look exactly like this:
+     * `} } } ... { { {` (Unmatched closing brackets, followed by unmatched opening brackets).
+     *
+     * * Step 2: The Reversal Math.
+     * Let `lc` be the number of unmatched '{' and `rc` be the number of unmatched '}'.
+     * - If we have an even number of unmatched brackets of the same type (e.g., `{{`),
+     * we only need to reverse half of them to balance the pair (`{}`). Math: 2 / 2 = 1.
+     *
+     * - If we have an odd number (e.g., `{{{`), we can fix the first two with 1 reversal (`{}{`),
+     * but the leftover `{` will need to pair with a leftover `}` from the other side.
+     * This requires an extra reversal.
+     *
+     * - Therefore, taking the ceiling of the count divided by 2 elegantly handles
+     * both even and odd residues: `ceil(count / 2.0)`.
+     *
+     * * ⏱️ COMPLEXITY:
+     * - Time Complexity: O(N) where N is the length of the string.
+     * - Space Complexity: O(1) auxiliary space. We use two integer trackers instead of a Stack.
+     */
+    int countMinReversals(string s)
+    {
+
+        int n = s.length();
+        int ans = -1;
+
+        // 1. Odd length check: An odd-length string can mathematically never be balanced.
+        if (n % 2 != 0)
+        {
+            return ans;
+        }
+
+        int lc = 0; // Tracks unmatched opening brackets '{' (left count)
+        int rc = 0; // Tracks unmatched closing brackets '}' (right count)
+
+        // 2. Iterate through the string to cancel out valid pairs
+        for (int i = 0; i < n; ++i)
+        {
+            char c = s[i];
+
+            if (c == '{')
+            {
+                // We found an opening bracket, it is now waiting for a match
+                ++lc;
+            }
+            else if (c == '}')
+            {
+                // We found a closing bracket. Does it have an opening bracket to pair with?
+                if (lc > 0)
+                {
+                    // Match found! Cancel the pending opening bracket.
+                    --lc;
+                    continue;
+                }
+
+                // No opening bracket available. This is an unmatched closing bracket.
+                ++rc;
+            }
+        }
+
+        // 3. Apply the ceiling math formula to the remaining unmatched residue
+        ans = ceil(lc / 2.0) + ceil(rc / 2.0);
+
+        return ans;
     }
 };
 
