@@ -326,7 +326,7 @@ public:
      *
      * * 🧠 THE INTUITION (The Two-Pointer State Machine):
      * View KMP as a sophisticated Two-Pointer algorithm:
-     * - `li` (Left Index): Tracks the length of our currently matched prefix. Because
+     * - `len` (Length Pointer): Tracks the length of our currently matched prefix. Because
      * arrays are 0-indexed, it ALSO represents the index of the next character in the
      * PATTERN we need to match!
      * - `i` (Right Index): Scans steadily forward through the text. It NEVER moves backward.
@@ -338,23 +338,23 @@ public:
      * * Example: Pattern = "A B C A B Y"
      * If we match "ABCAB" but fail on 'Y', we look at the LPS value for the previous
      * character ('B'). It tells us: "You just matched an 'AB' at the end of your streak,
-     * which matches the 'AB' at the start of your pattern! Just slide your Left Index (`li`)
+     * which matches the 'AB' at the start of your pattern! Just slide your `len` pointer
      * back to index 2 and keep going!"
      * * 🚀 STEP-BY-STEP EXECUTION:
      * PHASE 1: Build the LPS Array
-     * We run our Two Pointers (`li` and `i`) over the pattern itself. If they match,
+     * We run our Two Pointers (`len` and `i`) over the pattern itself. If they match,
      * the prefix grows. If they mismatch, we use the previously computed LPS values to
-     * safely slide `li` backward until we find a smaller matching prefix, or hit 0.
+     * safely slide `len` backward until we find a smaller matching prefix, or hit 0.
      * * PHASE 2: The Search
-     * We run our Two Pointers again, but this time `i` scans the Text, and `li` scans
+     * We run our Two Pointers again, but this time `i` scans the Text, and `len` scans
      * the PATTERN.
      * - MATCH: Both pointers move forward.
-     * - MISMATCH: Freeze the text pointer (`i`). Slide the pattern pointer (`li`) backward
+     * - MISMATCH: Freeze the text pointer (`i`). Slide the pattern pointer (`len`) backward
      * using the LPS array. Try again.
      * * ⏱️ COMPLEXITY ANALYSIS:
      * - Time Complexity: O(N + M).
      * Building the LPS array takes O(M) time. Scanning the text takes O(N) time.
-     * Because the text pointer `i` never moves backward, and `li` can only fall back
+     * Because the text pointer `i` never moves backward, and `len` can only fall back
      * as many times as it has moved forward, the loop executes in strictly linear time.
      * - Space Complexity: O(M) auxiliary space.
      * We allocate a single vector of size M to store the LPS array.
@@ -375,31 +375,31 @@ public:
         // =========================================================
         vector<int> LPS(m, 0);
 
-        int li = 0; // Left Index: Tracks the matching prefix length
-        int i = 1;  // Right Index: Scans the suffix of the pattern
+        int len = 0; // Length Pointer: Tracks the matching prefix length
+        int i = 1;   // Right Index: Scans the suffix of the pattern
 
         while (i < m)
         {
 
-            if (pattern[li] == pattern[i])
+            if (pattern[len] == pattern[i])
             {
                 // Match found: The safe prefix length expands
-                ++li;
-                LPS[i] = li;
+                ++len;
+                LPS[i] = len;
                 ++i;
             }
             else
             {
-                if (li != 0)
+                if (len != 0)
                 {
-                    // Mismatch: Slide Left Index backward to the last safe prefix length.
+                    // Mismatch: Slide the `len` pointer backward to the last safe prefix length.
                     // Note: 'i' is NOT incremented, so we stay frozen on this character
                     // to re-evaluate it against the new, smaller prefix.
-                    li = LPS[li - 1];
+                    len = LPS[len - 1];
                 }
                 else
                 {
-                    // Left Index is 0. No prefix matches this character. Advance 'i'.
+                    // `len` is 0. No prefix matches this character. Advance 'i'.
                     ++i;
                 }
             }
@@ -409,34 +409,34 @@ public:
         // PHASE 2: THE KMP SEARCH
         // =========================================================
         vector<int> ans;
-        li = 0; // Left Index now tracks our matched state against the Text
-        i = 0;  // Right Index now steadily scans the Text
+        len = 0; // `len` now tracks our matched state against the Text
+        i = 0;   // Right Index now steadily scans the Text
 
         while (i < n)
         {
 
-            if (pattern[li] == text[i])
+            if (pattern[len] == text[i])
             {
 
-                ++li;
+                ++len;
 
                 // Complete pattern match found!
-                if (li == m)
+                if (len == m)
                 {
                     // `i` is at the current matching end. Start index is `i - m + 1`.
                     ans.push_back(i - m + 1);
 
                     // Fall back the pattern to look for overlapping matches
-                    li = LPS[li - 1];
+                    len = LPS[len - 1];
                 }
 
                 ++i;
             }
-            else if (li != 0)
+            else if (len != 0)
             {
                 // Mismatch after a partial match.
-                // Slide Left Index backward using the LPS safety net.
-                li = LPS[li - 1];
+                // Slide the `len` pointer backward using the LPS safety net.
+                len = LPS[len - 1];
             }
             else
             {
