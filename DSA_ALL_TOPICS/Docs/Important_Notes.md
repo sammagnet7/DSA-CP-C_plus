@@ -1249,7 +1249,8 @@ The std::string::erase() function has overloads that take a starting position (i
 
      To safely wrap backward, **add the modulo base before applying the `%` operator**:
 
-     * **Formula:** `(value - subtraction + MOD) % MOD`
+     * **Formula 1:** `(value - subtraction + MOD) % MOD`
+     * **Formula 2 (Safest):** `( (value - subtraction) % MOD + MOD) % MOD`
      * **Example (4-way directions):** `dir = (dir - 1 + 4) % 4; // Safely wraps 0 down to 3`.
 
 56. The perimeter of a m * n matrix would be: ` [ 2 * (m-1) + 2 * (n-1) ]`
