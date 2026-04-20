@@ -217,8 +217,8 @@ public:
      * Instead of base-10, we use base-256 (for the ASCII alphabet).
      * Hash = (char[0] * 256^(m-1)) + (char[1] * 256^(m-2)) + ... + (char[m-1] * 256^0)
      * * * * 🚀 STEP-BY-STEP APPROACH:
-     * 1. Initialize two math constants: base `d` (256 for the ASCII character set)
-     * and a large prime `q` (to prevent integer overflow and minimize hash collisions).
+     * 1. Initialize two math constants: base `base` (256 for the ASCII character set)
+     * and a large prime `MOD` (to prevent integer overflow and minimize hash collisions).
      * 2. Calculate the initial hash value for the Pattern, and the first Window of the Text.
      * 3. Slide the window across the text:
      * - If Current Window Hash == Pattern Hash, we might have a match!
@@ -238,68 +238,85 @@ public:
         int m = pattern.length();
         vector<int> result;
 
+        // Edge cases: Pattern is empty or physically too large to fit in text
         if (m == 0 || n < m)
             return result;
 
-        // 'd' is the number of characters in the input alphabet (ASCII)
-        long long d = 256;
+        // 'base' represents the size of the character set (256 for extended ASCII)
+        long long base = 256;
 
-        // 'q' is a prime number. 10^9 + 7 is standard in competitive programming.
-        long long q = 1e9 + 7;
+        // 'MOD' is a large prime number to heavily mitigate hash collisions
+        // and prevent integer overflow during multiplication.
+        long long MOD = 1e9 + 7;
 
         long long pHash = 0; // Hash value for the target pattern
         long long tHash = 0; // Hash value for the sliding text window
 
-        // 'h' is the multiplier for the most significant digit (the character being removed).
-        // Mathematically: h = pow(d, m-1) % q
-        long long h = 1;
+        // =========================================================
+        // PHASE 1: PRE-COMPUTE THE MSB MULTIPLIER
+        // =========================================================
+        // 'msbMult' is the multiplier for the most significant digit (the character being removed).
+        // Mathematically: msbMult = (base^(m-1)) % MOD
+        long long msbMult = 1;
         for (int i = 0; i < m - 1; i++)
         {
-            h = (h * d) % q;
+            msbMult = (msbMult * base) % MOD;
         }
 
-        // 1. Calculate the initial hash values for pattern and the first text window
+        // =========================================================
+        // PHASE 2: CALCULATE INITIAL HASHES
+        // =========================================================
+        // Calculate the hash for the entire pattern and the FIRST window (length 'm') of the text.
         for (int i = 0; i < m; i++)
         {
-            pHash = (d * pHash + pattern[i]) % q;
-            tHash = (d * tHash + text[i]) % q;
+            pHash = (base * pHash + pattern[i]) % MOD;
+            tHash = (base * tHash + text[i]) % MOD;
         }
 
-        // 2. Slide the pattern over the text one character at a time
-        for (int i = 0; i <= n - m; i++)
+        // =========================================================
+        // PHASE 3: SLIDING WINDOW SEARCH
+        // =========================================================
+        // Note on Indexing: 'i' represents the index of the INCOMING character
+        // that will be added to the hash on the NEXT iteration.
+        // The current window ends at `i - 1` and starts at `i - m`.
+        for (int i = m; i <= n; i++)
         {
 
-            // Check if the current window's hash matches the pattern's hash
+            // 1. Check if the current window's hash matches the pattern's hash
             if (pHash == tHash)
             {
 
                 // Collision Verification: Ensure the strings actually match
                 bool match = true;
-                for (int j = 0; j < m; j++)
+
+                // Strictly compare the characters to rule out false positives
+                for (int p = 0; p < m; ++p)
                 {
-                    if (text[i + j] != pattern[j])
+                    if (pattern[p] != text[(i - m) + p])
                     {
                         match = false;
                         break;
                     }
                 }
 
+                // If verified, record the starting index of the window
                 if (match)
                 {
-                    result.push_back(i);
+                    result.push_back(i - m);
                 }
             }
 
-            // 3. Calculate the hash value for the NEXT window
-            if (i < n - m)
+            // 2. Roll the hash forward for the NEXT window
+            // We only roll if we haven't reached the end of the text string.
+            if (i < n)
             {
 
-                // Rolling Hash Formula:
-                // 1. Subtract the leading character safely (ensuring it stays positive)
-                tHash = (tHash - ((text[i] * h) % q) + q) % q;
+                // Step A: Subtract the outgoing character (at index i - m).
+                // We add MOD before taking the modulo to guarantee the result isn't negative.
+                tHash = (tHash - ((text[i - m] * msbMult) % MOD) + MOD) % MOD;
 
-                // 2. Multiply by base and add the trailing character
-                tHash = ((tHash * d) + text[i + m]) % q;
+                // Step B: Multiply by base (shift left) and add the incoming character (at index i).
+                tHash = ((tHash * base) + text[i]) % MOD;
             }
         }
 

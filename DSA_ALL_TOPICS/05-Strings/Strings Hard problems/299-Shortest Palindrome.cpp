@@ -26,7 +26,7 @@ https://leetcode.com/problems/shortest-palindrome/description/
 
 
 Problem statement:
-You are given a string s. You can convert s to a palindrome by adding characters in front of it.
+You are given a string `s`. You can convert `s` to a palindrome by adding characters in front of it.
 
 Return the shortest palindrome you can find by performing this transformation.
 
@@ -53,172 +53,229 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title:
-
-
-Links:
-
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
-
-----------------------------------------------------------------------------------------------------
-
 
 */
 
 //-------------------------------------------------------------------------------
 // 1. Title: Shortest Palindrome
 //-------------------------------------------------------------------------------
-//
+
+// ---------------------------------------
+// Approach 1: String concatenation + KMP
+// ---------------------------------------
 
 class Solution
 {
 public:
-    // ------------------------------------------------------------------------
-    // longestPrefixSuffix(s)
-    //
-    // Purpose / Idea:
-    //   - Compute the KMP prefix-function (also called LPS array) for the string s.
-    //   - LPS[i] = length of the longest proper prefix of s[0..i] that is also a
-    //     suffix of s[0..i].
-    //   - We return LPS[n-1], which is the length of the longest proper prefix
-    //     of the whole string that is also its suffix.
-    //
-    // Why we need it:
-    //   - This prefix-function lets us know how much of the prefix matches a
-    //     suffix, so we can quickly reuse that information instead of re-checking
-    //     characters from the beginning when mismatches occur.
-    //
-    // Complexity:
-    //   - Time: O(n) where n = s.length(). Each index is visited a constant
-    //     number of times because i only increases and j only falls back via
-    //     previously computed LPS values.
-    //   - Space: O(n) for the LPS array.
-    // ------------------------------------------------------------------------
-    int longestPrefixSuffix(string &s)
+    /**
+     * @brief Finds the shortest palindrome by prepending characters.
+     * * * * * * 🧠 INTUITION (The KMP Mirror Trick):
+     * To add the minimum characters to the front, we must find the Longest
+     * Palindromic Prefix (LPP) of the original string. The characters remaining
+     * after this prefix are the ones we need to reverse and prepend.
+     * * We can find the LPP by concatenating: `s + "#" + reverse(s)`.
+     * By building a KMP LPS array on this combined string, the final value
+     * `LPS[m - 1]` will give us the exact length of the longest prefix of `s`
+     * that matches a suffix of `reverse(s)` (which is a palindrome!).
+     * * * * * * 🛡️ WHY THE '#' SEPARATOR?:
+     * If s = "aaaa", reverse(s) = "aaaa". Without the separator, combined = "aaaaaaaa".
+     * The LPS of the last character would be 7, which is larger than the original
+     * string! The "#" acts as a hard boundary to prevent overlapping matches.
+     * * * * * * ⏱️ COMPLEXITY:
+     * - Time Complexity: \mathcal{O}(N). Reversing takes \mathcal{O}(N), KMP LPS takes \mathcal{O}(N).
+     * - Space Complexity: \mathcal{O}(N) to store the combined string and the LPS array.
+     */
+    string shortestPalindrome(string s)
     {
-        int n = s.size();
 
-        // LPS[i] = length of longest proper prefix that is also a suffix for s[0..i]
-        vector<int> LPS(n, 0);
+        int n = s.length();
+        if (n <= 1)
+            return s;
 
-        int i = 1; // current index in `s` we are computing LPS for (start at 1)
-        int j = 0; // length of current matched prefix (also index into prefix)
+        // 1. Create the reverse of the string
+        string rev_s = s;
+        reverse(rev_s.begin(), rev_s.end());
 
-        // Build LPS array using classic KMP preprocessing
-        while (i < n)
+        // 2. Create the mirrored string with a strict boundary
+        string combined = s + "#" + rev_s;
+        int m = combined.length();
+
+        // =========================================================
+        // PHASE 1: PRE-COMPUTE THE LPS ARRAY (Standard KMP Template)
+        // =========================================================
+        vector<int> LPS(m, 0);
+        int len = 0; // Length Pointer
+        int i = 1;   // Right Index
+
+        while (i < m)
         {
-            if (s[i] == s[j])
+            if (combined[len] == combined[i])
             {
-                // We can extend the current matched prefix by 1
-                LPS[i] = j + 1; // matched prefix length ending at i is j+1
-                i++;            // move to next character in s
-                j++;            // matched prefix length increased
+                ++len;
+                LPS[i] = len;
+                ++i;
             }
             else
             {
-                if (j == 0)
+                if (len != 0)
                 {
-                    // No current match to fallback to, so LPS[i] stays 0
-                    // Move forward in string
-                    i++;
+                    len = LPS[len - 1]; // Safe fallback
                 }
                 else
                 {
-                    // Fallback: try a shorter previously computed border
-                    // LPS[j-1] gives the next best candidate for a border length
-                    j = LPS[j - 1];
+                    ++i;
                 }
             }
         }
 
-        // The value for the whole string is stored at LPS[n-1]
-        return LPS[n - 1];
-    }
+        // =========================================================
+        // PHASE 2: EXTRACT AND PREPEND
+        // =========================================================
 
-    // ------------------------------------------------------------------------
-    // shortestPalindrome(s)
-    //
-    // Problem:
-    //   - Given a string s, create the shortest palindrome by adding characters
-    //     in front of s.
-    //
-    // Intuition / Approach:
-    //   - If the longest prefix of s that is also a palindrome (i.e., matches a
-    //     prefix of the reversed string) has length L, then the minimal addition
-    //     to front is the reverse of the remaining suffix s[L..n-1].
-    //
-    //   - Construct a helper string `probstr = s + '$' + rev(s)` where '$' is a
-    //     delimiter not present in s. Compute the LPS of probstr.
-    //
-    //   - Explanation:
-    //       * Consider the string s and its reverse rev.
-    //       * When we compute the LPS of s + '$' + rev, the LPS at the last
-    //         position tells us the longest prefix of s that matches a suffix
-    //         of rev, which is equivalent to the longest prefix of s that is
-    //         a palindrome (because matching a suffix of rev means reading the
-    //         same characters backwards).
-    //       * Let L = longestPrefixSuffix(probstr). Then the suffix of s
-    //         starting at index L (i.e., s[L..n-1]) is the part that is not
-    //         already a palindrome prefix. We reverse that suffix and prepend it.
-    //
-    // Steps:
-    //   1. rev = reverse(s)
-    //   2. probstr = s + '$' + rev
-    //   3. L = longestPrefixSuffix(probstr)
-    //   4. appendLen = n - L (characters from rev to prepend)
-    //   5. result = rev.substr(0, appendLen) + s
-    //
-    // Complexity:
-    //   - Let n = s.length().
-    //   - Constructing rev and probstr: O(n)
-    //   - longestPrefixSuffix(probstr): runs in O(n) (probstr has length 2n+1)
-    //   - Building the final string: O(n)
-    //   - Overall Time: O(n)
-    //   - Space: O(n) for rev and probstr and the LPS array (auxiliary O(n))
-    // ------------------------------------------------------------------------
-    string shortestPalindrome(string s)
+        // The last value in the LPS array is the length of the Longest Palindromic Prefix
+        int longest_pal_prefix_len = LPS[m - 1];
+
+        // The characters that are NOT part of the palindromic prefix
+        string remaining_suffix = s.substr(longest_pal_prefix_len);
+
+        // Reverse the leftovers
+        reverse(remaining_suffix.begin(), remaining_suffix.end());
+
+        // Prepend them to the original string
+        return remaining_suffix + s;
+    }
+};
+
+// -------------------------------------------
+// Approach 2: Raw KMP [OPTIMAL] [RECOMMENDED]
+// -------------------------------------------
+
+class Solution
+{
+public:
+    /**
+     * @brief Finds the shortest palindrome by prepending characters to a string.
+     * * * * * * * 🧠 INTUITION (Reverse-Engineering the Palindrome):
+     * Every string can be split into two parts:
+     * 1. A Longest Palindromic Prefix (LPP).
+     * 2. A leftover, non-palindromic suffix.
+     * Example: s = "aacecaaa" -> LPP = "aacecaa", Leftover = "a".
+     * To make the shortest palindrome, we simply take that leftover suffix,
+     * reverse it, and glue it to the front of the original string.
+     * Therefore, the entire problem boils down to finding the LPP!
+     * * * * * * * 🔍 THE KMP SEARCH MAGIC:
+     * A palindrome reads the same forwards and backwards. This means the LPP
+     * of a string `s` will perfectly match a suffix of `reverse(s)`.
+     * * Instead of the traditional (and memory-heavy) `s + "#" + reverse(s)` trick,
+     * we map this directly to a KMP Two-Pointer Search:
+     * - PATTERN = The original string `s`.
+     * - TEXT = The reversed string.
+     * * By running a standard KMP search of the Pattern against the Text, the
+     * algorithm inherently tries to match prefixes of the Pattern against suffixes
+     * of the Text. When the `while` loop finishes consuming the entire Text, the
+     * final state of the `len` pointer tells us exactly how many characters of the
+     * Pattern successfully matched the end of the Text.
+     * That number is the exact length of our Longest Palindromic Prefix.
+     * * * * * * * ⏱️ COMPLEXITY:
+     * - Time Complexity: O(N) to build the LPS array + O(N) to search the text.
+     * - Space Complexity: O(N) for the reversed text string and the LPS array.
+     * (This is highly optimized, saving the extra O(N) allocation required by
+     * the standard separator-concatenation approach).
+     * * @param s The input string.
+     * @return The shortest transformed palindrome.
+     */
+    string shortestPalindrome(string &s)
     {
 
-        int n = s.size();
+        int n = s.length();
 
-        // rev = reverse of s
-        string rev = s;
-        reverse(rev.begin(), rev.end());
+        // Edge Case: Empty strings or single characters are already palindromes
+        if (n <= 1)
+        {
+            return s;
+        }
 
-        // probstr combines s and rev with a delimiter to avoid cross matches
-        // that span both strings erroneously.
-        string probstr = s + "$" + rev;
+        // To map this to KMP, the original string is our Pattern
+        string &pattern = s;
 
-        // L gives length of longest prefix of `s` that is also a prefix of `rev`
-        // when considering the combined string — equivalently, the length of the
-        // longest palindrome prefix of s.
-        int exitingPalLen = longestPrefixSuffix(probstr);
+        // The reversed string is the Text we are searching through
+        string text = s;
+        reverse(text.begin(), text.end());
 
-        // Number of characters from rev that need to be prepended
-        int appendLen = n - exitingPalLen;
+        // =========================================================
+        // PHASE 1: PRE-COMPUTE THE LPS ARRAY FOR THE PATTERN
+        // =========================================================
+        vector<int> LPS(n, 0);
 
-        // Take first appendLen chars from rev and prepend to s
-        string appendStr = rev.substr(0, appendLen);
+        int len = 0; // Tracks the matching prefix length
+        int i = 1;   // Scans the suffix of the pattern
 
-        // Final answer: characters to prepend + original string
-        string ans = appendStr + s;
+        while (i < n)
+        {
+            if (pattern[len] == pattern[i])
+            {
+                ++len;
+                LPS[i] = len;
+                ++i;
+            }
+            else
+            {
+                if (len != 0)
+                {
+                    // Mismatch: Safely fall back to the last known prefix
+                    len = LPS[len - 1];
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+        }
+
+        // =========================================================
+        // PHASE 2: RUN KMP SEARCH TO FIND LONGEST MATCHING PREFIX
+        // =========================================================
+        len = 0; // Reset length pointer to track matches against the Text
+        i = 0;   // Reset Right Index to scan the Text
+
+        while (i < n)
+        {
+            if (pattern[len] == text[i])
+            {
+                ++len;
+                ++i;
+            }
+            else
+            {
+                if (len != 0)
+                {
+                    len = LPS[len - 1];
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+        }
+
+        // =========================================================
+        // PHASE 3: EXTRACT AND PREPEND THE REMAINDER
+        // =========================================================
+        // `len` now perfectly holds the length of the Longest Palindromic Prefix
+        int restLen = n - len;
+
+        // Extract the non-palindromic suffix from the original string
+        string rest = s.substr(len, restLen);
+
+        // Reverse it
+        reverse(rest.begin(), rest.end());
+
+        // Attach it to the front of the original string
+        string ans = rest + pattern;
 
         return ans;
     }
 };
-
-//-------------------------------------------------------------------------------
-// 2. Title:
-//-------------------------------------------------------------------------------
-//
 
 int main()
 {
