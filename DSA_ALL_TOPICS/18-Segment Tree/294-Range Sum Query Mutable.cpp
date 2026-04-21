@@ -52,236 +52,179 @@ Constraints:
 0 <= left <= right < nums.length
 At most 3 * 10^4 calls will be made to update and sumRange.
 
+----------------------------------------------------------------------------------------------------------------
 
 */
 
-//-------------------------------------------
-// Approach: Segment tree
-//-------------------------------------------
-
-/*
- * Segment Tree Implementation for Range Sum Queries (Mutable)
- * ==========================================================
- *
- * Problem Statement:
- * Given an integer array nums, handle multiple queries of:
- * 1. Update the value of an element at a specific index.
- * 2. Calculate the sum of elements within a specific range [left, right].
- *
- * Data Structure: Segment Tree
- * ----------------------------
- * A Segment Tree is a binary tree used for storing intervals or segments.
- * It allows querying which segment contains a given point. It is a static structure;
- * meaning, it's a structure that cannot be modified once built.
- * However, we can update the values of the nodes.
- *
- * Array Representation:
- * We use a flat array 'segT' to represent the tree.
- * - Root is at index 0.
- * - For node at index 'i':
- * - Left Child:  2*i + 1
- * - Right Child: 2*i + 2
- *
- * Space Complexity: O(4*N)
- * Time Complexity:
- * - Build: O(N)
- * - Update: O(log N)
- * - Query: O(log N)
+/**
+ * ============================================================================
+ * SEGMENT TREE: THE ULTIMATE INTERVAL DATA STRUCTURE
+ * ============================================================================
+ * * [1. THE CORE CONCEPT]
+ * A Segment Tree is a binary tree where every node represents a specific interval
+ * (range) of the original array. It is built using "Divide & Conquer on Indices."
+ * - Root node covers the entire array [0, n-1].
+ * - Leaves cover single elements [i, i].
+ * - Internal nodes cover [start, end] and merge the results of their two children.
+ * * [2. WHEN TO USE IT (THE TRIGGER PATTERN)]
+ * Trigger: You need BOTH frequent Point Updates AND frequent Range Queries.
+ * - Static Array + Range Queries -> Use Prefix Sums (O(1) query, but O(N) update).
+ * - Dynamic Array + Range Queries -> Use Segment Tree (O(log N) for BOTH).
+ * * [3. COMMON USE CASES]
+ * - Range Sum Queries (as implemented below)
+ * - Range Minimum/Maximum Queries (RMQ)
+ * - Range XOR / GCD / LCM Queries
+ * * [4. INTERVIEW TRICKS & MENTAL MODELS]
+ * - The "Flat Array" Trick: We never use pointers/structs. We use a flat array
+ * to represent the tree, exactly like a Binary Heap.
+ * * Left Child: 2 * node + 1
+ * * Right Child: 2 * node + 2
+ * - The "4*N" Space Trick: To safely guarantee we have enough array indices to
+ * hold a perfectly balanced representation (even if the input array size 'N'
+ * is not a power of 2), allocating 4 * N space is mathematically proven to
+ * prevent all OutOfBounds errors (2 * 2N).
+ * - The "Range" Variables: Always track the node's boundaries [start, end] and
+ * compare them against the target's boundaries [left, right] or index.
+ * ============================================================================
  */
-
-#include <vector>
-
-using namespace std;
-
 class NumArray
 {
-
 private:
-    vector<int> segT; // The flat array storing segment tree nodes
-    int N;            // Size of the original input array
+    std::vector<int> tree; // The segment tree array
+    std::vector<int> data; // Original data array (useful for leaf updates)
+    int n;
 
-    /*
-     * Method: buildSegTree
-     * --------------------
-     * Recursively builds the Segment Tree from the input array.
-     *
-     * Process:
-     * 1. Divide the current range [l, r] into two halves.
-     * 2. Recursively build the left child for range [l, mid].
-     * 3. Recursively build the right child for range [mid+1, r].
-     * 4. Merge step: The value of the current node is the sum of its children.
-     *
-     * Base Case:
-     * If l == r, we are at a leaf node representing a single element of the array.
-     * Store nums[l] in the tree.
-     *
-     * Time Complexity: O(N) - We visit every node exactly once.
-     * Space Complexity: O(N) - Recursion stack depth is O(log N).
-     *
-     * @param nums: Reference to the input array
-     * @param l: Left boundary of the current segment
-     * @param r: Right boundary of the current segment
-     * @param segTIdx: Index in the segment tree array for the current node
+    /**
+     * Helper: Recursively builds the segment tree from the bottom up.
+     * Logic: Post-order traversal. We go down to the leaves, grab the actual
+     * array values, and then merge them as we bubble back up.
+     * * Time Complexity: O(N) - We visit every node in the tree exactly once.
+     * Space Complexity: O(log N) - Maximum depth of the recursive call stack.
      */
-    void buildSegTree(vector<int> &nums, int l, int r, int segTIdx)
+    void buildTree(int node, int start, int end)
     {
-
-        // Base Case: Leaf Node
-        if (l == r)
+        // Base Case: Leaf node. The interval has narrowed to a single element.
+        if (start == end)
         {
-            segT[segTIdx] = nums[l];
+            tree[node] = data[start];
             return;
         }
 
-        int mid = l + (r - l) / 2;
+        // Divide: Split the current interval exactly in half.
+        int mid = start + (end - start) / 2;
 
-        // Recursive Build
-        buildSegTree(nums, l, mid, (2 * segTIdx + 1));     // Left Child
-        buildSegTree(nums, mid + 1, r, (2 * segTIdx + 2)); // Right Child
+        // Recurse: Build left child [start, mid] and right child [mid+1, end]
+        buildTree(2 * node + 1, start, mid);
+        buildTree(2 * node + 2, mid + 1, end);
 
-        // Merge Logic (Sum)
-        segT[segTIdx] = segT[2 * segTIdx + 1] + segT[2 * segTIdx + 2];
+        // Merge (Backtrack): Node value is the sum of its two children
+        tree[node] = tree[2 * node + 1] + tree[2 * node + 2];
     }
 
-    /*
-     * Method: updateSum
-     * -----------------
-     * Updates a value in the original array and reflects changes in the Segment Tree.
-     *
-     * Process:
-     * 1. Check if the 'updateIdx' is within the current range [l, r].
-     * If not, return immediately (pruning).
-     * 2. If we reached the leaf node corresponding to 'updateIdx' (l == r == updateIdx),
-     * update the value.
-     * 3. Otherwise, recurse to children.
-     * 4. Backtracking: After returning from children, re-calculate the current node's sum
-     * to ensure consistency up to the root.
-     *
-     * Time Complexity: O(log N) - We traverse the height of the tree.
-     * Space Complexity: O(log N) - Recursion stack.
-     *
-     * @param updateIdx: Index in the original array to update
-     * @param updateVal: New value to set
-     * @param l: Current segment left boundary
-     * @param r: Current segment right boundary
-     * @param segTIdx: Current node index in the tree
+    /**
+     * Helper: Updates a single element and recalculates affected tree nodes.
+     * Logic: Binary search on indices. We navigate down to the specific leaf,
+     * update it, and then recalculate the sums on the path back to the root.
+     * * Time Complexity: O(log N) - We only traverse one branch down to the leaf.
+     * Space Complexity: O(log N) - Depth of the recursive call stack.
      */
-    void updateSum(int updateIdx, int updateVal, int l, int r, int segTIdx)
+    void updateTree(int node, int start, int end, int index, int val)
     {
-
-        // Base Case: Leaf Node Found
-        if (l == r && l == updateIdx)
+        // Base Case: Found the exact leaf node for the index. Update it.
+        if (start == end)
         {
-            segT[segTIdx] = updateVal;
+            data[index] = val; // Update underlying data (optional depending on problem)
+            tree[node] = val;  // Update the tree leaf
             return;
         }
 
-        int mid = l + (r - l) / 2;
+        int mid = start + (end - start) / 2;
 
-        // Recurse to children
-        if (updateIdx <= mid)
+        // Binary search routing: Which child contains our target 'index'?
+        if (index <= mid)
         {
-            updateSum(updateIdx, updateVal, l, mid, 2 * segTIdx + 1);
+            updateTree(2 * node + 1, start, mid, index, val);
         }
         else
         {
-            updateSum(updateIdx, updateVal, mid + 1, r, 2 * segTIdx + 2);
+            updateTree(2 * node + 2, mid + 1, end, index, val);
         }
 
-        // Update current node sum after child modification
-        segT[segTIdx] = segT[2 * segTIdx + 1] + segT[2 * segTIdx + 2];
+        // Post-order update: Recalculate this node's sum based on updated children
+        tree[node] = tree[2 * node + 1] + tree[2 * node + 2];
     }
 
-    /*
-     * Method: getRangeSum
-     * -------------------
-     * Queries the sum of elements in the range [searchL, searchR].
-     *
-     * Process:
-     * 1. Total Overlap: If the current segment [l, r] is completely inside [searchL, searchR],
-     * return the pre-calculated sum stored in this node. This is the O(log N) optimization.
-     * 2. No Overlap: If the current segment is completely outside the query range, return 0.
-     * 3. Partial Overlap: If the segment partially overlaps, we must split the query
-     * and ask both children. Return the sum of results from left and right children.
-     *
-     * Time Complexity: O(log N) - In worst case, we visit ~4 nodes per level.
-     * Space Complexity: O(log N) - Recursion stack.
-     *
-     * @param searchL: Query range start
-     * @param searchR: Query range end
-     * @param l: Current segment left boundary
-     * @param r: Current segment right boundary
-     * @param segTIdx: Current node index in the tree
+    /**
+     * Helper: Queries the sum of elements in the range [left, right].
+     * Logic: Compares the Node's Range [start, end] against the Query's Range [left, right].
+     * This relies entirely on early-exit bounding to achieve logarithmic time.
+     * * Time Complexity: O(log N) - Because of "Case 2", we don't visit all nodes;
+     * we stop as soon as a node is perfectly swallowed by the query.
+     * Space Complexity: O(log N) - Depth of the recursive call stack.
      */
-    int getRangeSum(int searchL, int searchR, int l, int r, int segTIdx)
+    int sumRangeTree(int node, int start, int end, int left, int right)
     {
-
-        // Case 1: Total Overlap
-        if (searchL <= l && r <= searchR)
-        {
-            return segT[segTIdx];
-        }
-
-        // Case 2: No Overlap
-        else if (searchR < l || r < searchL)
+        // Case 1: Out of range (No overlap)
+        // The node's interval is completely outside our search interval.
+        // Return 0 (Identity value for Addition).
+        if (end < left || right < start)
         {
             return 0;
         }
 
-        // Case 3: Partial Overlap
-        int mid = l + (r - l) / 2;
-        int leftSum = getRangeSum(searchL, searchR, l, mid, (2 * segTIdx + 1));
-        int rightSum = getRangeSum(searchL, searchR, mid + 1, r, (2 * segTIdx + 2));
+        // Case 2: Full Overlap (Node is completely swallowed by Query)
+        // The node's entire interval is inside our search interval.
+        // We can confidently return its pre-calculated sum without digging deeper.
+        else if (left <= start && end <= right)
+        {
+            return tree[node];
+        }
 
-        return (leftSum + rightSum);
+        // Case 3: Partial Overlap (Intersection)
+        // Part of the node is inside the search interval, part is outside.
+        // We must split the search and dig deeper into both children.
+        else
+        {
+            int mid = start + (end - start) / 2;
+            return sumRangeTree(2 * node + 1, start, mid, left, right) + sumRangeTree(2 * node + 2, mid + 1, end, left, right);
+        }
     }
 
 public:
-    /*
-     * Constructor: NumArray
-     * ---------------------
-     * Initializes the Segment Tree.
-     * * Allocation Note:
-     * We allocate size 4*N for the segment tree array.
-     * Reason: A Segment Tree is a binary tree. For an array of size N, the tree height is ceil(log2(N)).
-     * The maximum number of nodes in a complete binary tree of this height can approach 4*N
-     * due to the way array indexing (2*i+1, 2*i+2) skips indices when the tree is not perfect.
+    /**
+     * Constructor
+     * Time: O(N) | Space: O(N) allocated for the tree array.
      */
-    NumArray(vector<int> &nums)
+    NumArray(std::vector<int> &nums)
     {
+        n = nums.size();
+        // Allocate 4*N space to prevent out-of-bounds on deep branches
+        tree.resize(4 * n, 0);
+        data = nums;
 
-        N = nums.size();
-
-        if (N > 0)
+        // Guard against empty array inputs
+        if (n > 0)
         {
-            segT.resize(4 * N);
-            buildSegTree(nums, 0, N - 1, 0);
+            buildTree(0, 0, n - 1);
         }
     }
 
-    /*
-     * Public API: update
-     * ------------------
-     * Wrapper for updateSum. Updates nums[index] to val.
+    /**
+     * API: Update index to a new value.
+     * Time: O(log N)
      */
     void update(int index, int val)
     {
-        if (N > 0 && 0<=index && index<N)
-        {
-            updateSum(index, val, 0, N - 1, 0);
-        }
+        updateTree(0, 0, n - 1, index, val);
     }
 
-    /*
-     * Public API: sumRange
-     * --------------------
-     * Wrapper for getRangeSum. Returns sum of nums[left...right].
+    /**
+     * API: Get the sum between indices left and right (inclusive).
+     * Time: O(log N)
      */
     int sumRange(int left, int right)
     {
-        if (N == 0)
-            return 0;
-        return getRangeSum(left, right, 0, N - 1, 0);
+        return sumRangeTree(0, 0, n - 1, left, right);
     }
 };
 
@@ -289,7 +232,7 @@ public:
  * Usage Example:
  * NumArray* obj = new NumArray(nums);
  * obj->update(index, val);
- * int param_2 = obj->sumRange(left, right);
+ * int result = obj->sumRange(left, right);
  */
 
 int main()
