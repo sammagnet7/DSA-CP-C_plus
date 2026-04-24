@@ -56,11 +56,6 @@ Constraints:
 
 */
 
-#include <vector>
-#include <algorithm>
-
-using namespace std;
-
 /**
  * ============================================================================
  * SEGMENT TREE: RANGE MAXIMUM QUERY (RMaxQ) + DESCENT ALGORITHM
