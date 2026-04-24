@@ -29,187 +29,172 @@ Return the number of fruit types that remain unplaced after all possible allocat
 
 
 Example 1:
-Input: fruits = [4,2,5], baskets = [3,5,4]
-Output: 1
-Explanation:
-fruits[0] = 4 is placed in baskets[1] = 5.
-fruits[1] = 2 is placed in baskets[0] = 3.
-fruits[2] = 5 cannot be placed in baskets[2] = 4.
-Since one fruit type remains unplaced, we return 1.
+    Input: fruits = [4,2,5], baskets = [3,5,4]
+    Output: 1
+    Explanation:
+    fruits[0] = 4 is placed in baskets[1] = 5.
+    fruits[1] = 2 is placed in baskets[0] = 3.
+    fruits[2] = 5 cannot be placed in baskets[2] = 4.
+    Since one fruit type remains unplaced, we return 1.
 
 Example 2:
-Input: fruits = [3,6,1], baskets = [6,4,7]
-Output: 0
-Explanation:
-fruits[0] = 3 is placed in baskets[0] = 6.
-fruits[1] = 6 cannot be placed in baskets[1] = 4 (insufficient capacity) but can be placed in the next available basket, baskets[2] = 7.
-fruits[2] = 1 is placed in baskets[1] = 4.
-Since all fruits are successfully placed, we return 0.
+    Input: fruits = [3,6,1], baskets = [6,4,7]
+    Output: 0
+    Explanation:
+    fruits[0] = 3 is placed in baskets[0] = 6.
+    fruits[1] = 6 cannot be placed in baskets[1] = 4 (insufficient capacity) but can be placed in the next available basket, baskets[2] = 7.
+    fruits[2] = 1 is placed in baskets[1] = 4.
+    Since all fruits are successfully placed, we return 0.
 
 
 Constraints:
-n == fruits.length == baskets.length
-1 <= n <= 10^5
-1 <= fruits[i], baskets[i] <= 10^9
+    n == fruits.length == baskets.length
+    1 <= n <= 10^5
+    1 <= fruits[i], baskets[i] <= 10^9
+
+-----------------------------------------------------------------------------------------------------------
 
 */
 
-//-------------------------------------------
-// Approach: Segment tree + Binary search
-//-------------------------------------------
+#include <vector>
+#include <algorithm>
 
-/*
- * Problem: Fruits Into Baskets III (LeetCode 3479)
- * ------------------------------------------------
- * Goal: Place each fruit into the *leftmost* available basket with capacity >= fruit size.
- * Count how many fruits cannot be placed.
- *
- * Approach: Segment Tree (Range Maximum Query)
- * --------------------------------------------
- * Why Segment Tree?
- * A brute force search for each fruit would be O(N^2).
- * A Segment Tree allows us to:
- * 1. Quickly check if a range [L, R] has ANY basket capable of holding the fruit (Max Query).
- * 2. Find the *leftmost* such basket in O(log N).
- * 3. Mark that basket as "used" (Update value to 0) in the same pass.
- *
- * Time Complexity: O(N log N)
- * - Building the tree: O(N)
- * - Processing N fruits: Each fruit triggers one tree traversal taking O(log N).
- * Total: N * log N.
- *
- * Space Complexity: O(4 * N)
- * - Standard space required for the Segment Tree array.
+using namespace std;
+
+/**
+ * ============================================================================
+ * SEGMENT TREE: RANGE MAXIMUM QUERY (RMaxQ) + DESCENT ALGORITHM
+ * ============================================================================
+ * * [THE INTUITION: WHY A SEGMENT TREE?]
+ * Problem Goal: Find the *leftmost* basket with capacity >= fruit quantity.
+ * * 1. Why Brute Force Fails: Scanning left-to-right for every fruit takes
+ * O(N) per fruit, leading to O(N^2) total time. With N=10^5, this TLEs.
+ * 2. Why Standard Binary Search Fails: To use std::lower_bound in O(log N),
+ * the array MUST be sorted. But sorting the baskets destroys their original
+ * left-to-right order, making it impossible to guarantee the "leftmost" rule.
+ * 3. The Segment Tree Solution: We need a structure that preserves the original
+ * indices but allows us to skip massive chunks of the array. By building a
+ * Range Maximum tree, we can look at a node covering a huge sub-array and ask:
+ * "Is the absolute biggest basket in this entire section >= my fruit?"
+ * If NO, we prune the whole section in O(1) time.
+ * If YES, we dive into the LEFT child first, guaranteeing we find the leftmost match.
+ * * * Time Complexities:
+ * - Build: O(N)       -> We visit every node exactly once to build max capacities.
+ * - Find & Update: O(log N) -> We only traverse a single path from root to leaf.
+ * - Total: O(N log N) -> Processing all N fruits.
+ * - Space: O(N)       -> 4*N array allocation.
+ * ============================================================================
  */
-class Solution
+class SegmentTree
 {
 private:
-    // Segment Tree Array
-    // segT[i] stores the MAXIMUM capacity available in the range covered by node 'i'.
-    vector<int> segT;
-    int N;
+    vector<int> tree;
+    int n;
 
-    /*
-     * Method: buildTree
-     * -----------------
-     * Constructs the Segment Tree from the initial baskets array.
-     * Each internal node stores the max(left_child, right_child).
-     *
-     * Complexity: O(N) - Visits every node once.
+    /**
+     * HELPER: Bottom-up construction of the Range Maximum Tree.
+     * @param data Passed by reference to avoid a massive O(N) deep copy.
      */
-    void buildTree(int l, int r, int segI, vector<int> &baskets)
+    void buildTree(int treeIdx, int start, int end, const vector<int> &data)
     {
-
-        // Base Case: Leaf Node
-        // Represents a single basket at index 'l'.
-        if (l == r)
+        if (start == end)
         {
-            segT[segI] = baskets[l];
+            tree[treeIdx] = data[start];
             return;
         }
 
-        int mid = l + (r - l) / 2;
+        int mid = start + (end - start) / 2;
+        buildTree(2 * treeIdx + 1, start, mid, data);
+        buildTree(2 * treeIdx + 2, mid + 1, end, data);
 
-        // Recursively build children
-        buildTree(l, mid, 2 * segI + 1, baskets);
-        buildTree(mid + 1, r, 2 * segI + 2, baskets);
-
-        // Current node stores the Maximum capacity of its children
-        segT[segI] = max(segT[2 * segI + 1], segT[2 * segI + 2]);
+        tree[treeIdx] = max(tree[2 * treeIdx + 1], tree[2 * treeIdx + 2]);
     }
 
-    /*
-     * Method: placedFruit
-     * -------------------
-     * The Core Logic: Finds the leftmost valid basket, places the fruit, and updates the tree.
-     * * Logic:
-     * 1. Check Root: If segT[node] < fruit, this entire range is useless. Return false.
-     * 2. Leaf Node: If we reach a leaf, we found the basket! Set capacity to 0 (used).
-     * 3. Internal Node:
-     * - Prefer LEFT child: If left child's max capacity >= fruit, go Left.
-     * (This satisfies the "leftmost" requirement).
-     * - Otherwise: Go Right.
-     * 4. Update: After returning from child, update current node's max value.
-     *
-     * Complexity: O(log N) - Traverses height of the tree.
+    /**
+     * HELPER: The Descent Algorithm (Combined Query & Update).
+     * @return true if a valid basket was found and allocated, false otherwise.
      */
-    bool placedFruit(int l, int r, int segI, int fruit, vector<int> &baskets)
+    bool findAndReplaceLeftMost(int treeIdx, int start, int end, int val)
     {
+        // Base Case 1: We reached a leaf node.
+        if (start == end)
+        {
+            if (tree[treeIdx] < val)
+            {
+                return false;
+            }
+            else
+            {
+                tree[treeIdx] = 0; // "Remove" the basket
+                return true;
+            }
+        }
 
-        // PRUNING / OPTIMIZATION
-        // If the max capacity in this current range is less than the fruit size,
-        // it is impossible to place the fruit here. Prune this branch immediately.
-        if (segT[segI] < fruit)
+        // PRUNING: The absolute maximum capacity in this entire sub-tree is too small.
+        else if (tree[treeIdx] < val)
         {
             return false;
         }
 
-        // BASE CASE: Leaf Node Found
-        // Since we passed the check above, we know baskets[l] >= fruit.
-        if (l == r)
-        {
-            segT[segI] = 0; // Mark basket as "Used" (capacity 0)
-            return true;
-        }
-
-        int mid = l + (r - l) / 2;
-
-        int leftSegI = 2 * segI + 1;
-        int rightSegI = 2 * segI + 2;
-
-        bool placed = false;
-
-        // GREEDY SEARCH STRATEGY
-        // We want the *leftmost* basket.
-        // Always check the Left Child first.
-        // If the left subtree has a basket capable of holding the fruit (Max >= fruit),
-        // we MUST search there first.
-        if (segT[leftSegI] >= fruit)
-        {
-            placed = placedFruit(l, mid, leftSegI, fruit, baskets);
-        }
+        // RECURSIVE SEARCH: We have enough capacity *somewhere* in this sub-tree.
         else
         {
-            // Only search Right if Left is impossible
-            placed = placedFruit(mid + 1, r, rightSegI, fruit, baskets);
+            int mid = start + (end - start) / 2;
+
+            // PRIORITY 1: Always try the LEFT branch first for "leftmost".
+            bool ret = findAndReplaceLeftMost(2 * treeIdx + 1, start, mid, val);
+
+            if (ret)
+            {
+                tree[treeIdx] = max(tree[2 * treeIdx + 1], tree[2 * treeIdx + 2]);
+                return true;
+            }
+
+            // PRIORITY 2: If the left branch failed, it MUST be in the RIGHT branch.
+            ret = findAndReplaceLeftMost(2 * treeIdx + 2, mid + 1, end, val);
+
+            if (ret)
+            {
+                tree[treeIdx] = max(tree[2 * treeIdx + 1], tree[2 * treeIdx + 2]);
+                return true;
+            }
+
+            return false;
         }
-
-        // UPDATE / BACKTRACKING
-        // Since one basket capacity changed to 0, we must update the max value
-        // of the current node to reflect the new state of the range.
-        segT[segI] = max(segT[leftSegI], segT[rightSegI]);
-
-        return placed;
     }
 
 public:
+    SegmentTree(int n, const vector<int> &data)
+    {
+        this->n = n;
+        tree.assign(4 * n, 0);
+        buildTree(0, 0, n - 1, data);
+    }
+
+    bool allocateLeftMost(int val)
+    {
+        return findAndReplaceLeftMost(0, 0, n - 1, val);
+    }
+};
+
+class Solution
+{
+public:
     int numOfUnplacedFruits(vector<int> &fruits, vector<int> &baskets)
     {
+        int n = fruits.size();
+        SegmentTree segTree(n, baskets);
+        int unallocated = 0;
 
-        N = fruits.size();
-
-        // Allocate Segment Tree size (4*N is safe upper bound)
-        segT.resize(4 * N);
-
-        // O(N) Build step
-        buildTree(0, N - 1, 0, baskets);
-
-        int unplacedCount = 0;
-
-        // O(N) Loop
-        for (int i = 0; i < N; i++)
+        for (int f : fruits)
         {
-            int fruit = fruits[i];
-
-            // O(log N) Search & Update per fruit
-            // If placedFruit returns false, it means no basket was found.
-            if (!placedFruit(0, N - 1, 0, fruit, baskets))
+            if (!segTree.allocateLeftMost(f))
             {
-                unplacedCount++;
+                ++unallocated;
             }
         }
 
-        return unplacedCount;
+        return unallocated;
     }
 };
 
