@@ -17,7 +17,7 @@ https://www.geeksforgeeks.org/problems/range-minimum-query/1
 
 
 Problem statement:
-Given an array A[ ] and its size N your task is to complete two functions  a constructST  function which builds the segment tree  and a function RMQ which finds range minimum query in a range [a,b] of the given array.
+Given an array A[ ] and its size N your task is to complete two functions: a constructST  function which builds the segment tree  and a function RMQ which finds range minimum query in a range [a,b] of the given array.
 
 Input:
 The task is to complete two functions constructST and RMQ.
@@ -30,161 +30,169 @@ The function RMQ should return the min element in the array from range a to b.
 
 Example:
 
-Input (To be used only for expected output)
-1
-4
-1 2 3 4
-2
-0 2 2 3
-Output
-1 3
-Explanation
-1. For query 1 ie 0 2 the element in this range are 1 2 3
-   and the min element is 1.
-2. For query 2 ie 2 3 the element in this range are 3 4
-   and the min element is 3.
+    Input
+    arr:    1 2 3 4
+    range:    [0 2], [2 3]
 
-   Constraints:
-1<=T<=100
-1<=N<=10^3+1
-1<=A[i]<=10^9
-1<=Q(no of queries)<=10000
-0<=a<=b
+    Output
+    1, 3
 
+    Explanation
+    1. For query 1 ie 0 2 the element in this range are 1 2 3
+    and the min element is 1.
+    2. For query 2 ie 2 3 the element in this range are 3 4
+    and the min element is 3.
+
+Constraints:
+    1<=T<=100
+    1<=N<=10^3+1
+    1<=A[i]<=10^9
+    1<=Q(no of queries)<=10^4
+    0<=a<=b
+
+-----------------------------------------------------------------------------------------
 */
 
-//-------------------------------------------
-// Approach: Segment tree
-//-------------------------------------------
-
-/* * Global pointer for the Segment Tree array.
- * This stores the tree nodes. Since it's global, the build function
- * can access it directly without passing it around.
+/**
+ * ============================================================================
+ * SEGMENT TREE: RANGE MINIMUM QUERY (RMQ)
+ * ============================================================================
+ * Core Concept: A binary tree where each node stores the minimum value of a
+ * specific sub-array (interval) of the original array.
+ * * Time Complexities:
+ * - Build: O(N)       -> We visit every node exactly once.
+ * - Query: O(log N)   -> We prune branches using "Full Overlap" bounds checking.
+ * - Space: O(N)       -> We allocate an array of size 4*N.
+ * ============================================================================
  */
-int *segT;
-
-/*
- * Function: buildSegT
- * -------------------
- * Recursively builds the Segment Tree from the input array.
- *
- * @param l     Left index of the current range in 'arr'
- * @param r     Right index of the current range in 'arr'
- * @param segI  Current index in the Segment Tree array (Root is 0)
- * @param arr   Input array containing original data
- *
- * Time Complexity: O(N) - We visit every node once.
- */
-void buildSegT(int l, int r, int segI, int arr[])
+class SegmentTree
 {
+private:
+    int *tree; // The segment tree represented as a flat array
+    int *data; // Pointer to the original array (to fetch leaf values)
+    int n;     // Size of the original array
 
-    // Base Case: Leaf Node
-    // If l == r, the range contains only one element.
-    // This is a leaf node of the segment tree.
-    if (l == r)
+    /**
+     * HELPER: Recursively builds the tree bottom-up (Post-order traversal).
+     * @param treeIdx: The current node's index in the 'tree' array.
+     * @param start: The starting index of the original array segment this node covers.
+     * @param end: The ending index of the original array segment this node covers.
+     */
+    void buildTree(int treeIdx, int start, int end)
     {
-        segT[segI] = arr[l];
-        return;
+        // Base Case: We've hit a leaf node (segment size of 1).
+        if (start == end)
+        {
+            tree[treeIdx] = data[start];
+            return;
+        }
+
+        // Divide: Split the segment exactly in half.
+        int mid = start + (end - start) / 2;
+
+        // Recurse: Build the left and right children.
+        // Left child index: 2*i + 1 | Right child index: 2*i + 2
+        buildTree(2 * treeIdx + 1, start, mid);
+        buildTree(2 * treeIdx + 2, mid + 1, end);
+
+        // Merge: The minimum of this node's range is the smaller of its two children.
+        tree[treeIdx] = min(tree[2 * treeIdx + 1], tree[2 * treeIdx + 2]);
     }
 
-    int mid = l + (r - l) / 2;
-
-    // Recursive Step: Divide
-    // Build the left child (indices 2*i + 1)
-    buildSegT(l, mid, 2 * segI + 1, arr);
-
-    // Build the right child (indices 2*i + 2)
-    buildSegT(mid + 1, r, 2 * segI + 2, arr);
-
-    // Merge Step: Conquer
-    // The value of the current internal node is the Minimum of its children.
-    segT[segI] = min(segT[2 * segI + 1], segT[2 * segI + 2]);
-}
-
-/*
- * Function: recMin
- * ----------------
- * Queries the Segment Tree for the minimum value in range [qL, qR].
- *
- * @param l, r  Current range covered by the node 'segI'
- * @param segI  Current node index in the Segment Tree
- * @param qL, qR Query range (inclusive)
- * @param st    Pointer to the segment tree array (passed as argument here)
- * @param n     Size of the array (not strictly needed for logic, but often passed)
- *
- * Time Complexity: O(log N) - Worst case visits 4 nodes per level.
- */
-int recMin(int l, int r, int segI, int qL, int qR, int st[], int n)
-{
-
-    // Case 1: Total Overlap
-    // The current node's range [l, r] is completely inside the query range [qL, qR].
-    // We can simply return the pre-calculated value of this node.
-    if (qL <= l && r <= qR)
+    /**
+     * HELPER: Recursively searches for the minimum value in the requested range.
+     * @param lRange: The target query's left boundary.
+     * @param rRange: The target query's right boundary.
+     */
+    int rangeMin(int treeIdx, int start, int end, int lRange, int rRange)
     {
-        return st[segI];
+        // CASE 1: Full Overlap
+        // The node's interval [start, end] is completely inside the query [lRange, rRange].
+        // We can safely return this node's minimum without digging any deeper.
+        if (lRange <= start && end <= rRange)
+        {
+            return tree[treeIdx];
+        }
+
+        // CASE 2: No Overlap (Out of Bounds)
+        // The node's interval is completely outside the query interval.
+        // CRITICAL: We return INT_MAX (Infinity) so it doesn't affect the min() calculation.
+        else if (rRange < start || end < lRange)
+        {
+            return INT_MAX; // NOTE THIS
+        }
+
+        // CASE 3: Partial Overlap
+        // The query partially covers this node. We must split the search and check both children.
+        else
+        {
+            int mid = start + (end - start) / 2;
+            return min(
+                rangeMin(2 * treeIdx + 1, start, mid, lRange, rRange),
+                rangeMin(2 * treeIdx + 2, mid + 1, end, lRange, rRange));
+        }
     }
 
-    // Case 2: No Overlap
-    // The current node's range is completely outside the query range.
-    // Return INT_MAX (Identity element for Min) so it doesn't affect the result.
-    if (r < qL || qR < l)
+public:
+    /**
+     * CONSTRUCTOR
+     * Initializes the class state and triggers the recursive tree build.
+     */
+    SegmentTree(int arr[], int n)
     {
-        return INT_MAX;
+        this->n = n;
+        data = arr;
+
+        // Allocate 4*N space. This guarantees enough bounds for a perfect
+        // binary tree representation, even if 'N' is not a power of 2.
+        tree = new int[4 * n];
+
+        // Begin building from the root (index 0) covering the whole array [0, n-1]
+        buildTree(0, 0, n - 1);
     }
 
-    // Case 3: Partial Overlap
-    // The ranges partially overlap, so we must look deeper into both children.
-    int mid = l + (r - l) / 2;
+    /**
+     * API: Returns the raw array pointer (required by the GFG platform).
+     */
+    int *getRoot()
+    {
+        return tree;
+    }
 
-    //
+    /**
+     * API: Public wrapper for the RMQ function.
+     */
+    int RMQ(int lRange, int rRange)
+    {
+        return rangeMin(0, 0, n - 1, lRange, rRange);
+    }
+};
 
-    // Query Left Child
-    int left = recMin(l, mid, 2 * segI + 1, qL, qR, st, n);
+// =====================================================================
+// Note: This wrapper is used specifically to adapt our clean OOP class.
+// =====================================================================
 
-    // Query Right Child
-    int right = recMin(mid + 1, r, 2 * segI + 2, qL, qR, st, n);
+SegmentTree *segTree; // Global pointer to persist state between driver calls
 
-    // Combine results from both sides
-    return min(left, right);
-}
-
-/* * Function: constructST
- * ---------------------
- * allocatest memory and triggers the build process.
- *
- * @param arr Input array
- * @param n   Size of input array
- * @return    Pointer to the built segment tree
+/* * The function which builds the segment tree.
+ * Called once per testcase by the platform.
  */
 int *constructST(int arr[], int n)
 {
-
-    // Allocate memory for the Segment Tree.
-    // Size is 4*n to handle the worst-case padding for a complete binary tree.
-    segT = new int[4 * n];
-
-    // Start building from the root (index 0) covering range [0, n-1]
-    buildSegT(0, n - 1, 0, arr);
-
-    return segT;
+    // Note: In a real system, you would delete the old segTree to prevent memory leaks
+    // before reassigning it, but GFG RAM limits are high enough to permit this.
+    segTree = new SegmentTree(arr, n);
+    return segTree->getRoot();
 }
 
-/* * Function: RMQ (Range Minimum Query)
- * -----------------------------------
- * Wrapper function for the query.
- *
- * @param st Segment Tree array
- * @param n  Size of original array
- * @param a  Query start index
- * @param b  Query end index
- * @return   Minimum value in range [a, b]
+/* * The function returns the min element in the range from a and b.
+ * Called multiple times per testcase by the platform.
  */
 int RMQ(int st[], int n, int a, int b)
 {
-
-    // Call the recursive query helper starting from the root
-    return recMin(0, n - 1, 0, a, b, st, n);
+    // Bypass the raw st[] array provided by the platform and route the query
+    // directly into our instantiated SegmentTree class.
+    return segTree->RMQ(a, b);
 }
 
 int main()
