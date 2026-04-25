@@ -327,3 +327,6 @@
 4. [Minimum Operations to Equalize Binary String](https://leetcode.com/problems/minimum-operations-to-equalize-binary-string/description/)
 5. [LIS optimized](https://leetcode.com/problems/maximum-balanced-subsequence-sum/description/)
 6. [Robot](https://leetcode.com/problems/minimum-total-distance-traveled/description/)
+7. [3464. Maximize the Distance Between Points on a Square](https://leetcode.com/problems/maximize-the-distance-between-points-on-a-square/description/)
+8. [2179. Count Good Triplets](https://leetcode.com/problems/count-good-triplets-in-an-array/description/)
+9. [3721. Longest Balanced Subarray II](https://leetcode.com/problems/longest-balanced-subarray-ii/)

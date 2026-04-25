@@ -44,205 +44,210 @@ n == nums1.length == nums2.length
 0 <= nums1[i], nums2[i] <= n - 1
 nums1 and nums2 are permutations of [0, 1, ..., n - 1].
 
+--------------------------------------------------------------------------------------
  */
 
-/*
- * Problem: 2179. Count Good Triplets in an Array
- * ----------------------------------------------
- * Goal: Find the number of triplets (x, y, z) such that:
- * 1. They appear in that relative order in nums1.
- * 2. They appear in that relative order in nums2.
+/**
+ * ============================================================================
+ * SEGMENT TREE: VALUE-SPACE FREQUENCY COUNTER (COUNTING INVERSIONS)
+ * ============================================================================
+ * * Problem: Find triplets (x, y, z) that appear in the exact same increasing
+ * positional order in BOTH nums1 and nums2.
  *
- * Approach: Segment Tree (or Fenwick Tree) + Line Sweep
- * -----------------------------------------------------
- * A brute force check is O(N^3), which is too slow. We need O(N log N).
+ * * * 1. THE NORMALIZATION TRICK (Two Arrays -> One Array)
+ * Dealing with two arrays simultaneously is too complex. Because both arrays are
+ * permutations of [0...n-1], we can map them together. We record the index of
+ * every value in `nums1`, and then replace the values in `nums2` with those indices.
+ * - Result: We now have a single array `A`. Any strictly increasing triplet
+ * (A[i] < A[j] < A[k] where i < j < k) in `A` is guaranteed to be a valid
+ * "Good Triplet" in the original two arrays.
  *
- * The Core Idea:
- * We iterate through 'nums1' and treat the current element as the MIDDLE element 'y' of the triplet.
- * For a fixed 'y', if we can efficiently count:
- * - L: Number of valid 'x' elements (appear before y in nums1 AND before y in nums2).
- * - R: Number of valid 'z' elements (appear after y in nums1 AND after y in nums2).
+ * * * 2. THE MATH PATTERN ("Fix the Middle")
+ * To find triplets A[i] < A[j] < A[k], we iterate through `A` and treat every
+ * element as the middle element (A[j]).
+ * - The number of valid triplets centered on A[j] is simply:
+ * (Numbers to its left that are smaller) * (Numbers to its right that are greater).
+ * - Let's call these `smaller_left` and `greater_right`.
  *
- * Then the number of good triplets centered at 'y' is simply (L * R).
- * We sum this up for all possible 'y'.
+ * * * 3. THE SEGMENT TREE (Finding 'smaller_left')
+ * We need to count `smaller_left` dynamically as we iterate. We build a Range Sum
+ * Segment Tree where the leaves represent the actual VALUES [0 to n-1], and the nodes
+ * store the FREQUENCY of how many times we've seen that value so far.
+ * - For middle element A[j], we query the tree for the sum of range [0, A[j] - 1].
+ * - This takes O(log N) time and gives us `smaller_left`.
+ * - We then insert A[j] into the tree so it exists for future queries.
  *
- * Data Structures:
- * 1. Hash Map (or Array): To quickly look up the index of a value in 'nums2'.
- * This allows us to translate the condition "before in nums2" to "index < pos2y".
- * 2. Segment Tree: To store the counts of elements we have processed so far based
- * on their positions in 'nums2'. This allows us to answer range sum queries in O(log N).
+ * * * 4. THE O(1) ARITHMETIC HACK (Finding 'greater_right')
+ * Do we need a second tree to find `greater_right`? No. Because `A` is a permutation
+ * of 0 to n-1, we can use pure math:
+ * - Total numbers greater than A[j] in the ENTIRE array: (n - 1 - A[j])
+ * - Total numbers greater than A[j] seen SO FAR (to the left): (j - smaller_left)
+ * - Therefore, numbers greater than A[j] to the RIGHT:
+ * greater_right = (n - 1 - A[j]) - (j - smaller_left)
  *
- * Complexity Analysis:
- * --------------------
- * Time Complexity: O(N log N)
- * - We iterate through the array once (N steps).
- * - Inside the loop, we perform Segment Tree Update and Query operations.
- * - Each SegTree op is O(log N).
- * - Total: O(N log N).
  *
- * Space Complexity: O(N)
- * - O(N) for the mapping array/map.
- * - O(4*N) for the Segment Tree array.
+ * * * [COMPLEXITY ANALYSIS]
+ * - Time Complexity: O(N) to normalize + O(N log N) to iterate and query the tree.
+ * - Space Complexity: O(N) for the Segment Tree array and normalization maps.
+ * ============================================================================
  */
-
-class Solution
+class SegmentTree
 {
 private:
-    vector<int> segT; // Segment Tree array
-    int N;
+    vector<int> tree;
+    int n;
 
-    /*
-     * Method: update
-     * --------------
-     * Performs a Point Update on the Segment Tree.
-     * Logic: Adds 'updateVal' to the leaf node at 'updateI' and recalculates sums up the tree.
-     * Used to mark an element as "visited" (processed in nums1).
+    /**
+     * @brief Point Update: Increments the frequency of a specific value.
+     * * * [THE VALUE-SPACE INTUITION: WHY DO WE DO THIS?]
+     * Standard segment trees map leaves to array *indices*. But we can't ask a
+     * standard tree "how many elements are < X?".
+     * By changing the leaves to represent the *universe of possible values* [0 to n-1],
+     * we physically map the SIZE of a number to its POSITION in the tree.
+     * As we iterate through the array, we increment the frequency of values we see.
+     * Because values are perfectly ordered left-to-right, counting "how many numbers < X
+     * have I seen?" simply becomes a Range Sum Query for everything to the left of X!
+     * * * [THE MECHANICS]
+     * We navigate down to the exact leaf representing our value `idx` and increment
+     * its frequency counter. Because the ranges [start, end] are perfectly ordered,
+     * we find the leaf using standard binary search logic.
      *
-     * Time: O(log N)
+     * In Value-Space Segment Tree, the tree's leaves represent the actual values of the array.
+     *
+     * * @time O(log N) - We only traverse exactly one path from root to leaf.
+     * @space O(log N) - Depth of the recursive call stack.
+     *
+     * @param treeIdx  The current index in the flat segment tree array.
+     * @param start The lower bound of the value range this treeIdx represents.
+     * @param end   The upper bound of the value range this treeIdx represents.
+     * @param idx   The specific value we are inserting (our target leaf).
      */
-    void update(int l, int r, int segI, int updateI, int updateVal)
+    void updateTree(int treeIdx, int start, int end, int idx)
     {
-
-        // Base Case: Leaf Node
-        if (l == r)
+        // Base Case: We hit the specific value's leaf. Increment its frequency.
+        if (start == end)
         {
-            segT[segI] = updateVal;
+            tree[treeIdx]++;
             return;
         }
+        int mid = start + (end - start) / 2;
 
-        int mid = l + (r - l) / 2;
-        int leftSegI = 2 * segI + 1;
-        int rightSegI = 2 * segI + 2;
-
-        // Recursive Step: Navigate to the correct child
-        if (updateI <= mid)
+        // Binary search routing to find the leaf for 'idx'
+        if (idx <= mid)
         {
-            update(l, mid, leftSegI, updateI, updateVal);
+            updateTree(2 * treeIdx + 1, start, mid, idx);
         }
         else
         {
-            update(mid + 1, r, rightSegI, updateI, updateVal);
+            updateTree(2 * treeIdx + 2, mid + 1, end, idx);
         }
 
-        // Merge Step: Parent sum = Sum of children
-        segT[segI] = segT[leftSegI] + segT[rightSegI];
+        // Post-order update: Recalculate frequency sums bubbling up
+        tree[treeIdx] = tree[2 * treeIdx + 1] + tree[2 * treeIdx + 2];
     }
 
-    /*
-     * Method: getRangeVal
-     * -------------------
-     * Performs a Range Sum Query.
-     * Logic: Returns the sum of values stored in the index range [rangeL, rangeR].
-     * Context: Used to count how many visited elements appear before index 'pos2y' in nums2.
+    /**
+     * @brief Range Sum Query: Counts how many times we've seen values in [L, R].
+     * * [THE INTUITION]
+     * We want to find the sum of frequencies for all values between L and R.
+     * Instead of visiting every leaf, we check if a treeIdx's entire range [start, end]
+     * is completely swallowed by our target range [L, R]. If it is, we return its
+     * pre-calculated sum in O(1) time and stop digging.
+     * * @time O(log N) - Bounded by early exits on Full Overlaps and Out of Bounds.
+     * @space O(log N) - Depth of the recursive call stack.
      *
-     * Time: O(log N)
+     * @param treeIdx  The current index in the flat segment tree array.
+     * @param start The lower bound of the value range this treeIdx represents.
+     * @param end   The upper bound of the value range this treeIdx represents.
+     * @param L     The lower bound of our target query range.
+     * @param R     The upper bound of our target query range.
+     * @return      The total frequency sum of values existing in [L, R].
      */
-    int getRangeVal(int l, int r, int segI, int rangeL, int rangeR)
+    int queryTree(int treeIdx, int start, int end, int L, int R)
     {
-
-        // Case 1: Range completely outside
-        if (r < rangeL || rangeR < l)
+        // Case 1: Out of Bounds (or invalid query bounds)
+        if (L > R || start > R || end < L)
         {
             return 0;
         }
-        // Case 2: Range completely inside
-        else if (rangeL <= l && r <= rangeR)
-        {
-            return segT[segI];
-        }
-        // Case 3: Partial overlap
-        else
-        {
-            int mid = l + (r - l) / 2;
-            int leftSegI = 2 * segI + 1;
-            int rightSegI = 2 * segI + 2;
 
-            return getRangeVal(l, mid, leftSegI, rangeL, rangeR) +
-                   getRangeVal(mid + 1, r, rightSegI, rangeL, rangeR);
+        // Case 2: Full Overlap - return precalculated frequency sum
+        if (L <= start && end <= R)
+        {
+            return tree[treeIdx];
         }
+
+        // Case 3: Partial Overlap - dig deeper
+        int mid = start + (end - start) / 2;
+        return queryTree(2 * treeIdx + 1, start, mid, L, R) +
+               queryTree(2 * treeIdx + 2, mid + 1, end, L, R);
     }
 
 public:
+    SegmentTree(int size)
+    {
+        n = size;
+        tree.assign(4 * n, 0);
+    }
+
+    // Point Update: Increments the frequency of the given value
+    void add(int idx)
+    {
+        updateTree(0, 0, n - 1, idx);
+    }
+
+    // Range Sum Query: Gets the total frequency of all values between L and R
+    int query(int L, int R)
+    {
+        return queryTree(0, 0, n - 1, L, R);
+    }
+};
+
+class Solution
+{
+public:
     long long goodTriplets(vector<int> &nums1, vector<int> &nums2)
     {
+        int n = nums1.size();
 
-        N = nums1.size();
-
-        // Initialize Segment Tree with size 4*N to handle all possible indices
-        // Initially all counts are 0.
-        segT.resize(4 * N, 0);
-
-        // Step 1: Pre-process indices of nums2.
-        // mapping[val] = index of 'val' in nums2.
-        // This effectively lets us ignore element values and just deal with permutation indices.
-        unordered_map<int, int> mp;
-        for (int i = 0; i < N; i++)
+        // Step 1: Normalization (Map nums1 values to their indices)
+        vector<int> pos(n);
+        for (int i = 0; i < n; ++i)
         {
-            mp[nums2[i]] = i;
+            pos[nums1[i]] = i;
         }
 
-        long long totalCounts = 0;
-
-        // Pre-process the first element of nums1.
-        // We consider it "visited" so it can serve as a Left Element (x) for future triplets.
-        update(0, N - 1, 0, mp[nums1[0]], 1);
-
-        // Step 2: Main Loop - Iterate through nums1
-        // 'pos1y' represents the index of the MIDDLE element (y) in nums1.
-        // We start from index 1 and go up to N-2.
-        for (int pos1y = 1; pos1y < N - 1; ++pos1y)
+        // Create the unified array A based on nums1's positional mapping
+        vector<int> A(n);
+        for (int i = 0; i < n; ++i)
         {
-
-            // Get the position of the current element 'y' inside nums2
-            int pos2y = mp[nums1[pos1y]];
-
-            // Mark 'y' as present in the Segment Tree.
-            // Note: Even though we update before querying, the query range is strictly [0, pos2y-1].
-            // So the update at 'pos2y' does not affect the Left Common Count calculation.
-            update(0, N - 1, 0, pos2y, 1);
-
-            // ---------------------------------------------------------
-            // CALCULATION PART 1: Find 'Left Common' (L)
-            // ---------------------------------------------------------
-            // We need count of elements 'x' such that:
-            // 1. x appears before y in nums1 (Indices 0 to pos1y-1) -> Guaranteed by loop order.
-            // 2. x appears before y in nums2 (Indices 0 to pos2y-1).
-            // Query SegTree for sum in range [0, pos2y-1].
-            int leftCommonCount = getRangeVal(0, N - 1, 0, 0, pos2y - 1);
-
-            // ---------------------------------------------------------
-            // CALCULATION PART 2: Find 'Right Common' (R)
-            // ---------------------------------------------------------
-            // We need count of elements 'z' such that:
-            // 1. z appears after y in nums1.
-            // 2. z appears after y in nums2.
-
-            // Logic Derivation:
-            // Total elements strictly to the right of y in nums1 = (N - 1) - pos1y.
-            // Let's call this "TotalRightInNums1".
-
-            // Some of these "TotalRightInNums1" appear to the LEFT of y in nums2.
-            // How many?
-            // - Total elements to the left of y in nums2 = pos2y.
-            // - Elements left in both arrays = leftCommonCount.
-            // - Therefore, elements (Left in nums2 BUT Right in nums1) = pos2y - leftCommonCount.
-
-            // So, Right Common = (Total Right in nums1) - (Those that are Left in nums2).
-
-            int leftExtraAtNums2 = pos2y - leftCommonCount; // Elements Left in nums2, Right in nums1
-            int rightElmsCountAtNums1 = (N - 1) - pos1y;    // Total elements Right in nums1
-
-            int rightCommonCount = rightElmsCountAtNums1 - leftExtraAtNums2;
-
-            // ---------------------------------------------------------
-            // ACCUMULATE RESULT
-            // ---------------------------------------------------------
-            long long tripletsCounts = (long long)leftCommonCount * rightCommonCount;
-
-            totalCounts += tripletsCounts;
+            A[i] = pos[nums2[i]];
         }
 
-        return totalCounts;
+        SegmentTree segTree(n);
+        long long totalTriplets = 0;
+
+        // Step 2: Iterate and "Fix the Middle"
+        for (int j = 0; j < n; ++j)
+        {
+            long long val = A[j];
+
+            // Query: How many values seen so far are strictly smaller than `val`?
+            long long smaller_left = segTree.query(0, val - 1);
+
+            // Math Hack: Calculate how many values to the right are strictly greater
+            long long total_greater = (n - 1 - val);
+            long long greater_seen_so_far = (j - smaller_left);
+            long long greater_right = total_greater - greater_seen_so_far;
+
+            // Multiply combinations and add to running total
+            totalTriplets += (smaller_left * greater_right);
+
+            // Add the current value's frequency to the Segment Tree for future iterations
+            segTree.add(val);
+        }
+
+        return totalTriplets;
     }
 };
 

@@ -58,439 +58,146 @@ Constraints:
 queries[i] = [ai, bi]
 0 <= ai, bi <= heights.length - 1
 
+-------------------------------------------------------------------------------------------------------
 */
 
-//-------------------------------------------------------------------------------
-//
-// APPROACH 1 : Segment Tree  + Binary search [Q * (Log N)^2] [sub-optimal]
-//
-//-------------------------------------------------------------------------------
-
-/*
- * Problem: 2940. Find Building Where Alice and Bob Can Meet
- * ---------------------------------------------------------
- *
- * Approach: Segment Tree (Range Maximum Query) + Binary Search
- *
- * Core Concept:
- * 1. If Alice (index 'a') can directly jump to Bob (index 'b'), we are done.
- * 2. If not, we need to find the *leftmost* building 'k' such that:
- * - k > max(a, b)   (The building is to the right of both)
- * - heights[k] > heights[a] AND heights[k] > heights[b]
- *
- * Data Structure:
- * We use a Segment Tree to store the INDEX of the maximum height in a range.
- * Storing indices allows us to look up the height value and position simultaneously.
- *
- * Algorithm Steps:
- * 1. Build a Segment Tree over the 'heights' array.
- * 2. For each query (a, b):
- * - Sort a, b so a <= b.
- * - Check basic cases (a==b or heights[b] > heights[a]).
- * - If basic cases fail, we need to search in range [b+1, N-1].
- * - We perform a Binary Search on the range [b+1, N-1].
- * - Inside the binary search, we query the Segment Tree to see if a valid
- * building exists in the left half of the current search window.
- *
- * Complexity Analysis:
- * --------------------
- * Time Complexity: O(N + Q * log^2 N)
- * - Build Tree: O(N)
- * - Per Query: We do a Binary Search (log N steps).
- * Inside each step, we query the Segment Tree (log N steps).
- * Total per query: O(log N * log N) = O(log^2 N).
- * - Total: With N, Q = 5*10^4, ~1.2*10^7 operations. Fits well within 1s limit.
- *
- * Space Complexity: O(4 * N)
- * - Used for the Segment Tree array.
+/**
+ * ============================================================================
+ * SEGMENT TREE: CONSTRAINED DESCENT (RANGE MAXIMUM QUERY)
+ * ============================================================================
+ * * [THE INTUITION]
+ * Problem: Find the *leftmost* building strictly to the right of Bob (index > b)
+ * that is strictly taller than Alice (height > heights[a]).
+ * * - Why not Brute Force? Scanning rightward for every query is O(N*Q), causing TLE.
+ * - Why not std::lower_bound? Binary search requires a sorted array. Sorting
+ * destroys the original building indices, making the "leftmost index" rule
+ * impossible to enforce cleanly online.
+ * * * The Segment Tree Solution: We build a Range Maximum Tree to answer queries
+ * online. Instead of just returning the maximum value in a range, we perform a
+ * "Descent" (binary searching the tree itself). We use a Dual-Pruning strategy:
+ * 1. Index Bounds: Is this node's segment inside our valid window [b + 1, n - 1]?
+ * 2. Value Bounds: Is the absolute tallest building here > Alice's height?
+ * * If both are true, we dive into the tree, always prioritizing the LEFT child
+ * to guarantee we find the minimum possible index. If either check fails, we
+ * prune the entire sub-tree in O(1) time.
+ * * * [COMPLEXITY ANALYSIS]
+ * - Time Complexity:
+ * * Build: O(N) -> We visit each node exactly once bottom-up.
+ * * Query: O(log N) -> The pruning strategy guarantees we bound our search
+ * and only traverse down a valid path.
+ * * Total Time: O(N + Q log N) where Q is the number of queries.
+ * - Space Complexity:
+ * * Tree: O(N) -> We allocate a flat vector of size 4*N to represent the tree.
+ * * Recursion Stack: O(log N) depth.
+ * * Total Space: O(N)
+ * ============================================================================
  */
-class Solution
+class SegmentTree
 {
 private:
-    // Segment Tree stores indices of the maximum elements
-    vector<int> segT;
-    int N;
+    vector<int> tree;
+    int n;
 
-    /*
-     * Method: buildTree
-     * -----------------
-     * Recursively builds the Segment Tree.
-     * segT[node] will store the INDEX of the maximum height in range [l, r].
-     * * Time: O(N)
-     */
-    void buildTree(int l, int r, int segI, vector<int> &heights)
+    // Standard Range Maximum Query Build
+    void buildTree(int node, int start, int end, const vector<int> &heights)
     {
-
-        // Base Case: Leaf Node
-        if (l == r)
+        if (start == end)
         {
-            segT[segI] = l; // Store the index itself
+            tree[node] = heights[start];
             return;
         }
+        int mid = start + (end - start) / 2;
+        buildTree(2 * node + 1, start, mid, heights);
+        buildTree(2 * node + 2, mid + 1, end, heights);
 
-        int mid = l + (r - l) / 2;
-
-        // Recursive Build
-        buildTree(l, mid, 2 * segI + 1, heights);
-        buildTree(mid + 1, r, 2 * segI + 2, heights);
-
-        // Merge Logic:
-        // We compare the HEIGHTS at the indices stored in children.
-        // We pick the index corresponding to the greater height.
-        int leftMaxIdx = segT[2 * segI + 1];
-        int rightMaxIdx = segT[2 * segI + 2];
-
-        int leftMaxVal = heights[leftMaxIdx];
-        int rightMaxVal = heights[rightMaxIdx];
-
-        // Store the index of the larger value
-        segT[segI] = (leftMaxVal >= rightMaxVal) ? leftMaxIdx : rightMaxIdx;
+        tree[node] = max(tree[2 * node + 1], tree[2 * node + 2]);
     }
 
-    /*
-     * Method: findMaxInRange
-     * ----------------------
-     * Standard Range Maximum Query (RMQ).
-     * Returns the INDEX of the maximum height in [rangeL, rangeR].
-     * * Time: O(log N)
-     */
-    int findMaxInRange(int l, int r, int rangeL, int rangeR, int segI, vector<int> &heights)
+public:
+    SegmentTree(int n, const vector<int> &heights)
     {
+        this->n = n;
+        tree.assign(4 * n, 0);
+        buildTree(0, 0, n - 1, heights);
+    }
 
-        // Case 1: Full Overlap
-        if (rangeL <= l && r <= rangeR)
-        {
-            return segT[segI];
-        }
-
-        // Case 2: No Overlap
-        else if (rangeR < l || r < rangeL)
+    /**
+     * @param L: The minimum index we are allowed to search from (Bob's index + 1)
+     * @param R: The maximum index (n - 1)
+     * @param target: The height we must strictly exceed (Alice's height)
+     * @return The leftmost index satisfying the conditions, or -1 if none exists.
+     */
+    int queryLeftmost(int node, int start, int end, int L, int R, int target)
+    {
+        // PRUNING 1: Out of Bounds
+        // If this node's segment is completely outside our valid [L, R] window, prune.
+        if (start > R || end < L)
         {
             return -1;
         }
 
-        // Case 3: Partial Overlap
-        int mid = l + (r - l) / 2;
-
-        int lI = findMaxInRange(l, mid, rangeL, rangeR, 2 * segI + 1, heights);
-        int rI = findMaxInRange(mid + 1, r, rangeL, rangeR, 2 * segI + 2, heights);
-
-        if (lI == -1)
-            return rI;
-        if (rI == -1)
-            return lI;
-
-        // Compare heights at the retrieved indices to decide the winner
-        if (heights[lI] >= heights[rI])
+        // PRUNING 2: Capacity Check
+        // If the absolute tallest building in this segment is too short, prune.
+        if (tree[node] <= target)
         {
-            return lI;
-        }
-        else
-        {
-            return rI;
-        }
-    }
-
-    /*
-     * Method: getHigherClosestOnRight
-     * -------------------------------
-     * Finds the leftmost index 'k' in [rangeL, rangeR] such that heights[k] > lowerLimit.
-     * * Strategy: Binary Search on the answer.
-     * We keep narrowing the window. If the left half of our current window contains
-     * a number > lowerLimit, we try to find the answer there (move left).
-     * Otherwise, we are forced to look in the right half.
-     * * Time: O(log^2 N)
-     */
-    int getHigherClosestOnRight(int rangeL, int rangeR, int lowerLimit, vector<int> &heights)
-    {
-
-        int closestAns = -1;
-
-        // Binary Search Loop: O(log N) iterations
-        while (rangeL <= rangeR)
-        {
-
-            int mid = rangeL + (rangeR - rangeL) / 2;
-
-            // Query Segment Tree for max index in [rangeL, mid]
-            // This query takes O(log N)
-            int leftMaxIdx = findMaxInRange(0, N - 1, rangeL, mid, 0, heights);
-
-            // Safety check although leftMaxIdx shouldn't be -1 given valid loop bounds
-            int leftMaxVal = (leftMaxIdx != -1) ? heights[leftMaxIdx] : -1;
-
-            // Decision:
-            // If the max value in the left half [rangeL, mid] is greater than our limit,
-            // it means a valid meeting place EXISTS in this left half.
-            if (lowerLimit < leftMaxVal)
-            {
-                // Found a candidate!
-                closestAns = leftMaxIdx;
-
-                // Try to find a "closer" (more left) one by ignoring the right half
-                rangeR = mid - 1;
-            }
-            else
-            {
-                // No valid building in [rangeL, mid].
-                // We MUST search in the right half [mid+1, rangeR].
-                rangeL = mid + 1;
-            }
+            return -1;
         }
 
-        return closestAns;
-    }
-
-public:
-    vector<int> leftmostBuildingQueries(vector<int> &heights, vector<vector<int>> &queries)
-    {
-
-        N = heights.size();
-
-        // 4*N Allocation for Segment Tree safety
-        segT.resize(4 * N);
-
-        // O(N) Build
-        buildTree(0, N - 1, 0, heights);
-
-        vector<int> ans;
-
-        // Process Queries
-        for (int i = 0; i < queries.size(); i++)
+        // BASE CASE: We survived pruning and hit a leaf node. This is our answer.
+        if (start == end)
         {
-
-            int ai = queries[i][0];
-            int bi = queries[i][1];
-
-            int ansi = -1;
-
-            // Normalize indices
-            int lefti = min(ai, bi);
-            int righti = max(ai, bi);
-
-            // Case A: Alice and Bob are at the same building
-            if (lefti == righti)
-            {
-                ansi = lefti;
-            }
-            // Case B: The person at the left building can jump directly to the right building
-            // (Because the destination is strictly higher)
-            else if (heights[lefti] < heights[righti])
-            {
-                ansi = righti;
-            }
-            // Case C: Indirect Jump required
-            else
-            {
-                // We need a building 'k' > righti
-                // Such that heights[k] > heights[lefti]
-                // (Since heights[lefti] >= heights[righti], checking > heights[lefti] suffices)
-                int lowerLimit = heights[lefti];
-
-                // Perform Binary Search + RMQ on range [righti + 1, End]
-                //
-                ansi = getHigherClosestOnRight(righti + 1, N - 1, lowerLimit, heights);
-            }
-
-            ans.push_back(ansi);
+            return start;
         }
 
-        return ans;
+        int mid = start + (end - start) / 2;
+
+        // PRIORITY 1: Always try the LEFT branch first to satisfy "leftmost" building
+        int leftResult = queryLeftmost(2 * node + 1, start, mid, L, R, target);
+
+        // If the left branch successfully found a building, return it immediately.
+        if (leftResult != -1)
+        {
+            return leftResult;
+        }
+
+        // PRIORITY 2: Left branch failed (either out of bounds or too short).
+        // We must check the RIGHT branch.
+        return queryLeftmost(2 * node + 2, mid + 1, end, L, R, target);
     }
 };
 
-//--------------------------------------------------
-//
-// APPROACH 2 : Segment Tree [Q * Log N] [OPTIMAL]
-//
-//--------------------------------------------------
-
-/*
- * Problem: 2940. Find Building Where Alice and Bob Can Meet
- * ---------------------------------------------------------
- *
- * Approach: Segment Tree Descent (Find First Element > X in Range)
- *
- * Core Concept:
- * 1. If Alice (index 'a') can directly jump to Bob (index 'b'), we are done.
- * 2. If not, we need to find the *leftmost* building 'k' such that:
- * - k > max(a, b)   (The building is to the right of both)
- * - heights[k] > heights[a] AND heights[k] > heights[b]
- *
- * Data Structure:
- * We use a Segment Tree where each node stores the INDEX of the maximum height
- * in its range. This allows us to check the max height of any range quickly.
- *
- * Algorithm Steps:
- * 1. Build a Segment Tree over the 'heights' array.
- * 2. For each query (a, b), normalize so a <= b.
- * 3. Handle simple cases (a==b or direct jump possible).
- * 4. For the complex case, we need to find the first building in range [b+1, N-1]
- * that is strictly taller than heights[a].
- * 5. Instead of Binary Search (which is O(log^2 N)), we use a recursive Segment Tree Walk.
- * We prune branches where max_height <= limit, and always prioritize the Left Child
- * to guarantee finding the leftmost index.
- *
- * Complexity Analysis:
- * --------------------
- * Time Complexity: O(N + Q * log N)
- * - Build Tree: O(N)
- * - Per Query: We descend the tree once. The "pruning" ensures we visit at most O(log N) nodes.
- * Total per query: O(log N).
- * - Total: Much faster than the binary search approach.
- *
- * Space Complexity: O(4 * N)
- * - Used for the Segment Tree array.
- */
-
 class Solution
 {
-private:
-    // Segment Tree stores indices of the maximum elements
-    vector<int> segT;
-    int N;
-
-    /*
-     * Method: buildTree
-     * -----------------
-     * Recursively builds the Segment Tree.
-     * segT[node] will store the INDEX of the maximum height in range [l, r].
-     * * Time: O(N)
-     */
-    void buildTree(int l, int r, int segI, vector<int> &heights)
-    {
-
-        // Base Case: Leaf Node
-        if (l == r)
-        {
-            segT[segI] = l; // Store the index itself
-            return;
-        }
-
-        int mid = l + (r - l) / 2;
-
-        // Recursive Build
-        buildTree(l, mid, 2 * segI + 1, heights);
-        buildTree(mid + 1, r, 2 * segI + 2, heights);
-
-        // Merge Logic:
-        // We compare the HEIGHTS at the indices stored in children.
-        // We pick the index corresponding to the greater height.
-        int leftMaxIdx = segT[2 * segI + 1];
-        int rightMaxIdx = segT[2 * segI + 2];
-
-        int leftMaxVal = heights[leftMaxIdx];
-        int rightMaxVal = heights[rightMaxIdx];
-
-        // Store the index of the larger value
-        segT[segI] = (leftMaxVal >= rightMaxVal) ? leftMaxIdx : rightMaxIdx;
-    }
-
-    /*
-     * Method: getHigherClosestOnRight
-     * -------------------------------
-     * Finds the leftmost index 'k' in [rangeL, rangeR] such that heights[k] > lowerLimit.
-     * * Strategy: Segment Tree Descent (Walk)
-     * - Pruning: If max height in current node <= lowerLimit, stop searching (return -1).
-     * - Greedy: Always try Left Child first. If found, return immediately. Else, try Right Child.
-     * * Time Complexity: O(log N)
-     */
-    int getHigherClosestOnRight(int l, int r, int segI, int rangeL, int rangeR, int lowerLimit, vector<int> &heights)
-    {
-
-        // 1. Range Check: Completely outside the query range
-        if (r < rangeL || rangeR < l)
-        {
-            return -1;
-        }
-
-        // 2. Pruning Optimization (CRITICAL)
-        // If the max height in this current node range is not strictly greater
-        // than the limit, there is no point searching here.
-        if (heights[segT[segI]] <= lowerLimit)
-        {
-            return -1;
-        }
-
-        // 3. Base Case: Leaf Node
-        // Since we passed the pruning check, we know heights[l] > lowerLimit.
-        if (l == r)
-        {
-            return segT[segI];
-        }
-
-        int mid = l + (r - l) / 2;
-
-        int leftSegI = 2 * segI + 1;
-        int rightSegI = 2 * segI + 2;
-
-        // 4. Greedy Descent
-        // Try to find the answer in the Left Child first (Leftmost priority).
-        int leftClosestI = getHigherClosestOnRight(l, mid, leftSegI, rangeL, rangeR, lowerLimit, heights);
-
-        // If found in Left, return it immediately.
-        if (leftClosestI != -1)
-        {
-            return leftClosestI;
-        }
-        else
-        {
-            // Otherwise, search in the Right Child.
-            return getHigherClosestOnRight(mid + 1, r, rightSegI, rangeL, rangeR, lowerLimit, heights);
-        }
-    }
-
 public:
     vector<int> leftmostBuildingQueries(vector<int> &heights, vector<vector<int>> &queries)
     {
+        int n = heights.size();
+        SegmentTree segTree(n, heights);
 
-        N = heights.size();
+        vector<int> ans(queries.size(), -1);
 
-        // 4*N Allocation for Segment Tree safety
-        segT.resize(4 * N);
-
-        // O(N) Build
-        buildTree(0, N - 1, 0, heights);
-
-        vector<int> ans;
-
-        // Process Queries
-        for (int i = 0; i < queries.size(); i++)
+        for (int i = 0; i < queries.size(); ++i)
         {
+            int a = queries[i][0];
+            int b = queries[i][1];
 
-            int ai = queries[i][0];
-            int bi = queries[i][1];
-
-            int ansi = -1;
-
-            // Normalize indices so we always look from left to right
-            int lefti = min(ai, bi);
-            int righti = max(ai, bi);
-
-            // Case A: Alice and Bob are at the same building
-            if (lefti == righti)
+            // Standardize: Force 'a' to be the person on the left
+            if (a > b)
             {
-                ansi = lefti;
+                swap(a, b);
             }
-            // Case B: The person at the left building can jump directly to the right building
-            // (Because the destination is strictly higher)
-            else if (heights[lefti] < heights[righti])
+
+            // Case 1 & 2: Same building, or Alice can jump directly to Bob
+            if (a == b || heights[a] < heights[b])
             {
-                ansi = righti;
+                ans[i] = b;
             }
-            // Case C: Indirect Jump required
+            // Case 3: Alice is taller or equal to Bob.
+            // They must meet at some index strictly > b, and height strictly > heights[a].
             else
             {
-                // We need a building 'k' > righti
-                // Such that heights[k] > heights[lefti]
-                int lowerLimit = heights[lefti];
-
-                // Perform Segment Tree Walk on range [righti + 1, N-1]
-                // This finds the first valid index in O(log N) time.
-                ansi = getHigherClosestOnRight(0, N - 1, 0, righti + 1, N - 1, lowerLimit, heights);
+                ans[i] = segTree.queryLeftmost(0, 0, n - 1, b + 1, n - 1, heights[a]);
             }
-
-            ans.push_back(ansi);
         }
 
         return ans;
