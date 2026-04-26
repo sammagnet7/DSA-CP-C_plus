@@ -14,6 +14,7 @@ using namespace std;
 Title: Longest Balanced Subarray II
 
 Link:
+https://www.youtube.com/watch?v=QxS30NMAjhE&t=1s
 https://leetcode.com/problems/longest-balanced-subarray-ii/description/
 
 
@@ -121,7 +122,7 @@ public:
             // Determine impact of current number:
             // Even numbers contribute +1 to the balance.
             // Odd numbers contribute -1 to the balance.
-            int curDelta = (nums[r] % 2 == 0) ? 1 : -1;
+            int update_val = (nums[r] % 2 == 0) ? 1 : -1;
 
             // -------------------------------------------------------
             // Step 1: Handle Duplicates (Enforce Uniqueness)
@@ -138,7 +139,7 @@ public:
                 // for subarrays that now contain BOTH instances.
                 for (int l = 0; l <= prevIdx; l++)
                 {
-                    cumulativeSum[l] -= curDelta;
+                    cumulativeSum[l] -= update_val;
                 }
             }
 
@@ -149,7 +150,7 @@ public:
             // This conceptually adds nums[r] to subarrays starting at 0, 1, ... r.
             for (int l = 0; l <= r; ++l)
             {
-                cumulativeSum[l] += curDelta;
+                cumulativeSum[l] += update_val;
             }
 
             // -------------------------------------------------------
@@ -181,260 +182,205 @@ public:
 };
 
 /**
- * ======================================================================================
- * Approach 2: optimization of Range Updates with Segment Tree [O(N log N)] [OPTIMAL]
- * ======================================================================================
- * * APPROACH OVERVIEW:
- * ------------------
- * We need to find the longest subarray where:
- * (Count of Unique Evens) == (Count of Unique Odds)
- * * 1. MAPPING TO VALUES:
- * - Even numbers contribute +1.
- * - Odd numbers contribute -1.
- * - We want a subarray range [L, R] where the "Unique Sum" is 0.
- * * 2. THE "UNIQUE" CONSTRAINT CHALLENGE:
- * - Standard prefix sums don't work because if a number appears twice, it shouldn't
- * be counted twice.
- * - We iterate 'R' from 0 to N-1. For a fixed 'R', we want to find the smallest 'L'
- * such that the unique sum of subarray nums[L...R] is 0.
- * * 3. SEGMENT TREE STATE:
- * - The Segment Tree maintains a "Cumulative Sum" for every possible start index 'i'.
- * - Specifically, leaf node 'i' stores the value of the unique balance for the
- * subarray nums[i...R] (where R is the current iteration index).
- * - As 'R' moves to 'R+1', we update these sums using Range Updates.
- * * 4. OPTIMIZATION (Why O(N log N)?):
- * - Previous Brute Force: Iterate 'L' from 0 to R for every R -> O(N^2).
- * - Segment Tree:
- * a) Range Update: Add/Subtract values across a range [0...index] in O(log N).
- * b) Range Query: Find the leftmost index with value 0 in O(log N).
- * - We use a "Min-Max" Segment Tree to PRUNE the search. If 0 is not
- * between min and max of a node, we skip that subtree.
- * * COMPLEXITY:
- * -----------
- * Time: O(N log N)
- * - We iterate R from 0 to N (N steps).
- * - Inside, we do at most 2 Range Updates and 1 Query.
- * - Each operation takes O(log N).
- * * Space: O(N)
- * - Segment Tree array size is 4*N.
+ * ============================================================================
+ * Approach 2: SEGMENT TREE: LAZY PROPAGATION + DESCENT [OPTIMAL]
+ * ============================================================================
+ * * [THE STEP-BY-STEP INTUITION JOURNEY]
+ * * STEP 1: The Brute Force Barrier
+ * We want the longest subarray [L...R] where (Distinct Evens) == (Distinct Odds).
+ * A naive approach checks every subarray in O(N^2) or O(N^3) time. With N = 10^5,
+ * this will Time Limit Exceed (TLE). We need an O(N log N) approach.
+ * 
+ * * STEP 2: The "Running Balance" Concept
+ * Let's iterate the right endpoint `R` from left to right. At any point `R`,
+ * imagine maintaining an array `val` where `val[L]` stores the exact balance of
+ * the subarray starting at `L` and ending at `R`.
+ * Balance = (Distinct Evens) - (Distinct Odds).
+ * If `val[L] == 0`, the subarray [L...R] is perfectly balanced. Our goal for a
+ * fixed `R` is to find the SMALLEST index `L` (the leftmost start) where `val[L] == 0`.
+ * 
+ * * STEP 3: Mapping the Updates (The "Aha!" Moment)
+ * As `R` moves to the right, we process a new number: `nums[R]`. How does this
+ * new number change the balance of all our possible starting points `L`?
+ * - The new number only counts as "distinct" if it hasn't appeared recently.
+ * - Let `prev` be the index where we last saw `nums[R]`.
+ * - This new `nums[R]` only increases the distinct count for subarrays that
+ * START strictly after `prev`.
+ * - Therefore, the balance changes ONLY for starting points L in the range [prev + 1, R].
+ * - If `nums[R]` is Even: Every `val[L]` in that range gets +1.
+ * - If `nums[R]` is Odd: Every `val[L]` in that range gets -1.
+ * 
+ * * STEP 4: Why Lazy Propagation?
+ * We now have a mathematical requirement: We need to add +1 or -1 to a MASSIVE
+ * range of elements `[prev + 1, R]` at every step. If we update them one by one,
+ * it takes O(N) time per step, leading to O(N^2) overall.
+ * A Segment Tree with Lazy Propagation allows us to apply these range additions
+ * in O(log N) time by deferring the updates to children until absolutely necessary.
+ * 
+ * * STEP 5: Finding the Leftmost '0' (The IVT Descent)
+ * Now we have a tree updated with our balances. How do we find the leftmost `0`?
+ * - Notice that `val[L]` and `val[L+1]` will differ by at most 1 (because moving
+ * the left endpoint by 1 drops exactly one number).
+ * - By the Intermediate Value Theorem (IVT), the values are contiguous.
+ * - Therefore, if a Segment Tree node tells us its `min_val <= 0` and its
+ * `max_val >= 0`, a `0` is MATHEMATICALLY GUARANTEED to exist in that branch!
+ * - We can do an O(log N) descent: If a branch contains 0, dive Left first
+ * (to get the longest subarray), and if it fails, dive Right.
+ * 
+ * * * [COMPLEXITY ANALYSIS]
+ * - Time: O(N log N) -> N elements, each takes O(log N) to update and query.
+ * - Space: O(N) -> Size 4*N for Segment Tree arrays + Hash map of size 10^5.
+ * ============================================================================
  */
-
-class Solution
+class LazySegmentTree
 {
 private:
-    // Segment Tree stores a pair <min, max> for each range.
-    // This allows us to quickly check if a specific target value exists in a subtree.
-    vector<pair<int, int>> segT;
-
-    // Lazy array for Lazy Propagation updates
+    vector<int> min_val;
+    vector<int> max_val;
     vector<int> lazy;
+    int n;
 
-    int N;
-
-    /**
-     * Helper: propagateUpdate
-     * -----------------------
-     * Pushes pending updates from a parent node down to its children.
-     * Crucial for O(log N) range updates.
-     */
-    void propagateUpdate(int l, int r, int segI)
+    // LAZY PROPAGATION: Push pending updates to the left and right children
+    void pushDown(int treeIdx)
     {
-
-        if (lazy[segI] != 0)
+        if (lazy[treeIdx] != 0)
         {
-            // Apply the pending update to the current node
-            segT[segI].first += lazy[segI];
-            segT[segI].second += lazy[segI];
+            int left = 2 * treeIdx + 1;
+            int right = 2 * treeIdx + 2;
 
-            // If not a leaf node, push the lazy value to children
-            if (l != r)
-            {
-                int segIL = 2 * segI + 1;
-                int segIR = 2 * segI + 2;
-                lazy[segIL] += lazy[segI];
-                lazy[segIR] += lazy[segI];
-            }
+            // Apply the deferred update to the left child
+            lazy[left] += lazy[treeIdx];
+            min_val[left] += lazy[treeIdx];
+            max_val[left] += lazy[treeIdx];
 
-            // Clear the lazy value for current node
-            lazy[segI] = 0;
+            // Apply the deferred update to the right child
+            lazy[right] += lazy[treeIdx];
+            min_val[right] += lazy[treeIdx];
+            max_val[right] += lazy[treeIdx];
+
+            // Clear the current treeIdx's pending update
+            lazy[treeIdx] = 0;
         }
     }
 
-    /**
-     * Method: updateRange
-     * -------------------
-     * Updates the cumulative sum for all subarrays starting in range [rangeL, rangeR].
-     * * Logic:
-     * 1. Standard Lazy Propagation structure.
-     * 2. If range matches fully, update lazy and return.
-     * 3. Else, recurse to children and update min/max on the way back.
-     */
-    void updateRange(int l, int r, int segI, int rangeL, int rangeR, int updateDelta)
+    // RANGE UPDATE: Add `val` to all leaves in the interval [L, R]
+    void updateRange(int treeIdx, int start, int end, int L, int R, int val)
     {
+        // Out of bounds
+        if (start > R || end < L)
+            return;
 
-        // 1. Always propagate first to ensure current node state is clean
-        propagateUpdate(l, r, segI);
-
-        // 2. Out of Range: Do nothing
-        if (r < rangeL || rangeR < l)
+        // Full Overlap: Update this treeIdx and stop. Defer children updates.
+        if (L <= start && end <= R)
         {
+            lazy[treeIdx] += val;
+            min_val[treeIdx] += val;
+            max_val[treeIdx] += val;
             return;
         }
-        // 3. Full Overlap: Apply update lazily
-        else if (rangeL <= l && r <= rangeR)
-        {
-            lazy[segI] += updateDelta;
-            propagateUpdate(l, r, segI); // Apply immediately to current node
-            return;
-        }
-        // 4. Partial Overlap: Recurse
-        else
-        {
-            int mid = l + (r - l) / 2;
 
-            int segIL = 2 * segI + 1;
-            int segIR = 2 * segI + 2;
+        // Partial Overlap: Push pending updates down before branching
+        pushDown(treeIdx);
 
-            updateRange(l, mid, segIL, rangeL, rangeR, updateDelta);
-            updateRange(mid + 1, r, segIR, rangeL, rangeR, updateDelta);
+        int mid = start + (end - start) / 2;
+        updateRange(2 * treeIdx + 1, start, mid, L, R, val);
+        updateRange(2 * treeIdx + 2, mid + 1, end, L, R, val);
 
-            // Backtracking: Update current node's min/max from children
-            segT[segI].first = min(segT[segIL].first, segT[segIR].first);
-            segT[segI].second = max(segT[segIL].second, segT[segIR].second);
-
-            return;
-        }
+        // Post-Order Merge
+        min_val[treeIdx] = min(min_val[2 * treeIdx + 1], min_val[2 * treeIdx + 2]);
+        max_val[treeIdx] = max(max_val[2 * treeIdx + 1], max_val[2 * treeIdx + 2]);
     }
 
-    /**
-     * Method: leftMostIdxOfValueAtRange
-     * ---------------------------------
-     * Searches for the LEFTMOST index 'i' in [rangeL, rangeR] where the cumulative sum is 'targetVal'.
-     * * OPTIMIZATIONS (vs O(N) linear search):
-     * 1. Pruning: If 'targetVal' is outside [node.min, node.max], we return -1 immediately.
-     * This skips entire subtrees, making the search O(log N) on average.
-     * 2. Greedy Search: We always check the Left Child first. If found, we don't check Right.
-     */
-    int leftMostIdxOfValueAtRange(int l, int r, int segI, int rangeL, int rangeR, int targetVal)
+    // DESCENT QUERY: Find the leftmost leaf containing the value `0`
+    int queryLeftmostZero(int treeIdx, int start, int end, int L, int R)
     {
-
-        // Ensure current node is up-to-date
-        propagateUpdate(l, r, segI);
-
-        // 1. PRUNING: Is the target impossible in this subtree?
-        // If min > target or max < target, the value doesn't exist here.
-        if (targetVal < segT[segI].first || segT[segI].second < targetVal)
-        {
+        // Out of bounds
+        if (start > R || end < L)
             return -1;
-        }
-        // 2. Boundary Check: Out of query range
-        else if (r < rangeL || rangeR < l)
-        {
+
+        // PRUNING: Intermediate Value Theorem.
+        // If 0 is not between min and max, 0 does not exist in this segment.
+        if (min_val[treeIdx] > 0 || max_val[treeIdx] < 0)
             return -1;
-        }
-        // 3. Leaf Node: We found a potential candidate
-        else if (l == r)
-        {
-            if (segT[segI].first == targetVal)
-                return l;
-            else
-                return -1;
-        }
 
-        int mid = l + (r - l) / 2;
-        int segIL = 2 * segI + 1;
-        int segIR = 2 * segI + 2;
+        // Base Case: We hit a valid leaf!
+        if (start == end)
+            return start;
 
-        int leftMostidx = -1;
+        // Must push down pending updates before reading children!
+        pushDown(treeIdx);
 
-        // 4. Greedy Left Search
-        leftMostidx = leftMostIdxOfValueAtRange(l, mid, segIL, rangeL, rangeR, targetVal);
+        int mid = start + (end - start) / 2;
 
-        // If found in left, return it (priority to leftmost index)
-        if (leftMostidx != -1)
-        {
-            return leftMostidx;
-        }
-        // Otherwise, search right
-        else
-            return leftMostIdxOfValueAtRange(mid + 1, r, segIR, rangeL, rangeR, targetVal);
+        // Priority 1: Dive Left
+        int leftResult = queryLeftmostZero(2 * treeIdx + 1, start, mid, L, R);
+        if (leftResult != -1)
+            return leftResult;
+
+        // Priority 2: Dive Right
+        return queryLeftmostZero(2 * treeIdx + 2, mid + 1, end, L, R);
     }
 
 public:
+    LazySegmentTree(int size)
+    {
+        n = size;
+        min_val.assign(4 * n, 0);
+        max_val.assign(4 * n, 0);
+        lazy.assign(4 * n, 0);
+    }
+
+    void update(int L, int R, int val)
+    {
+        if (L > R)
+            return;
+        updateRange(0, 0, n - 1, L, R, val);
+    }
+
+    int getLeftmostZero(int R)
+    {
+        return queryLeftmostZero(0, 0, n - 1, 0, R);
+    }
+};
+
+class Solution
+{
+public:
     int longestBalanced(vector<int> &nums)
     {
+        int n = nums.size();
+        LazySegmentTree segTree(n);
 
-        N = nums.size();
+        // Use a flat array for O(1) lookups instead of unordered_map.
+        // Elements are guaranteed to be <= 10^5 per constraints.
+        vector<int> last_seen(100005, -1);
 
-        // Resize Segment Tree (4*N is safe upper bound)
-        // Default init to 0 is correct as initial cumulative sums are 0
-        segT.resize(4 * N);
-        lazy.resize(4 * N);
+        int max_len = 0;
 
-        // Map to track the previous index of each number (for uniqueness constraint)
-        unordered_map<int, int> lastSeen;
-
-        int maxLen = 0;
-
-        // Main Loop: Sliding Window / Line Sweep
-        // We move 'r' (End of subarray) one by one.
-        for (int r = 0; r < N; ++r)
+        for (int R = 0; R < n; ++R)
         {
+            int num = nums[R];
+            int prev_pos = last_seen[num];
 
-            int curDelta = (nums[r] % 2 == 0) ? 1 : -1;
+            // If Even -> Add 1. If Odd -> Subtract 1.
+            int update_val = (num % 2 == 0) ? 1 : -1;
 
-            // -------------------------------------------------------
-            // Step 1: Handle Duplicates (Enforce Uniqueness)
-            // -------------------------------------------------------
-            // If nums[r] appeared before at 'prevIdx', it was already contributing
-            // +1 or -1 to subarrays starting at 0...prevIdx.
-            // Since it appears again, we must REMOVE its old contribution from those
-            // subarrays to avoid double counting.
-            if (lastSeen.find(nums[r]) != lastSeen.end())
+            // Apply Range Update
+            segTree.update(prev_pos + 1, R, update_val);
+
+            // Query the leftmost starting point L where balance == 0
+            int L = segTree.getLeftmostZero(R);
+
+            if (L != -1)
             {
-                int prevIdx = lastSeen[nums[r]];
-
-                // Range Update: Subtract curDelta from range [0...prevIdx]
-                // Complexity: O(log N)
-                int rangeL = 0;
-                int rangeR = prevIdx;
-                int updateDelta = (-curDelta);
-                updateRange(0, N - 1, 0, rangeL, rangeR, updateDelta);
+                max_len = max(max_len, R - L + 1);
             }
 
-            // -------------------------------------------------------
-            // Step 2: Update Current Range
-            // -------------------------------------------------------
-            // Add the current number's contribution to ALL subarrays ending at 'r'.
-            // Conceptually, this updates cumulativeSum[0...r] += curDelta.
-            // Complexity: O(log N)
-            int rangeL = 0;
-            int rangeR = r;
-            int updateDelta = curDelta;
-            updateRange(0, N - 1, 0, rangeL, rangeR, updateDelta);
-
-            // -------------------------------------------------------
-            // Step 3: Find Longest Balanced Subarray
-            // -------------------------------------------------------
-            // We need to find the smallest 'l' such that cumulativeSum[l] == 0.
-            // This means subarray nums[l...r] is balanced.
-            // Complexity: O(log N) due to pruning
-            rangeL = 0;
-            rangeR = r;
-            int targetVal = 0;
-            int leftMostIdx = leftMostIdxOfValueAtRange(0, N - 1, 0, rangeL, rangeR, targetVal);
-
-            // If a valid start index exists
-            if (leftMostIdx != -1)
-            {
-                maxLen = max(maxLen, (r - leftMostIdx + 1));
-            }
-
-            // Record current index for future duplicate handling
-            lastSeen[nums[r]] = r;
+            // Update the last seen position for this number
+            last_seen[num] = R;
         }
 
-        return maxLen;
+        return max_len;
     }
 };
 

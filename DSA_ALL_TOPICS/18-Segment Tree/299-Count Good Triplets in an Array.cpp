@@ -14,6 +14,7 @@ using namespace std;
 Title: Count Good Triplets in an Array
 
 Link:
+https://www.youtube.com/watch?v=gRF7k0dNr7k&t=1s
 https://leetcode.com/problems/count-good-triplets-in-an-array/description/
 
 
