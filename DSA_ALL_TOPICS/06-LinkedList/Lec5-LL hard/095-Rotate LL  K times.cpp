@@ -70,6 +70,9 @@ public:
     }
 };
 
+//--------------
+// Approach : 1
+//--------------
 class Solution
 {
 public:
@@ -110,6 +113,82 @@ public:
         back->next = nullptr;
 
         return head;
+    }
+};
+
+/**
+ * ============================================================================
+ * Approach 2: Circular Linked List + Modulo Math   [RECOMMENDED]
+ * ============================================================================
+ * Logic:
+ * 1. Find the length of the list and locate the tail node.
+ * 2. Connect the tail to the head to form a circular ring.
+ * 3. Find the actual number of rotations needed using k % N.
+ * 4. Traverse to the (N - k % N)th node, which will become our new tail.
+ * 5. Break the circle and return the new head.
+ * ============================================================================
+ * Complexity:
+ * - Time: O(N). We traverse the list once to find the length, and partially
+ *   traverse it again to find the cut point. Total steps <= 2N.
+ * - Space: O(1). We only allocate a few pointers, modifying the list in-place.
+ * ============================================================================
+ */
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution
+{
+public:
+    ListNode *rotateRight(ListNode *head, int k)
+    {
+        // Defensive Engineering: Handle edge cases instantly
+        if (!head || !head->next || k == 0)
+        {
+            return head;
+        }
+
+        // Step 1: Find the length (N) and the original tail node
+        int len = 1;
+        ListNode *tail = head;
+        while (tail->next)
+        {
+            len++;
+            tail = tail->next;
+        }
+
+        // Step 2: Calculate effective rotations to bypass the 2 * 10^9 constraint
+        int effective_k = k % len;
+        if (effective_k == 0)
+        {
+            return head; // List returns to original state
+        }
+
+        // Step 3: Connect tail to head to form a circular ring
+        tail->next = head;
+
+        // Step 4: Find the new tail
+        // If we rotate right by effective_k, the new tail is at index (len - effective_k - 1)
+        ListNode *new_tail = head;
+        int steps_to_new_tail = len - effective_k - 1;
+
+        for (int i = 0; i < steps_to_new_tail; ++i)
+        {
+            new_tail = new_tail->next;
+        }
+
+        // Step 5: Define the new head and sever the ring
+        ListNode *new_head = new_tail->next;
+        new_tail->next = nullptr;
+
+        return new_head;
     }
 };
 
