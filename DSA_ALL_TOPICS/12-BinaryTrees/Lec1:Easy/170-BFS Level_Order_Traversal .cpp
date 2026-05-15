@@ -68,13 +68,27 @@ struct TreeNode
 class Solution
 {
 public:
+  /**
+   * Definition for a binary tree node.
+   * struct TreeNode {
+   *     int val;
+   *     TreeNode *left;
+   *     TreeNode *right;
+   *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+   *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+   *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+   * };
+   */
+
   //-------------------------------------------------------------------------------
   // 1. Title: Level order Traversal i.e. BFS
   //-------------------------------------------------------------------------------
 
+  //============================================================================
+  // Approch 1: using two queues
+  //============================================================================
+
   /**
-   * Approach1: Level Order Traversal using two queues (q1 and q2).
-   *
    * At each level, one queue holds the current level nodes, and the other is used to queue up the next level nodes.
    * After processing all nodes in one queue, we switch to the other for the next level.
    *
@@ -137,54 +151,57 @@ public:
     }
     return ans;
   }
+};
 
-  /**
-   * Approach2: Level Order Traversal using a single queue.
-   *
-   * At each iteration, we process all nodes in the current level by tracking the queue size (number of nodes in current level),
-   * and for each node, we push its children into the queue to be processed in the next iteration (next level).
-   *
-   * Time Complexity: O(N)
-   *     - Every node is visited exactly once.
-   *
-   * Space Complexity: O(N)
-   *     - At worst, we store an entire level of the tree in the queue and output vector.
-   */
+//============================================================================
+// Approch 2: using a single queue  [RECOMMENDED]
+//============================================================================
+/**
+ * At each iteration, we process all nodes in the current level by tracking the queue size (number of nodes in current level),
+ * and for each node, we push its children into the queue to be processed in the next iteration (next level).
+ *
+ * Time Complexity: O(N)
+ *     - Every node is visited exactly once.
+ *
+ * Space Complexity: O(N)
+ *     - At worst, we store an entire level of the tree in the queue and output vector.
+ */
+
+class Solution
+{
+public:
   vector<vector<int>> levelOrder(TreeNode *root)
   {
 
-    vector<vector<int>> ans;
-
-    if (root == NULL)
-      return ans;
-
     queue<TreeNode *> q;
 
-    q.push(root);
+    vector<vector<int>> ans;
+
+    if (root)
+      q.push(root);
 
     while (!q.empty())
     {
-
-      vector<int> tmp;
-
       int size = q.size();
+      vector<int> level;
 
-      for (int i = 0; i < size; i++)
+      while (size--)
       {
-
-        TreeNode *node = q.front();
+        TreeNode *cur = q.front();
         q.pop();
 
-        tmp.push_back(node->val);
+        level.push_back(cur->val);
 
-        if (node->left != NULL)
-          q.push(node->left);
-        if (node->right != NULL)
-          q.push(node->right);
+        if (cur->left)
+          q.push(cur->left);
+
+        if (cur->right)
+          q.push(cur->right);
       }
 
-      ans.push_back(tmp);
+      ans.push_back(level);
     }
+
     return ans;
   }
 };

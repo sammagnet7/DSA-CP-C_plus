@@ -180,9 +180,9 @@ class Solution_Iter
 {
 public:
   /**
-   * ============================================================================
+   * ---------------------------------------------
    * 1. PRE-ORDER TRAVERSAL (Root -> Left -> Right)
-   * ============================================================================
+   * ---------------------------------------------
    * Logic: Standard Stack Approach.
    * Since a stack is LIFO (Last In, First Out), we must push the RIGHT child
    * first, then the LEFT child. This ensures the Left child is popped and
@@ -219,9 +219,9 @@ public:
   }
 
   /**
-   * ============================================================================
+   * ---------------------------------------------
    * 2. IN-ORDER TRAVERSAL (Left -> Root -> Right)
-   * ============================================================================
+   * ---------------------------------------------
    * Logic: Call-Stack Simulation (State Machine).
    * We use an integer `term` to represent the CPU instruction pointer:
    * - State 1: We just arrived at this node. Push it to state 2, and go Left.
@@ -272,9 +272,9 @@ public:
   }
 
   /**
-   * ============================================================================
+   * -----------------------------------------------
    * 3. POST-ORDER TRAVERSAL (Left -> Right -> Root)
-   * ============================================================================
+   * -----------------------------------------------
    * Logic: Call-Stack Simulation (State Machine).
    * Exact same logic as In-Order, but we add a 3rd state because the Root is
    * processed LAST, after returning from the Right child.
@@ -325,9 +325,9 @@ public:
   }
 
   /**
-   * ============================================================================
+   * ------------------------------------------------------
    * 4. POST-ORDER TRAVERSAL (The "Reverse Pre-Order" Hack)
-   * ============================================================================
+   * ------------------------------------------------------
    * Logic: Standard Stack + Array Reversal.
    * Post-order is (Left -> Right -> Root).
    * If we do a modified Pre-order of (Root -> Right -> Left), we can simply

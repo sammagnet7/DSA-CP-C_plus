@@ -72,30 +72,49 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : data(x), left(left), right(right) {}
 };
 
+//============================================================================
+// Approch 1: Recursive approach
+//============================================================================
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Preorder Inorder Postorder Traversals in One Traversal
-  //-------------------------------------------------------------------------------
-
-  void traverse_rec(TreeNode *root, vector<int> &in, vector<int> &pre, vector<int> &post)
+  void rec_traverse(TreeNode *node, vector<int> &pre, vector<int> &in, vector<int> &post)
   {
 
-    if (root == NULL)
-      return;
+    int cur = node->data;
 
-    pre.push_back(root->data);
+    pre.push_back(cur);
 
-    traverse_rec(root->left, in, pre, post);
+    if (node->left)
+      rec_traverse(node->left, pre, in, post);
 
-    in.push_back(root->data);
+    in.push_back(cur);
 
-    traverse_rec(root->right, in, pre, post);
+    if (node->right)
+      rec_traverse(node->right, pre, in, post);
 
-    post.push_back(root->data);
+    post.push_back(cur);
   }
 
+  vector<vector<int>> getTreeTraversal(TreeNode *root)
+  {
+    // Write your code here.
+
+    vector<int> pre, in, post;
+
+    rec_traverse(root, pre, in, post);
+
+    return {in, pre, post};
+  }
+};
+
+//============================================================================
+// Approch 2: Iterative approach
+//============================================================================
+
+class Solution
+{
+public:
   /**
    * Approach:
    * - This function performs all three tree traversals (Preorder, Inorder, Postorder)
@@ -103,8 +122,8 @@ public:
    * - It simulates the recursive traversal by using a visit count to decide which
    *   traversal phase (pre/in/post) the node is in.
    *
-   * Time Complexity: O(N) ? Each node is visited exactly three times.
-   * Space Complexity: O(H) ? Stack holds nodes up to the height of the tree (H = logN for balanced tree, N for skewed).
+   * Time Complexity: O(N) : Each node is visited exactly three times.
+   * Space Complexity: O(H) : Stack holds nodes up to the height of the tree (H = logN for balanced tree, N for skewed).
    */
   void traverse_itr(TreeNode *root, vector<int> &in, vector<int> &pre, vector<int> &post)
   {
@@ -172,8 +191,6 @@ public:
   {
     // Write your code here.
     vector<int> in, pre, post;
-
-    // traverse_rec(root, in, pre, post);
 
     traverse_itr(root, in, pre, post);
 
