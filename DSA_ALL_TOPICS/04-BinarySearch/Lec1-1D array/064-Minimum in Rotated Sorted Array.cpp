@@ -48,50 +48,87 @@ OUTPUT::::::
 11
 
  */
+
+/**
+ * ============================================================================
+ * Class: Solution
+ * Approach: Binary Search (Sorted-Half Elimination)
+ * ============================================================================
+ * Intuition:
+ * A rotated sorted array is always composed of two perfectly sorted sub-arrays.
+ * By checking the middle element, we can always determine which half of our
+ * current search space is perfectly sorted. The minimum element of any perfectly
+ * sorted half is simply its leftmost element. We record that minimum, and then
+ * throw that entire half away to search the other (unsorted) half.
+ *
+ * Approach:
+ * 1. Maintain a global `minVal` tracking the smallest number seen so far.
+ * 2. At each step, if the entire current window `[l, r]` is already sorted,
+ *    the minimum is strictly at `l`. We record it and immediately break.
+ * 3. Otherwise, find `mid`. Check if the left half `[l, mid]` is sorted.
+ *    - If YES: The minimum of the left half is `nums[l]`. Record it, then
+ *      discard the left half (`l = mid + 1`).
+ *    - If NO: The right half `[mid, r]` must be sorted. The minimum of the
+ *      right half is `nums[mid]`. Record it, then discard the right half
+ *      (`r = mid - 1`).
+ * ============================================================================
+ * Complexity:
+ * - Time: O(log N). We eliminate exactly half of the search space on every
+ *   iteration, leading to logarithmic time complexity.
+ * - Space: O(1). We only use a few primitive integer variables for pointers.
+ * ============================================================================
+ */
 class Solution
 {
 public:
-    // Optimal approach:
-    // Time: O(logN)
-    // Space: O(1)
-    int findMin(vector<int> &arr)
+    int findMin(vector<int> &nums)
     {
 
-        int N = arr.size();
+        int n = nums.size();
+        int minVal = INT_MAX; // Global tracker for the minimum value
 
-        int l = 0, r = N - 1;
-        int minI = INT_MAX;
+        int l = 0;
+        int r = n - 1;
 
         while (l <= r)
         {
 
-            if (arr[l] <= arr[r])
-            { // search space is already sorte no further iteration is needed
-                minI = min(minI, arr[l]);
-                break;
+            // EARLY EXIT (O(1) Check):
+            // If the element at 'l' is <= the element at 'r', the current
+            // sub-array is completely sorted. There is no rotation here.
+            // The smallest element must be at the very beginning ('l').
+            if (nums[l] <= nums[r])
+            {
+                minVal = min(minVal, nums[l]);
+                break; // Stop searching entirely to save CPU cycles
             }
 
+            // Calculate mid safely to prevent integer overflow
             int mid = l + (r - l) / 2;
 
-            // This handles the l==r case, or the end of a search
-            if (l == r)
+            // CONDITION 1: The Left Half is perfectly sorted.
+            if (nums[l] <= nums[mid])
             {
-                minI = min(minI, arr[l]);
-                break;
-            }
+                // The smallest value in this left half is guaranteed to be nums[l].
+                minVal = min(minVal, nums[l]);
 
-            if (arr[l] <= arr[mid])
-            {                             // Left side is sorted
-                minI = min(arr[l], minI); // Take min from left
-                l = mid + 1;              // Then go t right side
+                // Since we've processed the left half, the absolute minimum
+                // must be hiding in the unsorted right half.
+                l = mid + 1;
             }
-            else if (arr[mid] < arr[r])
-            {                               // Right side is sorted
-                minI = min(arr[mid], minI); // Take min from the right side
-                r = mid - 1;                // Then go to the left side
+            // CONDITION 2: The Right Half is perfectly sorted.
+            else
+            {
+                // The smallest value in this right half is guaranteed to be nums[mid].
+                minVal = min(minVal, nums[mid]);
+
+                // Since we've processed the right half, the absolute minimum
+                // must be hiding in the unsorted left half.
+                r = mid - 1;
             }
         }
-        return minI;
+
+        return minVal;
     }
 };
 
