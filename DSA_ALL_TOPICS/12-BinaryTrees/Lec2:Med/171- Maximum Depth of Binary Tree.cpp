@@ -63,63 +63,94 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+//-------------------------------------------------------------------------------
+// 1. Title: Height of a Binary Tree
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * APPROACH 1: RECURSIVE DEPTH-FIRST SEARCH (BOTTOM-UP)
+ * ============================================================================
+ * Logic: We ask our left child its max depth, ask our right child its max depth,
+ * take the larger of the two, and add 1 for ourselves. This bubbles up the
+ * max depth from the leaves back to the root.
+ *
+ * Time Complexity: O(N)
+ * -> We visit every single node in the tree exactly once.
+ * Space Complexity: O(H) (Where H is the height of the tree)
+ * -> This is the implicit memory used by the recursive call stack.
+ * -> Best/Average case (Balanced Tree): O(log N)
+ * -> Worst case (Skewed Tree / Linked List): O(N)
+ * ============================================================================
+ */
+class Solution1
+{
+public:
+  int maxDepth(TreeNode *root)
+  {
+    // Base Case: If we hit a null pointer, it contributes 0 to the depth.
+    if (!root)
+    {
+      return 0;
+    }
+
+    // Recursive Step: 1 (current node) + max depth of subtrees
+    return 1 + max(maxDepth(root->left), maxDepth(root->right));
+  }
+};
+
+/**
+ * ============================================================================
+ * APPROACH 2: ITERATIVE BREADTH-FIRST SEARCH (LEVEL-ORDER)
+ * ============================================================================
+ * Logic: We use a Queue to process the tree one horizontal level at a time.
+ * By capturing the `size` of the queue at the start of each level, we know
+ * exactly how many nodes belong to the current depth level. Every time we
+ * process a full level, we increment our depth counter.
+ *
+ * Time Complexity: O(N)
+ * -> Every node is pushed and popped from the queue exactly once.
+ * Space Complexity: O(W) (Where W is the maximum width of the tree)
+ * -> The queue holds at most one complete level of the tree at a time.
+ * -> Worst case (Perfectly Balanced Tree): The bottom level holds roughly N/2
+ *    nodes, making the space complexity O(N).
+ * ============================================================================
+ */
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Height of a Binary Tree
-  //-------------------------------------------------------------------------------
-  // Approach1:
-
-  // Optimal approach: using recursion
-  // Time: O(N)
-  // Space: O(h) i.e. auxiliary stack space
   int maxDepth(TreeNode *root)
   {
+    int depth = 0;
+    queue<TreeNode *> q;
 
-    if (root == NULL)
-      return 0;
-
-    int lLen = maxDepth(root->left);
-    int rLen = maxDepth(root->right);
-
-    return (1 + max(lLen, rLen));
-  }
-
-  // Approach2:
-
-  // // Optimal approach: using iteration
-  // // Time: O(N)
-  // // Space: O(N/2) because at last level N/2 leaf nodes stays
-  int maxDepth(TreeNode* root) {
-
-      if (root == NULL)
-          return 0;
-
-      int ans = 0;
-
-      queue<TreeNode *> q;    // O(N/2)
+    // Guard against an empty tree input
+    if (root)
       q.push(root);
 
-      while (!q.empty())
+    // Continue until there are no more levels to process
+    while (!q.empty())
+    {
+      // Capture the number of nodes at the current level
+      int size = q.size();
+      ++depth; // We are stepping into a new depth level
+
+      // Process all nodes strictly belonging to this current level
+      while (size--)
       {
-          ans++;
+        TreeNode *cur = q.front();
+        q.pop();
 
-          int preLvlSize = q.size();
+        // Queue up the children for the NEXT level
+        if (cur->left)
+          q.push(cur->left);
 
-          for (int i = 0; i < preLvlSize; i++)
-          {
-              TreeNode *node = q.front();
-              q.pop();
-
-              if (node->left != NULL)
-                  q.push(node->left);
-              if (node->right != NULL)
-                  q.push(node->right);
-          }
+        if (cur->right)
+          q.push(cur->right);
       }
+    }
 
-      return ans;
+    return depth;
   }
 };
 

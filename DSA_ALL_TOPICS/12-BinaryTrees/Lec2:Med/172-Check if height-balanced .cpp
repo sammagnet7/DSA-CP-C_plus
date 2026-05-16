@@ -64,38 +64,40 @@ public:
   // 1. Title: Check if the Binary tree is height-balanced or not
   //-------------------------------------------------------------------------------
 
-  // Approach1:
+  // =======================================
+  // Approach1: Using int reference variable
+  // =======================================
+  // Time: O(N)
+  // Space: O(h)
+  bool checkBalance(TreeNode *root, int &depth)
+  {
 
-  // // Optimal approach: Using int reference
-  // // Time: O(N)
-  // // Space: O(h)
-  // bool checkBalance(TreeNode* root, int &depth){
+    if (root == NULL)
+    {
+      depth = 0;
+      return true;
+    }
 
-  //     if(root == NULL){
-  //         depth = 0;
-  //         return true;
-  //     }
+    int lTreeDepth = 0;
+    int rTreeDepth = 0;
 
-  //     int lTreeDepth = 0;
-  //     int rTreeDepth = 0;
+    bool isLBalanced = checkBalance(root->left, lTreeDepth);
+    bool isRBalanced = checkBalance(root->right, rTreeDepth);
 
-  //     bool isLBalanced = checkBalance(root->left, lTreeDepth);
-  //     bool isRBalanced = checkBalance(root->right, rTreeDepth);
+    if (!isLBalanced || !isRBalanced)
+      return false;
 
-  //     if(!isLBalanced || !isRBalanced)
-  //         return false;
+    if (abs(lTreeDepth - rTreeDepth) > 1)
+      return false;
 
-  //     if(abs(lTreeDepth-rTreeDepth)>1)
-  //         return false;
+    depth = 1 + max(lTreeDepth, rTreeDepth);
 
-  //     depth = 1+ max(lTreeDepth, rTreeDepth);
+    return true;
+  }
 
-  //     return true;
-  // }
-
-  // Approach2:
-
-  // Optimal approach: Using -1 as false
+  // ======================================================
+  // Approach 2: Using return val -1 as false [RECOMMENDED]
+  // ======================================================
   // Time: O(N)
   // Space: O(h)
   int checkBalance(TreeNode *root)
