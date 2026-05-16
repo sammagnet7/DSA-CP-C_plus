@@ -9,8 +9,9 @@
 using namespace std;
 
 /*
-Find Minimum in Rotated Sorted Array
+1. Title: Find Minimum in Rotated Sorted Array
 
+Links:
 https://takeuforward.org/data-structure/minimum-in-rotated-sorted-array/
 https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/
 
@@ -47,11 +48,63 @@ OUTPUT::::::
 0
 11
 
+-------------------------------------------------------------------------------
+2. Title: Find Minimum in Rotated Sorted Array II
+
+
+Links:
+https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/description/
+
+
+Problem statement:
+Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,4,4,5,6,7] might become:
+
+[4,5,6,7,0,1,4] if it was rotated 4 times.
+[0,1,4,4,5,6,7] if it was rotated 7 times.
+Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].
+
+Given the sorted rotated array nums that may contain duplicates, return the minimum element of this array.
+
+You must decrease the overall operation steps as much as possible.
+
+
+
+Example 1:
+    Input: nums = [1,3,5]
+    Output: 1
+
+Example 2:
+    Input: nums = [2,2,2,0,1]
+    Output: 0
+
+
+Constraints:
+    n == nums.length
+    1 <= n <= 5000
+    -5000 <= nums[i] <= 5000
+    nums is sorted and rotated between 1 and n times.
+
+
+Follow up: This problem is similar to Find Minimum in Rotated Sorted Array, but nums may contain duplicates. Would this affect the runtime complexity? How and why?
+
+
+
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+
+
  */
+
+//-------------------------------------------------------------------------------
+// 1. Title: Find Minimum in Rotated Sorted Array
+//-------------------------------------------------------------------------------
 
 /**
  * ============================================================================
- * Class: Solution
  * Approach: Binary Search (Sorted-Half Elimination)
  * ============================================================================
  * Intuition:
@@ -97,7 +150,7 @@ public:
             // If the element at 'l' is <= the element at 'r', the current
             // sub-array is completely sorted. There is no rotation here.
             // The smallest element must be at the very beginning ('l').
-            if (nums[l] <= nums[r])
+            if (nums[l] < nums[r])
             {
                 minVal = min(minVal, nums[l]);
                 break; // Stop searching entirely to save CPU cycles
@@ -125,6 +178,94 @@ public:
                 // Since we've processed the right half, the absolute minimum
                 // must be hiding in the unsorted left half.
                 r = mid - 1;
+            }
+        }
+
+        return minVal;
+    }
+};
+
+//-------------------------------------------------------------------------------
+// 2. Title: Find Minimum in Rotated Sorted Array II
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * Approach: Optimized Binary Search with Duplicate Resolution
+ * ============================================================================
+ * Intuition:
+ * This algorithm finds the minimum element in a rotated sorted array that
+ * contains duplicates. It combines three powerful optimizations:
+ * 1. Global Minimum Tracking: We always record the middle element.
+ * 2. Duplicate Patch: If the boundaries and mid are identical, we shrink
+ *    the window to resolve the mathematical ambiguity.
+ * 3. Early Exit: If the current window is perfectly sorted (no rotation),
+ *    the minimum is simply the leftmost element.
+ * ============================================================================
+ * Complexity:
+ * - Time: O(log N) average. O(N) worst-case (if the array is entirely
+ *   identical duplicates, e.g., [2,2,2,2], forcing O(N) window shrinking).
+ * - Space: O(1). No extra memory allocated.
+ * ============================================================================
+ */
+class Solution
+{
+public:
+    int findMin(vector<int> &nums)
+    {
+
+        int n = nums.size();
+        int minVal = INT_MAX;
+
+        int l = 0;
+        int r = n - 1;
+
+        while (l <= r)
+        {
+
+            // Safe mid calculation to prevent integer overflow
+            int mid = l + (r - l) / 2;
+
+            // Record mid immediately. This acts as a protective mechanism
+            // before we potentially throw away boundaries in the duplicate patch.
+            minVal = min(minVal, nums[mid]);
+
+            // ================================================================
+            // THE PATCH: Resolve Duplicate Ambiguity
+            // If the boundaries and mid are identical, we cannot determine
+            // which half is sorted. Shrink the window to clear the blind spot.
+            // ================================================================
+            if (nums[l] == nums[mid] && nums[mid] == nums[r])
+            {
+                ++l;
+                --r;
+                continue;
+            }
+
+            // ================================================================
+            // EARLY EXIT: Fully Sorted Segment
+            // If the sub-array has no rotation, the minimum is at 'l'.
+            // ================================================================
+            if (nums[l] < nums[r])
+            {
+                minVal = min(minVal, nums[l]);
+                break;
+            }
+            // ================================================================
+            // CONDITION 1: The Left Sub-Array is Perfectly Sorted
+            // ================================================================
+            else if (nums[l] <= nums[mid])
+            {
+                minVal = min(minVal, nums[l]);
+                l = mid + 1; // Discard left, search right
+            }
+            // ================================================================
+            // CONDITION 2: The Right Sub-Array is Perfectly Sorted
+            // ================================================================
+            else
+            {
+                minVal = min(minVal, nums[mid]);
+                r = mid - 1; // Discard right, search left
             }
         }
 

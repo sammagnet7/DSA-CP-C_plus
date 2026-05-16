@@ -86,169 +86,226 @@ OUTPUT::::::
 
 
  */
+
+/**
+ * ============================================================================
+ * 1. Title: Search in Rotated Sorted Array without Duplicate
+ * ============================================================================
+ * Intuition:
+ * We use binary search to locate the target. Because the array is rotated,
+ * we must first determine which half of our current window is perfectly sorted.
+ * Once we know the sorted half, we can check if the target falls within its
+ * minimum and maximum boundaries. If it does, we search that half. If it
+ * doesn't, the target must be hiding in the other (unsorted) half.
+ *
+ * Optimization:
+ * If the current search space [l, r] is perfectly sorted (nums[l] < nums[r]),
+ * the rotation is no longer a factor. We can completely bypass the boundary
+ * logic and fall back to a standard, ultra-fast binary search.
+ * ============================================================================
+ * Complexity:
+ * - Time: O(log N). We discard exactly half the search space per iteration.
+ * - Space: O(1). Only a few primitive integer pointers are used.
+ * ============================================================================
+ */
 class Solution
 {
 public:
-    // Optimal approach
-    //
-    // Approach w/o duplicates:
-    // As the array is rotated, whichever index we take,
-    // either side of it is sorted and the other side may not be sorted
-    // Use Binary search on the sorted side.
-    // If element is not found then
-    // in the other unsorted side, again try to find sorted half and Binary search on it.
-    // Likewise continue
-    //
-    // Approach w/ duplicates:
-    // Same approach + There can arise an edge case: arr[l]==arr[mid]==arr[r] != target
-    // For this edge case We will eliminate the eliments from both edges making the array smaller
-    // until getting out of this case.
-    // Beacause anyway these elements are to be eliminated
-    // Lines added with annotation [*Duplicate handle]
-    //
-    // Time: O(Log N) if array is free from duplicates
-    //       O(N)     if array is full of duplicates
-    // Space: O(1)
-    int search(vector<int> &arr, int target)
-    {
-        int N = arr.size();
-        int l = 0, r = N - 1;
-        int res = -1;
-
-        while (l <= r)
-        {
-
-            int mid = l - (l - r) / 2;
-
-            if (arr[mid] == target)
-            {
-                return mid;
-            }
-
-            // if true means left half is sorted and right half may not be sorted.
-            bool dirL = arr[l] <= arr[mid];                               // left side is sorted
-            bool dirR = arr[mid] <= arr[r];                               // right side is sorted
-            bool edgeCase = (arr[l] == arr[mid]) && (arr[mid] == arr[r]); //[*Duplicate handle]   // None of the sides are sorted
-
-            if (edgeCase)
-            { //[*Duplicate handle]
-              // No BS
-            }
-            else if (dirL)
-            { //  make BS on the left sorted side
-                if (arr[l] <= target && target <= arr[mid])
-                    res = doBinarySearch(arr, l, mid - 1, target);
-            }
-            else if (dirR)
-            { //  make BS on the right sorted side
-                if (arr[mid] <= target && target <= arr[r])
-                    res = doBinarySearch(arr, mid + 1, r, target);
-            }
-
-            if (res != -1)
-                return res; // already target is found
-            else
-            {
-                if (edgeCase)
-                { //[*Duplicate handle]
-                    l++;
-                    r--;
-                }
-                else if (dirL)
-                { // target not found in sorted side, Focus on the other side
-                    l = mid + 1;
-                }
-                else
-                { // target not found in sorted side, Focus on the other side
-                    r = mid - 1;
-                }
-            }
-        }
-        return res;
-    }
-
-    // O(Log N)
-    int doBinarySearch(vector<int> &arr, int start, int end, int target)
-    {
-
-        int l = start;
-        int r = end;
-
-        while (l <= r)
-        {
-
-            int mid = l - (l - r) / 2;
-
-            if (arr[mid] == target)
-            {
-                return mid;
-            }
-            else if (target < arr[mid])
-            {
-                r = mid - 1;
-            }
-            else if (arr[mid] < target)
-            {
-                l = mid + 1;
-            }
-        }
-        return -1;
-    }
-
-    // Same approach with diff code style
-    // Time: O(Log N)
     int search(vector<int> &nums, int target)
     {
 
+        int n = nums.size();
         int l = 0;
-        int r = nums.size() - 1;
+        int r = n - 1;
 
         while (l <= r)
         {
 
+            // Calculate mid safely to prevent integer overflow
             int mid = l + (r - l) / 2;
 
+            // ================================================================
+            // TARGET FOUND
+            // ================================================================
             if (nums[mid] == target)
             {
                 return mid;
             }
 
-            // Handling the edge case: when the same element continues from middle to last to first of the array.
-            // e.g: [1,0,1,1,1]
-            if (nums[l] == nums[mid] && nums[mid] == nums[r])
+            // ================================================================
+            // OPTIMIZATION: Fully Sorted Segment
+            // NOTE: This block is mathematically redundant! If the array is
+            // perfectly sorted, `nums[l] <= nums[mid]` will inherently trigger
+            // the next block anyway, which routes the pointers to the exact
+            // same destination. Deleting this block saves an `if` evaluation.
+            // ================================================================
+            if (nums[l] < nums[r])
             {
-                l = l + 1;
-                r = r - 1;
-                continue;
+                if (target < nums[mid])
+                {
+                    r = mid - 1;
+                }
+                else
+                {
+                    l = mid + 1;
+                }
             }
-
-            if (nums[l] <= nums[mid])
+            // ================================================================
+            // CONDITION 1: The Left Sub-Array is Perfectly Sorted
+            // ================================================================
+            else if (nums[l] <= nums[mid])
             {
-                // left side sorted
+
+                // BOUNDARY CHECK: Is the target strictly within this sorted half?
+                // Note: `target <= nums[mid]` is safe, but technically `target < nums[mid]`
+                // is sufficient since we already checked `nums[mid] == target` above.
                 if (nums[l] <= target && target <= nums[mid])
                 {
-                    r = mid - 1;
+                    r = mid - 1; // It is here. Discard the right half.
                 }
                 else
                 {
-                    l = mid + 1;
+                    l = mid + 1; // It is not here. Discard the left half.
                 }
             }
+            // ================================================================
+            // CONDITION 2: The Right Sub-Array is Perfectly Sorted
+            // ================================================================
             else
             {
-                // right side sorted
+
+                // BOUNDARY CHECK: Is the target strictly within this sorted half?
                 if (nums[mid] <= target && target <= nums[r])
                 {
-                    l = mid + 1;
+                    l = mid + 1; // It is here. Discard the left half.
                 }
                 else
                 {
-                    r = mid - 1;
+                    r = mid - 1; // It is not here. Discard the right half.
                 }
             }
         }
 
+        // Exhausted the search space; the target does not exist.
         return -1;
+    }
+};
+
+/**
+ * ============================================================================
+ * 2. Title: Search in Rotated Sorted Array with Duplicates
+ * ============================================================================
+ * Intuition:
+ * This is a variation of the Rotated Sorted Array search where duplicates are
+ * allowed. Duplicates introduce a critical flaw: if the left, middle, and
+ * right pointers all point to the exact same value, it becomes mathematically
+ * impossible to determine which half of the array is perfectly sorted.
+ *
+ * Approach:
+ * 1. Calculate `mid` and check if it's the target.
+ * 2. THE PATCH: If we hit the duplicate blind spot (nums[l] == nums[mid] == nums[r]),
+ *    we know `nums[mid]` is NOT the target. Thus, the elements at `l` and `r`
+ *    are also safely NOT the target. We simply shrink the window inwards
+ *    (`++l`, `--r`) to clear the ambiguity and recalculate `mid`.
+ * 3. Once ambiguity is cleared, check if the segment is fully sorted. If so,
+ *    do a standard binary search.
+ * 4. Otherwise, determine which half is perfectly sorted and do a strict
+ *    boundary check to see if the target lies inside it. Discard halves accordingly.
+ * ============================================================================
+ * Complexity:
+ * - Time: O(log N) on average. However, in the worst-case scenario where the
+ *   array is densely packed with duplicates (e.g., [1, 1, 1, 1, 1] searching for 2),
+ *   the pointers only shrink by 1 each iteration, degrading to O(N).
+ * - Space: O(1). Only primitive integer pointers are allocated.
+ * ============================================================================
+ */
+class Solution
+{
+public:
+    bool search(vector<int> &nums, int target)
+    {
+
+        int n = nums.size();
+        int l = 0;
+        int r = n - 1;
+
+        while (l <= r)
+        {
+
+            // Prevent integer overflow during mid calculation
+            int mid = l + (r - l) / 2;
+
+            // Target successfully found
+            if (nums[mid] == target)
+            {
+                return true;
+            }
+
+            // ================================================================
+            // THE PATCH: Resolve Duplicate Ambiguity
+            // If boundaries and mid are identical, we cannot guarantee which
+            // half is sorted. Since nums[mid] != target, we can safely discard
+            // the boundaries and shrink the search space.
+            // ================================================================
+            if (nums[l] == nums[mid] && nums[mid] == nums[r])
+            {
+                ++l;
+                --r;
+                continue; // Recalculate mid with the new, narrower window
+            }
+
+            // ================================================================
+            // OPTIMIZATION: Fully Sorted Segment
+            // If the current window has no rotation, use standard Binary Search.
+            // BUT REDUNDANT
+            // ================================================================
+            if (nums[l] < nums[r])
+            {
+                if (target < nums[mid])
+                {
+                    r = mid - 1;
+                }
+                else
+                {
+                    l = mid + 1;
+                }
+            }
+            // ================================================================
+            // CONDITION 1: The Left Sub-Array is Perfectly Sorted
+            // ================================================================
+            else if (nums[l] <= nums[mid])
+            {
+
+                // BOUNDARY CHECK: Is the target strictly within this sorted half?
+                if (nums[l] <= target && target < nums[mid])
+                {
+                    r = mid - 1; // Target is here. Discard the right half.
+                }
+                else
+                {
+                    l = mid + 1; // Target is missing. Discard the left half.
+                }
+            }
+            // ================================================================
+            // CONDITION 2: The Right Sub-Array is Perfectly Sorted
+            // ================================================================
+            else
+            {
+
+                // BOUNDARY CHECK: Is the target strictly within this sorted half?
+                if (nums[mid] < target && target <= nums[r])
+                {
+                    l = mid + 1; // Target is here. Discard the left half.
+                }
+                else
+                {
+                    r = mid - 1; // Target is missing. Discard the right half.
+                }
+            }
+        }
+
+        // Exhausted the search space; the target does not exist.
+        return false;
     }
 };
 
