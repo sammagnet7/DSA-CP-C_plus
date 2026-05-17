@@ -42,7 +42,11 @@ Examples:
   Output: 42
   Explanation: The optimal path is 15 -> 20 -> 7 with a path sum of 15 + 20 + 7 = 42.
 
+Constraints:
+  The number of nodes in the tree is in the range [1, 3 * 104].
+  -1000 <= Node.val <= 1000
 
+  
 INPUT::::::
 
 
@@ -50,6 +54,7 @@ OUTPUT::::::
 
 
 */
+
 struct TreeNode
 {
   int val;
@@ -60,49 +65,92 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+//-------------------------------------------------------------------------------
+// 1. Title: Maximum path sum
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * TREE ALGORITHM: BOTTOM-UP EXPLICIT STATE DP (MAX PATH SUM)
+ * ============================================================================
+ * * [THE INTUITION]
+ * At any given node in a binary tree, a valid path can take exactly one of
+ * four combinatorial states:
+ * 1. The node by itself (severing ties with both children).
+ * 2. The node + the best path extending down its Left child. -> /
+ * 3. The node + the best path extending down its Right child -> \
+ * 4. The node acting as a "Peak" connecting the Left and Right paths together -> ⌒
+ *
+ * By explicitly calculating these 4 states at every node during a Post-Order
+ * traversal, we guarantee that we evaluate every possible valid path in the tree.
+ *
+ * * [THE MECHANICS]
+ * We separate what the node *calculates* (the 4 states used to update the global max)
+ * from what it *returns* to its parent. A node cannot return a branching path
+ * (State 4) to its parent, so it strictly returns a "straight line" downwards.
+ *
+ * * [COMPLEXITY ANALYSIS]
+ * - Time Complexity: O(N) -> Every node is visited exactly once.
+ * - Space Complexity: O(H) -> Recursion call stack depth. O(log N) average, O(N) worst.
+ * ============================================================================
+ */
 class Solution
 {
-public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Maximum path sum
-  //-------------------------------------------------------------------------------
-
-  // O(N)
-  int _maxPathSum(TreeNode *root, int &maxPathSum)
+private:
+  /**
+   * @brief Computes the maximum "straight line" path extending downwards from
+   *        the current node, while updating the global maximum path found so far.
+   *
+   * @param node   The current node we are evaluating.
+   * @param maxSum Passed by reference to safely track the global max across all recursive frames.
+   * @return int   The max sum of a non-branching path to pass up to the parent.
+   */
+  int rec_sum(TreeNode *node, int &maxSum)
   {
-
-    if (root == NULL)
+    // Base Case: Null nodes contribute 0 to the path sum.
+    if (!node)
+    {
       return 0;
+    }
 
-    int lPathSum = _maxPathSum(root->left, maxPathSum);
-    int rPathSum = _maxPathSum(root->right, maxPathSum);
+    // POST-ORDER: Ask children for their max straight-line paths first.
+    int leftSum = rec_sum(node->left, maxSum);
+    int rightSum = rec_sum(node->right, maxSum);
+    int cur = node->val;
 
-    int maxPathCurvingAtMe = lPathSum + root->val + rPathSum; // ⌒
-    maxPathSum = max(maxPathSum, maxPathCurvingAtMe);
+    // 1. UPDATE GLOBAL MAX (Evaluate all 4 combinatorial states)
+    // State 1: cur
+    // State 2 & 3: cur + max(leftSum, rightSum)  -> / or \
+    // State 4: cur + leftSum + rightSum ->  ⌒
+    maxSum = max({maxSum,
+                  cur,
+                  (cur + max(leftSum, rightSum)),
+                  (cur + leftSum + rightSum)});
 
-    int maxPathThroughMe = root->val + max(lPathSum, rPathSum); // / \
-
-    return (maxPathThroughMe >= 0) ? maxPathThroughMe : 0;
+    // 2. RETURN STRAIGHT LINE TO PARENT -> / or \
+    // We can only pass a continuous, non-forking line upwards.
+    // Therefore, we return either the node by itself, or the node + its best child.
+    // (This naturally prunes negative branches because if `cur + max(left, right)`
+    // is worse than just `cur`, the `max` function safely drops the children!)
+    return max({cur,
+                (cur + max(leftSum, rightSum))});
   }
 
-  
-  // Optimal approach
-  // Approach:
-
-  //  Begin by defining a recursive function designed to calculate the maximum path sum for each subtree rooted at a given node. If the current node is null, return 0, as there is no valid path through a null node.
-  //  Proceed by calculating the maximum path sum for both the left and right subtrees. If the path sum for either subtree is negative, it should be disregarded, as including it would decrease the overall sum. This can be achieved by taking the maximum of 0 and the calculated path sum for each subtree.
-  //  For each node, compute the potential maximum path sum that passes through the node and its children. This sum includes the node itself and the maximum path sums from both subtrees. If this value exceeds the current global maximum sum, update the global maximum to reflect this new higher value.
-  //  Finally, return the maximum path sum for the current node, considering only one of its subtrees. This step ensures that when the function backtracks up the tree, only the highest path sum from either the left or right subtree is propagated upward, maintaining the integrity of the overall maximum path sum calculation.
-  // Time: O(N)
-  // Space: O(h) Recursive Stack Auxiliary Space
+public:
   int maxPathSum(TreeNode *root)
   {
+    // Initialize to INT_MIN. This safely handles edge cases where the
+    // entire tree consists of strictly negative numbers.
+    int maxSum = INT_MIN;
 
-    int maxPathSum = INT_MIN;
+    if (!root)
+    {
+      return 0;
+    }
 
-    _maxPathSum(root, maxPathSum);
+    rec_sum(root, maxSum);
 
-    return maxPathSum;
+    return maxSum;
   }
 };
 

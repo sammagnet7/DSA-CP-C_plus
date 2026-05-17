@@ -42,6 +42,9 @@ Examples:
   Input: root = []
   Output: []
 
+Constraints:
+  The number of nodes in the tree is in the range [0, 2000].
+  -100 <= Node.val <= 100
 
 
 INPUT::::::
@@ -61,66 +64,110 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+//-------------------------------------------------------------------------------
+// 1. Title: Zig Zag or Spiral Traversal
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * TREE ALGORITHM: BREADTH-FIRST SEARCH (ZIGZAG LEVEL ORDER)
+ * ============================================================================
+ * * [THE INTUITION]
+ * We process the tree level by level using a Queue (BFS).
+ * To achieve the zigzag effect, we decouple the TRAVERSAL order from the
+ * STORAGE order.
+ * - Traversal: Always Left to Right (push left child, then right child).
+ * - Storage: Controlled by a boolean flag `leftToRight`. If false, we populate
+ *   our level array from the back to the front.
+ *
+ * * [THE MECHANICS]
+ * By capturing `q.size()` at the start of the while loop, we isolate exactly
+ * which nodes belong to the current depth level. We pre-allocate a vector for
+ * this level and use a calculated index `(leftToRight ? i : size - 1 - i)`
+ * to instantly place the node value in its correct zigzag position.
+ *
+ * * [COMPLEXITY ANALYSIS]
+ * - Time Complexity: O(N) -> Every node is pushed and popped exactly once.
+ * - Space Complexity: O(W) -> Where W is the max width of the tree. The queue
+ *   holds at most N/2 nodes (the bottom level of a perfectly balanced tree).
+ * ============================================================================
+ */
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Zig Zag or Spiral Traversal
-  //-------------------------------------------------------------------------------
-
-  // Optimal approach:
-  // create a leftToRight flag to track the traversal direction. When leftToRight is true, nodes are inserted into the level vector from left to right; when false, they are inserted from right to left.
-  //
-  // Time: O(N)
-  // Space: O(N), last level could at most hold N/2 nodes
   vector<vector<int>> zigzagLevelOrder(TreeNode *root)
   {
-
     vector<vector<int>> ans;
 
-    if (root == NULL)
+    // Edge case: Empty tree
+    if (!root)
+    {
       return ans;
+    }
 
     queue<TreeNode *> q;
-
     q.push(root);
 
-    bool isLtoR = true;
+    // Flag to dictate storage direction for the current level
+    bool leftToRight = true;
 
     while (!q.empty())
     {
+      int size = q.size();
 
-      int q_size = q.size();
-      vector<int> tmp(q_size);
+      // Pre-allocate the vector to the exact size of the current level
+      vector<int> currentLevel(size);
 
-      for (int i = 0; i < q_size; i++)
+      for (int i = 0; i < size; ++i)
       {
-
-        TreeNode *cur = q.front();
+        TreeNode *node = q.front();
         q.pop();
 
-        if (isLtoR)
-        {
-          tmp[i] = cur->val;
-        }
-        else
-        {
-          tmp[q_size - i - 1] = cur->val; // push in reverse order
-        }
+        // Determine the correct index based on the zigzag flag
+        int index = leftToRight ? i : (size - 1 - i);
+        currentLevel[index] = node->val;
 
-        if (cur->left != NULL)
-          q.push(cur->left);
-        if (cur->right != NULL)
-          q.push(cur->right);
+        // Queue up the next level (ALWAYS left child first, then right)
+        if (node->left)
+        {
+          q.push(node->left);
+        }
+        if (node->right)
+        {
+          q.push(node->right);
+        }
       }
 
-      ans.push_back(tmp);
-      isLtoR = !isLtoR;
+      // Flip the flag for the next depth level
+      leftToRight = !leftToRight;
+
+      ans.push_back(currentLevel);
     }
 
     return ans;
   }
 };
+
+// =========================
+// Approach 2: use Dequeue
+// =========================
+
+/*
+    // Inside the while loop...
+    deque<int> lvl; // Using a deque instead of a vector
+
+    for(int i = 0; i < size; i++) {
+        TreeNode* cur = q.front(); q.pop();
+
+        if (turn) {
+            lvl.push_back(cur->val);  // O(1) insert at the end
+        } else {
+            lvl.push_front(cur->val); // O(1) insert at the beginning (reversing it!)
+        }
+        // ... push children left and right to standard queue ...
+    }
+    ans.push_back(vector<int>(lvl.begin(), lvl.end()));
+*/
 
 int main()
 {
