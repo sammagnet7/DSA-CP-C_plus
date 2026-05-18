@@ -1280,4 +1280,29 @@ The std::string::erase() function has overloads that take a starting position (i
      ```cpp
           int idx = lower_bound(arr.begin(), arr.end(), target) - arr.begin();
      ```
+
+60. `mp[key].clear()` vs `mp.erase(key)` in C++
+     
+     When pruning dense subgraphs stored in an `unordered_map<int, vector<int>>`, **always use `.clear()` instead of `.erase()`**.
+
+     **The Hidden Trap of `.erase()`:**
+     * **Deallocation:** `.erase(key)` destroys the map node and deallocates the vector's heap memory.
+     * **The `operator[]` Bug:** If your loop later checks that same key via `mp[key]`, C++ does not safely skip it. Instead, it allocates *new* heap memory, creates a fresh empty vector, and re-inserts it into the map, destroying performance.
+
+     **Why `.clear()` is Superior:**
+     * **Zero Re-allocations:** `mp[key].clear()` leaves the key in the map but instantly sets the vector's `size` to `0`. 
+     * **Instant Skips:** If the loop checks that key again, C++ immediately retrieves the existing empty vector and skips the block in a fraction of a nanosecond, with zero memory overhead.
+
+     ```cpp
+          for (int neighbor : mp[key]) {
+               if (!visited[neighbor]) {
+                    q.push(neighbor);
+                    visited[neighbor] = true;
+               }
+          }
+          mp.erase(key); // ❌
+          mp[key].clear(); // ✅
+     ```
+61.  
+
 ---
