@@ -32,29 +32,43 @@ The boundary nodes of a binary tree include the nodes from the left and right bo
 Figure out the boundary nodes of this binary tree in an Anti-Clockwise direction starting from the root node.
 
 Examples:
-  Input: Consider the binary tree A as shown in the figure:
-  Output: [10, 5, 3, 7, 18, 25, 20]
-  Explanation: As shown in the figure
-  The nodes on the left boundary are [10, 5, 3]
-  The nodes on the right boundary are [10, 20, 25]
-  The leaf nodes are [3, 7, 18, 25].
-  Please note that nodes 3 and 25 appear in two places but are considered once.
+  Example1:
+    Input: 10 5 20 3 8 18 25 -1 -1 7 -1 -1 -1 -1 -1 -1 -1
 
-  Sample Input 1:
-  10 5 20 3 8 18 25 -1 -1 7 -1 -1 -1 -1 -1 -1 -1
-  Sample Output 1:
-  10 5 3 7 18 25 20
-  Explanation of Sample Input 1:
-  The nodes on the left boundary are [10, 5, 3]
-  The nodes on the right boundary are [10, 20, 25]
-  The leaf nodes are [3, 7, 18, 25].
-  Please note that nodes 3 and 25 appear in two places but are considered once.
+             (10)
+            /    \
+          (5)    (20)
+         /   \   /   \
+       (3)   (8)(18) (25)
+             /
+           (7)
 
-  Sample Input 2:
-  100 50 150 25 75 140 200 -1 30 70 80 -1 -1 -1 -1 -1 35 -1 -1 -1 -1 -1 -1
-  Sample Output 2:
-  100 50 25 30 35 70 80 140 200 150
+    Output: 10 5 3 7 18 25 20
+    Explanation:
+    The nodes on the left boundary are [10, 5, 3]
+    The nodes on the right boundary are [10, 20, 25]
+    The leaf nodes are [3, 7, 18, 25].
+    Please note that nodes 3 and 25 appear in two places but are considered once.
 
+  Example2:
+    Input: 100 50 150 25 75 140 200 -1 30 70 80 -1 -1 -1 -1 -1 35 -1 -1 -1 -1 -1 -1
+
+                 (100)
+                /     \
+             (50)     (150)
+            /    \    /   \
+         (25)   (75)(140) (200)
+           \    /  \
+           (30)(70)(80)
+             \
+             (35)
+
+    Output: 100 50 25 30 35 70 80 140 200 150
+
+
+Constraints:
+  1 <= n <= 10000
+  Where 'n' is the total number of nodes in the binary tree.
 
 
 INPUT::::::
@@ -75,287 +89,167 @@ struct TreeNode
   TreeNode(T x, TreeNode *left, TreeNode *right) : data(x), left(left), right(right) {}
 };
 
+//-------------------------------------------------------------------------------
+// 1. Title: Boundary Traversal
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * TREE ALGORITHM: BOUNDARY TRAVERSAL (3-PART DECOMPOSITION)
+ * ============================================================================
+ * * [GRAPH THEORY DEFINITION OF A BOUNDARY]
+ * In computer science, a tree's boundary is NOT its visual silhouette. It is
+ * defined as a strict topological perimeter consisting of three parts:
+ *
+ * 1. Left Boundary: A continuous, unbroken edge path starting from `root->left`.
+ *    Rule: Must travel to the Left Child. If (and ONLY if) no left child
+ *    exists, it travels to the Right Child. Stops upon hitting a leaf.
+ * 2. Right Boundary: A continuous, unbroken edge path starting from `root->right`.
+ *    Rule: Must travel to the Right Child. If (and ONLY if) no right child
+ *    exists, it travels to the Left Child. Stops upon hitting a leaf.
+ * 3. Leaves: All nodes with zero children, read from left to right.
+ *
+ * * [THE "INNER NODE" TRAP]
+ * Because boundaries are unbroken paths, if a left-boundary node has both a
+ * left and right child, the algorithm MUST go left. The entire right branch
+ * is permanently bypassed and becomes "internal" to the tree, even if nodes
+ * inside it visually stick out further to the left.
+ *
+ * * [COMPLEXITY ANALYSIS]
+ * - Time Complexity: O(N) -> Every node is visited a constant number of times.
+ * - Space Complexity: O(H) -> Where H is the height of the tree (due to the
+ *   recursion stack for leaves and temporary vectors for boundaries).
+ * ============================================================================
+ */
+
 class Solution
 {
-public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Boundary Traversal
-  //-------------------------------------------------------------------------------
-
-  // Approach1: ------------------------
-
-  // void leftBoundary(TreeNode<int> *node, vector<int> &ans, unordered_set<TreeNode<int> *> &seen){
-
-  //     if(node == NULL)
-  //         return;
-
-  //     if(node->left==NULL && node->right==NULL)
-  //         return;
-
-  //     // Save to ans
-  //     if (seen.find(node) == seen.end()) {
-  //         ans.push_back(node->data);  // maintain order
-  //         seen.insert(node);       // ensure uniqueness
-  //     }
-
-  //     if(node->left != NULL){
-  //         leftBoundary(node->left, ans, seen);
-  //     }
-  //     else if(node->right != NULL){
-  //         leftBoundary(node->right, ans, seen);
-  //     }
-  //     else{
-  //         return;
-  //     }
-  // }
-
-  // void traverseLeaf(TreeNode<int> *node, vector<int> &ans, unordered_set<TreeNode<int> *> &seen){
-
-  //     if(node == NULL)
-  //         return;
-
-  //     if(node->left==NULL && node->right==NULL){
-
-  //         if (seen.find(node) == seen.end()) {
-  //             ans.push_back(node->data);  // maintain order
-  //             seen.insert(node);       // ensure uniqueness
-  //         }
-  //         return;
-  //     }
-
-  //     if(node->left!=NULL){
-  //         traverseLeaf(node->left, ans, seen);
-  //     }
-  //     if(node->right != NULL){
-  //         traverseLeaf(node->right, ans, seen);
-  //     }
-
-  // }
-
-  // void rightBoundary(TreeNode<int> *node, vector<int> &ans, unordered_set<TreeNode<int> *> &seen){
-
-  //     if(node == NULL)
-  //         return;
-
-  //     if(node->right != NULL){
-  //         rightBoundary(node->right, ans, seen);
-  //     }
-  //     else if(node->left != NULL){
-  //         rightBoundary(node->left, ans, seen);
-  //     }
-  //     else{
-  //         return;
-  //     }
-
-  //     if(node->left==NULL && node->right==NULL)
-  //         return;
-
-  //     if (seen.find(node) == seen.end()) {
-  //         ans.push_back(node->data);  // maintain order
-  //         seen.insert(node);       // ensure uniqueness
-  //     }
-  // }
-
-  // //
-  // //  Time: O(N)
-  // //  Space: O(N)
-  // vector<int> traverseBoundary(TreeNode<int> *root)
-  // {
-  //     // Write your code here.
-  //     vector<int> ans;
-  //     unordered_set<TreeNode<int> *> seen;
-
-  //     if(root==NULL)
-  //         return {};
-
-  //     seen.insert(root);
-  //     ans.push_back(root->data);
-
-  //     leftBoundary(root->left,ans, seen);
-
-  //     traverseLeaf(root,ans,seen);
-
-  //     rightBoundary(root->right,ans, seen);
-
-  //     return ans;
-  // }
-
-  // Approach2: ----------------------------------
-
-  // void leftBoundary(TreeNode<int> *node, vector<int> &ans){
-
-  //     if(node == NULL)
-  //         return;
-
-  //     // Ignore leaf nodes
-  //     if(node->left==NULL && node->right==NULL)
-  //         return;
-
-  //     // Otherwise save to ans
-  //     ans.push_back(node->data);
-
-  //     if(node->left != NULL){
-  //         leftBoundary(node->left, ans);
-  //     }
-  //     else if(node->right != NULL){
-  //         leftBoundary(node->right, ans);
-  //     }
-  // }
-
-  // void traverseLeaf(TreeNode<int> *node, vector<int> &ans){
-
-  //     if(node == NULL)
-  //         return;
-
-  //     if(node->left==NULL && node->right==NULL){
-  //         // save to ans
-  //         ans.push_back(node->data);
-  //         return;
-  //     }
-
-  //     if(node->left!=NULL){
-  //         traverseLeaf(node->left, ans);
-  //     }
-  //     if(node->right != NULL){
-  //         traverseLeaf(node->right, ans);
-  //     }
-
-  // }
-
-  // void rightBoundary(TreeNode<int> *node, vector<int> &ans){
-
-  //     if(node == NULL)
-  //         return;
-
-  //     // Ignore leaf nodes
-  //     if(node->left==NULL && node->right==NULL)
-  //         return;
-
-  //     if(node->right != NULL){
-  //         rightBoundary(node->right, ans);
-  //     }
-  //     else if(node->left != NULL){
-  //         rightBoundary(node->left, ans);
-  //     }
-
-  //     // Otherwise save to ans
-  //     ans.push_back(node->data);
-  // }
-
-  // //
-  // // Optimal approach
-  // // Time: O(N)
-  // // Space: O(N)
-  // vector<int> traverseBoundary(TreeNode<int> *root)
-  // {
-  // 	// Write your code here.
-  //     vector<int> ans;
-
-  //     if(root==NULL)
-  //         return {};
-
-  //     ans.push_back(root->data);
-
-  //     leftBoundary(root->left,ans);
-
-  //     traverseLeaf(root,ans);
-
-  //     rightBoundary(root->right,ans);
-
-  //     return ans;
-  // }
-
-  // Approach3: -----------------------------------
-
-  // Function to check if a node is a leaf
-  bool isLeaf(TreeNode<int> *root)
+private:
+  /**
+   * @brief Safely checks if a node is a leaf node.
+   * Includes a guard clause against null pointers to prevent SegFaults.
+   */
+  bool isLeaf(TreeNode<int> *node)
   {
-    return !root->left && !root->right;
+    if (!node)
+    {
+      return false;
+    }
+    return !node->left && !node->right;
   }
 
-  // Function to add the left boundary of the tree
-  void addLeftBoundary(TreeNode<int> *root, vector<int> &res)
+  /**
+   * @brief Standard Pre-Order DFS to collect all leaf nodes from Left to Right.
+   */
+  void traverseLeaves(TreeNode<int> *node, vector<int> &leaves)
   {
-    TreeNode<int> *curr = root->left;
-    while (curr)
+    if (isLeaf(node))
     {
-      if (!isLeaf(curr))
-      {
-        res.push_back(curr->data);
-      }
-      if (curr->left)
-      {
-        curr = curr->left;
-      }
-      else
-      {
-        curr = curr->right;
-      }
-    }
-  }
-
-  // Function to add the right boundary of the tree
-  void addRightBoundary(TreeNode<int> *root, vector<int> &res)
-  {
-    TreeNode<int> *curr = root->right;
-    vector<int> temp;
-    while (curr)
-    {
-      if (!isLeaf(curr))
-      {
-        temp.push_back(curr->data);
-      }
-      if (curr->right)
-      {
-        curr = curr->right;
-      }
-      else
-      {
-        curr = curr->left;
-      }
-    }
-    for (int i = temp.size() - 1; i >= 0; --i)
-    {
-      res.push_back(temp[i]);
-    }
-  }
-
-  // Function to add the leaves of the tree
-  void addLeaves(TreeNode<int> *root, vector<int> &res)
-  {
-    if (isLeaf(root))
-    {
-      res.push_back(root->data);
+      leaves.push_back(node->data);
       return;
     }
-    if (root->left)
+
+    // We check left and right independently to ensure no leaves are missed.
+    if (node->left)
     {
-      addLeaves(root->left, res);
+      traverseLeaves(node->left, leaves);
     }
-    if (root->right)
+    if (node->right)
     {
-      addLeaves(root->right, res);
+      traverseLeaves(node->right, leaves);
     }
   }
 
-  // Main function to perform the boundary traversal of the binary tree
+public:
   vector<int> traverseBoundary(TreeNode<int> *root)
   {
-    vector<int> res;
+    vector<int> ans, left, leaves, right;
+    TreeNode<int> *tmp;
+
+    // [SAFETY CHECK 1] Empty tree
     if (!root)
+      return ans;
+
+    // [SAFETY CHECK 2] Single node tree (prevents duplicate root later)
+    if (isLeaf(root))
     {
-      return res;
-    }
-    if (!isLeaf(root))
-    {
-      res.push_back(root->data);
+      return {root->data};
     }
 
-    addLeftBoundary(root, res);
-    addLeaves(root, res);
-    addRightBoundary(root, res);
+    // Add root to answer independently to prevent left/right boundary crossover
+    ans.push_back(root->data);
 
-    return res;
+    // ==========================================
+    // PART 1: LEFT BOUNDARY
+    // ==========================================
+    // Must start strictly at root->left
+    tmp = root->left;
+
+    while (tmp)
+    {
+      // Only add if it is NOT a leaf (leaves are handled in Part 2)
+      if (!isLeaf(tmp))
+        left.push_back(tmp->data);
+
+      // Follow the strict left-boundary topological path rule
+      if (tmp->left)
+      {
+        tmp = tmp->left;
+      }
+      else if (tmp->right)
+      {
+        tmp = tmp->right;
+      }
+      else
+      {
+        tmp = nullptr;
+      }
+    }
+
+    // ==========================================
+    // PART 2: LEAVES
+    // ==========================================
+    // Sweeps the bottom of the tree from left to right
+    traverseLeaves(root, leaves);
+
+    // ==========================================
+    // PART 3: RIGHT BOUNDARY
+    // ==========================================
+    // Must start strictly at root->right
+    tmp = root->right;
+
+    while (tmp)
+    {
+      // Only add if it is NOT a leaf
+      if (!isLeaf(tmp))
+        right.push_back(tmp->data);
+
+      // Follow the strict right-boundary topological path rule
+      if (tmp->right)
+      {
+        tmp = tmp->right;
+      }
+      else if (tmp->left)
+      {
+        tmp = tmp->left;
+      }
+      else
+      {
+        tmp = nullptr;
+      }
+    }
+
+    // Reverse the right boundary so it reads anti-clockwise (bottom-up)
+    reverse(right.begin(), right.end());
+
+    // ==========================================
+    // MERGE RESULTS
+    // ==========================================
+    ans.insert(ans.end(), left.begin(), left.end());
+    ans.insert(ans.end(), leaves.begin(), leaves.end());
+    ans.insert(ans.end(), right.begin(), right.end());
+
+    return ans;
   }
 };
 

@@ -1303,6 +1303,28 @@ The std::string::erase() function has overloads that take a starting position (i
           mp.erase(key); // ❌
           mp[key].clear(); // ✅
      ```
-61.  
+61.  Algorithmic Definition: Binary Tree Boundary
 
+     In graph theory, a tree's "boundary" is a **continuous topological path**, not its visual silhouette. It consists of three distinct parts:
+
+     ### 1. Left Boundary Path
+     * Starts at the root's left child.
+     * **Rule:** Always step to the **Left Child**. 
+     * **Fallback:** If (and ONLY if) no left child exists, step to the **Right Child**.
+     * **Stop:** Immediately upon reaching a leaf node.
+
+     ### 2. Right Boundary Path
+     * Starts at the root's right child.
+     * **Rule:** Always step to the **Right Child**. 
+     * **Fallback:** If (and ONLY if) no right child exists, step to the **Left Child**.
+     * **Stop:** Immediately upon reaching a leaf node. (Usually collected bottom-up/reversed in the final output).
+
+     ### 3. Leaves
+     * All nodes with zero children, typically collected via a standard left-to-right traversal (e.g., Pre-order DFS).
+
+     
+     ### ⚠️ The "Inner Node" Trap
+     The boundaries are defined by an **unbroken edge path**. If a node on the left boundary has both a left and right child, the algorithm *must* go left. That right branch is permanently bypassed and becomes "internal" to the tree—even if a node deep inside it visually sticks out further left than the rest of the tree.
+
+62. 
 ---
