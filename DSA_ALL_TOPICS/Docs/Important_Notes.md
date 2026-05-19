@@ -1326,5 +1326,10 @@ The std::string::erase() function has overloads that take a starting position (i
      ### ⚠️ The "Inner Node" Trap
      The boundaries are defined by an **unbroken edge path**. If a node on the left boundary has both a left and right child, the algorithm *must* go left. That right branch is permanently bypassed and becomes "internal" to the tree—even if a node deep inside it visually sticks out further left than the rest of the tree.
 
-62. 
+62. To swap vector variables in O(1):
+    ```cpp
+          vector<int> one, two;
+          swap(one,two); //swallo copy -> swaps just the variable names using in built move().
+    ```
+63. 
 ---
