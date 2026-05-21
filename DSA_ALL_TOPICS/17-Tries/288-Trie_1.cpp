@@ -104,6 +104,8 @@ class TrieNode
 {
 public:
     vector<TrieNode *> children;
+    // TrieNode* children[10] = {nullptr}; -> More optimized
+    
     bool isEndOfWord;
 
     /**
