@@ -32,27 +32,43 @@ The Top view of the binary tree is the set of nodes visible when we see the tree
 Find the top view of the given binary tree, from left to right.
 
 Examples:
-  Example :
-  Input: Let the binary tree be:
-  Output: [10, 4, 2, 1, 3, 6]
-  Explanation: Consider the vertical lines in the figure. The top view contains the topmost node from each vertical line.
+  Example1 :
+      1 2 3 4 5 -1 6 -1 7 -1 -1 8 -1 9 -1 -1 11 10 -1 -1 -1 -1 -1
 
-  Sample Input 1:
-  1 2 3 4 5 -1 6 -1 7 -1 -1 8 -1 9 -1 -1 11 10 -1 -1 -1 -1 -1
-  Sample Output 1:
-  10 4 2 1 3 6
-  Explanation of Sample Output 1:
-  The binary tree is:
-  Consider the vertical lines in the figure. The top view contains the topmost node from each vertical line.
-  In test case 1,
+                     (1)
+                    /   \
+                  (2)   (3)
+                /   \     \
+              (4)   (5)   (6)
+                \         /
+                (7)     (8)
+                /         \
+              (9)         (11)
+              /
+            (10)
 
-  Sample Input 2:
-  1 2 3 4 5 6 7 8 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-  Sample Output 2:
-  8 4 2 1 3 7
-  Explanation of Sample Output 2:
-  The binary tree is:
-  From left to right, the top view of the tree will be [8,4,2,1,3,7], where 9, 5 and 6 will be hidden when we see from the top of the tree.
+      Output:
+      10 4 2 1 3 6
+      Explanation:
+      The binary tree is:
+      Consider the vertical lines in the figure. The top view contains the topmost node from each vertical line.
+
+  Example2 :
+      1 2 3 4 5 6 7 8 9 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+
+                    (1)
+                   /   \
+                 (2)   (3)
+                /   \   / \
+              (4)  (5)(6) (7)
+             / \
+           (8) (9)
+
+      Output:
+      8 4 2 1 3 7
+      Explanation:
+      The binary tree is:
+      From left to right, the top view of the tree will be [8,4,2,1,3,7], where 9, 5 and 6 will be hidden when we see from the top of the tree.
 
 
 Expected time complexity :
@@ -87,6 +103,12 @@ Note :
 
 Examples:
   Input: Consider the given Binary Tree:
+                   (1)
+                  /   \
+                (2)   (3)
+                / \   / \
+              (4)(5)(6)(7)
+
   Output: 4 2 6 3 7
   Explanation:
   Below is the bottom view of the binary tree.
@@ -108,6 +130,15 @@ Examples:
 
   Sample input 1 :
   1 2 3 -1 -1 5 6 7 8 -1 -1 -1 -1 -1 -1
+
+                         (1)
+                        /   \
+                      (2)   (3)
+                             / \
+                           (5) (6)
+                           / \
+                         (7) (8)
+
   Sample output 1 :
   7 5 8 6
   Explanation of sample input 1 :
@@ -153,13 +184,12 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : data(x), left(left), right(right) {}
 };
 
+//-------------------------------------------------------------------------------
+// 1. Title: Top View of BT
+//-------------------------------------------------------------------------------
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Top View of BT
-  //-------------------------------------------------------------------------------
-
   // Optmal approach: Using level order traversal
   //
   // Time: O(N)
@@ -175,26 +205,21 @@ public:
 
     while (!q.empty())
     { // O(N)
-      int qSize = q.size();
+      auto cur = q.front();
+      TreeNode<int> *curNode = cur.first;
+      int curCol = cur.second;
 
-      for (int i = 0; i < qSize; i++)
-      {
-        auto cur = q.front();
-        TreeNode<int> *curNode = cur.first;
-        int curCol = cur.second;
+      q.pop();
 
-        q.pop();
-
-        if (mp.find(curCol) == mp.end())
-        { // col not encountered
-          mp[curCol] = curNode->data;
-        }
-
-        if (curNode->left != NULL)
-          q.push({curNode->left, curCol - 1});
-        if (curNode->right != NULL)
-          q.push({curNode->right, curCol + 1});
+      if (mp.find(curCol) == mp.end())
+      { // col not encountered
+        mp[curCol] = curNode->data;
       }
+
+      if (curNode->left != NULL)
+        q.push({curNode->left, curCol - 1});
+      if (curNode->right != NULL)
+        q.push({curNode->right, curCol + 1});
     }
 
     vector<int> ans;
@@ -206,11 +231,15 @@ public:
 
     return ans;
   }
+};
 
-  //-------------------------------------------------------------------------------
-  // 2. Title: Bottom View of BT
-  //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Bottom View of BT
+//-------------------------------------------------------------------------------
 
+class Solution
+{
+public:
   // Optmal approach: Using level order traversal (Exactly same as Top view excep one line)
   //
   // Time: O(N)
@@ -225,23 +254,19 @@ public:
 
     while (!q.empty())
     { // O(N)
-      int qSize = q.size();
 
-      for (int i = 0; i < qSize; i++)
-      {
-        auto cur = q.front();
-        TreeNode<int> *curNode = cur.first;
-        int curCol = cur.second;
+      auto cur = q.front();
+      TreeNode<int> *curNode = cur.first;
+      int curCol = cur.second;
 
-        q.pop();
+      q.pop();
 
-        mp[curCol] = curNode->data; // Note: update with bottom most value for the column (Only change from Top view)
+      mp[curCol] = curNode->data; // Note: update with bottom most value for the column (Only change from Top view)
 
-        if (curNode->left != NULL)
-          q.push({curNode->left, curCol - 1});
-        if (curNode->right != NULL)
-          q.push({curNode->right, curCol + 1});
-      }
+      if (curNode->left != NULL)
+        q.push({curNode->left, curCol - 1});
+      if (curNode->right != NULL)
+        q.push({curNode->right, curCol + 1});
     }
 
     vector<int> ans;
