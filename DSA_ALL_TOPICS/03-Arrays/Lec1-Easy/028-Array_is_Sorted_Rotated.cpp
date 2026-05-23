@@ -6,6 +6,9 @@
 using namespace std;
 
 /*
+Title: Check if Array Is Sorted and Rotated
+
+Links:
 http://takeuforward.org/data-structure/check-if-an-array-is-sorted/
 https://www.naukri.com/code360/problems/ninja-and-the-sorted-check_6581957?utm_source=striver&utm_medium=website&utm_campaign=codestudio_a_zcourse
 https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/
@@ -13,46 +16,35 @@ https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/
 
 Problem statement:
 Given an array nums, return true if the array was originally sorted in non-decreasing order, then rotated some number of positions (including zero). Otherwise, return false.
+
 There may be duplicates in the original array.
 
 Note: An array A rotated by x positions results in an array B of the same length such that B[i] == A[(i+x) % A.length] for every valid index i.
 
-Example 1:
-Input: nums = [3,4,5,1,2]
-Output: true
-Explanation: [1,2,3,4,5] is the original sorted array.
-You can rotate the array by x = 3 positions to begin on the element of value 3: [3,4,5,1,2].
+Examples:
+    Example 1:
+    Input: nums = [3,4,5,1,2]
+    Output: true
+    Explanation: [1,2,3,4,5] is the original sorted array.
+    You can rotate the array by x = 2 positions to begin on the element of value 3: [3,4,5,1,2].
 
-Example 2:
-Input: nums = [2,1,3,4]
-Output: false
-Explanation: There is no sorted array once rotated that can make nums.
+    Example 2:
+    Input: nums = [2,1,3,4]
+    Output: false
+    Explanation: There is no sorted array once rotated that can make nums.
 
-Example 3:
-Input: nums = [1,2,3]
-Output: true
-Explanation: [1,2,3] is the original sorted array.
-You can rotate the array by x = 0 positions (i.e. no rotation) to make nums.
+    Example 3:
+    Input: nums = [1,2,3]
+    Output: true
+    Explanation: [1,2,3] is the original sorted array.
+    You can rotate the array by x = 0 positions (i.e. no rotation) to make nums.
 
-ms, return true if the array was originally sorted in non-decreasing order, then rotated some number of positions (including zero). Otherwise, return false.
-There may be duplicates in the original array.
 
-Note: An array A rotated by x positions results in an array B of the same length such that B[i] == A[(i+x) % A.length] for every valid index i.
+Constraints:
+    1 <= nums.length <= 100
+    1 <= nums[i] <= 100
 
-Example 1:
-Input: nums = [3,4,5,1,2]
-Output: true
-Explanation: [1,2,3,4,5] is the original sorted array.
-You can rotate the array by x = 3 positions to begin on the element of value 3: [3,4,5,1,2].
 
-Example 2:
-Input: nums = [2,1,3,4]
-Output: false
-Explanation: There is no sorted array once rotated that can make nums.
-
-Example 3:
-Input: nums = [1,2,3]
-Output: true
 INPUT::::::
 6
 3 4 5 1 2
@@ -73,110 +65,110 @@ Is Array Sorted? Ans: true
 Is Array Sorted? Ans: true
 
  */
+
+/**
+ * ============================================================================
+ * 1. Title: Check if Array Is Sorted and Rotated
+ * ============================================================================
+ */
+
+
+// ============================================================================
+// APPROACH 1: The "Drop Count" Method (Industry Standard) [RECOMMENDED]
+// ============================================================================
+// Intuition:
+// A perfectly sorted array that is rotated will have AT MOST one point where
+// a number is strictly greater than the next number (the "drop" or "seam").
+// If we check the array circularly (comparing the last element back to the
+// first), any count greater than 1 means the array is fundamentally broken.
+//
+// Time: O(N) | Space: O(1)
+// ============================================================================
 class Solution
 {
 public:
-    // Time: O(N)
-    // Space: O(1)
     bool check(vector<int> &nums)
     {
-        // Finds the first minimum element index from array
-        int min_idx = 0;
-        for (int i = 0; i < nums.size(); i++)
-        {
-            if (nums[i] < nums[min_idx])
-                min_idx = i;
-        }
+        int n = nums.size();
+        int dropCount = 0;
 
-        // If minimum value spans from last element to the first element we need to handle such case
-        // by taking the index from the tail side
-        // example case: 6,10,6
-        if (min_idx == 0 && nums[0] == nums[nums.size() - 1])
+        for (int i = 0; i < n; ++i)
         {
-            for (int i = nums.size() - 1; i >= 0; i--)
+
+            // The modulo operator (i + 1) % n safely handles the wrap-around
+            // check from the last index back to index 0.
+            if (nums[i] > nums[(i + 1) % n])
             {
-                if (nums[0] == nums[i])
-                    min_idx = i;
-                else
-                    break;
+                dropCount++;
             }
         }
 
-        // Finally the found index chack if array is in non-decreasing order
-        int prev = nums[min_idx];
-        for (int i = 1; i < nums.size(); i++)
-        {
-            if (prev > nums[(min_idx + i) % nums.size()])
-                return false;
-            prev = nums[(min_idx + i) % nums.size()];
-        }
-        return true;
+        return dropCount <= 1;
     }
+};
 
-    // Another approach: Find the starting index as the first index which is breaking non-decreasing order
+// ============================================================================
+// APPROACH 2: Prefix-Stripping Pivot Search (The User's Approach)
+// ============================================================================
+// Intuition:
+// 1. Strip away identical elements at the start and end of the array. This
+//    guarantees that if duplicate minimums exist, we won't accidentally
+//    target a "false pivot".
+// 2. Scan the remaining elements to find the exact index of the true minimum.
+// 3. Do a circular validation starting from that true minimum to ensure
+//    every subsequent number is strictly increasing or equal.
+//
+// Time: O(N) | Space: O(1)
+// ============================================================================
+class Solution
+{
+public:
     bool check(vector<int> &nums)
     {
-        int N = nums.size();
+        int n = nums.size();
 
-        int sIdx = -1;
+        if (n <= 1)
+            return true;
 
-        for (int i = 0; i < N - 1; i++)
+        int l = 0, r = n - 1;
+
+        // STEP 1: Strip matching prefix/suffix values.
+        // This is the genius step that prevents duplicates from tricking the
+        // min-finding logic into grabbing the wrong pivot!
+        while (nums[l] == nums[r] && l < r)
         {
-            if (nums[i] > nums[i + 1])
+            l++;
+        }
+
+        // STEP 2: Find the true pivot (minimum value) in the remaining window.
+        int minIdx = 0;
+        int minVal = INT_MAX;
+
+        for (int i = l; i < n; ++i)
+        {
+            if (nums[i] < minVal)
             {
-                sIdx = i + 1;
-                break;
+                minVal = nums[i];
+                minIdx = i;
             }
         }
 
-        if (sIdx == -1)
-        {
-            return true;
-        }
+        // STEP 3: Circularly validate the array starting from the true pivot.
+        l = minIdx;
+        r = (minIdx + 1) % n;
 
-        for (int i = sIdx; i + 1 != sIdx; i = (i + 1) % N)
+        while (r != minIdx)
         {
-            int nxtIdx = (i + 1) % N;
-            if (nums[nxtIdx] < nums[i])
+
+            // If the next element drops below the current, it's invalid.
+            if (nums[r] < nums[l])
             {
                 return false;
             }
-        }
 
-        return true;
-    }
-
-    // -----------------------------------
-    // Another approach
-    // Time: O(N)
-    bool check(vector<int> &nums)
-    {
-
-        int N = nums.size();
-
-        int sIdx = -1;
-
-        for (int i = 0; i < N - 1; i++)
-        {
-            if (nums[i] > nums[i + 1])
-            {
-                sIdx = i + 1;
-                break;
-            }
-        }
-
-        if (sIdx == -1)
-        {
-            return true;
-        }
-
-        for (int i = sIdx; i + 1 != sIdx; i = (i + 1) % N)
-        {
-            int nxtIdx = (i + 1) % N;
-            if (nums[nxtIdx] < nums[i])
-            {
-                return false;
-            }
+            // Move the window forward circularly.
+            l = r;
+            r = (r + 1) % n;
         }
 
         return true;
