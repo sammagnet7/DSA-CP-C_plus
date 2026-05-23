@@ -66,7 +66,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title:
+2. Title: Binary Tree Paths
 
 Links:
 https://takeuforward.org/data-structure/print-root-to-node-path-in-a-binary-tree/
@@ -95,17 +95,12 @@ OUTPUT::::::
 
 
 */
-struct TreeNode
-{
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-  TreeNode() : val(0), left(nullptr), right(nullptr) {}
-  TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-  TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
-};
 
-template <typename T=int>
+//-------------------------------------------------------------------------------
+// 1. Title: Path In A Tree
+//-------------------------------------------------------------------------------
+
+template <typename T = int>
 struct TreeNodeN
 {
   int data;
@@ -116,87 +111,189 @@ struct TreeNodeN
   TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
 };
 
+/**
+ * ============================================================================
+ * TREE ALGORITHM: PATH TO GIVEN NODE (EXPLICIT SHORT-CIRCUIT DFS)
+ * ============================================================================
+ * * [THE INTUITION]
+ * We use Pre-Order DFS to hunt for the target node 'x'. By returning a boolean
+ * from our recursion, we can "catch" the success signal the moment the node
+ * is found and immediately halt all further exploration.
+ *
+ * * [THE MECHANICS]
+ * We push every visited node into our path array. We use an explicit boolean
+ * `ret` to capture the result of the left branch. If it's true, we instantly
+ * return it up the chain. If false, we check the right branch. If both fail,
+ * we pop the current node (backtrack) and return false.
+ *
+ * * [COMPLEXITY]
+ * Time: O(N) -> Visits every node at most once. Halts early if target is found.
+ * Space: O(H) -> Where H is the tree height. Avoids unnecessary stack frames
+ * by checking if children exist before recursing.
+ * ============================================================================
+ */
 class Solution
 {
-public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Path In A Tree
-  //-------------------------------------------------------------------------------
-  int traverse(TreeNodeN<int> *node, int x, vector<int> &v)
+private:
+  bool rec(TreeNodeN<int> *node, vector<int> &path, int x)
   {
-    if (node == NULL)
-      return 0;
+    // Base case: Safety check for empty tree
+    if (!node)
+    {
+      return false;
+    }
 
+    // Add the current node to our tentative path
+    path.push_back(node->data);
+
+    // Target found! Trigger the short-circuit
     if (node->data == x)
     {
-      v.push_back(x);
-      return 1;
+      return true;
     }
 
-    if (traverse(node->left, x, v) == 1)
+    bool ret = false;
+
+    // Traverse Left: Guarded check saves a recursion stack frame
+    if (node->left)
     {
-      v.push_back(node->data);
-      return 1;
+      ret = rec(node->left, path, x);
     }
 
-    if (traverse(node->right, x, v) == 1)
+    // Short-circuit: If found in the left subtree, stop immediately
+    if (ret)
     {
-      v.push_back(node->data);
-      return 1;
+      return ret;
     }
 
-    return 0;
+    // Traverse Right: Guarded check
+    if (node->right)
+    {
+      ret = rec(node->right, path, x);
+    }
+
+    // Short-circuit: If found in the right subtree, stop immediately
+    if (ret)
+    {
+      return ret;
+    }
+
+    // BACKTRACK: 'x' is not in this branch. Remove node and report failure.
+    path.pop_back();
+    return false;
   }
 
+public:
   vector<int> pathInATree(TreeNodeN<int> *root, int x)
   {
-    // Write your code here.
-    vector<int> ans;
+    vector<int> path;
 
-    traverse(root, x, ans);
+    // Kick off the optimized DFS
+    rec(root, path, x);
 
-    reverse(ans.begin(), ans.end());
-    return ans;
+    return path;
   }
+};
 
-  //-------------------------------------------------------------------------------
-  // 2. Title: Binary Tree Paths
-  //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Binary Tree Paths
+//-------------------------------------------------------------------------------
 
-  void traverse(TreeNode *node, string &s, vector<string> &ans)
+struct TreeNode
+{
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+  TreeNode() : val(0), left(nullptr), right(nullptr) {}
+  TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+  TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
+/**
+ * ============================================================================
+ * TREE ALGORITHM: ROOT-TO-LEAF PATHS (OPTIMIZED BACKTRACKING)
+ * ============================================================================
+ * * [THE INTUITION]
+ * To find all paths, we use a Pre-Order DFS. However, instead of passing the
+ * path string by value (which creates expensive copies at every node), we pass
+ * a single string BY REFERENCE. As we travel down, we append to it. As we
+ * travel back up, we "backtrack" by shrinking the string back to its previous size.
+ *
+ * * [THE MECHANICS]
+ * C++ `string.resize()` is incredibly fast when shrinking because it merely
+ * moves the null-terminator. By saving the length of the string before we
+ * append a number or an arrow, we know exactly where to truncate the string
+ * when we are done exploring that branch.
+ *
+ * * [COMPLEXITY]
+ * Time: O(N) -> We visit every node exactly once. String operations are O(1).
+ * Space: O(H) -> Where H is the height of the tree. The single path string
+ * and the recursive call stack both scale linearly with tree depth.
+ * ============================================================================
+ */
+class Solution
+{
+private:
+  void rec(TreeNode *node, vector<string> &ans, string &path)
   {
-
-    int prevSize = s.size();
-
-    string num = to_string(node->val);
-    s.append(num);
-
-    if (node->left == NULL && node->right == NULL)
+    // Base case: Safety check
+    if (!node)
     {
-      ans.push_back(s);
-      s.resize(prevSize);
       return;
     }
 
-    s.append("->");
+    // Snapshot the current length of the string before adding this node
+    int preLen = path.length();
 
-    if (node->left != NULL)
-      traverse(node->left, s, ans);
+    // Add the current node's value to our shared path
+    path += to_string(node->val);
 
-    if (node->right != NULL)
-      traverse(node->right, s, ans);
+    // If we hit a leaf, record the completed path into our answer array
+    if (!node->left && !node->right)
+    {
+      ans.push_back(path);
+    }
 
-    s.resize(prevSize);
+    // Traverse Left
+    if (node->left)
+    {
+      // Snapshot before adding the arrow
+      int tmpLen = path.length();
+      path += "->";
+
+      // Explore the left branch
+      rec(node->left, ans, path);
+
+      // BACKTRACK: Remove the arrow before trying the right branch
+      path.resize(tmpLen);
+    }
+
+    // Traverse Right
+    if (node->right)
+    {
+      // Snapshot before adding the arrow
+      int tmpLen = path.length();
+      path += "->";
+
+      // Explore the right branch
+      rec(node->right, ans, path);
+
+      // BACKTRACK: Remove the arrow
+      path.resize(tmpLen);
+    }
+
+    // BACKTRACK: Remove the current node's value before returning to parent
+    path.resize(preLen);
   }
 
+public:
   vector<string> binaryTreePaths(TreeNode *root)
   {
     vector<string> ans;
-    if (root == NULL)
-      return ans;
+    string path; // Shared memory buffer for the entire traversal
 
-    string tmp = "";
-    traverse(root, tmp, ans);
+    // Kick off the optimized DFS
+    rec(root, ans, path);
 
     return ans;
   }

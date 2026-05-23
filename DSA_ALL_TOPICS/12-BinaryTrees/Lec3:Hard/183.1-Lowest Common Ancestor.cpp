@@ -33,11 +33,29 @@ According to the definition of LCA on Wikipedia: “The lowest common ancestor i
 Examples:
   Example 1:
   Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+
+           (3)
+          /   \
+        (5)   (1)
+       /  \   / \
+     (6)  (2)(0)(8)
+          / \
+        (7) (4)
+
   Output: 3
   Explanation: The LCA of nodes 5 and 1 is 3.
 
   Example 2:
   Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+
+           (3)
+          /   \
+        (5)   (1)
+       /  \   / \
+     (6)  (2)(0)(8)
+          / \
+        (7) (4)
+
   Output: 5
   Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
 
@@ -46,8 +64,8 @@ Examples:
   Output: 1
 
 Constraints:
-  The number of nodes in the tree is in the range [2, 105].
-  -109 <= Node.val <= 109
+  The number of nodes in the tree is in the range [2, 10^5].
+  -10^9 <= Node.val <= 10^9
   All Node.val are unique.
   p != q
   p and q will exist in the tree.
@@ -59,20 +77,6 @@ INPUT::::::
 OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
-
-2. Title:
-
-Links:
-
-
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
 
 
 */
@@ -86,139 +90,74 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
+//-------------------------------------------------------------------------------
+// 1. Title: Lowest Common Ancestor
+//-------------------------------------------------------------------------------
 
+/**
+ * ============================================================================
+ * TREE ALGORITHM: LOWEST COMMON ANCESTOR (BOTTOM-UP DFS)
+ * ============================================================================
+ * * [THE INTUITION]
+ * We use a Post-Order traversal. We go all the way down to the leaves, and as
+ * we return (bubble up), we carry information about whether we found `p` or `q`.
+ * The very first node that receives a non-null result from BOTH its left and
+ * right children is guaranteed to be the Lowest Common Ancestor.
+ *
+ * * [THE MECHANICS]
+ * - If the current node is `p` or `q`, return the current node immediately.
+ * - Search the left subtree.
+ * - Search the right subtree.
+ * - If both searches return a node, the current node is the LCA.
+ * - If only one search returns a node, bubble that node further up the tree.
+ *
+ * * [COMPLEXITY]
+ * Time: O(N) -> In the worst case, we visit every node exactly once.
+ * Space: O(H) -> Where H is the tree height, corresponding to the recursion stack.
+ * ============================================================================
+ */
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Lowest Common Ancestor
-  //-------------------------------------------------------------------------------
-  // Approach1: check the other approach i.e. simpler
-
-  // // O(N)
-  // TreeNode *traverse(TreeNode *node, int pVal, int qVal, unordered_map<int, int> &mp, int seen)
-  // {
-  //   // If current node matches either p or q, mark it as seen
-  //   if (node->val == pVal || node->val == qVal)
-  //   {
-  //     seen++;          // increment how many targets found so far
-  //     mp[node->val]++; // increment counter for this node
-  //   }
-
-  //   // If both p and q already matched at this node (duplicate check case)
-  //   if (mp[node->val] == 2)
-  //     return node;
-
-  //   // If both p and q have been seen in this path, stop recursion
-  //   if (seen == 2)
-  //     return NULL;
-
-  //   TreeNode *tmp = NULL;
-
-  //   // Recurse on left child if exists
-  //   if (node->left != NULL)
-  //   {
-  //     tmp = traverse(node->left, pVal, qVal, mp, seen);
-  //     // Propagate child's match count up to parent
-  //     mp[node->val] += mp[node->left->val];
-  //   }
-
-  //   // If LCA found in left subtree, bubble it up
-  //   if (tmp != NULL)
-  //   {
-  //     return tmp;
-  //   }
-  //   // After left recursion, check if current node now covers both targets
-  //   if (mp[node->val] == 2)
-  //     return node;
-
-  //   // Recurse on right child if exists
-  //   if (node->right != NULL)
-  //   {
-  //     tmp = traverse(node->right, pVal, qVal, mp, seen);
-  //     // Propagate child's match count up to parent
-  //     mp[node->val] += mp[node->right->val];
-  //   }
-
-  //   // If LCA found in right subtree, bubble it up
-  //   if (tmp != NULL)
-  //   {
-  //     return tmp;
-  //   }
-  //   // Final check: if current node covers both targets, it's the LCA
-  //   if (mp[node->val] == 2)
-  //     return node;
-  //   else
-  //     return NULL; // otherwise keep bubbling NULL upward
-  // }
-
-  // //
-  // // Wrapper function to call traverse()
-  // // Time: O(N)  → visits each node once
-  // // Space: O(N + h) → hashmap + recursion stack (h = height of tree)
-  // TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q)
-  // {
-  //   if (root == NULL)
-  //     return NULL;
-
-  //   unordered_map<int, int> mp; // tracks how many of p/q found under each node
-  //   int seen = 0;               // number of targets encountered so far globally
-
-  //   return traverse(root, p->val, q->val, mp, seen);
-  // }
-
-  //---------------------------
-  // Approach2: Optimal
-
-  // Optimal approach:
-  //
-  // Time: O(N)
-  // Space: O(h) i.e. for auxiliary stack space
   TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q)
   {
+    // Base case 1: We hit a dead end
+    if (!root)
+    {
+      return nullptr;
+    }
 
-    if (root == NULL || root->val == p->val || root->val == q->val)
-    { // If find any match then no need to go deeper
-      // because deeper match's lca will be cur node only
+    // Base case 2: We found one of our targets!
+    // We return it immediately to bubble it up.
+    // (If the other target is a descendant of this one, returning this
+    // node satisfies the rule: "a node can be a descendant of itself").
+    if (root == p || root == q)
+    {
       return root;
     }
 
-    TreeNode *left = NULL;
-    TreeNode *right = NULL;
+    // Send a search party down the left and right branches
+    TreeNode *leftResult = lowestCommonAncestor(root->left, p, q);
+    TreeNode *rightResult = lowestCommonAncestor(root->right, p, q);
 
-    if (root->left != NULL)
+    // --- PROCESSING THE RESULTS (BOTTOM-UP) ---
+
+    // Case 1: Both branches found a target. This node is the split point!
+    if (leftResult != nullptr && rightResult != nullptr)
     {
-      left = lowestCommonAncestor(root->left, p, q);
-    }
-
-    if (root->right != NULL)
-    {
-      right = lowestCommonAncestor(root->right, p, q);
-    }
-
-    if (left != NULL && right != NULL)
-    { // This means two values reside in left and right subtree each, so cur is lca
       return root;
     }
-    else if (left != NULL) // if coming from one hand only, then that is the most possible alternative, so return that
-      return left;
-    else
-      return right;
+
+    // Case 2: Only the left branch found a target. Bubble it up.
+    if (leftResult != nullptr)
+    {
+      return leftResult;
+    }
+
+    // Case 3: Only the right branch found a target. Bubble it up.
+    // (If both were null, this naturally returns null, handling Case 4).
+    return rightResult;
   }
-
-  //-------------------------------------------------------------------------------
-  // 2. Title:
-  //-------------------------------------------------------------------------------
 };
 
 int main()

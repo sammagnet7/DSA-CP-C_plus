@@ -22,41 +22,50 @@ using namespace std;
 
 Links:
 https://leetcode.com/problems/lowest-common-ancestor-of-deepest-leaves/description/
-https://leetcode.com/problems/smallest-subtree-with-all-the-deepest-nodes/description/?envType=daily-question&envId=2026-01-09
+
+Duplicate:  https://leetcode.com/problems/smallest-subtree-with-all-the-deepest-nodes/description
 
 
 Problem statement:
 Given the root of a binary tree, return the lowest common ancestor of its deepest leaves.
 
 Recall that:
-
-The node of a binary tree is a leaf if and only if it has no children
+The node of a binary tree is a leaf if and only if it has no children.
 The depth of the root of the tree is 0. if the depth of a node is d, the depth of each of its children is d + 1.
 The lowest common ancestor of a set S of nodes, is the node A with the largest depth such that every node in S is in the subtree with root A.
 
+Examples:
+  Example 1:
+  Input: root = [3,5,1,6,2,0,8,null,null,7,4]
 
-Example 1:
-Input: root = [3,5,1,6,2,0,8,null,null,7,4]
-Output: [2,7,4]
-Explanation: We return the node with value 2, colored in yellow in the diagram.
-The nodes coloured in blue are the deepest leaf-nodes of the tree.
-Note that nodes 6, 0, and 8 are also leaf nodes, but the depth of them is 2, but the depth of nodes 7 and 4 is 3.
+                3
+              /   \
+            5       1
+           / |     | \
+          6  2     0  8
+            / \
+           7   4
 
-Example 2:
-Input: root = [1]
-Output: [1]
-Explanation: The root is the deepest node in the tree, and it's the lca of itself.
+  Output: [2,7,4]
+  Explanation: We return the node with value 2, colored in yellow in the diagram.
+  The nodes coloured in blue are the deepest leaf-nodes of the tree.
+  Note that nodes 6, 0, and 8 are also leaf nodes, but the depth of them is 2, but the depth of nodes 7 and 4 is 3.
 
-Example 3:
-Input: root = [0,1,3,null,2]
-Output: [2]
-Explanation: The deepest leaf node in the tree is 2, the lca of one node is itself.
+  Example 2:
+  Input: root = [1]
+  Output: [1]
+  Explanation: The root is the deepest node in the tree, and it's the lca of itself.
+
+  Example 3:
+  Input: root = [0,1,3,null,2]
+  Output: [2]
+  Explanation: The deepest leaf node in the tree is 2, the lca of one node is itself.
 
 
 Constraints:
-The number of nodes in the tree will be in the range [1, 1000].
-0 <= Node.val <= 1000
-The values of the nodes in the tree are unique.
+  The number of nodes in the tree will be in the range [1, 1000].
+  0 <= Node.val <= 1000
+  The values of the nodes in the tree are unique.
 
 
 
@@ -66,21 +75,6 @@ INPUT::::::
 OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
-
-2. Title:
-
-Links:
-
-
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
 
 */
 struct TreeNode
@@ -93,114 +87,120 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
+/**
+ * ============================================================================
+ * TApproach 1 :: LCA OF DEEPEST LEAVES (TWO-PASS REDUCTION)
+ * ============================================================================
+ * * [THE INTUITION]
+ * Instead of calculating depth and LCA simultaneously, we can break the problem
+ * into two distinct, easy-to-manage phases:
+ * 1. Find the absolute maximum depth of the tree.
+ * 2. Run a standard Lowest Common Ancestor (LCA) search, where our "target"
+ *    is ANY node that sits at that maximum depth.
+ *
+ * * [THE MECHANICS]
+ * - Phase 1 is a standard DFS to find tree height.
+ * - Phase 2 is our standard Bottom-Up LCA algorithm. If a node discovers it
+ *   is at `maxDepth`, it acts as a target and bubbles itself upwards. The
+ *   first node to receive a valid target from both left and right is the LCA.
+ *
+ * * [COMPLEXITY]
+ * Time: O(N) -> We traverse the tree exactly twice. Asymptotically still O(N).
+ * Space: O(H) -> Where H is the tree height. (Recursion stack memory).
+ * ============================================================================
+ */
+class Solution
 {
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
+private:
+  /**
+   * @brief Phase 1: Calculates the maximum depth of the tree.
+   */
+  int findDepth(TreeNode *node)
+  {
+    if (!node)
+    {
+      return 0;
+    }
+
+    int left = 0, right = 0;
+
+    if (node->left)
+    {
+      left = findDepth(node->left);
+    }
+    if (node->right)
+    {
+      right = findDepth(node->right);
+    }
+
+    return 1 + max(left, right);
+  }
+
+  /**
+   * @brief Phase 2: Standard LCA bubbling, targeting nodes at maxDepth.
+   * Note: 'curDepth' is passed by value, so we don't need to backtrack it.
+   */
+  TreeNode *findDeepestLCA(TreeNode *node, int curDepth, int maxDepth)
+  {
+    if (!node)
+      return nullptr;
+
+    // Step down into the current depth level
+    ++curDepth;
+
+    // Base Case: We hit our target depth! Bubble this node up.
+    if (curDepth == maxDepth)
+    {
+      return node;
+    }
+
+    TreeNode *left = nullptr, *right = nullptr;
+
+    // Send search parties down both branches (Guarded to save stack frames)
+    if (node->left)
+    {
+      left = findDeepestLCA(node->left, curDepth, maxDepth);
+    }
+    if (node->right)
+    {
+      right = findDeepestLCA(node->right, curDepth, maxDepth);
+    }
+
+    // --- PROCESSING THE RESULTS ---
+
+    // Case 1: Both sides found deepest leaves. This node is the split point!
+    if (left && right)
+    {
+      return node;
+    }
+
+    // Case 2 & 3: Only one side found a deepest leaf. Bubble it up.
+    if (left)
+    {
+      return left;
+    }
+    if (right)
+    {
+      return right;
+    }
+
+    // Case 4: Neither side found anything.
+    return nullptr;
+  }
+
+public:
+  TreeNode *lcaDeepestLeaves(TreeNode *root)
+  {
+    // Phase 1: Establish the target depth
+    int maxDepth = findDepth(root);
+
+    // Phase 2: Find the LCA of all nodes at that target depth
+    return findDeepestLCA(root, 0, maxDepth);
+  }
 };
 
 //--------------------------------------------
-// Approach 1 : Double pass
-//-------------------------------------------
-// class Solution {
-// public:
-//     /**
-//      * Helper Function 1: Calculate Tree Height
-//      * Standard recursive function to find the maximum depth of the tree.
-//      * Time: O(N)
-//      */
-//     int getDepth(TreeNode* node){
-//         if(!node){
-//             return 0;
-//         }
-//         return 1 + max(getDepth(node->left), getDepth(node->right));
-//     }
-
-//     /**
-//      * Helper Function 2: Find LCA of Deepest Nodes
-//      * * Approach:
-//      * This recursive function searches for nodes that are located at 'maxDepth'.
-//      * It uses a "Bubble Up" strategy similar to the standard LCA algorithm.
-//      * * Logic:
-//      * 1. If a node is a leaf and is at 'maxDepth', it returns itself (it's a target).
-//      * 2. If a node receives non-null returns from BOTH left and right children,
-//      * it means this node is the Lowest Common Ancestor of two deepest nodes.
-//      * 3. If a node receives a non-null return from only ONE child, it bubbles that result up.
-//      * * @param node Current node being visited
-//      * @param curDepth Depth of the current node (0-indexed from root call)
-//      * @param maxDepth The target depth we calculated in Pass 1
-//      */
-//     TreeNode* rec(TreeNode* node, int curDepth, int maxDepth){
-
-//         // Base Case: Leaf Node Check
-//         // Deepest nodes are by definition leaves (or else their children would be deeper).
-//         if(!node->left && !node->right){
-//             // Check if this leaf is at the deepest level
-//             // Note: Using 1+curDepth to match the 1-based height from getDepth
-//             if(1 + curDepth == maxDepth){
-//                 return node; // Found a deepest node
-//             }
-//             else{
-//                 return nullptr; // This leaf is not deep enough
-//             }
-//         }
-
-//         TreeNode* left = nullptr;
-//         TreeNode* right = nullptr;
-
-//         // Recursive Step: Check children
-//         if(node->left){
-//             left = rec(node->left, curDepth + 1, maxDepth);
-//         }
-//         if(node->right){
-//             right = rec(node->right, curDepth + 1, maxDepth);
-//         }
-
-//         // Decision Step (The LCA Logic):
-
-//         // Case 1: Both sides returned a node.
-//         // This implies there are deepest nodes in the left subtree AND the right subtree.
-//         // Therefore, CURRENT node is the Lowest Common Ancestor.
-//         if(left && right){
-//             return node;
-//         }
-//         // Case 2: Only one side returned a node (or neither).
-//         // Bubble up the non-null result (or null if neither found anything).
-//         else {
-//             return left == nullptr ? right : left;
-//         }
-//     }
-
-//     /**
-//      * Main Function
-//      * * Approach: Two-Pass DFS
-//      * 1. First Pass: Calculate the global maximum depth of the tree.
-//      * 2. Second Pass: Find the subtree that contains all nodes at that depth.
-//      * * Complexity Analysis:
-//      * - Time Complexity: O(N). We traverse the tree twice (once for depth, once for LCA). O(2N) -> O(N).
-//      * - Space Complexity: O(H). Recursion stack depth depends on tree height.
-//      */
-//     TreeNode* lcaDeepestLeaves(TreeNode* root) {
-
-//         if(!root){
-//             return root;
-//         }
-
-//         // Pass 1: Get the target depth
-//         int maxDepth = getDepth(root);
-
-//         // Pass 2: Find the LCA for nodes at that depth
-//         return rec(root, 0, maxDepth);
-//     }
-//};
-
-//--------------------------------------------
-// Approach 2 : Single pass
+// Approach 2 : Single pass [RECOMMENDED]
 //-------------------------------------------
 class Solution
 {
