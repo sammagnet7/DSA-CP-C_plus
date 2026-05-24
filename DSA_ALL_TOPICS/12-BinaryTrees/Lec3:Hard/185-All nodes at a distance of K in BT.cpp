@@ -18,24 +18,7 @@ using namespace std;
 
 /*
 
-1. Title: All nodes at a distance of K in BT
-
-Links:
-
-
-
-Problem statement:
-
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
-----------------------------------------------------------------------------------------------------
-
-2. Title:
+1. Title: All Nodes Distance K in Binary Tree
 
 Links:
 https://takeuforward.org/plus/dsa/problems/print-all-nodes-at-a-distance-of-k-in-bt?tab=editorial
@@ -49,6 +32,15 @@ You can return the answer in any order.
 Examples:
   Example 1:
   Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, k = 2
+
+           (3)
+          /   \
+        (5)   (1)
+       /  \   / \
+     (6)  (2)(0)(8)
+          / \
+        (7) (4)
+
   Output: [7,4,1]
   Explanation: The nodes that are a distance 2 from the target node (with value 5) have values 7, 4, and 1.
 
@@ -69,6 +61,7 @@ INPUT::::::
 
 OUTPUT::::::
 
+----------------------------------------------------------------------------------------------------
 
 */
 struct TreeNode
@@ -81,268 +74,132 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
-
+/**
+ * ============================================================================
+ * TREE ALGORITHM: ALL NODES DISTANCE K (GRAPH CONVERSION + BFS)
+ * ============================================================================
+ * * [THE MENTAL MODEL: "THE POND RIPPLE"]
+ * Standard binary trees are one-way streets (you can only go down). To find
+ * nodes at distance K, we must be able to go UP as well.
+ *
+ * Phase 1: We convert the tree into an Undirected Graph by mapping every
+ *          child to its parent using a Hash Map.
+ * Phase 2: We drop a "stone" at the target node and let a Breadth-First Search
+ *          (BFS) ripple outward in all three directions (Left, Right, Up).
+ *          The K-th ripple contains our answer.
+ *
+ * * [COMPLEXITY]
+ * Time: O(N) -> Phase 1 visits every node once. Phase 2 (BFS) visits every
+ *               node at most once.
+ * Space: O(N) -> The parent map, visited set, and BFS queue all scale
+ *                linearly with the number of nodes in the tree.
+ * ============================================================================
+ */
 class Solution
 {
-public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: All nodes at a distance of K in BT
-  //-------------------------------------------------------------------------------
+  // Global map for the instance to store [Child -> Parent] relationships
+  unordered_map<TreeNode *, TreeNode *> parentMap;
 
-  // -----------------------------------------------------------------------------
-  // Method: createParentMap
-  // Purpose: Builds a map that stores the parent of each node in the binary tree.
-  //          For each child node, we store the mapping: child → parent.
-  //
-  // Parameters:
-  // - node: current TreeNode* to process.
-  // - parentMap: unordered_map to store the mapping from child to parent.
-  //
-  // Time Complexity: O(N)
-  //     - Each node in the tree is visited exactly once.
-  // Space Complexity: O(N)
-  //     - In the worst case, the map stores N-1 entries (excluding root).
-  // -----------------------------------------------------------------------------
-  void createParentMap(TreeNode *node, unordered_map<TreeNode *, TreeNode *> &parentMap)
+private:
+  /**
+   * @brief Phase 1: DFS to map every node to its parent.
+   * Note: Uses guarded checks (if node->left) before recursing to save
+   * unnecessary stack frames.
+   */
+  void buildParentMap(TreeNode *node)
   {
-    if (node == NULL)
+    if (!node)
+    {
       return;
+    }
 
     if (node->left)
     {
-      parentMap[node->left] = node;           // Store left child's parent
-      createParentMap(node->left, parentMap); // Recursively process left subtree
+      parentMap[node->left] = node;
+      buildParentMap(node->left);
     }
 
     if (node->right)
     {
-      parentMap[node->right] = node;           // Store right child's parent
-      createParentMap(node->right, parentMap); // Recursively process right subtree
+      parentMap[node->right] = node;
+      buildParentMap(node->right);
     }
   }
 
-  // -----------------------------------------------------------------------------
-  // Method: traverseKLevelsBelow
-  // Purpose: Performs a BFS (level-order traversal) starting from a given node,
-  //          and collects all nodes that are exactly K levels below it.
-  //
-  // Parameters:
-  // - node: starting node (TreeNode*) from which distance is measured.
-  // - k: the distance/level to search for.
-  // - ans: vector<int> to store values of nodes found at distance k.
-  //
-  // Time Complexity: O(N)
-  //     - In the worst case, if k is large, the entire subtree may be traversed.
-  //     - But practically, we only traverse nodes up to level k, so the complexity
-  //       is proportional to the number of nodes up to that level.
-  //
-  // Space Complexity: O(W)
-  //     - Where W is the maximum width of the tree (nodes in the queue at any level).
-  //     - In the worst case (balanced binary tree), W = N/2.
-  // -----------------------------------------------------------------------------
-  void traverseKLevelsBelow(TreeNode *node, int k, vector<int> &ans)
+public:
+  vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
   {
+    vector<int> ans;
+
+    // Base case: Safety check
+    if (!root)
+    {
+      return ans;
+    }
+
+    // Phase 1: Build the graph connections (Upward pointers)
+    buildParentMap(root);
+
+    // Phase 2: BFS outward from the target node
     queue<TreeNode *> q;
-    q.push(node); // Start from given node
-    int dist = 0; // Current level from the source node
+    unordered_set<TreeNode *> visited; // Crucial to prevent Parent <-> Child infinite loops
+
+    q.push(target);
+    visited.insert(target);
+
+    // Start at -1 because we pre-increment `dist` at the start of the outer while loop.
+    // When the queue processes the target node, dist will correctly become 0.
+    int dist = -1;
 
     while (!q.empty())
     {
-      int qSize = q.size(); // Number of nodes in the current level
 
-      // If we've reached the desired level
-      if (dist == k)
+      // Snapshot the current ripple (level) size
+      int qSize = q.size();
+      ++dist;
+
+      // Process the entire ripple boundary
+      while (qSize--)
       {
-        for (int i = 0; i < qSize; i++)
-        {
-          ans.push_back(q.front()->val); // Collect all node values at level k
-          q.pop();
-        }
-        return; // No need to process further levels
-      }
-
-      // Traverse all nodes at the current level and enqueue their children
-      for (int i = 0; i < qSize; i++)
-      {
-        auto *tmp = q.front();
-
-        if (tmp->left)
-          q.push(tmp->left);
-
-        if (tmp->right)
-          q.push(tmp->right);
-
+        TreeNode *cur = q.front();
         q.pop();
-      }
 
-      dist++; // Move to the next level
-    }
-  }
-
-  // -----------------------------------------------------------------------------
-  // Method: traverseKLevelsAbove
-  // Purpose: Traverses upward from the target node to its ancestors, and for each
-  //          ancestor node, performs BFS to find nodes that are at remaining
-  //          distance down the subtree rooted at that ancestor (excluding visited nodes).
-  //
-  // Parameters:
-  // - node: TreeNode* from which we start going upward (i.e., target node).
-  // - k: Target distance to find nodes at.
-  // - ans: vector<int> to collect the results.
-  // - parentMap: unordered_map mapping each node to its parent.
-  //
-  // Time Complexity: O(N)
-  //     - In the worst case, we may visit all nodes in the tree.
-  //     - For each ancestor, we may do a BFS into part of the tree, which can
-  //       cumulatively cover all nodes.
-  //
-  // Space Complexity: O(N)
-  //     - For the visited map and the queue used in BFS.
-  // -----------------------------------------------------------------------------
-  void traverseKLevelsAbove(TreeNode *node, int k, vector<int> &ans, unordered_map<TreeNode *, TreeNode *> parentMap)
-  {
-    unordered_map<TreeNode *, int> visited; // Keeps track of visited nodes to avoid duplicates
-    int dist_up = 0;                        // Distance moved upward from the target node
-
-    // Traverse ancestors using parent map
-    while (parentMap.find(node) != parentMap.end())
-    {
-      visited[node]++;        // Mark current node as visited
-      node = parentMap[node]; // Move to parent
-      dist_up++;              // Increase upward distance
-
-      // BFS from current ancestor to find nodes at distance = k - dist_up (downward)
-      queue<TreeNode *> q;
-      q.push(node);
-      int dist_down = dist_up;
-
-      while (!q.empty())
-      {
-        int qSize = q.size();
-
-        // If current distance from original target is k, collect nodes at this level
-        if (dist_down == k)
+        // HARVESTING PHASE
+        // If we reached the target distance, collect the node.
+        // Notice there is no `else if` for children here. This means
+        // we stop queuing new nodes, allowing the queue to naturally
+        // empty and terminate the outer while loop!
+        if (dist == k)
         {
-          for (int i = 0; i < qSize; i++)
+          ans.push_back(cur->val);
+        }
+        // EXPANSION PHASE
+        // We haven't reached K yet, keep expanding the ripple.
+        else
+        {
+          // 1. Expand Down-Left
+          if (cur->left && visited.find(cur->left) == visited.end())
           {
-            ans.push_back(q.front()->val);
-            q.pop();
+            q.push(cur->left);
+            visited.insert(cur->left);
           }
-          continue; // We've collected this level, skip processing children
-        }
 
-        // Normal level-order traversal with visited check
-        for (int i = 0; i < qSize; i++)
-        {
-          auto *tmp = q.front();
-          if (tmp->left && visited.find(tmp->left) == visited.end())
-            q.push(tmp->left);
-          if (tmp->right && visited.find(tmp->right) == visited.end())
-            q.push(tmp->right);
-          q.pop();
-        }
+          // 2. Expand Down-Right
+          if (cur->right && visited.find(cur->right) == visited.end())
+          {
+            q.push(cur->right);
+            visited.insert(cur->right);
+          }
 
-        dist_down++; // Move to the next level
+          // 3. Expand UP (Using our graph parent map)
+          if (parentMap.find(cur) != parentMap.end() && visited.find(parentMap[cur]) == visited.end())
+          {
+            q.push(parentMap[cur]);
+            visited.insert(parentMap[cur]);
+          }
+        }
       }
     }
-  }
-
-  // -----------------------------------------------------------------------------
-  // Method: distanceK
-  // Purpose: Finds all nodes at distance K from a given target node in a binary tree.
-  //          Combines:
-  //          - BFS downward traversal from the target node.
-  //          - BFS downward traversal from each ancestor going upward using parent map.
-  //
-  // Parameters:
-  // - root: TreeNode* root of the binary tree.
-  // - target: TreeNode* target node from which distance is measured.
-  // - k: integer distance to find nodes at.
-  //
-  // Returns:
-  // - A vector of integers representing the values of all nodes at distance k.
-  //
-  // Time Complexity: O(N)
-  //     - Each node is visited at most once during upward/downward traversals.
-  // Space Complexity: O(N)
-  //     - For parentMap, visited map, queues, and the result vector.
-  // -----------------------------------------------------------------------------
-  vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
-  {
-    vector<int> ans;
-    if (root == NULL)
-      return ans;
-    if (k == 0)
-      return {target->val}; // Distance 0 → return target node's value
-
-    unordered_map<TreeNode *, TreeNode *> parentMap; // Stores child → parent
-
-    createParentMap(root, parentMap);                // O(N)
-    traverseKLevelsBelow(target, k, ans);            // O(N)
-    traverseKLevelsAbove(target, k, ans, parentMap); // O(N)
-
-    return ans;
-  }
-
-  //-------------------------------------------------------------------------------
-  // 2. Title: Approach 2 : Using DFS [Easier]
-  //-------------------------------------------------------------------------------
-
-  void dfsBuiltParentMap(TreeNode *node, TreeNode *p, map<TreeNode *, TreeNode *> &parentMap)
-  {
-
-    if (node == NULL)
-    {
-      return;
-    }
-
-    parentMap[node] = p;
-
-    dfsBuiltParentMap(node->left, node, parentMap);
-    dfsBuiltParentMap(node->right, node, parentMap);
-  }
-
-  void walkKLevels(int k, TreeNode *node, TreeNode *p, vector<int> &ans, map<TreeNode *, TreeNode *> &parentMap)
-  {
-    if (node == NULL)
-    {
-      return;
-    }
-
-    if (k == 0)
-    {
-      ans.push_back(node->val);
-      return;
-    }
-
-    if (parentMap[node] != p)
-      walkKLevels(k - 1, parentMap[node], node, ans, parentMap);
-    if (node->left != p)
-      walkKLevels(k - 1, node->left, node, ans, parentMap);
-    if (node->right != p)
-      walkKLevels(k - 1, node->right, node, ans, parentMap);
-  }
-
-  vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
-  {
-
-    map<TreeNode *, TreeNode *> parentMap;
-
-    dfsBuiltParentMap(root, NULL, parentMap);
-
-    vector<int> ans;
-
-    walkKLevels(k, target, NULL, ans, parentMap);
 
     return ans;
   }

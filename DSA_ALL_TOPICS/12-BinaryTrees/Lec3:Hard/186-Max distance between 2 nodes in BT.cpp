@@ -43,9 +43,13 @@ Output: 2
 Explanation :
 In the zeroth minute, Node 3 will start to burn.
 After one minute, Nodes (1, 4, 5) that are adjacent to 3 will burn completely.
-After two minutes, the only remaining Node 2 will be burnt and there will be no nodes remaining in the binary tree. 
+After two minutes, the only remaining Node 2 will be burnt and there will be no nodes remaining in the binary tree.
 So, the whole tree will burn in 2 minutes.
 
+Constraints :
+  1 <= N <= 10^5
+  1 <= Value of Tree Node <= 10^9
+  1 <= Value of Start Node <= 10^9
 
 INPUT::::::
 
@@ -54,42 +58,7 @@ OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
 
-2. Title:
-
-Links:
-
-
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
-
 */
-struct TreeNode
-{
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-  TreeNode() : val(0), left(nullptr), right(nullptr) {}
-  TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-  TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
-};
-
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
 
 template <typename T>
 class BinaryTreeNode
@@ -107,158 +76,130 @@ public:
   }
 };
 
+//-------------------------------------------------------------------------------
+// 1. Title: Time To Burn Tree
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * TREE ALGORITHM: TIME TO BURN TREE (CLASS-LEVEL STATE)
+ * ============================================================================
+ * * [THE MENTAL MODEL]
+ * Imagine the tree is a physical structure and you drop a match at the `start`
+ * node. Fire doesn't just spread down to the children; it spreads UP to the
+ * parent. To model this, we must upgrade our 1-way tree into a 2-way Graph.
+ * The total time to burn the tree is simply the maximum "blast radius" of
+ * a Breadth-First Search (BFS) starting from the origin of the fire.
+ *
+ * * [APPROACH]
+ * 1. Convert to Graph (DFS): Traverse the tree to populate a `parentMap`
+ *    that links every child to its parent, allowing us to traverse upwards.
+ *    Simultaneously, capture the memory address of the `start` node.
+ * 2. Simulate Fire (BFS): Push the `start` node into a queue and mark it
+ *    as visited. Expand outward level by level (Left, Right, Up).
+ * 3. Count Levels: Initialize `time = -1`. For every full level the queue
+ *    processes, increment the time. When the queue is empty, return `time`.
+ *
+ * * [TIME COMPLEXITY]
+ * O(N) -> We traverse the tree once (O(N)) to build the parent map. We then
+ * perform a BFS that visits every node exactly once (O(N)). Total Time: O(N).
+ *
+ * * [SPACE COMPLEXITY]
+ * O(N) -> The `parentMap` stores N-1 entries. The `visited` set and BFS
+ * `queue` can hold up to N elements. The DFS recursion stack takes O(H) space
+ * (worst case O(N)). Overall Space: O(N).
+ * ============================================================================
+ */
 class Solution
 {
-public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Time To Burn Tree
-  //-------------------------------------------------------------------------------
+private:
+  // Class-level variables (Shared across the methods of this instance)
+  unordered_map<BinaryTreeNode<int> *, BinaryTreeNode<int> *> parentMap;
+  BinaryTreeNode<int> *target;
 
-  // -----------------------------------------------------------------------------
-  // Method: createParentMap
-  // Purpose: Builds a map that stores the parent of each node in the binary tree.
-  //          For each child node, we store the mapping: child -> parent.
-  //          Also finds and stores the pointer to the node with value `startVal`.
-  //
-  // Time Complexity: O(N)
-  //     - Each node is visited once.
-  // Space Complexity: O(N)
-  //     - The map stores N-1 entries (excluding root).
-  // -----------------------------------------------------------------------------
-  void createParentMap(BinaryTreeNode<int> *node, unordered_map<int, BinaryTreeNode<int> *> &parentMap, int startVal, BinaryTreeNode<int> *&startNode)
+  // Helper function signature is now beautifully clean
+  void buildParentMap(BinaryTreeNode<int> *node, int start)
   {
-    if (node == NULL)
-      return;
 
-    if (node->data == startVal)
-      startNode = node;
+    // Locate the starting node and capture its pointer in our class variable
+    if (node->data == start)
+    {
+      target = node;
+    }
 
     if (node->left)
     {
-      parentMap[node->left->data] = node;
-      createParentMap(node->left, parentMap, startVal, startNode);
+      parentMap[node->left] = node;
+      buildParentMap(node->left, start);
     }
 
     if (node->right)
     {
-      parentMap[node->right->data] = node;
-      createParentMap(node->right, parentMap, startVal, startNode);
+      parentMap[node->right] = node;
+      buildParentMap(node->right, start);
     }
   }
 
-  // -----------------------------------------------------------------------------
-  // Method: heightOfBinaryTree
-  // Purpose: Calculates the height (max depth) of the subtree rooted at `root`.
-  //
-  // Height is defined as the number of edges on the longest path from the node
-  // to a leaf.
-  //
-  // Time Complexity: O(N)
-  //     - Visits each node once.
-  // Space Complexity: O(H)
-  //     - Due to recursion stack, where H = height of tree.
-  // -----------------------------------------------------------------------------
-  int heightOfBinaryTree(BinaryTreeNode<int> *root)
-  {
-    if (root == NULL)
-      return 0;
-
-    int leftHeight = heightOfBinaryTree(root->left);
-    int rightHeight = heightOfBinaryTree(root->right);
-
-    return 1 + max(leftHeight, rightHeight);
-  }
-
-  // -----------------------------------------------------------------------------
-  // Method: traverseLevelsAbove
-  // Purpose: For each ancestor of the target node (moving upward), it performs a
-  //          level-order traversal (BFS) to calculate the maximum downward
-  //          distance from that ancestor node, ignoring already visited nodes.
-  //
-  // Time Complexity: O(N)
-  //     - In worst case, all nodes may be visited through upward + downward traversal.
-  // Space Complexity: O(N)
-  //     - Due to the visited map and queue.
-  // -----------------------------------------------------------------------------
-  int traverseLevelsAbove(BinaryTreeNode<int> *node, unordered_map<int, BinaryTreeNode<int> *> parentMap)
-  {
-    unordered_map<int, int> visited; // Track visited nodes
-    int dist_up = 0;                 // How far we’ve moved up
-    int maxDist = 0;
-
-    // Traverse upward until root (no parent)
-    while (parentMap.find(node->data) != parentMap.end())
-    {
-      visited[node->data] = 1;      // Mark current node as visited
-      node = parentMap[node->data]; // Move to parent
-      dist_up++;                    // Upward distance increases
-
-      // Start BFS from this ancestor downward
-      queue<BinaryTreeNode<int> *> q;
-      q.push(node);
-      int dist_down = dist_up;
-
-      while (!q.empty())
-      {
-        int qSize = q.size();
-
-        for (int i = 0; i < qSize; i++)
-        {
-          auto *tmp = q.front();
-          q.pop();
-
-          // Push left child if not visited
-          if (tmp->left && visited.find(tmp->left->data) == visited.end())
-            q.push(tmp->left);
-
-          // Push right child if not visited
-          if (tmp->right && visited.find(tmp->right->data) == visited.end())
-            q.push(tmp->right);
-        }
-
-        dist_down++; // Move one level deeper
-      }
-
-      dist_down--;                       // Adjust extra increment after exiting loop
-      maxDist = max(maxDist, dist_down); // Track farthest burn time
-    }
-
-    return maxDist;
-  }
-
-  // -----------------------------------------------------------------------------
-  // Method: timeToBurnTree
-  // Purpose: Calculates minimum time required to burn the entire binary tree,
-  //          starting from a target node `start`.
-  //
-  // Approach:
-  //  - Step 1: Map each node to its parent.
-  //  - Step 2: Calculate max depth below `start` node (fire spreads down).
-  //  - Step 3: From each ancestor of `start`, calculate max depth not visited
-  //            (fire spreads up, and then down again).
-  //  - Result = max(time_downward, time_upward)
-  //
-  // Time Complexity: O(N)
-  // Space Complexity: O(N)
-  // -----------------------------------------------------------------------------
+public:
   int timeToBurnTree(BinaryTreeNode<int> *root, int start)
   {
-    if (root == NULL)
+    if (!root)
+    {
       return 0;
+    }
 
-    BinaryTreeNode<int> *startNode;
-    unordered_map<int, BinaryTreeNode<int> *> parentMap;
+    // ==========================================
+    // THE GOLDEN RULE FOR CLASS VARIABLES:
+    // Always reset them before starting a new run!
+    // ==========================================
+    parentMap.clear();
+    target = nullptr;
 
-    createParentMap(root, parentMap, start, startNode);
+    // Phase 1: Build graph and find target
+    buildParentMap(root, start);
 
-    int timeMaxAtBelow = heightOfBinaryTree(startNode) - 1;         // Fire spreads downward
-    int timeMaxAtAbove = traverseLevelsAbove(startNode, parentMap); // Fire spreads upward and down from ancestors
+    // Phase 2: Set up the BFS fire simulation
+    unordered_set<BinaryTreeNode<int> *> visited;
+    queue<BinaryTreeNode<int> *> q;
 
-    return max(timeMaxAtBelow, timeMaxAtAbove);
+    q.push(target);
+    visited.insert(target);
+
+    int time = -1;
+
+    while (!q.empty())
+    {
+      int qSize = q.size();
+
+      ++time;
+
+      while (qSize--)
+      {
+        BinaryTreeNode<int> *cur = q.front();
+        q.pop();
+
+        if (cur->left && visited.find(cur->left) == visited.end())
+        {
+          visited.insert(cur->left);
+          q.push(cur->left);
+        }
+
+        if (cur->right && visited.find(cur->right) == visited.end())
+        {
+          visited.insert(cur->right);
+          q.push(cur->right);
+        }
+
+        if (parentMap.find(cur) != parentMap.end() && visited.find(parentMap[cur]) == visited.end())
+        {
+          visited.insert(parentMap[cur]);
+          q.push(parentMap[cur]);
+        }
+      }
+    }
+
+    return time;
   }
-  //-------------------------------------------------------------------------------
-  // 2. Title:
-  //-------------------------------------------------------------------------------
 };
 
 int main()
