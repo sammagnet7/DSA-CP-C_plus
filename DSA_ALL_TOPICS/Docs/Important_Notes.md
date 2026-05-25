@@ -846,10 +846,10 @@ Convert int number to string of binary digits:
 25.  How to parse comma:
 ```cpp
      stringstream ss(data);
-     string s;
+     string token;
      // here ',' seperator is used
-     while (getline(ss, s, ',')) {
-          cout << s << endl;
+     while (getline(ss, token, ',')) {
+          cout << token << endl;
      }
 ```
 26.  Floor and Ceil:

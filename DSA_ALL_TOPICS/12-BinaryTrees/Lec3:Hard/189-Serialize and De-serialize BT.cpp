@@ -34,6 +34,13 @@ Clarification: The input/output format is the same as how LeetCode serializes a 
 Examples:
   Example 1:
   Input: root = [1,2,3,null,null,4,5]
+
+        (1)
+       /   \
+     (2)   (3)
+           / \
+         (4) (5)
+
   Output: [1,2,3,null,null,4,5]
 
   Example 2:
@@ -42,7 +49,7 @@ Examples:
 
 
 Constraints:
-The number of nodes in the tree is in the range [0, 104].
+The number of nodes in the tree is in the range [0, 10^4].
 -1000 <= Node.val <= 1000
 
 
@@ -52,21 +59,6 @@ INPUT::::::
 OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
-
-2. Title:
-
-Links:
-
-
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
 
 */
 struct TreeNode
@@ -79,174 +71,117 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
+//-------------------------------------------------------------------------------
+// 1. Title: Serialize and De-serialize BT
+//-------------------------------------------------------------------------------
 
-template <typename T>
-class BinaryTreeNode
+/**
+ * ============================================================================
+ * TREE ALGORITHM: SERIALIZE AND DESERIALIZE BINARY TREE (PREORDER DFS)
+ * ============================================================================
+ * * [THE INTUITION & MENTAL MODEL]
+ * * 1. The Flattening (Serialization):
+ * To convert a multidimensional tree into a 1D string, we need a traversal
+ * method that is deterministic. Preorder (Root -> Left -> Right) is the most
+ * natural choice because when we eventually decode the string from left to
+ * right, the very first number we read will immediately be the Root node.
+ * * However, just printing the numbers isn't enough (e.g., a tree with duplicate
+ * values or missing branches becomes ambiguous). We MUST record the exact
+ * structure by encoding the `null` leaves (using a marker like `#`). This
+ * mathematically locks the shape of the tree into the string.
+ * * 2. The Reconstruction (Deserialization):
+ * Because we encoded using Preorder, decoding is just a direct translation.
+ * We feed the string into a data stream and consume it token by token.
+ * - Read a number? Create a node and recursively build its Left and Right children.
+ * - Read a `#`? Return `nullptr`. This acts as a structural boundary, naturally
+ * terminating the branch and forcing the recursion to step back up the stack.
+ * ============================================================================
+ */
+class Codec
 {
-public:
-  T data;
-  BinaryTreeNode<T> *left;
-  BinaryTreeNode<T> *right;
-
-  BinaryTreeNode(T data)
+private:
+  // Helper to traverse the tree and build the string via reference
+  void recBuildPreorder(TreeNode *node, string &preOrderSerial)
   {
-    this->data = data;
-    left = NULL;
-    right = NULL;
+
+    // Base case: structural boundary hit. Encode the null marker.
+    if (!node)
+    {
+      preOrderSerial += "#,";
+      return;
+    }
+
+    // Process Root
+    preOrderSerial += to_string(node->val) + ',';
+
+    // Process Left, then Right
+    recBuildPreorder(node->left, preOrderSerial);
+    recBuildPreorder(node->right, preOrderSerial);
   }
-};
 
-class Solution
-{
+  // Helper to dynamically consume the stream and build nodes
+  TreeNode *recBuildTree(stringstream &ss)
+  {
+
+    string token;
+
+    // Base case 1: End of stream reached unexpectedly
+    if (!getline(ss, token, ','))
+    {
+      return nullptr;
+    }
+    // Base case 2: We hit a serialized null marker. Close this branch.
+    else if (token == "#")
+    {
+      return nullptr;
+    }
+    // Build the current node, then recursively build its children
+    else
+    {
+      int num = stoi(token);
+      TreeNode *curN = new TreeNode(num);
+
+      curN->left = recBuildTree(ss);
+      curN->right = recBuildTree(ss);
+
+      return curN;
+    }
+  }
+
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Serialize and De-serialize BT
-  //-------------------------------------------------------------------------------
-
-  /**
-   * Method: serialize
-   * -----------------
-   * Serializes a binary tree into a single string using level-order traversal (BFS).
-   *
-   * Approach:
-   * - Perform BFS starting from root.
-   * - For each node:
-   *    - Add its value to the result string.
-   *    - If the node has left/right children, enqueue them and add their values.
-   *    - If a child is null, append a special marker "#" to denote null.
-   *
-   * Output Format:
-   * - Values separated by commas.
-   * - Nulls represented using "#".
-   *
-   * Example:
-   * For tree:      1
-   *               / \
-   *              2   3
-   *                 / \
-   *                4   5
-   * Serialized string: "1,2,3,#,#,4,5,#,#,#,#"
-   *
-   * Time Complexity: O(N) — each node visited once.
-   * Space Complexity: O(N) — queue for BFS and result string size.
-   */
+  // Encodes a tree to a single string.
   string serialize(TreeNode *root)
   {
-    if (root == NULL)
-      return "";
+    string preOrderSerial = "";
 
-    // Start result with root value
-    string ret = to_string(root->val);
-
-    queue<TreeNode *> q;
-    q.push(root);
-
-    while (!q.empty())
+    if (!root)
     {
-      int s = q.size();
-
-      for (int i = 0; i < s; i++)
-      {
-        TreeNode *cur = q.front();
-        q.pop();
-
-        // Process left child
-        if (cur->left)
-        {
-          q.push(cur->left);
-          ret.append("," + to_string(cur->left->val));
-        }
-        else
-        {
-          ret.append(",#"); // null marker
-        }
-
-        // Process right child
-        if (cur->right)
-        {
-          q.push(cur->right);
-          ret.append("," + to_string(cur->right->val));
-        }
-        else
-        {
-          ret.append(",#");
-        }
-      }
+      return preOrderSerial;
     }
 
-    // Optional debug print
-    cout << ret;
-    return ret;
+    recBuildPreorder(root, preOrderSerial);
+
+    // Optional but clean: remove the very last trailing comma
+    preOrderSerial.pop_back();
+
+    return preOrderSerial;
   }
 
-  /**
-   * Method: deserialize
-   * -------------------
-   * Deserializes a string back into a binary tree using BFS.
-   *
-   * Approach:
-   * - Use a stringstream to split values by ','.
-   * - First value is root.
-   * - Use a queue to keep track of nodes to attach left/right children to.
-   * - For each node, read next two values:
-   *    - If not "#", create left/right node and enqueue it.
-   *
-   * Time Complexity: O(N) — each node created once.
-   * Space Complexity: O(N) — queue + tree nodes.
-   */
+  // Decodes your encoded data to tree.
   TreeNode *deserialize(string data)
   {
-    if (data.empty())
-      return NULL;
 
-    stringstream ss(data);
-    string s;
-
-    // First value is the root node
-    getline(ss, s, ',');
-    TreeNode *root = new TreeNode(stoi(s));
-
-    queue<TreeNode *> q;
-    q.push(root);
-
-    while (!q.empty())
+    if (data.length() == 0)
     {
-      TreeNode *cur = q.front();
-      q.pop();
-
-      // Process left child
-      if (getline(ss, s, ',') && s != "#")
-      {
-        TreeNode *node = new TreeNode(stoi(s));
-        cur->left = node;
-        q.push(node);
-      }
-
-      // Process right child
-      if (getline(ss, s, ',') && s != "#")
-      {
-        TreeNode *node = new TreeNode(stoi(s));
-        cur->right = node;
-        q.push(node);
-      }
+      return nullptr;
     }
 
-    return root;
-  }
+    // Convert the raw string into a consumable stream
+    stringstream ss(data);
 
-  //-------------------------------------------------------------------------------
-  // 2. Title: Construct a BT from Postorder and Inorder
-  //-------------------------------------------------------------------------------
+    // Kick off the recursive reconstruction
+    return recBuildTree(ss);
+  }
 };
 
 int main()

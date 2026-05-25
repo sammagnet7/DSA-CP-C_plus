@@ -30,6 +30,13 @@ Given two integer arrays preorder and inorder where preorder is the preorder tra
 
 Examples:
   Example 1:
+
+        (3)
+       /   \
+     (9)  (20)
+           / \
+        (15) (7)
+
   Input: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
   Output: [3,9,20,null,null,15,7]
 
@@ -68,6 +75,13 @@ Given two integer arrays inorder and postorder where inorder is the inorder trav
 
 Examples:
   Example 1:
+
+        (3)
+       /   \
+     (9)  (20)
+           / \
+        (15) (7)
+
   Input: inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
   Output: [3,9,20,null,null,15,7]
 
@@ -89,6 +103,7 @@ INPUT::::::
 
 OUTPUT::::::
 
+----------------------------------------------------------------------------------------------------
 
 */
 struct TreeNode
@@ -101,220 +116,184 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
-
-template <typename T>
-class BinaryTreeNode
-{
-public:
-  T data;
-  BinaryTreeNode<T> *left;
-  BinaryTreeNode<T> *right;
-
-  BinaryTreeNode(T data)
-  {
-    this->data = data;
-    left = NULL;
-    right = NULL;
-  }
-};
-
+//-------------------------------------------------------------------------------
+// 1. Title: Construct a BT from Preorder and Inorder
+//-------------------------------------------------------------------------------
+/**
+ * ============================================================================
+ * TREE ALGORITHM: CONSTRUCT BINARY TREE FROM PREORDER & INORDER TRAVERSAL
+ * ============================================================================
+ * * [APPROACH SUMMARY]
+ * 1. Preorder sequence tells us the sequential order of ROOTS.
+ * 2. Inorder sequence tells us the structural boundaries of SUBTREES.
+ * 3. We use a hash map to map each Node Value to its Index in the inorder array.
+ * 4. We recursively slice both arrays into Left Subtree segments and Right
+ * Subtree segments, tracking boundaries with 4 index pointers.
+ * * * [TIME COMPLEXITY]
+ * O(N) -> Populating the map takes O(N) time. The recursive function builds
+ * exactly one node per call, executing a total of N calls. Each call
+ * does O(1) work due to the constant-time hash map index lookups.
+ * * * [SPACE COMPLEXITY]
+ * O(N) -> The hash map stores N elements, consuming linear space. The
+ * recursive call stack scales with the height of the tree, which is
+ * O(log N) for a balanced tree and O(N) in the worst-case skewed tree.
+ * ============================================================================
+ */
 class Solution
 {
-public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Construct a BT from Preorder and Inorder
-  //-------------------------------------------------------------------------------
+private:
+  // Maps Node Value -> Index location in the Inorder array
+  unordered_map<int, int> inorderIdxMap;
 
   /**
-   * Method: buildFromPreOrder
-   * -------------------------
-   * Recursively builds the binary tree from preorder and inorder traversal arrays.
-   *
-   * Approach:
-   * - The first element of the preorder list is the root of the current subtree.
-   * - Using a map for inorder values, we find the index of the root in inorder array.
-   * - This index helps divide the inorder array into left and right subtrees.
-   * - Similarly, we compute bounds for the left and right subtrees in preorder array.
-   * - Recursive calls build left and right subtrees accordingly.
-   *
-   * Time Complexity: O(N)
-   * - Each node is created exactly once.
-   * - Lookup in map is O(1), done N times.
-   *
-   * Space Complexity: O(N)
-   * - Map takes O(N) space.
-   * - Recursion stack in worst case (skewed tree) takes O(N) space.
+   * @brief Recursive helper that isolates subarrays to build nodes bottom-up.
+   * * @param pStart Starting index of the current subtree in the preorder array
+   * @param pEnd Ending index of the current subtree in the preorder array
+   * @param iStart Starting index of the current subtree in the inorder array
+   * @param iEnd Ending index of the current subtree in the inorder array
    */
-  TreeNode *buildFromPreOrder(vector<int> &preorder, vector<int> &inorder, int pStart, int pEnd, int iStart, int iEnd, unordered_map<int, int> &mp)
+  TreeNode *recBuild(int pStart, int pEnd, int iStart, int iEnd,
+                     vector<int> &preorder, vector<int> &inorder)
   {
-    // Base case: no elements to construct subtree
+
+    // Base case: If boundaries cross, the current subtree is empty (null child)
     if (pStart > pEnd || iStart > iEnd)
-      return NULL;
+    {
+      return nullptr;
+    }
 
-    // Root node is the first element in current preorder range
-    TreeNode *me = new TreeNode(preorder[pStart]);
+    // 1. Preorder rule: The first element of the current range is always the Root
+    int curVal = preorder[pStart];
+    TreeNode *curN = new TreeNode(curVal);
 
-    // Find index of root in inorder array
-    int in_root_idx = mp[me->val];
+    // 2. Look up where this root splits the inorder sequence in O(1) time
+    int inIdx = inorderIdxMap[curVal];
 
-    // Count of nodes in left subtree
-    int leftNumsCount = in_root_idx - iStart;
+    // 3. Count how many nodes belong specifically to the left subtree
+    int inLeftCount = inIdx - iStart;
 
-    // Recursively build left subtree
-    TreeNode *left = buildFromPreOrder(
-        preorder, inorder,
-        pStart + 1,             // left subtree starts right after root in preorder
-        pStart + leftNumsCount, // end of left subtree in preorder
-        iStart,                 // left subtree in inorder
-        in_root_idx - 1,        // just before root in inorder
-        mp);
+    // 4. Divide and Conquer: Slice boundaries for the children
+    // Left Subtree:
+    // - Preorder range: skips current root (+1) up to the size of the left pool
+    // - Inorder range: starts at current boundary up to just before the root divider
+    TreeNode *leftN = recBuild(pStart + 1, pStart + inLeftCount, iStart, inIdx - 1, preorder, inorder);
 
-    // Recursively build right subtree
-    TreeNode *right = buildFromPreOrder(
-        preorder, inorder,
-        pStart + leftNumsCount + 1, // start of right subtree in preorder
-        pEnd,                       // end of preorder
-        in_root_idx + 1,            // right subtree in inorder starts after root
-        iEnd,                       // end of inorder
-        mp);
+    // Right Subtree:
+    // - Preorder range: starts immediately after the left pool up to the end of the range
+    // - Inorder range: starts just after the root divider up to the current right boundary
+    TreeNode *rightN = recBuild(pStart + inLeftCount + 1, pEnd, inIdx + 1, iEnd, preorder, inorder);
 
-    // Attach left and right subtrees
-    me->left = left;
-    me->right = right;
+    // 5. Establish structural pointers bottom-up
+    curN->left = leftN;
+    curN->right = rightN;
 
-    return me;
+    // Return current constructed root to its parent frame
+    return curN;
   }
 
-  /**
-   * Method: buildTree
-   * -----------------
-   * Initiates the tree construction using preorder and inorder traversal arrays.
-   *
-   * Time Complexity: O(N)
-   * - Preprocesses map of inorder indices in O(N).
-   * - buildFromPreOrder runs in O(N).
-   *
-   * Space Complexity: O(N)
-   * - Map storage and recursion stack.
-   */
+public:
   TreeNode *buildTree(vector<int> &preorder, vector<int> &inorder)
   {
-    int pN = preorder.size();
-    int iN = inorder.size();
+    int n = preorder.size();
 
-    // Build map for quick lookup of root index in inorder
-    unordered_map<int, int> mp;
-    for (int i = 0; i < iN; i++)
+    // Step 1: Pre-process inorder array to enable O(1) index searches
+    for (int i = 0; i < n; ++i)
     {
-      mp[inorder[i]] = i;
+      inorderIdxMap[inorder[i]] = i;
     }
 
-    // Start building tree
-    return buildFromPreOrder(preorder, inorder, 0, pN - 1, 0, iN - 1, mp);
+    // Step 2: Trigger the recursive divide-and-conquer builder across the entire range
+    return recBuild(0, n - 1, 0, n - 1, preorder, inorder);
   }
+};
 
-  //-------------------------------------------------------------------------------
-  // 2. Title: Construct a BT from Postorder and Inorder
-  //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+// 2. Title: Construct a BT from Postorder and Inorder
+//-------------------------------------------------------------------------------
+/**
+ * ============================================================================
+ * TREE ALGORITHM: CONSTRUCT BINARY TREE FROM INORDER & POSTORDER TRAVERSAL
+ * ============================================================================
+ * * [APPROACH SUMMARY]
+ * 1. Postorder sequence tells us the sequential order of ROOTS (always at the end).
+ * 2. Inorder sequence tells us the structural boundaries of SUBTREES.
+ * 3. We use a hash map to map each Node Value to its Index in the inorder array
+ * for O(1) lookups.
+ * 4. We recursively slice both arrays. Because it is Postorder, the current root
+ * is at `pEnd`. The left subtree comes first, followed by the right subtree.
+ * * * [TIME COMPLEXITY]
+ * O(N) -> Populating the map takes O(N). Building the tree takes N recursive
+ * calls, doing O(1) mathematical slicing at each step.
+ * * * [SPACE COMPLEXITY]
+ * O(N) -> The hash map requires linear space. The recursion stack uses O(H)
+ * space, which degrades to O(N) in a perfectly skewed tree.
+ * ============================================================================
+ */
+class Solution
+{
+private:
+  // Maps Node Value -> Index location in the Inorder array
+  unordered_map<int, int> inorderIdxMap;
 
   /**
-   * Method: buildFromPostorder
-   * --------------------------
-   * Recursively builds the binary tree from postorder and inorder traversal arrays.
-   *
-   * Approach:
-   * - In postorder traversal, the last element is the root of the current subtree.
-   * - Using a hashmap for inorder, find the index of the root.
-   * - The inorder array is split into left and right subtrees using the root index.
-   * - Calculate number of nodes in left and right subtree to determine the correct
-   *   ranges in postorder array for recursive calls.
-   * - Recursively build left and right subtrees.
-   *
-   * Time Complexity: O(N)
-   * - Each node is processed once.
-   * - Hash map lookups are O(1).
-   *
-   * Space Complexity: O(N)
-   * - Hash map and recursion stack in the worst case (skewed tree).
+   * @brief Recursive helper that isolates subarrays to build nodes bottom-up.
+   * @param pStart Starting index of the current subtree in the postorder array
+   * @param pEnd Ending index of the current subtree in the postorder array
+   * @param iStart Starting index of the current subtree in the inorder array
+   * @param iEnd Ending index of the current subtree in the inorder array
    */
-  TreeNode *buildFrompostorder(vector<int> &postorder, vector<int> &inorder, int pStart, int pEnd, int iStart, int iEnd, unordered_map<int, int> &mp)
+  TreeNode *recBuild(int pStart, int pEnd, int iStart, int iEnd,
+                     vector<int> &postorder, vector<int> &inorder)
   {
 
-    // Base case: no nodes to construct
+    // Base case: Boundaries cross, meaning this child doesn't exist
     if (pStart > pEnd || iStart > iEnd)
-      return NULL;
+    {
+      return nullptr;
+    }
 
-    // Last element in postorder is the root of current subtree
-    TreeNode *me = new TreeNode(postorder[pEnd]);
+    // 1. Postorder rule: The LAST element of the current range is the Root
+    int curVal = postorder[pEnd];
+    TreeNode *curN = new TreeNode(curVal);
 
-    // Find root index in inorder array
-    int in_root_idx = mp[me->val];
+    // 2. Look up the root's position in the inorder sequence in O(1) time
+    int inIdx = inorderIdxMap[curVal];
 
-    // Count nodes in left and right subtrees
-    int leftNumsCount = in_root_idx - iStart;
-    int rightNumsCount = iEnd - in_root_idx;
+    // 3. Calculate exactly how many elements belong to the Left Subtree
+    int inLeftCount = inIdx - iStart;
 
-    // Recursively build left subtree
-    TreeNode *left = buildFrompostorder(
-        postorder, inorder,
-        pStart,                     // start of left subtree in postorder
-        pStart + leftNumsCount - 1, // end of left subtree
-        iStart,                     // start in inorder
-        in_root_idx - 1,            // end in inorder
-        mp);
+    // 4. Divide and Conquer: Slice boundaries for the children
 
-    // Recursively build right subtree
-    TreeNode *right = buildFrompostorder(
-        postorder, inorder,
-        pEnd - rightNumsCount, // start of right subtree in postorder
-        pEnd - 1,              // end (before root)
-        in_root_idx + 1,       // right subtree in inorder
-        iEnd,
-        mp);
+    // Left Subtree:
+    // - Postorder: starts at pStart, spans exactly `inLeftCount` elements
+    // - Inorder: everything up to just before the root
+    TreeNode *leftN = recBuild(pStart, pStart + inLeftCount - 1, iStart, inIdx - 1, postorder, inorder);
 
-    // Attach left and right subtrees
-    me->left = left;
-    me->right = right;
+    // Right Subtree:
+    // - Postorder: starts immediately after the left pool, ends right before current root
+    // - Inorder: everything right after the root
+    TreeNode *rightN = recBuild(pStart + inLeftCount, pEnd - 1, inIdx + 1, iEnd, postorder, inorder);
 
-    return me;
+    // 5. Build the connections
+    curN->left = leftN;
+    curN->right = rightN;
+
+    return curN;
   }
 
-  /**
-   * Method: buildTree
-   * -----------------
-   * Initiates tree construction from inorder and postorder traversal arrays.
-   *
-   * Time Complexity: O(N)
-   * - Builds hashmap in O(N)
-   * - Recursive build in O(N)
-   *
-   * Space Complexity: O(N)
-   * - Map and recursion stack
-   */
+public:
   TreeNode *buildTree(vector<int> &inorder, vector<int> &postorder)
   {
-    int pN = postorder.size();
-    int iN = inorder.size();
+    int n = postorder.size();
 
-    // Hash map to quickly find index of root in inorder
-    unordered_map<int, int> mp;
-    for (int i = 0; i < iN; i++)
+    // Step 1: Pre-process inorder array to enable O(1) index searches
+    for (int i = 0; i < n; ++i)
     {
-      mp[inorder[i]] = i;
+      inorderIdxMap[inorder[i]] = i;
     }
 
-    // Start recursive construction
-    return buildFrompostorder(postorder, inorder, 0, pN - 1, 0, iN - 1, mp);
+    // Step 2: Trigger the recursive builder across the entire range
+    return recBuild(0, n - 1, 0, n - 1, postorder, inorder);
   }
 };
 
