@@ -20,11 +20,15 @@ using namespace std;
 
 1. Title: Morris Inorder Traversal
 
+Definition:
+Morris Traversal is a tree traversal algorithm that visits every node in a binary tree in `O(N)` time while strictly using `O(1)` constant extra space.
+Unlike standard Depth-First Search (DFS) which relies on a recursion call stack or a manual `std::stack` to remember how to return to parent nodes, Morris Traversal bypasses external memory entirely by temporarily modifying the tree itself.
+
+
 Links:
 https://takeuforward.org/data-structure/morris-inorder-traversal-of-a-binary-tree/
 https://takeuforward.org/plus/dsa/problems/morris-inorder-traversal-?tab=editorial
-https://leetcode.com/problems/binary-tree-inorder-traversal/submissions/1697272849/
-
+https://leetcode.com/problems/binary-tree-inorder-traversal/
 
 Problem statement:
 Given the root of a binary tree, return the inorder traversal of its nodes' values.
@@ -32,10 +36,26 @@ Given the root of a binary tree, return the inorder traversal of its nodes' valu
 Examples:
   Example 1:
   Input: root = [1,null,2,3]
+
+             (1)
+                \
+                (2)
+                /
+              (3)
+
   Output: [1,3,2]
 
   Example 2:
   Input: root = [1,2,3,4,5,null,8,null,null,6,7,9]
+
+              (1)
+             /   \
+           (2)   (3)
+          /  \      \
+        (4)  (5)    (8)
+             / \    /
+           (6) (7)(9)
+
   Output: [4,2,6,5,7,1,3,9,8]
 
   Example 3:
@@ -51,6 +71,8 @@ Constraints:
   The number of nodes in the tree is in the range [0, 100].
   -100 <= Node.val <= 100
 
+
+Note: Do it with in O(1) space complexity.
 
 INPUT::::::
 
@@ -91,11 +113,60 @@ Constraints:
   The number of nodes in the tree is in the range [0, 100].
   -100 <= Node.val <= 100
 
+
+Note: Do it with in O(1) space complexity.
+
 INPUT::::::
 
 
 OUTPUT::::::
 
+----------------------------------------------------------------------------------------------------
+
+3. Title: Morris Postorder Traversal
+
+Links:
+https://leetcode.com/problems/binary-tree-postorder-traversal/
+
+
+Problem statement:
+Given the root of a binary tree, return the postorder traversal of its nodes' values.
+
+
+Example 1:
+  Input: root = [1,null,2,3]
+  Output: [3,2,1]
+  Explanation:
+
+
+Example 2:
+  Input: root = [1,2,3,4,5,null,8,null,null,6,7,9]
+  Output: [4,6,7,5,2,9,8,3,1]
+  Explanation:
+
+Example 3:
+  Input: root = []
+  Output: []
+
+Example 4:
+  Input: root = [1]
+  Output: [1]
+
+
+Constraints:
+  The number of the nodes in the tree is in the range [0, 100].
+  -100 <= Node.val <= 100
+
+
+Note: Do it with in O(1) space complexity.
+
+
+INPUT::::::
+
+
+OUTPUT::::::
+
+----------------------------------------------------------------------------------------------------
 
 */
 struct TreeNode
@@ -108,204 +179,293 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
+//-------------------------------------------------------------------------------
+// 1. Title: Morris Inorder Traversal IN Order
+//-------------------------------------------------------------------------------
 
-template <typename T>
-class BinaryTreeNode
-{
-public:
-  T data;
-  BinaryTreeNode<T> *left;
-  BinaryTreeNode<T> *right;
-
-  BinaryTreeNode(T data)
-  {
-    this->data = data;
-    left = NULL;
-    right = NULL;
-  }
-};
-
+/**
+ * ============================================================================
+ * TREE ALGORITHM: MORRIS INORDER TRAVERSAL (O(1) SPACE)
+ * ============================================================================
+ * * [THE MENTAL MODEL: "TEMPORARY BRIDGES"]
+ * Standard traversals use an O(H) stack (or recursion) to remember how to
+ * return to a parent node after visiting its left subtree. Morris Traversal
+ * eliminates this by using the tree's own empty leaf pointers.
+ * It temporarily builds a "bridge" (a thread) from the deepest rightmost node
+ * of a left subtree (the predecessor) straight back up to the parent. Once
+ * the left subtree is fully explored, it crosses the bridge back to the parent,
+ * destroys the bridge to restore the original tree, and moves to the right subtree.
+ * * [APPROACH / ALGORITHM DESIGN]
+ * Initialize `curr` at the root.
+ * 1. If `curr` has NO left child:
+ * - We can't go left. Process/print `curr`, and move right (`curr = curr->right`).
+ * 2. If `curr` HAS a left child:
+ * - Find the Inorder Predecessor (go left once, then all the way right).
+ * - Case A (Bridge doesn't exist): The predecessor's right pointer is null.
+ * Link it to `curr` to create our return path. Safely move left (`curr = curr->left`).
+ * - Case B (Bridge already exists): The predecessor's right pointer points
+ * to `curr`. This means we just returned from the left side! Break the
+ * link (set to null), process `curr`, and move right (`curr = curr->right`).
+ * * [COMPLEXITY ANALYSIS]
+ * - SPACE COMPLEXITY: O(1)
+ * We strictly use two pointers (`curr` and `pred`) regardless of the tree's
+ * size or shape. No recursive call stack or external memory is used.
+ * * - TIME COMPLEXITY: O(N)
+ * [Why isn't it O(N^2) due to the nested while loop?]
+ * A tree with N nodes has exactly N-1 edges. In Morris Traversal, every
+ * single edge in the tree is traversed a maximum of THREE times:
+ * 1. Once when `curr` naturally traverses down it.
+ * 2. Once when `pred` traverses down it to build the bridge.
+ * 3. Once when `pred` traverses down it to destroy the bridge.
+ * Since the maximum number of edge traversals is bounded by 3 * (N - 1),
+ * the work scales linearly, making it strictly O(N) time.
+ * ============================================================================
+ */
 class Solution
 {
 public:
-  //-------------------------------------------------------------------------------
-  // 1. Title: Morris Inorder Traversal
-  //-------------------------------------------------------------------------------
-
-  /**
-   * Method: inorderTraversal_Moris
-   * ------------------------------
-   * Performs Morris Inorder Traversal on a binary tree and stores the result in `ans`.
-   *
-   * Morris Traversal is a way to do an inorder traversal of a binary tree **without recursion**
-   * and **without using a stack**. It temporarily modifies the tree structure by creating
-   * threaded links to predecessors (rightmost nodes in the left subtree).
-   *
-   * Approach:
-   * - Start from the root node.
-   * - For each node:
-   *     - If it has no left child, add its value to the result and move to the right.
-   *     - Else, find its inorder predecessor in the left subtree.
-   *         - If the predecessor's right is NULL, set it to the current node (thread) and go left.
-   *         - If the predecessor's right is current (thread exists), remove it, add current's value,
-   *           and go right.
-   *
-   * This method ensures that each node is visited exactly as required by inorder traversal
-   * (left-root-right) and no extra space is used (stack or recursion).
-   *
-   * Time Complexity: O(2N) ~ amortized
-   *     - Each edge is visited at most twice (once to create the thread, once to remove it).
-   * Space Complexity: O(1)
-   *     - No stack or recursion; uses constant space.
-   *
-   * Parameters:
-   * - root: Pointer to the root of the binary tree.
-   * - ans: Vector to store the result of inorder traversal.
-   */
-  void inorderTraversal_Morris(TreeNode *root, vector<int> &ans)
-  {
-    TreeNode *cur = root;
-
-    while (cur)
-    { // O(N)
-      if (cur->left == NULL)
-      {
-        // No left child, visit node and move to right
-        ans.push_back(cur->val);
-        cur = cur->right;
-      }
-      else
-      {
-        // Find the inorder predecessor (rightmost node in left subtree)
-        TreeNode *tmp = cur->left;
-
-        while (tmp->right && tmp->right != cur)
-        { // Note: amortized to O(N) after whole traversal
-          tmp = tmp->right;
-        }
-
-        if (tmp->right == cur)
-        {
-          // Thread exists -> remove it, visit node, and move to right
-          tmp->right = NULL;
-          ans.push_back(cur->val);
-          cur = cur->right;
-        }
-        else
-        {
-          // Create a temporary thread to the current node and move left
-          tmp->right = cur;
-          cur = cur->left;
-        }
-      }
-    }
-  }
-
-public:
   vector<int> inorderTraversal(TreeNode *root)
   {
-    vector<int> ans;
-    if (root == NULL)
-      return ans;
+    vector<int> inorder;
+    TreeNode *curr = root;
 
-    inorderTraversal_Morris(root, ans);
-
-    return ans;
-  }
-
-  //-------------------------------------------------------------------------------
-  // 2. Title: Morris Preorder Traversal
-  //-------------------------------------------------------------------------------
-  /**
-   * Method: preorderTraversal_Morris
-   * --------------------------------
-   * Performs Morris Preorder Traversal on a binary tree and stores the result in `ans`.
-   *
-   * Morris Traversal avoids using recursion or a stack. It temporarily modifies the tree
-   * by creating threads (temporary right pointers) to predecessors.
-   *
-   * Approach:
-   * - Start from the root.
-   * - For each node:
-   *     - If left child is NULL: Visit the node, move to right.
-   *     - Else:
-   *         - Find the inorder predecessor (rightmost node in left subtree).
-   *         - If the predecessor's right is NULL:
-   *             - Create a thread to current node and visit current.
-   *             - Move to left child.
-   *         - Else:
-   *             - Thread exists → remove it, and move to right child.
-   *
-   * Time Complexity: O(2N) : amortized
-   *     - Each node is visited at most twice (creating and removing threads).
-   * Space Complexity: O(1)
-   *     - No extra space (stack or recursion).
-   *
-   * Parameters:
-   * - root: Pointer to the root of the binary tree.
-   * - ans: Vector to store the result of preorder traversal.
-   */
-  void preorderTraversal_Morris(TreeNode *root, vector<int> &ans)
-  {
-    TreeNode *cur = root;
-
-    while (cur)
+    while (curr)
     {
-      if (cur->left == NULL)
+
+      // Case 1: No left child. Process current node and move right.
+      if (curr->left == nullptr)
       {
-        // No left child, visit node and move to right
-        ans.push_back(cur->val);
-        cur = cur->right;
+        inorder.push_back(curr->val);
+        curr = curr->right;
       }
+      // Case 2: Left child exists. We must build or cross a bridge.
       else
       {
-        // Find the inorder predecessor (rightmost node in left subtree)
-        TreeNode *tmp = cur->left;
+        // Step A: Find the inorder predecessor of 'curr'
+        TreeNode *pred = curr->left;
 
-        while (tmp->right && tmp->right != cur)
-        { // Note amortized to O(N) after whole traversal
-          tmp = tmp->right;
-        }
-
-        if (tmp->right == cur)
+        // Go as far right as possible.
+        // Stop if we hit a null (end of leaf) OR if we hit 'curr'
+        // (meaning our temporary bridge already exists).
+        while (pred->right != nullptr && pred->right != curr)
         {
-          // Thread exists -> remove it and move to right
-          tmp->right = NULL;
-          cur = cur->right;
+          pred = pred->right;
         }
+
+        // Step B: Build the bridge
+        if (pred->right == nullptr)
+        {
+          pred->right = curr; // Create temporary thread back to parent
+          curr = curr->left;  // Safely traverse down the left side
+        }
+        // Step C: Cross and destroy the bridge
         else
         {
-          // Create thread to return here later, visit current before going left
-          ans.push_back(cur->val); // Note: moved here because pre-order
-          tmp->right = cur;
-          cur = cur->left;
+          pred->right = nullptr;        // Restore tree structure
+          inorder.push_back(curr->val); // Left is done, process parent
+          curr = curr->right;           // Move to right subtree
         }
       }
     }
-  }
 
+    return inorder;
+  }
+};
+
+//-------------------------------------------------------------------------------
+// 2. Title: Morris Preorder Traversal PRE Order
+//-------------------------------------------------------------------------------
+/**
+ * ============================================================================
+ * TREE ALGORITHM: MORRIS PREORDER TRAVERSAL (O(1) SPACE)
+ * ============================================================================
+ * * [THE MENTAL MODEL]
+ * Preorder visits the Root *before* its children. Therefore, in Morris Traversal,
+ * we must process the current node the very first time we see it, which is
+ * right before we step down into its left subtree (when we build the bridge).
+ * * * [APPROACH]
+ * 1. If no left child: Process current node, move right.
+ * 2. If left child exists: Find the Inorder Predecessor.
+ * - Case A (Bridge doesn't exist): Process the current node FIRST (Preorder rule).
+ * Then build the bridge to guarantee a return path, and move left.
+ * - Case B (Bridge already exists): We are returning from the left subtree.
+ * Do NOT process the node again. Just destroy the bridge to restore
+ * the tree structure, and move right.
+ * * * [COMPLEXITY]
+ * Time: O(N) -> Every edge is traversed at most 3 times.
+ * Space: O(1) -> Only uses two pointers, no recursion stack.
+ * ============================================================================
+ */
+class Solution
+{
 public:
   vector<int> preorderTraversal(TreeNode *root)
   {
 
-    vector<int> ans;
+    vector<int> preorder;
+    TreeNode *cur = root;
 
-    if (root == NULL)
-      return ans;
+    while (cur)
+    {
 
-    preorderTraversal_Morris(root, ans);
+      // Case 1: No left child. Process Root, move Right.
+      if (cur->left == nullptr)
+      {
+        preorder.push_back(cur->val);
+        cur = cur->right;
+      }
+      // Case 2: Left child exists. Handle the predecessor bridge.
+      else
+      {
+        TreeNode *pred = cur->left;
 
-    return ans;
+        // Find the rightmost node in the left subtree
+        while (pred->right && pred->right != cur)
+        {
+          pred = pred->right;
+        }
+
+        // Subcase A: First time visiting this root.
+        // Process it BEFORE going left!
+        if (pred->right == nullptr)
+        {
+          preorder.push_back(cur->val); // <-- Preorder magic happens here
+          pred->right = cur;            // Build the bridge
+          cur = cur->left;              // Step down into left subtree
+        }
+        // Subcase B: Returning from the left subtree.
+        else
+        {
+          pred->right = nullptr; // Destroy the bridge
+          cur = cur->right;      // Move to right subtree
+        }
+      }
+    }
+
+    return preorder;
+  }
+};
+
+//-------------------------------------------------------------------------------
+// 3. Title: Morris Preorder Traversal POST order   [NOT UNDERSTOOD]
+//-------------------------------------------------------------------------------
+
+/**
+ * ============================================================================
+ * TREE ALGORITHM: MORRIS POSTORDER TRAVERSAL (O(1) SPACE)
+ * ============================================================================
+ * * [THE INTUITION]
+ * Postorder requires Left -> Right -> Root. To print the right boundary of a
+ * left subtree bottom-up without using an O(H) memory stack, we temporarily
+ * reverse the `right` pointers of that boundary (like reversing a singly
+ * linked list), record the values, and then reverse them back to restore
+ * the tree structure.
+ * * * [APPROACH]
+ * 1. Introduce a `dummy` node where `dummy->left = root` so the final right
+ * boundary of the true root gets harvested naturally.
+ * 2. When a bridge is crossed (`pred->right == curr`), before moving right,
+ * reverse the path from `curr->left` to `pred`.
+ * 3. Collect the node values from `pred` back up to `curr->left`.
+ * 4. Reverse the path a second time to perfectly restore the tree.
+ * ============================================================================
+ */
+class Solution
+{
+private:
+  /**
+   * @brief Reverses the 'right' pointers of a chain from 'start' to 'end'
+   * (Standard in-place singly linked list reversal)
+   */
+  void reversePath(TreeNode *start, TreeNode *end)
+  {
+    if (start == end)
+      return;
+
+    TreeNode *prev = start;
+    TreeNode *curr = start->right;
+    TreeNode *nextNode = nullptr;
+
+    while (prev != end)
+    {
+      nextNode = curr->right;
+      curr->right = prev; // Flip the pointer backward
+      prev = curr;
+      curr = nextNode;
+    }
+  }
+
+  /**
+   * @brief Reverses a boundary segment, extracts its values sequentially,
+   * and immediately restores it back to its original state.
+   */
+  void processPath(TreeNode *start, TreeNode *end, vector<int> &postorder)
+  {
+    // Step 1: Flip pointers so 'end' becomes the accessible head
+    reversePath(start, end);
+
+    // Step 2: Traverse from the bottom node back up to the top node
+    TreeNode *curr = end;
+    while (true)
+    {
+      postorder.push_back(curr->val);
+      if (curr == start)
+        break;
+      curr = curr->right;
+    }
+
+    // Step 3: Flip pointers back to fully restore tree integrity
+    reversePath(end, start);
+  }
+
+public:
+  vector<int> postorderTraversal(TreeNode *root)
+  {
+    vector<int> postorder;
+    if (!root)
+      return postorder;
+
+    // Create a temporary dummy frame to catch the main root's right boundary
+    TreeNode *dummy = new TreeNode(0);
+    dummy->left = root;
+    TreeNode *curr = dummy;
+
+    while (curr != nullptr)
+    {
+      // Case 1: No left child, drift to the right branch
+      if (curr->left == nullptr)
+      {
+        curr = curr->right;
+      }
+      // Case 2: Left child exists. Manage the bridge.
+      else
+      {
+        TreeNode *pred = curr->left;
+        while (pred->right != nullptr && pred->right != curr)
+        {
+          pred = pred->right;
+        }
+
+        // Subcase A: First time seeing this subtree. Build the bridge.
+        if (pred->right == nullptr)
+        {
+          pred->right = curr;
+          curr = curr->left;
+        }
+        // Subcase B: Returning via an existing bridge!
+        else
+        {
+          // Harvest the right boundary of this completed left subtree in reverse
+          processPath(curr->left, pred, postorder);
+
+          pred->right = nullptr; // Destroy the bridge
+          curr = curr->right;    // Move to right subtree
+        }
+      }
+    }
+
+    // Clean up heap allocation for the dummy node
+    delete dummy;
+    return postorder;
   }
 };
 
