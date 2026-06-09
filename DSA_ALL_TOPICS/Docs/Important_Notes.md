@@ -1331,5 +1331,41 @@ The std::string::erase() function has overloads that take a starting position (i
           vector<int> one, two;
           swap(one,two); //swallo copy -> swaps just the variable names using in built move().
     ```
-63. 
+63. Subarray Combinatorics: Counting Subarrays with a Fixed Element
+
+     **Formula:**
+     The total number of valid subarrays that strictly include a specific fixed element is:
+     $$\text{Total Subarrays} = (L + 1) \times (R + 1)$$
+
+     **Variables:**
+     * **$L$**: The number of contiguous elements strictly to the **left** of the fixed element.
+     * **$R$**: The number of contiguous elements strictly to the **right** of the fixed element.
+
+     **Why it works:**
+     To form a valid subarray, you must pick one starting boundary and one ending boundary.
+     * You have $(L + 1)$ choices for the start (the element itself + $L$ elements to its left).
+     * You have $(R + 1)$ choices for the end (the element itself + $R$ elements to its right).
+     Since these choices are independent, you multiply them.
+
+     ### Example
+
+     Given the array: `[A, B, X, C, D]`
+     Find all subarrays containing the fixed element **`X`**.
+
+     **1. Calculate Variables:**
+     * Elements to the left (`A`, `B`) $\rightarrow L = 2$
+     * Elements to the right (`C`, `D`) $\rightarrow R = 2$
+
+     **2. Apply Formula:**
+     * $(2 + 1) \times (2 + 1) = 3 \times 3 = \textbf{9 total subarrays}$
+
+     **3. The 9 Valid Subarrays:**
+     * **Starting at A:** `[A, B, X]`, `[A, B, X, C]`, `[A, B, X, C, D]`
+     * **Starting at B:** `[B, X]`, `[B, X, C]`, `[B, X, C, D]`
+     * **Starting at X:** `[X]`, `[X, C]`, `[X, C, D]`
+
+     > **Note:** This property is the mathematical backbone for Monotonic Stack problems like *Sum of Subarray Minimums* and *Sum of Subarray Ranges*.
+64. 
+
+
 ---
