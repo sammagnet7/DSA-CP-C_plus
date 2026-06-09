@@ -36,11 +36,17 @@ Notice that by initializing the pointer to a non-existent smallest number, the f
 You may assume that next() calls will always be valid. That is, there will be at least a next number in the in-order traversal when next() is called.
 
 Example 1:
-  Input
-  ["BSTIterator", "next", "next", "hasNext", "next", "hasNext", "next", "hasNext", "next", "hasNext"]
-  [[[7, 3, 15, null, null, 9, 20]], [], [], [], [], [], [], [], [], []]
-  Output
-  [null, 3, 7, true, 9, true, 15, true, 20, false]
+  Input:
+    ["BSTIterator", "next", "next", "hasNext", "next", "hasNext", "next", "hasNext", "next", "hasNext"]
+    [[[7, 3, 15, null, null, 9, 20]], [], [], [], [], [], [], [], [], []]
+
+           (7)
+         /   \
+       (3)   (15)
+             /  \
+           (9)  (20)
+
+  Output:   [null, 3, 7, true, 9, true, 15, true, 20, false]
 
   Explanation
   BSTIterator bSTIterator = new BSTIterator([7, 3, 15, null, null, 9, 20]);
@@ -55,25 +61,22 @@ Example 1:
   bSTIterator.hasNext(); // return False
 
 
+Constraints:
+  The number of nodes in the tree is in the range [1, 10^5].
+  0 <= Node.val <= 10^6
+  At most 10^5 calls will be made to hasNext, and next.
+
+
+Follow up:
+Could you implement next() and hasNext() to run in average O(1) time and use O(h) memory, where h is the height of the tree?
+
+
 INPUT::::::
 
 
 OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
-
-2. Title:
-
-Links:
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
 
 */
 struct TreeNode
@@ -86,95 +89,81 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
-
-template <typename T>
-class BinaryTreeNode
-{
-public:
-  T data;
-  BinaryTreeNode<T> *left;
-  BinaryTreeNode<T> *right;
-
-  BinaryTreeNode(T data)
-  {
-    this->data = data;
-    left = NULL;
-    right = NULL;
-  }
-};
-
-
 //-------------------------------------------------------------------------------
 // 1. Title: BST iterator
 //-------------------------------------------------------------------------------
 
-class BSTIterator {
+/**
+ * ============================================================================
+ * BST ALGORITHM: BINARY SEARCH TREE ITERATOR (O(h) SPACE)
+ * ============================================================================
+ * * [THE MENTAL MODEL]
+ * We simulate a "Paused" Inorder Traversal (Left -> Root -> Right).
+ * We maintain a stack that holds the strict "left spine" of the current
+ * traversal path.
+ * 1. Constructor: Initialize by pushing the root and its entire left lineage.
+ * 2. next(): Pop and return the top node. If that node has a right child,
+ * we push that right child and its entire left lineage onto the stack.
+ * * * [COMPLEXITY ANALYSIS]
+ * - TIME COMPLEXITY:
+ * - `hasNext()`: O(1) -> Just checking if the stack is empty.
+ * - `next()`: Amortized O(1) -> While there is a `while` loop inside, across
+ * the entire lifecycle of the iterator, every node in the tree is pushed
+ * exactly once and popped exactly once.
+ * - SPACE COMPLEXITY: O(h)
+ * - The stack only stores nodes along a single path from root to leaf,
+ * meaning the memory footprint never exceeds the height of the tree.
+ * ============================================================================
+ */
+class BSTIterator
+{
+private:
+  stack<TreeNode *> st;
+
 public:
-    // Stack to store the path to the next smallest node (left spine of the tree/subtree)
-    stack<TreeNode*> st;
+  BSTIterator(TreeNode *root)
+  {
+    // Initialize by diving all the way down the left spine
+    while (root != nullptr)
+    {
+      st.push(root);
+      root = root->left;
+    }
+  }
 
-    /**
-     * Constructor
-     * ------------
-     * Initializes the iterator to the smallest element in the BST by traversing to the 
-     * leftmost node and pushing all encountered nodes on the stack.
-     *
-     * @param root: Root node of the BST.
-     */
-    BSTIterator(TreeNode* root) {
-        while (root) {
-            st.push(root);
-            root = root->left; // Go as left as possible
-        }
+  int next()
+  {
+    // Pop the absolute smallest available element
+    TreeNode *cur = st.top();
+    st.pop();
+
+    // If this node has a right subtree, we must explore it.
+    // We step right, then dive all the way down its left spine.
+    TreeNode *tmp = cur->right;
+    while (tmp != nullptr)
+    {
+      st.push(tmp);
+      tmp = tmp->left;
     }
 
-    /**
-     * next()
-     * -------
-     * Returns the next smallest number in the BST.
-     * - Pops the top node from the stack (which is the current smallest).
-     * - If that node has a right subtree, push all left children of that subtree.
-     *
-     * @return: Value of the next smallest node.
-     */
-    int next() {
-        TreeNode* el = st.top(); // Current smallest
-        st.pop();
-        int ret = el->val;
+    return cur->val;
+  }
 
-        // If right child exists, push all left children of right subtree
-        el = el->right;
-        while (el) {
-            st.push(el);
-            el = el->left;
-        }
-
-        return ret;
-    }
-
-    /**
-     * hasNext()
-     * ----------
-     * Returns true if there is a next smallest number to be returned (i.e., stack is not empty).
-     *
-     * @return: Boolean indicating if another element exists in the iteration.
-     */
-    bool hasNext() {
-        return !st.empty();
-    }
+  bool hasNext()
+  {
+    // If the stack has elements, the traversal is not finished
+    return !st.empty();
+  }
 };
 
 int main()
 {
+
+  /**
+   * Your BSTIterator object will be instantiated and called as such:
+   * BSTIterator* obj = new BSTIterator(root);
+   * int param_1 = obj->next();
+   * bool param_2 = obj->hasNext();
+   */
   return 0;
 }
