@@ -26,22 +26,36 @@ https://leetcode.com/problems/two-sum-iv-input-is-a-bst/
 
 
 Problem statement:
-Given the root of a binary search tree and an integer k, return true if there exist two elements in the BST such that their sum is equal to k, or false otherwise.
+Given the root of a Binary Search Tree and an integer k, return true if there exist two elements in the BST such that their sum is equal to k, or false otherwise.
 
 Examples:
   Example 1:
   Input: root = [5,3,6,2,4,null,7], k = 9
+
+            (5)
+           /   \
+         (3)   (6)
+         / \     \
+       (2) (4)   (7)
+
   Output: true
 
   Example 2:
   Input: root = [5,3,6,2,4,null,7], k = 28
+
+            (5)
+           /   \
+         (3)   (6)
+         / \     \
+       (2) (4)   (7)
+
   Output: false
 
 Constraints:
-  The number of nodes in the tree is in the range [1, 104].
-  -104 <= Node.val <= 104
-  root is guaranteed to be a valid binary search tree.
-  -105 <= k <= 105
+  The number of nodes in the tree is in the range [1, 10^4].
+  -10^4 <= Node.val <= 10^4
+  root is guaranteed to be a valid Binary Search Tree.
+  -10^5 <= k <= 10^5
 
 
 INPUT::::::
@@ -50,19 +64,6 @@ INPUT::::::
 OUTPUT::::::
 
 ----------------------------------------------------------------------------------------------------
-
-2. Title:
-
-Links:
-
-Problem statement:
-
-
-INPUT::::::
-
-
-OUTPUT::::::
-
 
 */
 struct TreeNode
@@ -75,165 +76,214 @@ struct TreeNode
   TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-template <typename T = int>
-struct TreeNodeN
-{
-  int data;
-  TreeNodeN *left;
-  TreeNodeN *right;
-  TreeNodeN() : data(0), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x) : data(x), left(nullptr), right(nullptr) {}
-  TreeNodeN(int x, TreeNodeN *left, TreeNodeN *right) : data(x), left(left), right(right) {}
-};
-
-template <typename T>
-class BinaryTreeNode
-{
-public:
-  T data;
-  BinaryTreeNode<T> *left;
-  BinaryTreeNode<T> *right;
-
-  BinaryTreeNode(T data)
-  {
-    this->data = data;
-    left = NULL;
-    right = NULL;
-  }
-};
-
 //-------------------------------------------------------------------------------
 // 1. Title: Two sum in BST
 //-------------------------------------------------------------------------------
 
 /**
- * Class: BSTIterator
- * -------------------
- * Implements an iterator for in-order or reverse in-order traversal on a BST.
- * It uses a stack to simulate the traversal iteratively.
- *
- * isReverse = false → Normal in-order (ascending)
- * isReverse = true  → Reverse in-order (descending)
- *
- * Time Complexity (next, hasNext): O(1) amortized
- * Space Complexity: O(H), where H is the height of the tree
+ * =============================================================================
+ * Approach 1: HASH SET APPROACH  [SUB-OPTIMAL] [O(N) space -> optimize to O(H)]
+ * =============================================================================
+ * * [THE MENTAL MODEL]
+ * We traverse the tree (in any order) while maintaining a Hash Set of all
+ * previously visited values. For every node, we check if its mathematical
+ * complement (`target - node->val`) already exists in the set.
+ * * NOTE: While this works perfectly, it ignores the sorted property of a BST.
+ * This is the optimal approach for an UNSORTED Binary Tree, but for a strict
+ * BST, the O(h) space Dual Iterator approach is vastly preferred.
+ * * * [COMPLEXITY ANALYSIS]
+ * - TIME COMPLEXITY: O(N)
+ * We visit each node at most once. Set insertions and lookups are O(1).
+ * - SPACE COMPLEXITY: O(N)
+ * In the worst-case scenario (no valid pair exists), every single node's
+ * value will be stored in the `unordered_set`.
+ * ============================================================================
  */
-class BSTIterator
+class Solution
 {
-public:
-  stack<TreeNode *> st; // Stack to simulate recursive traversal
-  bool isReverse;       // Flag to determine direction of traversal
-
-  // Constructor for in-order (ascending) traversal
-  BSTIterator(TreeNode *root) : isReverse(false)
+private:
+  bool checkTarget(TreeNode *node, int target, unordered_set<int> &st)
   {
-    while (root)
+
+    // Base case: We fell off the tree
+    if (!node)
     {
-      st.push(root);
-      root = root->left; // Go as left as possible
+      return false;
     }
-  }
 
-  // Constructor for general use (in-order or reverse in-order)
-  BSTIterator(TreeNode *root, bool rev) : isReverse(rev)
-  {
-    pushAll(root);
-  }
-
-  // Returns the next node in traversal
-  int next()
-  {
-    TreeNode *el = st.top();
-    st.pop();
-    int ret = el->val;
-
-    // For reverse traversal, go to left subtree
-    // For in-order traversal, go to right subtree
-    if (isReverse)
+    // Check if we have already seen the complement needed to hit the target
+    if (st.find(target - node->val) != st.end())
     {
-      pushAll(el->left);
+      return true;
+    }
+
+    // Add the current node to our set of "seen" values
+    st.insert(node->val);
+
+    // Recursively search the left branch. If it finds the pair, short-circuit and return true.
+    if (checkTarget(node->left, target, st))
+    {
+      return true;
+    }
+
+    // Recursively search the right branch.
+    return checkTarget(node->right, target, st);
+  }
+
+public:
+  bool findTarget(TreeNode *root, int k)
+  {
+    unordered_set<int> st;
+    return checkTarget(root, k, st);
+  }
+};
+
+/**
+ * ============================================================================
+ * Approach 2: Using BST ITERATORS  [OPTIMAL] [O(H) space]
+ * ============================================================================
+ * * [THE MENTAL MODEL]
+ * To find if two nodes sum to a target 'k', we simulate the classic Two-Pointer
+ * approach used on sorted arrays. We start one pointer at the absolute minimum
+ * (Forward Iterator) and one at the absolute maximum (Backward Iterator).
+ * If the sum is too small, we advance the Forward Iterator. If the sum is too
+ * large, we advance the Backward Iterator, squeezing them together until they
+ * cross paths.
+ * * * [HOW WE ACHIEVED O(H) SPACE INSTEAD OF O(N)]
+ * The brute-force way to do this is to run a full Inorder Traversal, flatten
+ * the tree into an array, and run the Two-Pointer logic on the array. However,
+ * an array stores EVERY node simultaneously, requiring O(N) memory.
+ * * Instead, this `BstIterator` creates a "Paused Traversal". It uses a stack
+ * to traverse the tree dynamically, pausing at each node. Because the stack
+ * only needs to remember the ancestry path from the root down to the current
+ * node (a single "spine" of the tree), the stack size never exceeds the maximum
+ * depth of the tree. Therefore, memory usage drops from O(N) to O(h).
+ * * * * [COMPLEXITY ANALYSIS]
+ * - TIME COMPLEXITY: O(N)
+ * Every node is pushed and popped from a stack at most once.
+ * - SPACE COMPLEXITY: O(h)
+ * Where 'h' is the height of the tree. Two stacks are used, each bounded by O(h).
+ * ============================================================================
+ */
+
+class BstIterator
+{
+private:
+  stack<TreeNode *> st;
+  bool isFwd; // True = Ascending (Left-to-Right), False = Descending (Right-to-Left)
+
+public:
+  // Constructor: Initializes the stack by diving down the appropriate extreme edge
+  BstIterator(TreeNode *root, bool fwd) : isFwd(fwd)
+  {
+    if (isFwd)
+    {
+      // Forward Iterator: Dive down the left spine to find the absolute minimum
+      while (root != nullptr)
+      {
+        st.push(root);
+        root = root->left;
+      }
     }
     else
     {
-      pushAll(el->right);
+      // Backward Iterator: Dive down the right spine to find the absolute maximum
+      while (root != nullptr)
+      {
+        st.push(root);
+        root = root->right;
+      }
     }
-
-    return ret;
   }
 
-  // Checks if more elements are left in traversal
   bool hasNext()
   {
     return !st.empty();
   }
 
-private:
-  /**
-   * Utility to push a path of nodes into the stack depending on traversal type.
-   * For in-order → go leftwards.
-   * For reverse in-order → go rightwards.
-   */
-  void pushAll(TreeNode *node)
+  // Returns the next sequential node in the paused traversal
+  TreeNode *next()
   {
-    while (node)
+    TreeNode *ret = st.top();
+    st.pop();
+
+    if (isFwd)
     {
-      st.push(node);
-      if (isReverse)
-        node = node->right;
-      else
-        node = node->left;
+      // If moving forward, explore the right subtree by diving down its left spine
+      TreeNode *tmp = ret->right;
+      while (tmp != nullptr)
+      {
+        st.push(tmp);
+        tmp = tmp->left;
+      }
     }
+    else
+    {
+      // If moving backward, explore the left subtree by diving down its right spine
+      TreeNode *tmp = ret->left;
+      while (tmp != nullptr)
+      {
+        st.push(tmp);
+        tmp = tmp->right;
+      }
+    }
+
+    return ret;
   }
 };
 
-/**
- * Method: findTarget
- * -------------------
- * Given a BST and an integer k, determines whether there exists two elements
- * in the BST such that their sum is equal to k.
- *
- * Uses two iterators (one in-order and one reverse in-order) to simulate the
- * two-pointer technique on sorted data.
- *
- * Time Complexity: O(N)
- * Space Complexity: O(H) + O(H) = O(H)  // For both iterators
- */
 class Solution
 {
 public:
   bool findTarget(TreeNode *root, int k)
   {
-    if (root == NULL)
-      return false;
 
-    // Create two BST iterators
-    BSTIterator *forw = new BSTIterator(root);        // In-order
-    BSTIterator *backw = new BSTIterator(root, true); // Reverse in-order
+    // Spin up the two paused-traversals.
+    // Allocated on the stack (not heap) to automatically prevent memory leaks.
+    BstIterator f(root, true);  // Finds minimums
+    BstIterator b(root, false); // Finds maximums
 
-    int l = forw->next();  // smallest value
-    int r = backw->next(); // largest value
+    // Grab the absolute smallest and largest nodes in the BST
+    TreeNode *l = f.next();
+    TreeNode *r = b.next();
 
-    // Use two-pointer technique to search for target sum
-    while (l < r)
+    // Squeeze the pointers together.
+    // Because we returned actual pointers, we can verify they crossed paths
+    // by simply checking if they point to the exact same memory address!
+    while (l != r)
     {
-      int sum = l + r;
+
+      int sum = l->val + r->val;
+
       if (sum == k)
-        return true;
+      {
+        return true; // Target match found
+      }
       else if (sum > k)
       {
-        // Decrease the larger value
-        if (backw->hasNext())
-          r = backw->next();
+        // The sum is too large. We need a smaller number.
+        // Advance the backward iterator (which yields smaller maximums).
+        if (b.hasNext())
+        {
+          r = b.next();
+        }
         else
-          break;
+        {
+          break; // Exhausted the tree
+        }
       }
       else
       {
-        // Increase the smaller value
-        if (forw->hasNext())
-          l = forw->next();
+        // The sum is too small. We need a larger number.
+        // Advance the forward iterator (which yields larger minimums).
+        if (f.hasNext())
+        {
+          l = f.next();
+        }
         else
-          break;
+        {
+          break; // Exhausted the tree
+        }
       }
     }
 
